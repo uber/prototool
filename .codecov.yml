@@ -1,0 +1,18 @@
+codecov:
+  branch: dev
+coverage:
+  range: 50...90
+  status:
+    project:
+      default:
+        enabled: yes
+        target: 50%
+    patch:
+      default:
+        enabled: yes
+        target: 50%
+ignore:
+  - /example/cmd/excited
+  - /example/gen/proto/go/foo
+  - /example/gen/proto/go/sub
+  - /internal/x/cmd/testdata/grpc/gen/grpcpb

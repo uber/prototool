@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package style.dep;
+
+option go_package = "deppb";
+option java_package = "com.style.dep.pb";
+
+// Dep is a dep.
+message Dep {
+  string value = 1;
+}

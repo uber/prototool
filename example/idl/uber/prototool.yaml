@@ -1,0 +1,33 @@
+# if starting from scratch in development, run "make init example" to get/build the .gitignored files
+protoc_includes:
+  # note vendor is .gitignored
+  - ../../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+protoc_include_wkt: true
+lint:
+  # run "prototool list-linters" to see the currently configured linters
+  # add "exclude_ids" to ignore specific linter IDs for all files
+  ignore_id_to_files:
+    REQUEST_RESPONSE_TYPES_IN_SAME_FILE:
+      - foo/foo.proto
+    REQUEST_RESPONSE_TYPES_UNIQUE:
+      - foo/foo.proto
+gen:
+  go_options:
+    import_path: github.com/uber/prototool/example/idl/uber
+    extra_modifiers:
+      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
+      google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
+  plugins:
+    - name: gogoslick
+      type: gogo
+      flags: plugins=grpc
+      output: ../../gen/proto/go
+    - name: yarpc-go
+      type: gogo
+      output: ../../gen/proto/go
+      # note ../../gen/proto/java is .gitignored
+    - name: java
+      output: ../../gen/proto/java
+    - name: grpc-gateway
+      type: go
+      output: ../../gen/proto/go

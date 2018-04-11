@@ -1,0 +1,30 @@
+package: github.com/uber/prototool
+import:
+  - package: github.com/emicklei/proto
+  - package: github.com/fullstorydev/grpcurl
+  - package: github.com/gogo/protobuf/protoc-gen-gogoslick
+  - package: github.com/golang/protobuf/protoc-gen-go
+  - package: github.com/jhump/protoreflect/dynamic
+  - package: github.com/spf13/cobra
+  - package: github.com/spf13/pflag
+  - package: go.uber.org/atomic
+  - package: go.uber.org/multierr
+  - package: go.uber.org/zap
+  - package: google.golang.org/grpc
+    repo: https://github.com/grpc/grpc-go
+  - package: gopkg.in/yaml.v2
+testImport:
+  - package: github.com/golang/glog
+  - package: github.com/golang/lint/golint
+  - package: github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+  - package: github.com/kisielk/errcheck
+  - package: github.com/kisielk/gotool
+  - package: github.com/stretchr/testify
+  - package: github.com/wadey/gocovmerge
+  - package: go.uber.org/tools/update-license
+  - package: go.uber.org/yarpc/encoding/protobuf/protoc-gen-yarpc-go
+  - package: golang.org/x/lint
+  - package: golang.org/x/tools/cmd/cover
+  - package: google.golang.org/genproto/googleapis/api/annotations
+  - package: honnef.co/go/tools/cmd/staticcheck
+  - package: honnef.co/go/tools/cmd/unused

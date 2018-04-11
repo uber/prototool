@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+import "google/protobuf/descriptor.proto";
+
+package bar;
+
+option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BarProto";
+option java_package = "com.bar.pb";
+
+extend google.protobuf.MessageOptions {
+  optional bool message_option_proto2 = 90001 [default = false];
+}
+
+extend google.protobuf.FileOptions {
+  optional bool file_option_proto2 = 90002 [default = false];
+}

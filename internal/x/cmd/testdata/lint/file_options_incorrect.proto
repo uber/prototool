@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package foo;
+
+option go_package = "barpb";
+option java_multiple_files = false;
+option java_outer_classname = "BarProto";
+option java_package = "com.bar.pb";
+

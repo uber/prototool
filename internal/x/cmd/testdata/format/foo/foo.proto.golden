@@ -1,0 +1,123 @@
+// foo
+
+// bar
+
+syntax = "proto3"; // inline comment1
+
+// comment9
+import "google/protobuf/timestamp.proto"; // inline comment9
+
+//comment10
+import "bar/bar.proto"; //inline comment10
+// comment2
+import "bar/bar_proto2.proto"; // inline comment2
+
+package foo; // inline comment3
+
+// comment4
+option go_package = "foopb"; // inline comment4
+// comment11
+option java_multiple_files = true; //inline comment11
+// comment5
+option java_outer_classname = "FooProto"; // inline comment5
+// comment12
+option java_package = "com.foo.pb"; // inline comment23
+// comment16
+option (bar.file_dep_option) = { hello: 1 }; // inline comment16
+// comment6
+option (bar.file_option) = true; // inline comment6
+// comment7
+option (bar.file_option_proto2) = true; //inline comment7
+
+// baz
+
+// bat
+// ban
+
+// Baz is a baz.
+message Baz {
+	// comment14
+	// still comment14
+	option (bar.message_option) = true; // inline comment14
+	//
+	//  comment c-style
+	//  
+	option (bar.message_option_proto2) = true;
+	// comment15
+	option (bar.message_dep_option) = { hello: 1 }; // inline comment15
+	int64 hello = 1;
+	// unassociated comment
+
+	// another unassociated comment
+
+	// dep comment
+	bar.Dep dep = 2;
+	google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
+	int64 woot = 5 [
+		(bar.field_option) = true
+	];
+	// comment17
+	int64 woot2 = 6 [
+		(bar.field_dep_option) = { hello: 1 },
+		(bar.field_option) = true
+	]; // inline comment17
+	map<string, int64> m = 11;
+	map<string, int64> m2 = 12 [
+		(bar.field_dep_option) = { hello: 1 },
+		(bar.field_option) = true
+	];
+	oneof test_oneof {
+		// TODO: readd when oneof options handled
+		option (bar.oneof_option) = true; // inline comment18
+		option (bar.oneof_dep_option) = { hello: 1 }; // inline comment19
+		int64 foo1 = 8;
+		string foo2 = 9;
+		// comment18
+		int64 woot3 = 10 [
+			(bar.field_dep_option) = { hello: 1 },
+			(bar.field_option) = true
+		]; // inline comment18
+		// comment21
+		bar.Dep dep2 = 14; // inline comment21
+	}
+}
+
+// Bat is a bat.
+message Bat {
+	reserved 2 to 10, 1000 to 1100;
+	reserved "foo";
+	reserved "bar", "baz";
+	// NestedBat is a nested bat.
+	message NestedBat {
+		int64 hello = 1;
+	}
+}
+
+// Empty is an empty message.
+message Empty {}
+
+// Something is something.
+enum Something {
+	option (bar.enum_option) = true;
+	// comment25
+	 SOMETHING_INVALID = 0 [
+		(bar.enum_value_option) = true
+	]; // inline comment25
+	// comment27
+	SOMETHING_UNSET = 1; // inline comment27
+	// comment28
+	SOMETHING_FOO = 2; // inline comment28
+}
+
+// Daylight is the daylight service.
+service Daylight {
+	option (bar.service_option) = true; // inline comment29
+	option (bar.service_dep_option) = { hello: 1 }; // inline comment30
+	rpc Hello(Bat) returns (Empty) {
+		option (bar.method_dep_option) = {
+			hello: 1
+			bar: 2
+		}; // inline comment22
+	} // inline comment23
+	rpc Foo(Empty) returns (Bat); // inline comment24
+}

@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package grpc;
+
+option java_multiple_files = true;
+option java_outer_classname = "GrpcProto";
+option java_package = "com.grpc.pb";
+option go_package = "grpcpb";
+
+message ExclamationRequest {
+  string value = 1;
+}
+
+message ExclamationResponse {
+  string value = 1;
+}
+
+// ExcitedService is a service with exciting transformations.
+service ExcitedService {
+  // Exclamation adds an exclamation to the request value.
+  rpc Exclamation(ExclamationRequest) returns (ExclamationResponse) {}
+  // ExclamationClientStream adds an exclamation to the combined request values.
+  rpc ExclamationClientStream(stream ExclamationRequest) returns (ExclamationResponse) {}
+  // ExclamationServerStream adds an exclamation to the request value
+  // and streams each character as a response.
+  rpc ExclamationServerStream(ExclamationRequest) returns (stream ExclamationResponse) {}
+  // ExclamationBidiStream adds an exclamation to the each request value.
+  rpc ExclamationBidiStream(stream ExclamationRequest) returns (stream ExclamationResponse) {}
+}

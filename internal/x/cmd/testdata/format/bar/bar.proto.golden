@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+import "google/protobuf/descriptor.proto";
+
+package bar;
+
+option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BarProto";
+option java_package = "com.bar.pb";
+
+// Dep is a dep.
+message Dep {
+	int64 hello = 1;
+	int64 bar = 2;
+}
+
+extend google.protobuf.MessageOptions {
+	bool message_option = 80001;
+	Dep message_dep_option = 80003;
+}
+
+extend google.protobuf.FileOptions {
+	bool file_option = 80002;
+	Dep file_dep_option = 80004;
+}
+
+extend google.protobuf.FieldOptions {
+	bool field_option = 80006;
+	Dep field_dep_option = 80007;
+}
+
+extend google.protobuf.OneofOptions {
+	bool oneof_option = 80008;
+	Dep oneof_dep_option = 80009;
+}
+
+extend google.protobuf.MethodOptions {
+	bool method_option = 80010;
+	Dep method_dep_option = 80011;
+}
+
+extend google.protobuf.EnumOptions {
+	bool enum_option = 80012;
+	Dep enum_dep_option = 80014;
+}
+
+extend google.protobuf.EnumValueOptions {
+	bool enum_value_option = 80015;
+	Dep enum_value_dep_option = 80016;
+}
+
+extend google.protobuf.ServiceOptions {
+	bool service_option = 80012;
+	Dep service_dep_option = 80014;
+}

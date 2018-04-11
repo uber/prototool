@@ -1,0 +1,139 @@
+# The Protobuf version to use from https://github.com/google/protobuf/releases.
+# By default use 3.5.1.
+# You probably want to set this to make your builds completely reproducible.
+protoc_version: 3.5.1
+
+# Paths to exclude when using directory mode.
+# These are prefixes, not regexes, so path/to/a will ignore anything beginning with
+# $(dirname some/dir/prototool.yaml)/path/to/a including for example $(dirname some/dir/prototool.yaml)/path/to/ab.
+excludes:
+  - path/to/a
+  - path/to/b/file.proto
+
+# Do not use the default exclude paths.
+# The only default exclude path is "vendor".
+no_default_excludes: true
+
+# Additional paths to include with -I to protoc.
+# By default, the directory of the config file is included,
+# or the current directory if there is no config file.
+protoc_includes:
+  - ../../vendor/github.com/grpc-ecosystem/grpc-gateweay/third_party/googleapis
+
+# Include the Well-Known Types when compiling with protoc.
+# For example, this allows you to do import "google/protobuf/timestamp.proto" in your Protobuf files.
+protoc_include_wkt: true
+
+# If not set, compile will fail if there are unused imports.
+# Setting this will ignore unused imports.
+allow_unused_imports: true
+
+# Lint directives.
+lint:
+  # Linter * files to ignore.
+  ignore_id_to_files:
+    RPC_NAMES_CAMEL_CASE:
+      - path/to/foo.proto
+      - path/to/bar.proto
+    SYNTAX_PROTO3:
+      - path/to/foo.proto
+
+  # When specifying linters, you can only specify ids, or any combination of
+  # group,include_ids,exclude_ids, but not ids and any of those three.
+  # Run prototool list-all-linters to see all available linters.
+  # All are specified just for this example.
+  # By default, the default group of linters is used.
+
+  # The specific linters to use.
+  ids:
+    - ENUM_NAMES_CAMEL_CASE
+    - ENUM_NAMES_CAPITALIZED
+
+  # The lint group to use.
+  # The only valid value as of now is default, which is also the default value.
+  group: default
+
+  # Linters to include that are not in the lint group.
+  include_ids:
+    - REQUEST_RESPONSE_NAMES_MATCH_RPC
+
+  # Linters to exclude from the lint group.
+  exclude_ids:
+    - ENUM_NAMES_CAMEL_CASE
+
+# Format directives.
+format:
+  # The indent to use. This should be Xt or Xs, where X >= 1 and "t"
+  # represents tabs, "s" represents spaces.
+  # If empty, format will use two spaces.
+  indent: 1t
+
+  # Use semicolons to finish RPC definitions when possible, ie when the associated
+  # RPC hs no options. Otherwise format will always use {}.
+  rpc_use_semicolons: true
+
+  # Trim the newline from the end of the file. Otherwise ends the file with a newline.
+  trim_newline: true
+
+# Code generation directives.
+gen:
+  # Options that will apply to all plugins of type go, gogo, gogrpc, gogogrpc.
+  go_options:
+    # The base import path. This should be the go path of the prototool.yaml file.
+    # This is required if you have any go plugins.
+    import_path: uber/foo/bar.git/idl/uber
+
+    # Do not include default modifiers with Mfile=package.
+    # By default, modifiers are included for the Well-Known Types if
+    # protoc_include_wkt is set, and for all files in the compilation relative
+    # to the import path.
+    # ** Generally do not set this unless you know what you are doing. **
+    #no_default_modifiers: true
+
+    # Extra modifiers to include with Mfile=package.
+    extra_modifiers:
+      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
+      google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
+
+  # Plugin overrides. For example, if you set "grpc-gpp: /usr/local/bin/grpc_cpp_plugin",
+  # This will mean that a plugin named "grpc-gpp" in the plugins list will be looked for
+  # at "/usr/local/bin/grpc_cpp_plugin" by setting the
+  # "--plugin=protoc-gen-grpc-gpp=/usr/local/bin/grpc_cpp_plugin" flag on protoc.
+  plugin_overrides:
+    grpc-gpp: /usr/local/bin/grpc_cpp_plugin
+
+  # The list of plugins.
+  plugins:
+      # The plugin name. This will go to protoc with --name_out, so it either needs
+      # to be a built-in name (like java), or a plugin name with a binary
+      # protoc-gen-name.
+    - name: gogo
+
+      # The type, if any. Valid types are go, gogo.
+      # Use go if your plugin is a standard Golang plugin
+      # that uses github.com/golang/protobuf imports, use gogo
+      # if it uses github.com/gogo/protobuf imports. For protoc-gen-go
+      # use go, For protoc-gen-gogo, protoc-gen-gogoslick, etc, use gogo.
+      type: gogo
+
+      # Extra flags to specify.
+      # The only flag you will generally set is plugins=grpc for Golang.
+      # The Mfile=package flags are automatically set.
+      # ** Otherwise, enerally do not set this unless you know what you are doing. **
+      flags: plugins=grpc
+
+      # The path to output generated files to.
+      # If the directory does not exist, it will be created when running generation.
+      # This needs to be a relative path.
+      output: ../../.gen/proto/go
+
+    - name: yarpc-go
+      type: gogo
+      output: ../../.gen/proto/go
+
+    - name: grpc-gateway
+      type: go
+      output: ../../.gen/proto/go
+
+    - name: java
+      output: ../../.gen/proto/java

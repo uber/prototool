@@ -1,0 +1,14 @@
+/.glide
+/.idea
+/example/gen/proto/java
+/cover
+/cover.html
+/coverage.txt
+/internal/x/gen/gen-prototool-bash-completion/gen-prototool-bash-completion
+/internal/x/gen/gen-prototool-zsh-completion/gen-prototool-zsh-completion
+/internal/x/gen/gen-prototool-manpages/gen-prototool-manpages
+/cmd/prototool/prototool
+/main
+/prototool.iml
+/release
+/vendor

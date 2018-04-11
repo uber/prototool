@@ -1,0 +1,20 @@
+#compdef prototool
+
+_arguments \
+  '1: :->level1' \
+  '2: :_files'
+case $state in
+  level1)
+    case $words[1] in
+      prototool)
+        _arguments '1: :(all binary-to-json clean compile descriptor-proto download field-descriptor-proto files format gen grpc init json-to-binary lint list-all-lint-groups list-all-linters list-lint-group list-linters protoc-commands service-descriptor-proto version)'
+      ;;
+      *)
+        _arguments '*: :_files'
+      ;;
+    esac
+  ;;
+  *)
+    _arguments '*: :_files'
+  ;;
+esac

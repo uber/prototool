@@ -1,0 +1,12 @@
+protoc_include_wkt: true
+lint:
+  exclude_ids:
+  - REQUEST_RESPONSE_TYPES_UNIQUE
+gen:
+  go_options:
+    import_path: github.com/uber/prototool/internal/x/cmd/testdata/grpc
+  plugins:
+    - name: gogoslick
+      type: gogo
+      flags: plugins=grpc
+      output: gen/grpcpb

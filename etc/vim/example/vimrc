@@ -1,0 +1,22 @@
+Vundle 'w0rp/ale'
+Vundle 'uber/prototool' { 'rtp':'vim/prototool' }
+
+" I would recommend setting just this for Golang, as well as the necessary set for proto
+let g:ale_linters = {
+\   'go': ['golint'],
+\   'proto': ['prototool'],
+\}
+" If you don't set this, it will get annoying
+let g:ale_lint_on_text_changed = 'never'
+" Set to 'lint' to not do code generation
+" Set to 'compile' to not do linting either and just compile without code generation
+"let g:ale_proto_prototool_command = 'compile'
+
+" I have <leader> mapped to ",", uncomment this to set leader
+"let mapleader=","
+
+" ,f will toggle formatting on and off
+nnoremap <silent> <leader>f :call PrototoolFormatToggle()<CR>
+
+" Uncomment this to enable formatting by default
+"call PrototoolFormatEnable()

@@ -1,0 +1,58 @@
+// foo
+
+// bar
+
+syntax = "proto2"; // inline comment1
+
+// baz
+
+// comment3
+package foo; // inline comment3
+
+// bat
+// ban
+
+//comment10
+import "bar/bar.proto"; //inline comment10
+
+// comment2
+import "bar/bar_proto2.proto"; // inline comment2
+
+
+
+// comment11
+option java_multiple_files = true; //inline comment11
+// comment12
+option java_package = "com.foo.pb"; // inline comment23
+// comment4
+option go_package = "foopb"; // inline comment4
+// comment5
+option java_outer_classname = "FooProto"; // inline comment5
+// comment6
+option (bar.file_option) = true; // inline comment6
+// comment7
+option (bar.file_option_proto2) = true; //inline comment7
+// comment16
+option (bar.file_dep_option) = { hello: 1 }; // inline comment16
+
+// FooProto2 is a foo proto2.
+message FooProto2 {
+  extensions 10 to 20;
+  extensions 100 to 200, 2000 to 2500;
+  extensions 2700 to 2800, 3000 to max;
+
+  optional int64 hello = 1;
+
+  // comment20
+  optional group Group = 2 {
+    required int64 bar = 3;
+    optional int64 bar2 = 4;
+  }
+}
+
+message FooSomething {}
+
+// SomeService is a service.
+service SomeService {
+  rpc Echo(FooSomething) returns (FooProto2) {}
+}

@@ -1,0 +1,5 @@
+package foo;
+
+message Bar {
+  int64 hello = 1;
+}

@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+import "foo/dep.proto";
+import "google/api/annotations.proto";
+import "sub/sub.proto";
+
+package foo;
+
+option go_package = "foopb";
+option java_multiple_files = true;
+option java_package = "com.foo.pb";
+
+// Hello is a hello.
+enum Hello {
+  HELLO_INVALID = 0;
+  HELLO_UNSET = 1;
+  HELLO_TREE = 2;
+  HELLO_BALLOON = 3;
+}
+
+// Foo is a foo.
+message Foo {
+  // Bar is a bar.
+  message Bar {
+    // Baz is a baz.
+    enum Baz {
+      FOO_BAR_BAZ_INVALID = 0;
+    }
+    // Bat is a bat.
+    enum Bat {
+      FOO_BAR_BAT_INVALID = 0;
+    }
+    Baz baz = 1;
+    Bat bat = 2;
+  }
+  Bar bar = 1;
+}
+
+// Bar is a bar.
+enum Bar {
+  BAR_INVALID = 0;
+}
+
+// Barr is a barr.
+message Barr {
+  int64 hello = 1;
+  foo.Dep dep = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}
+
+// Another is another message.
+message Another {
+  int64 one = 1;
+  string two = 2;
+  Another another = 3;
+  repeated string four = 4;
+  Hello hello = 5;
+  map<string, int64> m = 6;
+  oneof oneof_oneof {
+    int64 seven = 7;
+    string eight = 8;
+  }
+  repeated Another nine = 9;
+  google.protobuf.Duration duration = 10;
+}
+
+// HasWKT has Well-Known Types.
+message HasWKT {
+  google.protobuf.Duration duration = 1;
+}
+
+// Bazz is a bazzzz.
+message Bazz {}
+
+// BarRequest is a bar request.
+message BarRequest {
+  int64 id = 1;
+}
+
+// FooResponse is an foo response.
+message FooResponse {
+  foo.Dep dep = 1;
+}
+
+// HelloService is a service.
+service HelloService {
+  // Foo does a foo.
+  rpc Foo(foo.sub.Dep) returns (FooResponse) {}
+  // Bar does a bar.
+  rpc Bar(BarRequest) returns (foo.Dep) {
+    option (google.api.http) = { get: "/bar/{id}" };
+  }
+}
+
+message ExclamationRequest {
+  string value = 1;
+}
+
+message ExclamationResponse {
+  string value = 1;
+}
+
+// ExcitedService is a service with exciting transformations.
+service ExcitedService {
+  // Exclamation adds an exclamation to the request value.
+  rpc Exclamation(ExclamationRequest) returns (ExclamationResponse) {}
+  // ExclamationClientStream adds an exclamation to the combined request values.
+  rpc ExclamationClientStream(stream ExclamationRequest) returns (ExclamationResponse) {}
+  // ExclamationServerStream adds an exclamation to the request value
+  // and streams each character as a response.
+  rpc ExclamationServerStream(ExclamationRequest) returns (stream ExclamationResponse) {}
+  // ExclamationBidiStream adds an exclamation to the each request value.
+  rpc ExclamationBidiStream(stream ExclamationRequest) returns (stream ExclamationResponse) {}
+}
