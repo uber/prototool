@@ -109,7 +109,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 
 	downloadCmd := &cobra.Command{
 		Use:   "download",
-		Short: "Downlond the protobuf artifacts to a cache.",
+		Short: "Download the protobuf artifacts to a cache.",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.Download)
