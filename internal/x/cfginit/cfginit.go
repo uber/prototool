@@ -146,7 +146,7 @@ protoc_version: {{.ProtocVersion}}
       # Extra flags to specify.
       # The only flag you will generally set is plugins=grpc for Golang.
       # The Mfile=package flags are automatically set.
-      # ** Otherwise, enerally do not set this unless you know what you are doing. **
+      # ** Otherwise, generally do not set this unless you know what you are doing. **
 {{.V}}      flags: plugins=grpc
 
       # The path to output generated files to.
