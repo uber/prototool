@@ -278,8 +278,6 @@ Prototool is under active development, if you want to help, here's some places t
 
 Over the coming months, we hope to push to a v1.0.
 
-If sending a PR, make sure to run `make contributors` before submitting.
-
 A note on package layout: all Golang code except for `cmd/prototool/main.go` is purposefully under the `internal` package to not expose any API for the time being. Within the internal package, anything under `internal/x` has not been reviewed, and is especially unstable. Any package in `internal` not in `internal/x` has been fully reviewed and is more stable.
 
 ## Special Thanks

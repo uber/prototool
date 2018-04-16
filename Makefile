@@ -31,10 +31,6 @@ license:
 	@go install ./vendor/go.uber.org/tools/update-license
 	update-license $(SRCS)
 
-.PHONY: contributors
-contributors:
-	git log --format='%aN <%aE>' | sort -fu > CONTRIBUTORS
-
 .PHONY: golden
 golden: install
 	for file in $(shell find internal/x/cmd/testdata/format -name '*.proto.golden'); do \
@@ -72,7 +68,7 @@ internalgen: install
 	prototool init etc/config/example --uncomment
 
 .PHONY: generate
-generate: license contributors golden example internalgen
+generate: license golden example internalgen
 
 .PHONY: checknodiffgenerated
 checknodiffgenerated:
