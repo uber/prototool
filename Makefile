@@ -58,13 +58,6 @@ example: install
 .PHONY: internalgen
 internalgen: install
 	prototool gen internal/x/cmd/testdata/grpc
-	rm -rf etc/release
-	mkdir -p etc/release/etc/bash_completion.d
-	mkdir -p etc/release/etc/zsh_completion.d
-	mkdir -p etc/release/share/man/man1
-	go run internal/x/gen/gen-prototool-bash-completion/main.go > etc/release/etc/bash_completion.d/prototool
-	go run internal/x/gen/gen-prototool-zsh-completion/main.go > etc/release/etc/zsh_completion.d/prototool
-	go run internal/x/gen/gen-prototool-manpages/main.go etc/release/share/man/man1
 	prototool init etc/config/example --uncomment
 
 .PHONY: generate

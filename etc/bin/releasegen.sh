@@ -29,8 +29,12 @@ for os in Darwin Linux; do
     tar_context_dir="$(dirname "${dir}")"
     tar_dir="prototool"
     mkdir -p "${dir}/bin"
-    cp -R "etc/release/etc" "${dir}/etc"
-    cp -R "etc/release/share" "${dir}/share"
+    mkdir -p "${dir}/etc/bash_completion.d"
+    mkdir -p "${dir}/etc/zsh_completion.d"
+    mkdir -p "${dir}/share/man/man1"
+    go run internal/x/gen/gen-prototool-bash-completion/main.go > "${dir}/etc/bash_completion.d/prototool"
+    go run internal/x/gen/gen-prototool-zsh-completion/main.go > "${dir}/etc/zsh_completion.d/prototool"
+    go run internal/x/gen/gen-prototool-manpages/main.go "${dir}/share/man/man1"
     CGO_ENABLED=0 GOOS=$(goos "${os}") GOARCH=$(goarch "${arch}") \
       go build \
       -a \
