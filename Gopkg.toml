@@ -1,0 +1,43 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/emicklei/proto"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/fullstorydev/grpcurl"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/gogo/protobuf"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/golang/protobuf"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/stretchr/testify"
+
+[[constraint]]
+  branch = "master"
+  name = "go.uber.org/fx"
+
+[[constraint]]
+  branch = "master"
+  name = "go.uber.org/multierr"
+
+[[constraint]]
+  branch = "master"
+  name = "go.uber.org/zap"
+
+[[constraint]]
+  branch = "master"
+  name = "google.golang.org/grpc"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "v2.2.1"
+
+[prune]
+  go-tests = true
+  unused-packages = true
