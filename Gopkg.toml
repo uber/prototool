@@ -1,0 +1,94 @@
+# Gopkg.toml example
+#
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
+# for detailed Gopkg.toml documentation.
+#
+# required = ["github.com/user/thing/cmd/thing"]
+# ignored = ["github.com/user/project/pkgX", "bitbucket.org/user/project/pkgA/pkgY"]
+#
+# [[constraint]]
+#   name = "github.com/user/project"
+#   version = "1.0.0"
+#
+# [[constraint]]
+#   name = "github.com/user/project2"
+#   branch = "dev"
+#   source = "github.com/myfork/project2"
+#
+# [[override]]
+#   name = "github.com/x/y"
+#   version = "2.4.0"
+#
+# [prune]
+#   non-go = false
+#   go-tests = true
+#   unused-packages = true
+
+
+[[constraint]]
+  name = "github.com/emicklei/proto"
+  version = "1.4.6"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/fullstorydev/grpcurl"
+
+[[constraint]]
+  name = "github.com/gogo/protobuf"
+  version = "0.5.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/golang/protobuf"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/grpc-ecosystem/grpc-gateway"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/jhump/protoreflect"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/stretchr/testify"
+
+[[constraint]]
+  name = "github.com/uber/prototool"
+  version = "0.1.0"
+
+[[constraint]]
+  name = "go.uber.org/fx"
+  version = "1.4.0"
+
+[[constraint]]
+  name = "go.uber.org/multierr"
+  version = "1.1.0"
+
+[[constraint]]
+  branch = "dev"
+  name = "go.uber.org/yarpc"
+
+[[constraint]]
+  name = "go.uber.org/zap"
+  version = "1.7.1"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/net"
+
+[[constraint]]
+  branch = "master"
+  name = "google.golang.org/genproto"
+
+[[constraint]]
+  name = "google.golang.org/grpc"
+  version = "1.11.3"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.1"
+
+[prune]
+  go-tests = true
+  unused-packages = true
