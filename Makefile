@@ -10,15 +10,15 @@ ci: init lint codecov
 
 .PHONY: init
 init:
-	go get github.com/Masterminds/glide
+	go get github.com/golang/dep/...
 	rm -rf vendor
-	glide install
+	dep ensure
 
 .PHONY: vendor
 vendor:
-	go get github.com/Masterminds/glide
+	go get github.com/golang/dep/...
 	rm -rf vendor
-	glide update
+	dep ensure
 
 .PHONY: install
 install:
