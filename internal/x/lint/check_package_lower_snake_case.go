@@ -21,8 +21,6 @@
 package lint
 
 import (
-	"text/scanner"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/x/strs"
 	"github.com/uber/prototool/internal/x/text"
@@ -60,12 +58,10 @@ func (v *packageLowerSnakeCaseVisitor) VisitPackage(pkg *proto.Package) {
 }
 
 func (v *packageLowerSnakeCaseVisitor) Finally() error {
-	if v.pkg == nil {
-		v.AddFailuref(scanner.Position{}, "No package declaration found.")
-		return nil
-	}
-	if !strs.IsLowerSnakeCase(v.pkg.Name, '.') {
-		v.AddFailuref(v.pkg.Position, "Package should be lower_snake.case but was %q.", v.pkg.Name)
+	if v.pkg != nil {
+		if !strs.IsLowerSnakeCase(v.pkg.Name, '.') {
+			v.AddFailuref(v.pkg.Position, "Package should be lower_snake.case but was %q.", v.pkg.Name)
+		}
 	}
 	return nil
 }

@@ -59,6 +59,7 @@ var (
 		messagesHaveCommentsChecker,
 		messagesHaveCommentsExceptRequestResponseTypesChecker,
 		oneofNamesLowerSnakeCaseChecker,
+		packageIsDeclaredChecker,
 		packageLowerSnakeCaseChecker,
 		packagesSameInDirChecker,
 		rpcsHaveCommentsChecker,

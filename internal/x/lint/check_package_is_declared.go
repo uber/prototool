@@ -21,52 +21,36 @@
 package lint
 
 import (
-	"sort"
-	"strings"
 	"text/scanner"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/x/text"
 )
 
-var packagesSameInDirChecker = NewAddChecker(
-	"PACKAGES_SAME_IN_DIR",
-	"Verifies that the packages of all files in a directory are the same.",
-	checkPackagesSameInDir,
+var packageIsDeclaredChecker = NewAddChecker(
+	"PACKAGE_IS_DECLARED",
+	"Verifies that there is a package declaration.",
+	checkPackageIsDeclared,
 )
 
-func checkPackagesSameInDir(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
-	visitor := &packagesSameInDirVisitor{baseAddVisitor: newBaseAddVisitor(add), pkgs: make(map[string]struct{})}
-	if err := runVisitor(visitor, descriptors); err != nil {
-		return err
-	}
-	if len(visitor.pkgs) > 1 {
-		pkgsSlice := make([]string, 0, len(visitor.pkgs))
-		for pkg := range visitor.pkgs {
-			pkgsSlice = append(pkgsSlice, pkg)
-		}
-		sort.Strings(pkgsSlice)
-		for _, descriptor := range descriptors {
-			visitor.AddFailuref(scanner.Position{Filename: descriptor.Filename}, "Multiple packages in directory: %v.", strings.Join(pkgsSlice, ", "))
-		}
-	}
-	return nil
+func checkPackageIsDeclared(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(&packageIsDeclaredVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
-type packagesSameInDirVisitor struct {
+type packageIsDeclaredVisitor struct {
 	baseAddVisitor
 
-	pkgs map[string]struct{}
-
-	pkg *proto.Package
+	filename string
+	pkg      *proto.Package
 }
 
-func (v *packagesSameInDirVisitor) OnStart(*proto.Proto) error {
+func (v *packageIsDeclaredVisitor) OnStart(descriptor *proto.Proto) error {
+	v.filename = descriptor.Filename
 	v.pkg = nil
 	return nil
 }
 
-func (v *packagesSameInDirVisitor) VisitPackage(pkg *proto.Package) {
+func (v *packageIsDeclaredVisitor) VisitPackage(pkg *proto.Package) {
 	if v.pkg != nil {
 		v.AddFailuref(pkg.Position, "multiple package declarations, first was %v", v.pkg)
 		return
@@ -74,9 +58,10 @@ func (v *packagesSameInDirVisitor) VisitPackage(pkg *proto.Package) {
 	v.pkg = pkg
 }
 
-func (v *packagesSameInDirVisitor) Finally() error {
-	if v.pkg != nil {
-		v.pkgs[v.pkg.Name] = struct{}{}
+func (v *packageIsDeclaredVisitor) Finally() error {
+	if v.pkg == nil {
+		v.AddFailuref(scanner.Position{Filename: v.filename}, "No package declaration found.")
+		return nil
 	}
 	return nil
 }
