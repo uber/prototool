@@ -129,6 +129,14 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
+		1:1:PACKAGE_IS_DECLARED`,
+		"testdata/lint/base_file.proto",
+	)
+	assertDoLintFile(
+		t,
+		false,
 		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
 		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB`,
 		"testdata/lint/file_options_incorrect.proto",
