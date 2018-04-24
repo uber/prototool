@@ -25,6 +25,8 @@ testImport:
   - package: github.com/wadey/gocovmerge
   - package: go.uber.org/tools/update-license
   - package: go.uber.org/yarpc/encoding/protobuf/protoc-gen-yarpc-go
+  - package: golang.org/x/lint
+    repo: https://github.com/golang/lint
   - package: golang.org/x/tools/cmd/cover
   - package: google.golang.org/genproto/googleapis/api/annotations
   - package: honnef.co/go/tools/cmd/staticcheck

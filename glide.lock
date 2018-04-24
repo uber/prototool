@@ -1,5 +1,5 @@
-hash: 5cf950ed3c5b236f5dd3e6071c2af4ed4f45505577bf979963b56e88b8208627
-updated: 2018-04-24T15:58:59.418159873+02:00
+hash: 7496dc3ea34fb0c74b5331db91859a636a7f696cda08075d90c24f6b69eb8df6
+updated: 2018-04-24T16:05:31.221862347+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 3a771d992973f24aa725d07868b467d1ddfceafb
@@ -110,7 +110,7 @@ imports:
 - name: go.uber.org/atomic
   version: 8474b86a5a6f79c443ce4b2992817ff32cf208b8
 - name: go.uber.org/dig
-  version: 15c67344e48b1b3317399a647b0ec0069c34321d
+  version: d100de9c8cc8358591507951141bc107713ba671
   subpackages:
   - internal/digreflect
 - name: go.uber.org/fx
@@ -249,6 +249,9 @@ testImports:
   version: ce2550dad7144b81ae2f67dc5e55597643f6902b
   subpackages:
   - update-license
+- name: golang.org/x/lint
+  version: 85993ffd0a6cd043291f3f63d45d656d97b165bd
+  repo: https://github.com/golang/lint
 - name: golang.org/x/tools
   version: c1def519f03ddf76f16b3e444ee1095d73afa01b
   subpackages:
