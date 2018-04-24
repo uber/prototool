@@ -1,6 +1,7 @@
 package: github.com/uber/prototool
 import:
   - package: github.com/emicklei/proto
+    version: ff6be386c301eb22b1d738ffe54727e3a51d9bdb
   - package: github.com/fullstorydev/grpcurl
   - package: github.com/gogo/protobuf/protoc-gen-gogoslick
   - package: github.com/golang/protobuf/protoc-gen-go
@@ -12,6 +13,7 @@ import:
   - package: go.uber.org/zap
   - package: google.golang.org/grpc
     repo: https://github.com/grpc/grpc-go
+    version: master
   - package: gopkg.in/yaml.v2
 testImport:
   - package: github.com/golang/glog
@@ -23,7 +25,6 @@ testImport:
   - package: github.com/wadey/gocovmerge
   - package: go.uber.org/tools/update-license
   - package: go.uber.org/yarpc/encoding/protobuf/protoc-gen-yarpc-go
-  - package: golang.org/x/lint
   - package: golang.org/x/tools/cmd/cover
   - package: google.golang.org/genproto/googleapis/api/annotations
   - package: honnef.co/go/tools/cmd/staticcheck
