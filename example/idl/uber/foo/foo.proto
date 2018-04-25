@@ -88,7 +88,7 @@ message FooResponse {
 // HelloService is a service.
 service HelloService {
   // Foo does a foo.
-  rpc Foo(foo.sub.Dep) returns (FooResponse) {}
+  rpc Foo(sub.Dep) returns (FooResponse) {}
   // Bar does a bar.
   rpc Bar(BarRequest) returns (foo.Dep) {
     option (google.api.http) = { get: "/bar/{id}" };
