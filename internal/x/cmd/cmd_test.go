@@ -23,10 +23,12 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -34,6 +36,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/x/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/internal/x/settings"
 	"google.golang.org/grpc"
 )
 
@@ -97,6 +100,20 @@ func TestCompile(t *testing.T) {
 		"testdata/compile/dep.proto",
 		"testdata/compile/not_imported.proto",
 	)
+}
+
+func TestInit(t *testing.T) {
+	t.Parallel()
+
+	tmpDir, err := ioutil.TempDir("", "")
+	require.NoError(t, err)
+	require.NotEmpty(t, tmpDir)
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
+
+	assertDo(t, 0, "", "init", tmpDir)
+	assertDo(t, 1, fmt.Sprintf("%s already exists", filepath.Join(tmpDir, settings.DefaultConfigFilename)), "init", tmpDir)
 }
 
 func TestLint(t *testing.T) {
