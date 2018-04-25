@@ -86,6 +86,7 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) ([]*Pro
 		protoSet.WorkDirPath = workDirPath
 		protoSet.DirPath = absDirPath
 	}
+	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.String("dirPath", dirPath), zap.Any("protoSets", protoSets))
 	return protoSets, nil
 }
 
@@ -107,6 +108,7 @@ func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) 
 		protoSet.WorkDirPath = workDirPath
 		protoSet.DirPath = workDirPath
 	}
+	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.Strings("filePaths", filePaths), zap.Any("protoSets", protoSets))
 	return protoSets, nil
 }
 
