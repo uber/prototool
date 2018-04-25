@@ -537,6 +537,9 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*text.Failure, error)
 		// I would prefer to error so that we signal that we don't know what the line is
 		// but if this becomes problematic with some plugin in the future, we should
 		// return nil, nil here
+		// TODO: this should probably be changed to return a generic *text.Failure with
+		// no file, line, or column, and just the message being protocLine
+		// https://github.com/uber/prototool/issues/14
 		return nil, fmt.Errorf("could not interpret protoc line: %s", protocLine)
 	}
 	line, err := strconv.Atoi(split[1])
