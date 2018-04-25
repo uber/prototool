@@ -58,6 +58,7 @@ example: install
 .PHONY: internalgen
 internalgen: install
 	prototool gen internal/x/cmd/testdata/grpc
+	rm -f etc/config/example/prototool.yaml
 	prototool init etc/config/example --uncomment
 
 .PHONY: generate

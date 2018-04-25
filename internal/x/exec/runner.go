@@ -125,11 +125,15 @@ func (r *runner) Init(args []string, uncomment bool) error {
 			return err
 		}
 	}
+	filePath := filepath.Join(dirPath, settings.DefaultConfigFilename)
+	if _, err := os.Stat(filePath); err == nil {
+		return fmt.Errorf("%s already exists", filePath)
+	}
 	data, err := cfginit.Generate(vars.DefaultProtocVersion, uncomment)
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath.Join(dirPath, settings.DefaultConfigFilename), data, 0644)
+	return ioutil.WriteFile(filePath, data, 0644)
 }
 
 func (r *runner) Download() error {
