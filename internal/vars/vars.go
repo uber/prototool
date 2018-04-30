@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Package vars contains static variables used in Prototool.
+//
+// Some variables are populated at build time using ldflags.
 package vars
 
 const (
