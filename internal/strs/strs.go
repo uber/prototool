@@ -18,6 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Package strs contains common string manipulation functionality.
+//
+// This functionality is not really centralized anywhere in Golang OSS world,
+// and there are some specific requirements we have. This is used mostly
+// in the lint package.
 package strs
 
 import (
