@@ -15,4 +15,4 @@ ignore:
   - /example/cmd/excited
   - /example/gen/proto/go/foo
   - /example/gen/proto/go/sub
-  - /internal/x/cmd/testdata/grpc/gen/grpcpb
+  - /internal/cmd/testdata/grpc/gen/grpcpb
