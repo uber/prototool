@@ -18,6 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Package wkt contains the list of the Google Well-Known Types as well
+// as the Golang package mappings for the generated code for
+// github.com/golang/protobuf and github.com/gogo/protobuf.
+//
+// https://developers.google.com/protocol-buffers/docs/reference/google.protobuf
 package wkt
 
 var (
