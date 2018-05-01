@@ -30,7 +30,7 @@ import (
 	"strings"
 )
 
-// IsCapitalized returns true if is is not empty and the first letter is
+// IsCapitalized returns true if is not empty and the first letter is
 // between 'A' and 'Z'.
 func IsCapitalized(s string) bool {
 	if s == "" {
@@ -41,8 +41,8 @@ func IsCapitalized(s string) bool {
 }
 
 // IsCamelCase returns false if s is empty or contains any character that is
-// not between 'A' and 'Z' or 'a' and 'z'. It does not care about lowercase
-// or uppercase.
+// not between 'A' and 'Z', 'a' and 'z', '0' and '9', or in extraRunes.
+// It does not care about lowercase or uppercase.
 func IsCamelCase(s string, extraRunes ...rune) bool {
 	if s == "" {
 		return false
@@ -132,7 +132,7 @@ func ToSnakeCase(s string) string {
 	return output
 }
 
-// DedupeSlice returns s with no duplicates, in the same order.
+// DedupeSlice returns s with no duplicates and no empty strings, in the same order.
 // If modifier is not nil, modifier will be applied to each element in s.
 func DedupeSlice(s []string, modifier func(string) string) []string {
 	m := make(map[string]struct{})
@@ -163,7 +163,7 @@ func DedupeSlice(s []string, modifier func(string) string) []string {
 	return o
 }
 
-// DedupeSortSlice returns s with no duplicates, sorted.
+// DedupeSortSlice returns s with no duplicates and no empty strings, sorted.
 // If modifier is not nil, modifier will be applied to each element in s.
 func DedupeSortSlice(s []string, modifier func(string) string) []string {
 	o := DedupeSlice(s, modifier)
@@ -171,7 +171,8 @@ func DedupeSortSlice(s []string, modifier func(string) string) []string {
 	return o
 }
 
-// IntersectionSlice return the intersection between one and two, sorted.
+// IntersectionSlice return the intersection between one and
+// two, sorted and dropping empty strings.
 func IntersectionSlice(one []string, two []string) []string {
 	m1 := make(map[string]struct{})
 	for _, e := range one {

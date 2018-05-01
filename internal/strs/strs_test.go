@@ -28,33 +28,37 @@ import (
 )
 
 func TestIsCapitalized(t *testing.T) {
-	assert.Equal(t, false, IsCapitalized("hello"))
-	assert.Equal(t, true, IsCapitalized("Hello"))
-	assert.Equal(t, false, IsCapitalized("hELLO"))
-	assert.Equal(t, true, IsCapitalized("HeLLo"))
+	assert.False(t, IsCapitalized(""))
+	assert.False(t, IsCapitalized("hello"))
+	assert.True(t, IsCapitalized("Hello"))
+	assert.False(t, IsCapitalized("hELLO"))
+	assert.True(t, IsCapitalized("HeLLo"))
 }
 
 func TestIsCamelCase(t *testing.T) {
-	assert.Equal(t, true, IsCamelCase("hello"))
-	assert.Equal(t, true, IsCamelCase("helloWorld"))
-	assert.Equal(t, false, IsCamelCase("hello_world"))
-	assert.Equal(t, false, IsCamelCase("hello.World"))
-	assert.Equal(t, true, IsCamelCase("hello.World", '.'))
-	assert.Equal(t, true, IsCamelCase("ABBRCamel"))
+	assert.False(t, IsCamelCase(""))
+	assert.True(t, IsCamelCase("hello"))
+	assert.True(t, IsCamelCase("helloWorld"))
+	assert.False(t, IsCamelCase("hello_world"))
+	assert.False(t, IsCamelCase("hello.World"))
+	assert.True(t, IsCamelCase("hello.World", '.'))
+	assert.True(t, IsCamelCase("ABBRCamel"))
 }
 
 func TestIsLowerSnakeCase(t *testing.T) {
-	assert.Equal(t, true, IsLowerSnakeCase("hello"))
-	assert.Equal(t, false, IsLowerSnakeCase("helloWorld"))
-	assert.Equal(t, true, IsLowerSnakeCase("hello_world"))
-	assert.Equal(t, false, IsLowerSnakeCase("Hello_world"))
-	assert.Equal(t, false, IsLowerSnakeCase("_hello_world"))
-	assert.Equal(t, false, IsLowerSnakeCase("hello_world_"))
-	assert.Equal(t, false, IsLowerSnakeCase("hello_world.foo"))
-	assert.Equal(t, true, IsLowerSnakeCase("hello_world.foo", '.'))
+	assert.False(t, IsLowerSnakeCase(""))
+	assert.True(t, IsLowerSnakeCase("hello"))
+	assert.False(t, IsLowerSnakeCase("helloWorld"))
+	assert.True(t, IsLowerSnakeCase("hello_world"))
+	assert.False(t, IsLowerSnakeCase("Hello_world"))
+	assert.False(t, IsLowerSnakeCase("_hello_world"))
+	assert.False(t, IsLowerSnakeCase("hello_world_"))
+	assert.False(t, IsLowerSnakeCase("hello_world.foo"))
+	assert.True(t, IsLowerSnakeCase("hello_world.foo", '.'))
 }
 
 func TestToSnakeCase(t *testing.T) {
+	assert.Equal(t, "", ToSnakeCase(""))
 	assert.Equal(t, "Camel_Case", ToSnakeCase("CamelCase"))
 	assert.Equal(t, "camel_Case", ToSnakeCase("camelCase"))
 	assert.Equal(t, "Camel_Case_", ToSnakeCase("CamelCase_"))
@@ -71,6 +75,7 @@ func TestDedupeSlice(t *testing.T) {
 	assert.Equal(t, []string{"b", "A", "c"}, DedupeSlice([]string{"b", "A", "c"}, nil))
 	assert.Equal(t, []string{"b", "A", "c", "a"}, DedupeSlice([]string{"b", "A", "c", "a"}, nil))
 	assert.Equal(t, []string{"b", "A", "c", "B"}, DedupeSlice([]string{"b", "A", "c", "A", "B"}, nil))
+	assert.Equal(t, []string{"b", "A", "c", "B"}, DedupeSlice([]string{"b", "A", "c", "", "A", "B"}, nil))
 }
 
 func TestIntersectionSlice(t *testing.T) {
@@ -82,4 +87,5 @@ func TestIntersectionSlice(t *testing.T) {
 	assert.Equal(t, []string{}, IntersectionSlice([]string{}, []string{"1"}))
 	assert.Equal(t, []string{}, IntersectionSlice([]string{"1"}, []string{}))
 	assert.Equal(t, []string{}, IntersectionSlice([]string{}, []string{}))
+	assert.Equal(t, []string{"1", "2"}, IntersectionSlice([]string{"1", "2", "3"}, []string{"1", "5", "", "2"}))
 }
