@@ -137,4 +137,6 @@ func TestIntersectionSlice(t *testing.T) {
 	assert.Equal(t, []string{}, IntersectionSlice([]string{"1"}, []string{}))
 	assert.Equal(t, []string{}, IntersectionSlice([]string{}, []string{}))
 	assert.Equal(t, []string{"1", "2"}, IntersectionSlice([]string{"1", "2", "3"}, []string{"1", "5", "", "2"}))
+	assert.Equal(t, []string{"1", "2"}, IntersectionSlice([]string{"1", "2", "", "3"}, []string{"1", "5", "2"}))
+	assert.Equal(t, []string{"1", "2"}, IntersectionSlice([]string{"1", "2", "", "3"}, []string{"1", "5", "", "2"}))
 }
