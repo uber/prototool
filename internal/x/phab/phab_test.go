@@ -20,7 +20,7 @@
 
 // Package phab provides functionality to interact with Phabricator.
 //
-// The primary purpose is to convert failures to JSON that is compatible
+// The primary purpose is to convert failures to JSON that are compatible
 // with the Harbormaster API.
 //
 // https://secure.phabricator.com/conduit/method/harbormaster.sendmessage
