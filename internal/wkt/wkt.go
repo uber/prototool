@@ -27,27 +27,20 @@ package wkt
 
 var (
 	// Filenames contains the Google Well-Known Types filenames.
-	//
-	// These are alphabetically ordered.
-	Filenames = []string{
-		"google/protobuf/any.proto",
-		"google/protobuf/api.proto",
-		"google/protobuf/compiler/plugin.proto",
-		"google/protobuf/descriptor.proto",
-		"google/protobuf/duration.proto",
-		"google/protobuf/empty.proto",
-		"google/protobuf/field_mask.proto",
-		"google/protobuf/source_context.proto",
-		"google/protobuf/struct.proto",
-		"google/protobuf/timestamp.proto",
-		"google/protobuf/type.proto",
-		"google/protobuf/wrappers.proto",
+	Filenames = map[string]struct{}{
+		"google/protobuf/any.proto":             struct{}{},
+		"google/protobuf/api.proto":             struct{}{},
+		"google/protobuf/compiler/plugin.proto": struct{}{},
+		"google/protobuf/descriptor.proto":      struct{}{},
+		"google/protobuf/duration.proto":        struct{}{},
+		"google/protobuf/empty.proto":           struct{}{},
+		"google/protobuf/field_mask.proto":      struct{}{},
+		"google/protobuf/source_context.proto":  struct{}{},
+		"google/protobuf/struct.proto":          struct{}{},
+		"google/protobuf/timestamp.proto":       struct{}{},
+		"google/protobuf/type.proto":            struct{}{},
+		"google/protobuf/wrappers.proto":        struct{}{},
 	}
-
-	// FilenameMap contains the Google Well-Known Types filenames in a map.
-	//
-	// This is populated with the filenames in Filenames in the init function.
-	FilenameMap map[string]struct{}
 
 	// FilenameToGoModifierMap is a map from filename to package for github.com/golang/protobuf.
 	FilenameToGoModifierMap = map[string]string{
@@ -81,10 +74,3 @@ var (
 		"google/protobuf/wrappers.proto":        "github.com/gogo/protobuf/types",
 	}
 )
-
-func init() {
-	FilenameMap = make(map[string]struct{}, len(Filenames))
-	for _, filename := range Filenames {
-		FilenameMap[filename] = struct{}{}
-	}
-}

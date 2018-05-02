@@ -119,7 +119,7 @@ func (v *firstPassVisitor) VisitImport(element *proto.Import) {
 	v.haveHitNonComment = true
 	// this won't hit filenames that aren't imported with "google/protobuf"
 	// prefix directly, but this should be caught by the linter
-	if _, ok := wkt.FilenameMap[element.Filename]; ok {
+	if _, ok := wkt.Filenames[element.Filename]; ok {
 		v.WKTImports = append(v.WKTImports, element)
 	} else {
 		v.Imports = append(v.Imports, element)
