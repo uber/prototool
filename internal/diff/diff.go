@@ -73,7 +73,7 @@ func writeTempFile(dir, prefix string, data []byte) (string, error) {
 		err = err1
 	}
 	if err != nil {
-		defer func() { _ = os.Remove(file.Name()) }()
+		_ = os.Remove(file.Name())
 		return "", err
 	}
 	return file.Name(), nil
