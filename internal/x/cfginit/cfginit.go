@@ -45,7 +45,7 @@ protoc_version: {{.ProtocVersion}}
 # By default, the directory of the config file is included,
 # or the current directory if there is no config file.
 {{.V}}protoc_includes:
-{{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateweay/third_party/googleapis
+{{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
 
 # Include the Well-Known Types when compiling with protoc.
 # For example, this allows you to do import "google/protobuf/timestamp.proto" in your Protobuf files.
