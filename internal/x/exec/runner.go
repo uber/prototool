@@ -819,7 +819,7 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 				if err != nil {
 					return err
 				}
-				if err := r.println(string(data)); err != nil {
+				if _, err := fmt.Fprintln(bufWriter, string(data)); err != nil {
 					return err
 				}
 			} else if err := failure.Fprintln(bufWriter, failureFields...); err != nil {
