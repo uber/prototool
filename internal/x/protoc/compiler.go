@@ -83,6 +83,9 @@ func newCompiler(options ...CompilerOption) *compiler {
 
 func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) {
 	var allCmdMetas []*cmdMeta
+	// we potentially create temporary files if doFileDescriptorSet is true
+	// if so, we try to remove them when we return no matter what
+	// by putting this defer here, we get this catch early
 	defer cleanCmdMetas(allCmdMetas)
 	for _, protoSet := range protoSets {
 		cmdMetas, err := c.getCmdMetas(protoSet)
@@ -92,6 +95,12 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 		allCmdMetas = append(allCmdMetas, cmdMetas...)
 	}
 	if c.doGen {
+		// the directories for the output files have to exist
+		// so if we are generating, we create them before running
+		// protoc, which calls the plugins, which results in created
+		// generated files potentially
+		// we know the directories from the output option in the
+		// config files
 		if err := c.makeGenDirs(protoSets...); err != nil {
 			return nil, err
 		}
@@ -115,16 +124,23 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 		}()
 	}
 	wg.Wait()
+	// errors are not text.Failures, these are actual unhandled
+	// system errors from calling protoc, so we short circuit
 	if len(errs) > 0 {
 		// I want newlines instead of spaces so not using multierr
 		errStrings := make([]string, 0, len(errs))
 		for _, err := range errs {
+			// errors.New("") is a non-nil error, so even
+			// if all error strings are empty, we still get an error
 			if errString := err.Error(); errString != "" {
 				errStrings = append(errStrings, errString)
 			}
 		}
 		return nil, errors.New(strings.Join(errStrings, "\n"))
 	}
+	// if we have failures, it does not matter if we have file descriptor sets
+	// as we should error out, so we do not do any parsing of file descriptor sets
+	// this decision could be revisited
 	if len(failures) > 0 {
 		text.SortFailures(failures)
 		return &CompileResult{
@@ -134,6 +150,8 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 
 	fileDescriptorSets := make([]*descriptor.FileDescriptorSet, 0, len(allCmdMetas))
 	for _, cmdMeta := range allCmdMetas {
+		// if doFileDescriptorSet is not set, we won't get a fileDescriptorSet anyways,
+		// so the end result will be an empty CompileResult at this point
 		fileDescriptorSet, err := getFileDescriptorSet(cmdMeta)
 		if err != nil {
 			return nil, err
@@ -150,6 +168,10 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 func (c *compiler) ProtocCommands(protoSets ...*file.ProtoSet) ([]string, error) {
 	var cmdMetaStrings []string
 	for _, protoSet := range protoSets {
+		// we end up calling the logic that creates temporary files for file descriptor sets
+		// anyways, so we need to clean them up with cleanCmdMetas
+		// this logic could be simplified to have a "dry run" option, but ProtocCommands
+		// is more for debugging anyways
 		cmdMetas, err := c.getCmdMetas(protoSet)
 		if err != nil {
 			return nil, err
@@ -170,6 +192,11 @@ func (c *compiler) makeGenDirs(protoSets ...*file.ProtoSet) error {
 		}
 	}
 	for genDir := range genDirs {
+		// we could choose a different permission set, but this seems reasonable
+		// in a perfect world, if directories are created and we error out, we
+		// would want to remove any newly created directories, but this seems
+		// like overkill as these directories would be created on success as
+		// generated directories anyways
 		if err := os.MkdirAll(genDir, 0744); err != nil {
 			return err
 		}
@@ -181,13 +208,14 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	c.logger.Debug("running protoc", zap.String("command", cmdMeta.String()))
 	buffer := bytes.NewBuffer(nil)
 	cmdMeta.execCmd.Stderr = buffer
-	// probably only need stderr but doing this to see what else comes up
-	// TODO: commented out because of unknown newlines that come up
-	//cmdMeta.execCmd.Stdout = buffer
+	// we only need stderr to parse errors
+	// you have to explicitly set to ioutil.Discard, otherwise if there
+	// is a stdout, it will be printed to os.Stdout
 	cmdMeta.execCmd.Stdout = ioutil.Discard
 	runErr := cmdMeta.execCmd.Run()
 	if runErr != nil {
 		// exit errors are ok, we can probably parse them into text.Failures
+		// if not an exec.ExitError, short circuit
 		if _, ok := runErr.(*exec.ExitError); !ok {
 			return nil, runErr
 		}
@@ -213,17 +241,23 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 
 func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, retErr error) {
 	defer func() {
+		// if we error in this function, we clean ourselves up
 		if retErr != nil {
 			cleanCmdMetas(cmdMetas)
 			cmdMetas = nil
 		}
 	}()
+	// you need a new downloader for every ProtoSet as each prototool.yaml could
+	// have a different protoc_version value
 	downloader := c.newDownloader(protoSet.Config)
 	if _, err := downloader.Download(); err != nil {
 		return cmdMetas, err
 	}
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
-		// best effort to make sure we have the a parent directory of the file
+		// you want your proto files to be in at least one of the -I directories
+		// or otherwise things can get weird
+		// we make best effort to make sure we have the a parent directory of the file
+		// if we have a config, use that directory, otherwise use the working directory
 		configDirPath := protoSet.Config.DirPath
 		if configDirPath == "" {
 			configDirPath = protoSet.WorkDirPath
@@ -240,6 +274,12 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 		if err != nil {
 			return cmdMetas, err
 		}
+		// this could really use some refactoring
+		// descriptorSetFilePath will either be a temporary file that we output
+		// a file descriptor set to, or the system equivalent of /dev/null
+		// isTempFile is effectively != /dev/null for all intents and purposes
+		// we do -o /dev/null because protoc needs at least one output, but in the compile-only
+		// mode, we want to just test for compile failures
 		descriptorSetFilePath, isTempFile, err := c.getDescriptorSetFilePath(protoSet)
 		if err != nil {
 			return cmdMetas, err
@@ -249,7 +289,10 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 			if !isTempFile {
 				descriptorSetTempFilePath = ""
 			}
+			// either /dev/null or a temporary file
 			iArgs := append(args, "-o", descriptorSetFilePath)
+			// if its a temporary file, that means we actually care about the output
+			// so we do --include_imports to get all necessary info in the output file descriptor set
 			if descriptorSetTempFilePath != "" {
 				// TODO(pedge): we will need source info if we switch out emicklei/proto
 				//iArgs = append(iArgs, "--include_source_info")
@@ -259,9 +302,10 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 				iArgs = append(iArgs, protoFile.Path)
 			}
 			cmdMetas = append(cmdMetas, &cmdMeta{
-				execCmd:                   exec.Command(protocPath, iArgs...),
-				protoSet:                  protoSet,
-				protoFiles:                protoFiles,
+				execCmd:    exec.Command(protocPath, iArgs...),
+				protoSet:   protoSet,
+				protoFiles: protoFiles,
+				// used for cleaning up the cmdMeta after everything is done
 				descriptorSetTempFilePath: descriptorSetTempFilePath,
 			})
 		}
@@ -319,7 +363,12 @@ func (c *compiler) getDescriptorSetFilePath(protoSet *file.ProtoSet) (string, bo
 	return devNullFilePath, false, err
 }
 
+// each value in the slice of string slices is a flag passed to protoc
+// examples:
+// []string{"--go_out=plugins=grpc:."}
+// []string{"--grpc-cpp_out=.", "--plugin=protoc-gen-grpc-cpp=/path/to/foo"}
 func (c *compiler) getPluginFlagSets(protoSet *file.ProtoSet, dirPath string) ([][]string, error) {
+	// if not generating, or there are no plugins, nothing to do
 	if !c.doGen || len(protoSet.Config.Gen.Plugins) == 0 {
 		return nil, nil
 	}
@@ -349,7 +398,12 @@ func getPluginFlagSet(protoSet *file.ProtoSet, dirPath string, genPlugin setting
 	return flagSet, nil
 }
 
+// the return value corresponds to CodeGeneratorRequest.Parameter
+// https://github.com/golang/protobuf/blob/b4deda0973fb4c70b50d226b1af49f3da59f5265/protoc-gen-go/plugin/plugin.pb.go#L103
+// this function basically just sets the Mfile=package values for go and gogo plugins
 func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlugin settings.GenPlugin) (string, error) {
+	// the type just denotes what Well-Known Type map to use from the wkt package
+	// if not go or gogo, we don't have any special automatic handling, so just return what we have
 	if !genPlugin.Type.IsGo() && !genPlugin.Type.IsGogo() {
 		return genPlugin.Flags, nil
 	}
@@ -364,6 +418,9 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 	if !genGoPluginOptions.NoDefaultModifiers {
 		modifiers := make(map[string]string)
 		for subDirPath, protoFiles := range protoSet.DirPathToFiles {
+			// you cannot include the files in the same package in the Mfile=package map
+			// or otherwise protoc-gen-go, protoc-gen-gogo, etc freak out and put
+			// these packages in as imports
 			if subDirPath != dirPath {
 				for _, protoFile := range protoFiles {
 					path, err := filepath.Rel(protoSet.Config.DirPath, protoFile.Path)
@@ -428,12 +485,19 @@ func getIncludes(
 			fileInIncludePath = true
 		}
 	}
+	// you want your proto files to be in at least one of the -I directories
+	// or otherwise things can get weird
+	// if the file is not in one of the -I directories and we haven't included
+	// the config directory set, at least do that to try to help out
+	// this logic could be removed as it is special casing a bit
 	if !fileInIncludePath && !includedConfigDirPath {
 		includes = append(includes, configDirPath)
 	}
 	return includes, nil
 }
 
+// we try to handle all protoc errors to convert them into text.Failures
+// so we can output failures in the standard filename:line:column:message format
 func parseProtocOutput(cmdMeta *cmdMeta, output string) ([]*text.Failure, error) {
 	var failures []*text.Failure
 	for _, line := range strings.Split(strings.TrimSpace(output), "\n") {
@@ -633,6 +697,7 @@ func devNull() (string, error) {
 
 func getTempFilePath() (string, error) {
 	prefix := ""
+	// TODO: what were we doing here?
 	if len(os.Args) > 0 {
 		prefix = "prototool"
 	}
