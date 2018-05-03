@@ -18,12 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package phab provides functionality to interact with Phabricator.
-//
-// The primary purpose is to convert failures to JSON that are compatible
-// with the Harbormaster API.
-//
-// https://secure.phabricator.com/conduit/method/harbormaster.sendmessage
 package phab
 
 import (
