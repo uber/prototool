@@ -278,7 +278,7 @@ Prototool is under active development, if you want to help, here's some places t
 
 Over the coming months, we hope to push to a v1.0.
 
-On initially cloning the repository, run `make init` if you have not already to download dependencies to `vendor`.
+Note that development of Prototool will only work with Golang 1.10 or newer. On initially cloning the repository, run `make init` if you have not already to download dependencies to `vendor`.
 
 Before submitting a PR, make sure to:
 
