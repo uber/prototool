@@ -143,12 +143,21 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 			v.P(prefix, o.Name, ` = {`)
 			v.In()
 			for _, namedLiteral := range o.Constant.OrderedMap {
-				v.P(namedLiteral.Name, `: `, namedLiteral.SourceRepresentation())
+				v.pInnerLiteral(namedLiteral.Name, namedLiteral)
 			}
 			v.Out()
 			v.PWithInlineComment(o.InlineComment, `}`, suffix)
 		}
 	}
+}
+
+// should only be called by Poptions
+func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal) {
+	if name == "" {
+		v.P(literal.SourceRepresentation())
+		return
+	}
+	v.P(name, `: `, literal.SourceRepresentation())
 }
 
 func (v *baseVisitor) PField(prefix string, t string, field *proto.Field) {
