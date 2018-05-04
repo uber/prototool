@@ -91,7 +91,9 @@ service HelloService {
   rpc Foo(sub.Dep) returns (FooResponse) {}
   // Bar does a bar.
   rpc Bar(BarRequest) returns (foo.Dep) {
-    option (google.api.http) = { get: "/bar/{id}" };
+    option (google.api.http) = {
+      get: "/bar/{id}"
+    };
   }
 }
 
