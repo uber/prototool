@@ -143,7 +143,7 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 			v.P(prefix, o.Name, ` = {`)
 			v.In()
 			for _, namedLiteral := range o.Constant.OrderedMap {
-				v.pInnerLiteral(namedLiteral.Name, namedLiteral)
+				v.pInnerLiteral(namedLiteral.Name, *namedLiteral.Literal)
 			}
 			v.Out()
 			v.PWithInlineComment(o.InlineComment, `}`, suffix)
