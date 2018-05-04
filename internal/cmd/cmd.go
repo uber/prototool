@@ -18,6 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Package cmd contains the logic to setup Prototool with github.com/spf13/cobra.
+//
+// The packages cmd/prototool, internal/gen/gen-prototool-bash-completion,
+// internal/gen/gen-prototool-manpages and internal/gen/gen-prototool-zsh-completion
+// are main packages that call into this package, and this package calls into
+// internal/exec to execute the logic.
+//
+// This package also contains integration testing for Prototool.
 package cmd
 
 import (
