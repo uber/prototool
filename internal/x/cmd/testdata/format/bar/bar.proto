@@ -13,6 +13,7 @@ option java_package = "com.bar.pb";
 message Dep {
   int64 hello = 1;
   int64 bar = 2;
+  Dep recursive = 3;
 }
 
 extend google.protobuf.MessageOptions {

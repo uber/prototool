@@ -124,7 +124,7 @@ service Daylight {
   hello: 1 };// inline comment30
   rpc Hello(Bat) returns (Empty) {
     //option (bar.method_option) = true;
-    option (bar.method_dep_option) = { hello: 1, bar: 2 }; // inline comment22
+    option (bar.method_dep_option) = { hello: 1, bar: 2, recursive: { hello: 3, recursive: { bar: 2 } } }; // inline comment22
   } // inline comment23
   rpc Foo(Empty) returns (Bat); // inline comment24
 }

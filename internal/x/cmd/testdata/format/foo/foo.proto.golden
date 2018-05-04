@@ -131,6 +131,12 @@ service Daylight {
 		option (bar.method_dep_option) = {
 			hello: 1
 			bar: 2
+			recursive: {
+				hello: 3
+				recursive: {
+					bar: 2
+				}
+			}
 		}; // inline comment22
 	} // inline comment23
 	rpc Foo(Empty) returns (Bat); // inline comment24
