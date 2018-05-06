@@ -23,7 +23,9 @@ option java_outer_classname = "FooProto"; // inline comment5
 // comment12
 option java_package = "com.foo.pb"; // inline comment23
 // comment16
-option (bar.file_dep_option) = { hello: 1 }; // inline comment16
+option (bar.file_dep_option) = {
+	hello: 1
+}; // inline comment16
 // comment6
 option (bar.file_option) = true; // inline comment6
 // comment7
@@ -44,7 +46,9 @@ message Baz {
 	//  
 	option (bar.message_option_proto2) = true;
 	// comment15
-	option (bar.message_dep_option) = { hello: 1 }; // inline comment15
+	option (bar.message_dep_option) = {
+		hello: 1
+	}; // inline comment15
 	int64 hello = 1;
 	// unassociated comment
 
@@ -58,23 +62,31 @@ message Baz {
 	];
 	// comment17
 	int64 woot2 = 6 [
-		(bar.field_dep_option) = { hello: 1 },
+		(bar.field_dep_option) = {
+			hello: 1
+		},
 		(bar.field_option) = true
 	]; // inline comment17
 	map<string, int64> m = 11;
 	map<string, int64> m2 = 12 [
-		(bar.field_dep_option) = { hello: 1 },
+		(bar.field_dep_option) = {
+			hello: 1
+		},
 		(bar.field_option) = true
 	];
 	oneof test_oneof {
 		// TODO: readd when oneof options handled
 		option (bar.oneof_option) = true; // inline comment18
-		option (bar.oneof_dep_option) = { hello: 1 }; // inline comment19
+		option (bar.oneof_dep_option) = {
+			hello: 1
+		}; // inline comment19
 		int64 foo1 = 8;
 		string foo2 = 9;
 		// comment18
 		int64 woot3 = 10 [
-			(bar.field_dep_option) = { hello: 1 },
+			(bar.field_dep_option) = {
+				hello: 1
+			},
 			(bar.field_option) = true
 		]; // inline comment18
 		// comment21
@@ -112,11 +124,19 @@ enum Something {
 // Daylight is the daylight service.
 service Daylight {
 	option (bar.service_option) = true; // inline comment29
-	option (bar.service_dep_option) = { hello: 1 }; // inline comment30
+	option (bar.service_dep_option) = {
+		hello: 1
+	}; // inline comment30
 	rpc Hello(Bat) returns (Empty) {
 		option (bar.method_dep_option) = {
 			hello: 1
 			bar: 2
+			recursive: {
+				hello: 3
+				recursive: {
+					bar: 2
+				}
+			}
 		}; // inline comment22
 	} // inline comment23
 	rpc Foo(Empty) returns (Bat); // inline comment24

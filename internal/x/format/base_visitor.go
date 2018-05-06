@@ -134,20 +134,42 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 			}
 		}
 		v.PComment(o.Comment)
-		switch len(o.AggregatedConstants) {
-		case 0:
+		// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
+		if len(o.Constant.Array) == 0 && len(o.Constant.OrderedMap) == 0 {
 			v.PWithInlineComment(o.InlineComment, prefix, o.Name, ` = `, o.Constant.SourceRepresentation(), suffix)
-		case 1:
-			v.PWithInlineComment(o.InlineComment, prefix, o.Name, ` = { `, o.AggregatedConstants[0].Name, ": ", o.AggregatedConstants[0].Literal.SourceRepresentation(), " }", suffix)
-		default:
+		} else if len(o.Constant.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
+			// TODO https://github.com/uber/prototool/issues/59
+		} else { // len(o.Constant.OrderedMap) > 0
 			v.P(prefix, o.Name, ` = {`)
 			v.In()
-			for _, aggregatedConstant := range o.AggregatedConstants {
-				v.P(aggregatedConstant.Name, `: `, aggregatedConstant.Literal.SourceRepresentation())
+			for _, namedLiteral := range o.Constant.OrderedMap {
+				v.pInnerLiteral(namedLiteral.Name, *namedLiteral.Literal)
 			}
 			v.Out()
 			v.PWithInlineComment(o.InlineComment, `}`, suffix)
 		}
+	}
+}
+
+// should only be called by Poptions
+func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal) {
+	prefix := ""
+	if name != "" {
+		prefix = name + ": "
+	}
+	// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
+	if len(literal.Array) == 0 && len(literal.OrderedMap) == 0 {
+		v.P(prefix, literal.SourceRepresentation())
+	} else if len(literal.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
+		// TODO https://github.com/uber/prototool/issues/59
+	} else { // len(literal.OrderedMap) > 0
+		v.P(prefix, `{`)
+		v.In()
+		for _, namedLiteral := range literal.OrderedMap {
+			v.pInnerLiteral(namedLiteral.Name, *namedLiteral.Literal)
+		}
+		v.Out()
+		v.P(`}`)
 	}
 }
 

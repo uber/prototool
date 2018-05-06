@@ -1,7 +1,7 @@
 package: github.com/uber/prototool
 import:
   - package: github.com/emicklei/proto
-    version: ff6be386c301eb22b1d738ffe54727e3a51d9bdb
+    version: 0cbee195654dd0aab66561d51e08d37554fd8cfe
   - package: github.com/fullstorydev/grpcurl
   - package: github.com/gogo/protobuf/protoc-gen-gogoslick
   - package: github.com/golang/protobuf/protoc-gen-go
@@ -18,6 +18,7 @@ import:
 testImport:
   - package: github.com/golang/glog
   - package: github.com/golang/lint/golint
+  - package: github.com/ghodss/yaml
   - package: github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
   - package: github.com/kisielk/errcheck
   - package: github.com/kisielk/gotool
