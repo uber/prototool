@@ -151,7 +151,7 @@ type Checker interface {
 	Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error)
 }
 
-// NewChecker is a convienence function that returns a new Checker for the
+// NewChecker is a convenience function that returns a new Checker for the
 // given parameters.
 //
 // The ID will be upper-cased.
@@ -161,7 +161,7 @@ func NewChecker(id string, purpose string, check func(string, []*proto.Proto) ([
 	return newBaseChecker(id, purpose, check)
 }
 
-// NewAddChecker is a convienence function that returns a new Checker for the
+// NewAddChecker is a convenience function that returns a new Checker for the
 // given parameters, using a function to record failures.
 //
 // The ID will be upper-cased.
@@ -227,7 +227,7 @@ func GetCheckers(config settings.LintConfig) ([]Checker, error) {
 	return checkers, nil
 }
 
-// GetDirPathToDescriptors is a convienence function that gets the
+// GetDirPathToDescriptors is a convenience function that gets the
 // descriptors for the given ProtoSet.
 func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto, error) {
 	dirPathToDescriptors := make(map[string][]*proto.Proto, len(protoSet.DirPathToFiles))
@@ -252,7 +252,7 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto
 	return dirPathToDescriptors, nil
 }
 
-// CheckMultiple is a convienence function that checks multiple checkers and multiple descriptors.
+// CheckMultiple is a convenience function that checks multiple checkers and multiple descriptors.
 func CheckMultiple(checkers []Checker, dirPathToDescriptors map[string][]*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
 	var allFailures []*text.Failure
 	for dirPath, descriptors := range dirPathToDescriptors {
