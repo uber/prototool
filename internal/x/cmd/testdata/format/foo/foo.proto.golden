@@ -92,6 +92,19 @@ message Baz {
 		// comment21
 		bar.Dep dep2 = 14; // inline comment21
 	}
+	int64 test_repeated_field_option = 15 [
+		(bar.repeated_field_option) = 1,
+		(bar.repeated_field_option) = 2
+	];
+	int64 test_repeated_dep_option = 16 [
+		(bar.field_dep_option) = {
+			hello: 1
+			repeated_bar: [
+				1,
+				2
+			]
+		}
+	];
 }
 
 // Bat is a bat.

@@ -14,6 +14,7 @@ message Dep {
   int64 hello = 1;
   int64 bar = 2;
   Dep recursive = 3;
+  repeated int64 repeated_bar = 4;
 }
 
 extend google.protobuf.MessageOptions {
@@ -29,6 +30,7 @@ extend google.protobuf.FileOptions {
 extend google.protobuf.FieldOptions {
   bool field_option = 80006;
   Dep field_dep_option = 80007;
+  repeated int64 repeated_field_option = 80017;
 }
 
 extend google.protobuf.OneofOptions {
