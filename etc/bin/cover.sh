@@ -10,6 +10,11 @@ if echo "${GOPATH}" | grep : >/dev/null; then
 	exit 1
 fi
 
+if ! which jq > /dev/null; then
+  echo "error: jq must be installed to run code coverage" >&2
+  exit 1
+fi
+
 COVER=cover
 ROOT_PKG=github.com/uber/prototool
 
