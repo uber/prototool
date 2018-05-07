@@ -221,6 +221,11 @@ func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {
 	if d.protocURL != "" {
 		return d.protocURL, nil
 	}
+	// if protocURL is not set, we need to make sure we have a version that will result
+	// in a GitHub Releases link with a protoc zip file
+	if _, ok := vars.ValidProtocVersions[d.config.Compile.ProtobufVersion]; !ok {
+		return "", fmt.Errorf("%s is not a known to have a protoc zip file in the proper format downloadable from https://github.com/google/protobuf/releases/v%s", d.config.Compile.ProtobufVersion, d.config.Compile.ProtobufVersion)
+	}
 	unameS, unameM, err := getUnameSUnameMPaths(goos, goarch)
 	if err != nil {
 		return "", err
