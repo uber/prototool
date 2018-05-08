@@ -28,6 +28,14 @@ import (
 )
 
 func TestTextFailureToHarbormasterLintResult(t *testing.T) {
+	harbormasterLintResult, err := TextFailureToHarbormasterLintResult(
+		&text.Failure{
+			Filename: "path/to/foo.proto",
+			Line:     2,
+			Message:  "Foo is a foo.",
+		},
+	)
+	assert.NoError(t, err)
 	assert.Equal(
 		t,
 		&HarbormasterLintResult{
@@ -38,14 +46,17 @@ func TestTextFailureToHarbormasterLintResult(t *testing.T) {
 			Line:        2,
 			Description: "Foo is a foo.",
 		},
-		TextFailureToHarbormasterLintResult(
-			&text.Failure{
-				Filename: "path/to/foo.proto",
-				Line:     2,
-				Message:  "Foo is a foo.",
-			},
-		),
+		harbormasterLintResult,
 	)
+	harbormasterLintResult, err = TextFailureToHarbormasterLintResult(
+		&text.Failure{
+			Filename: "path/to/foo.proto",
+			Line:     2,
+			ID:       "FOO",
+			Message:  "Foo is a foo.",
+		},
+	)
+	assert.NoError(t, err)
 	assert.Equal(
 		t,
 		&HarbormasterLintResult{
@@ -56,13 +67,6 @@ func TestTextFailureToHarbormasterLintResult(t *testing.T) {
 			Line:        2,
 			Description: "Foo is a foo.",
 		},
-		TextFailureToHarbormasterLintResult(
-			&text.Failure{
-				Filename: "path/to/foo.proto",
-				Line:     2,
-				ID:       "FOO",
-				Message:  "Foo is a foo.",
-			},
-		),
+		harbormasterLintResult,
 	)
 }

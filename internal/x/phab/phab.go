@@ -26,14 +26,19 @@
 // https://secure.phabricator.com/conduit/method/harbormaster.sendmessage
 package phab
 
-import "github.com/uber/prototool/internal/x/text"
+import (
+	"fmt"
+
+	"github.com/uber/prototool/internal/x/text"
+)
 
 const (
 	// DefaultHarbormasterLintResultName is the default name
 	// used when populating a HarbormasterLintResult.
 	DefaultHarbormasterLintResultName = "PROTOTOOL"
 	// DefaultHarbormasterLintResultCode is the default code
-	// used when populating a HarbormasterLintResult.
+	// used when populating a HarbormasterLintResult. This will
+	// only be used if there is no ID for lint failure.
 	DefaultHarbormasterLintResultCode = "PROTOTOOL"
 	// DefaultHarbormasterLintResultSeverity is the default severity
 	// used when populating a HarbormasterLintResult.
@@ -56,17 +61,17 @@ type HarbormasterLintResult struct {
 }
 
 // TextFailureToHarbormasterLintResult converts a text.Failure to a HarbormasterLintResult.
-func TextFailureToHarbormasterLintResult(textFailure *text.Failure) *HarbormasterLintResult {
+func TextFailureToHarbormasterLintResult(textFailure *text.Failure) (*HarbormasterLintResult, error) {
 	if textFailure == nil {
-		return nil
+		return nil, nil
+	}
+	if textFailure.Filename == "" {
+		return nil, fmt.Errorf("%v could not be converted to a harbormaster lint result due to no Filename being set", textFailure)
 	}
 	harbormasterLintResult := &HarbormasterLintResult{
-		Name:     DefaultHarbormasterLintResultName,
-		Code:     textFailure.ID,
-		Severity: DefaultHarbormasterLintResultSeverity,
-		// TODO: Filename is not a required field on text.Failure
-		// but Path is a required field for a Harbormaster Lint Result
-		// There are no good options here
+		Name:        DefaultHarbormasterLintResultName,
+		Code:        textFailure.ID,
+		Severity:    DefaultHarbormasterLintResultSeverity,
 		Path:        textFailure.Filename,
 		Line:        textFailure.Line,
 		Char:        textFailure.Column,
@@ -75,5 +80,5 @@ func TextFailureToHarbormasterLintResult(textFailure *text.Failure) *Harbormaste
 	if harbormasterLintResult.Code == "" {
 		harbormasterLintResult.Code = DefaultHarbormasterLintResultCode
 	}
-	return harbormasterLintResult
+	return harbormasterLintResult, nil
 }

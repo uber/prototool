@@ -815,7 +815,11 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 		}
 		if shouldPrint {
 			if r.harbormasterOutput {
-				data, err := json.Marshal(phab.TextFailureToHarbormasterLintResult(failure))
+				harbormasterLintResult, err := phab.TextFailureToHarbormasterLintResult(failure)
+				if err != nil {
+					return err
+				}
+				data, err := json.Marshal(harbormasterLintResult)
 				if err != nil {
 					return err
 				}
