@@ -32,6 +32,28 @@ const (
 )
 
 var (
+	// ValidProtocVersions is the list of protoc versions that are known
+	// to have protoc zip files for darwin and osx. These need to contain
+	// protoc at bin/protoc, as well as the Well-Known Types in include.
+	// Google only packages zip files for certain versions, and without
+	// a known list, this can be confusing when errors happen.
+	// See https://github.com/uber/prototool/issues/63.
+	ValidProtocVersions = map[string]struct{}{
+		"3.5.1":          struct{}{},
+		"3.5.0":          struct{}{},
+		"3.4.0":          struct{}{},
+		"3.3.0":          struct{}{},
+		"3.2.0":          struct{}{},
+		"3.2.0rc2":       struct{}{},
+		"3.1.0":          struct{}{},
+		"3.0.2":          struct{}{},
+		"3.0.0":          struct{}{},
+		"3.0.0-beta-4":   struct{}{},
+		"3.0.0-beta-3.1": struct{}{},
+		"3.0.0-beta-3":   struct{}{},
+		"3.0.0-beta-2":   struct{}{},
+	}
+
 	// GitCommit is the git commit used to build the binary.
 	//
 	// This is populated at build time using ldflags.
