@@ -58,17 +58,17 @@ import (
 var jsonMarshaler = &jsonpb.Marshaler{Indent: "  "}
 
 type runner struct {
-	configProvider     settings.ConfigProvider
-	protoSetProvider   file.ProtoSetProvider
-	workDirPath        string
-	input              io.Reader
-	output             io.Writer
-	logger             *zap.Logger
-	cachePath          string
-	protocURL          string
-	printFields        string
-	dirMode            bool
-	harbormasterOutput bool
+	configProvider   settings.ConfigProvider
+	protoSetProvider file.ProtoSetProvider
+	workDirPath      string
+	input            io.Reader
+	output           io.Writer
+	logger           *zap.Logger
+	cachePath        string
+	protocURL        string
+	printFields      string
+	dirMode          bool
+	harbormaster     bool
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -814,7 +814,7 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 			}
 		}
 		if shouldPrint {
-			if r.harbormasterOutput {
+			if r.harbormaster {
 				harbormasterLintResult, err := phab.TextFailureToHarbormasterLintResult(failure)
 				if err != nil {
 					return err

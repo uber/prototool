@@ -324,7 +324,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	flags.bindCachePath(rootCmd.PersistentFlags())
 	flags.bindProtocURL(rootCmd.PersistentFlags())
 	flags.bindPrintFields(rootCmd.PersistentFlags())
-	flags.bindHarbormasterOutput(rootCmd.PersistentFlags())
+	flags.bindHarbormaster(rootCmd.PersistentFlags())
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetOutput(stdout)
@@ -384,10 +384,10 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 			exec.RunnerWithDirMode(),
 		)
 	}
-	if flags.harbormasterOutput {
+	if flags.harbormaster {
 		runnerOptions = append(
 			runnerOptions,
-			exec.RunnerWithHarbormasterOutput(),
+			exec.RunnerWithHarbormaster(),
 		)
 	}
 	workDirPath, err := os.Getwd()
@@ -424,23 +424,23 @@ func printAndGetErrorExitCode(err error, stdout io.Writer) int {
 }
 
 type flags struct {
-	debug              bool
-	cachePath          string
-	protocURL          string
-	printFields        string
-	dirMode            bool
-	overwrite          bool
-	diffMode           bool
-	lintMode           bool
-	disableFormat      bool
-	disableLint        bool
-	gen                bool
-	headers            []string
-	callTimeout        string
-	connectTimeout     string
-	keepaliveTime      string
-	uncomment          bool
-	harbormasterOutput bool
+	debug          bool
+	cachePath      string
+	protocURL      string
+	printFields    string
+	dirMode        bool
+	overwrite      bool
+	diffMode       bool
+	lintMode       bool
+	disableFormat  bool
+	disableLint    bool
+	gen            bool
+	headers        []string
+	callTimeout    string
+	connectTimeout string
+	keepaliveTime  string
+	uncomment      bool
+	harbormaster   bool
 }
 
 func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
@@ -507,6 +507,6 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
 }
 
-func (f *flags) bindHarbormasterOutput(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.harbormasterOutput, "harbormaster-output", false, "Print failures in JSON compatible with the Harbormaster API.")
+func (f *flags) bindHarbormaster(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.harbormaster, "harbormaster", false, "Print failures in JSON compatible with the Harbormaster API.")
 }

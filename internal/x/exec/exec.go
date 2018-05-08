@@ -105,13 +105,13 @@ func RunnerWithDirMode() RunnerOption {
 	}
 }
 
-// RunnerWithHarbormasterOutput returns a RunnerOption that will print
+// RunnerWithHarbormaster returns a RunnerOption that will print
 // failures as Harbormaster compatible JSON.
 //
 // https://secure.phabricator.com/conduit/method/harbormaster.sendmessage
-func RunnerWithHarbormasterOutput() RunnerOption {
+func RunnerWithHarbormaster() RunnerOption {
 	return func(runner *runner) {
-		runner.harbormasterOutput = true
+		runner.harbormaster = true
 	}
 }
 
