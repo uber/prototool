@@ -324,6 +324,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	flags.bindCachePath(rootCmd.PersistentFlags())
 	flags.bindProtocURL(rootCmd.PersistentFlags())
 	flags.bindPrintFields(rootCmd.PersistentFlags())
+	flags.bindHarbormaster(rootCmd.PersistentFlags())
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetOutput(stdout)
@@ -383,6 +384,12 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 			exec.RunnerWithDirMode(),
 		)
 	}
+	if flags.harbormaster {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithHarbormaster(),
+		)
+	}
 	workDirPath, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -433,6 +440,7 @@ type flags struct {
 	connectTimeout string
 	keepaliveTime  string
 	uncomment      bool
+	harbormaster   bool
 }
 
 func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
@@ -497,4 +505,8 @@ func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
+}
+
+func (f *flags) bindHarbormaster(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.harbormaster, "harbormaster", false, "Print failures in JSON compatible with the Harbormaster API.")
 }
