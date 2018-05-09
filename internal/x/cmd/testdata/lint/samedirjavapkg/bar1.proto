@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package foo;
-
-option go_package = "foopb";
-
-message Three {}
