@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package bar;
+
+option go_package = "barpb";
+option java_package = "com.bar.pb";
+
+message Three {}

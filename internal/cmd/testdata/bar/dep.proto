@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package bar;
+
+option java_multiple_files = true;
+option java_outer_classname = "BarProto";
+option java_package = "com.bar.pb";
+option go_package = "barpb";
+
+// Dep is a dep.
+message Dep {
+  int64 hello = 1;
+}

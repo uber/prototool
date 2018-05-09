@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+// not valid!
+package foo
+
+message DepError {
+  int64 hello = 1;
+}

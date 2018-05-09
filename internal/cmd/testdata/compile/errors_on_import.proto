@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package foo;
+
+import "google/protobuf/timestamp.proto";
+import "dep_errors.proto";
+
+message Woot {
+  int64 hello = 1;
+  foo.DepError dep = 2;
+  google.protobuf.Timestamp timestamp = 3;
+}

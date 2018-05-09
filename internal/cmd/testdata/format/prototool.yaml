@@ -1,0 +1,12 @@
+protoc_include_wkt: true
+lint:
+  exclude_ids:
+  - RPCS_HAVE_COMMENTS
+  - REQUEST_RESPONSE_TYPES_UNIQUE
+  ignore_id_to_files:
+    SYNTAX_PROTO3:
+      - bar/bar_proto2.proto
+      - foo/foo_proto2.proto
+format:
+  indent: 1t
+  rpc_use_semicolons: true

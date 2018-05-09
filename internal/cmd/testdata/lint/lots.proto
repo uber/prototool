@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package foo.bAr;
+
+import "bar/dep.proto";
+
+message baz {}
+
+message Baz_bat {}
+
+message Bat {
+  int64 Hello = 1;
+  int64 helloWorld = 2;
+  int64 hello_world_one_ = 3;
+  int64 _hello_world_two = 4;
+  int64 hello_world_three = 5;
+  // normal comment
+  int64 world = 6; // normal inline comment
+  /*
+    c-style comment
+  */
+  int64 world2 = 7;
+  int64 world3 = 8; /* c-style inline comment */
+}
+
+service hello {}
+
+service World_woot {}
+
+message FooRequest {}
+message FooResponse {}
+
+
+message BarOneRequest {
+    // message Foo
+    message Hello {}
+}
+message BarOneResponse {}
+
+message Boo {
+  message BooRequest {}
+}
+
+service Foobar {
+  rpc Foo(FooRequest) returns (FooResponse) {}
+  rpc FooOne(FooRequest) returns (FooResponse) {}
+  rpc FooTwo(FooRequest) returns (FooResponse) {}
+  rpc barOne(BarOneRequest) returns (BarOneResponse) {}
+  rpc BarTwo(FooRequest) returns (bar.Dep) {}
+  rpc Boo(Boo.BooRequest) returns (bar.Dep) {}
+}
+
+enum Hello {
+  HELLO_INVALID = 0;
+  HELLO_UNSET = 1;
+  HELLO_TREE = 2;
+  HELLO_BALLOON = 3;
+  FOO_LAMP_POST = 4;
+}
+
+message Foo {
+  message Bar {
+    enum Baz {
+      BAZ_INVALID = 0;
+    }
+    enum Bat {
+      FOO_BAR_BAT_NONE = 0;
+    }
+  }
+}
+
+enum Bar {
+  BAR_NONE = 0;
+}
