@@ -259,11 +259,11 @@ message StreamGalaxiesResponse {
   Galaxy galaxy = 1;
 }
 
-message GetQuasarsRequest {
-  Quasar quasar = 1;
+message StreamQuasarsRequest {
+  Quasar quasars = 1;
 }
 
-message GetQuasarsResponse {
+message StreamQuasarsResponse {
   repeated Quasar quasars = 1;
 }
 
@@ -281,6 +281,6 @@ service HelloService {
   rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse) {}
   // StreamGalaxies streams galaxies.
   rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse) {}
-  // GetQuasars gets quasars.
-  rpc GetQuasars(stream GetQuasarsRequest) returns (GetQuasarsResponse) {}
+  // StreamQuasars streams quasars.
+  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse) {}
 }
