@@ -208,12 +208,6 @@ message Galaxy {
   string name = 2;
 }
 
-// Quadrant is a quadrant.
-message Quadrant {
-  string id = 1;
-  string name = 2;
-}
-
 // Quasar is a quasar.
 message Quasar {
   string id = 1;
@@ -265,11 +259,11 @@ message StreamGalaxiesResponse {
   Galaxy galaxy = 1;
 }
 
-message StreamQuasarsRequest {
-  Quadrant quadrant = 1;
+message GetQuasarsRequest {
+  Quasar quasar = 1;
 }
 
-message StreamQuasarsResponse {
+message GetQuasarsResponse {
   repeated Quasar quasars = 1;
 }
 
@@ -287,6 +281,6 @@ service HelloService {
   rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse) {}
   // StreamGalaxies streams galaxies.
   rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse) {}
-  // StreamQuasars strams quasars.
-  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse) {}
+  // GetQuasars gets quasars.
+  rpc GetQuasars(stream GetQuasarsRequest) returns (GetQuasarsResponse) {}
 }
