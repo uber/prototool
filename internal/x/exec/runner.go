@@ -306,6 +306,7 @@ func (r *runner) compile(doGen bool, doFileDescriptorSet bool, meta *meta) ([]*d
 	if len(compileResult.Failures) > 0 {
 		return nil, newExitErrorf(255, "")
 	}
+	r.logger.Debug("protoc command exited without errors")
 	return compileResult.FileDescriptorSets, nil
 }
 
@@ -340,6 +341,7 @@ func (r *runner) Lint(args []string) error {
 }
 
 func (r *runner) lint(meta *meta) error {
+	r.logger.Debug("calling LintRunner")
 	failures, err := r.newLintRunner().Run(meta.ProtoSets...)
 	if err != nil {
 		return err
