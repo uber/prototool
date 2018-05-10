@@ -260,7 +260,7 @@ message StreamGalaxiesResponse {
 }
 
 message StreamQuasarsRequest {
-  Quasar quasars = 1;
+  Quasar quasar = 1;
 }
 
 message StreamQuasarsResponse {
