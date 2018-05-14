@@ -72,3 +72,24 @@ message Foo {
 enum Bar {
   BAR_NONE = 0;
 }
+
+/* c-style file comment */
+
+message Woo {
+  /* c-style reserved comment */
+  reserved 10;
+  /* c-style oneof comment */
+  oneof woo {
+    /* c-style oneof field comment */
+    int64 field = 1;
+  }
+}
+
+enum Hoo {
+  HOO_INVALID = 0;
+  HOO_one = 1;
+}
+
+enum Hoo_one {
+  HOO_ONE_INVALID = 0;
+}
