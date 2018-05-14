@@ -318,6 +318,12 @@ func TestVersion(t *testing.T) {
 	assert.True(t, matched, stdout)
 }
 
+func TestListAllLintGroups(t *testing.T) {
+	stdout, exitCode := testDo(t, "list-all-lint-groups")
+	assert.Equal(t, 0, exitCode)
+	assert.Equal(t, "default", stdout)
+}
+
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
 	lines := getCleanLines(expectedLinePrefixes)
 	expectedExitCode := 0
