@@ -18,39 +18,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package format
+package settings
 
 import (
-	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/x/text"
-	"go.uber.org/zap"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// TODO: single primitive options on same line
-
-// Transformer transforms an input file into an output file.
-type Transformer interface {
-	// Transform transforms the data.
-
-	// Failures should never happen in the CLI tool as we run the files
-	// through protoc first, but this is done because we want to verify
-	// code correctness here and protect against the bad case.
-	Transform(config settings.Config, data []byte) ([]byte, []*text.Failure, error)
+func TestGetIndent(t *testing.T) {
+	testGetIndent(t, "2s", "  ", false)
+	testGetIndent(t, "4s", "    ", false)
+	testGetIndent(t, "1t", "\t", false)
+	testGetIndent(t, "2t", "\t\t", false)
+	testGetIndent(t, "0s", "", true)
+	testGetIndent(t, "s", "", true)
+	testGetIndent(t, "0t", "", true)
+	testGetIndent(t, "t", "", true)
+	testGetIndent(t, "-1t", "", true)
+	testGetIndent(t, "2r", "", true)
 }
 
-// TransformerOption is an option for a new Transformer.
-type TransformerOption func(*transformer)
-
-// TransformerWithLogger returns a TransformerOption that uses the given logger.
-//
-// The default is to use zap.NewNop().
-func TransformerWithLogger(logger *zap.Logger) TransformerOption {
-	return func(transformer *transformer) {
-		transformer.logger = logger
+func testGetIndent(t *testing.T, spec string, expected string, expectError bool) {
+	indent, err := getIndent(spec)
+	if expectError {
+		assert.Equal(t, invalidIndentSpecErrorf(spec), err)
+	} else {
+		assert.NoError(t, err)
 	}
-}
-
-// NewTransformer returns a new Transformer.
-func NewTransformer(options ...TransformerOption) Transformer {
-	return newTransformer(options...)
+	assert.Equal(t, expected, indent)
 }
