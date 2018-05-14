@@ -308,20 +308,11 @@ func TestGRPC(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
-	stdout, exitCode := testDo(t, "version")
-	assert.Equal(t, 0, exitCode)
-	matched, err := regexp.MatchString(
-		fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion),
-		stdout,
-	)
-	assert.NoError(t, err)
-	assert.True(t, matched, stdout)
+	assertRegexp(t, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	stdout, exitCode := testDo(t, "list-all-lint-groups")
-	assert.Equal(t, 0, exitCode)
-	assert.Equal(t, "default", stdout)
+	assertExact(t, 0, "default", "list-all-lint-groups")
 }
 
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
@@ -378,6 +369,20 @@ func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string,
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
 	assertDoStdin(t, strings.NewReader(jsonData), expectedExitCode, expectedLinePrefixes, "grpc", filePath, excitedTestCase.Address(), method, "-")
+}
+
+func assertRegexp(t *testing.T, expectedExitCode int, expectedRegexp string, args ...string) {
+	stdout, exitCode := testDo(t, args...)
+	assert.Equal(t, expectedExitCode, exitCode)
+	matched, err := regexp.MatchString(expectedRegexp, stdout)
+	assert.NoError(t, err)
+	assert.True(t, matched, stdout)
+}
+
+func assertExact(t *testing.T, expectedExitCode int, expectedStdout string, args ...string) {
+	stdout, exitCode := testDo(t, args...)
+	assert.Equal(t, expectedExitCode, exitCode)
+	assert.Equal(t, expectedStdout, stdout)
 }
 
 func assertDoStdin(t *testing.T, stdin io.Reader, expectedExitCode int, expectedLinePrefixes string, args ...string) {
