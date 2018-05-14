@@ -298,7 +298,7 @@ Prototool uses some external libraries that deserve special mention and thanks f
 [mit-img]: http://img.shields.io/badge/License-MIT-blue.svg
 [mit]: https://github.com/uber/prototool/blob/master/LICENSE
 
-[release-img]: https://img.shields.io/github/release/uber/prototool.svg
+[release-img]: https://img.shields.io/github/release/uber/prototool/all.svg
 [release]: https://github.com/uber/prototool/releases
 
 [ci-img]: https://img.shields.io/travis/uber/prototool/dev.svg
