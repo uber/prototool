@@ -315,6 +315,42 @@ func TestListAllLintGroups(t *testing.T) {
 	assertExact(t, 0, "default", "list-all-lint-groups")
 }
 
+func TestDescriptorProto(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "Baz",
+  "field": [
+    {
+      "name": "hello",
+      "number": 1,
+      "label": "LABEL_OPTIONAL",
+      "type": "TYPE_INT64",
+      "jsonName": "hello"
+    },
+    {
+      "name": "dep",
+      "number": 2,
+      "label": "LABEL_OPTIONAL",
+      "type": "TYPE_MESSAGE",
+      "typeName": ".bar.Dep",
+      "jsonName": "dep"
+    },
+    {
+      "name": "timestamp",
+      "number": 3,
+      "label": "LABEL_OPTIONAL",
+      "type": "TYPE_MESSAGE",
+      "typeName": ".google.protobuf.Timestamp",
+      "jsonName": "timestamp"
+    }
+  ]
+}`,
+		"descriptor-proto", "testdata/foo/success.proto", "foo.Baz",
+	)
+}
+
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
 	lines := getCleanLines(expectedLinePrefixes)
 	expectedExitCode := 0
