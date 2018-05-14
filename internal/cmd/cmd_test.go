@@ -367,6 +367,55 @@ func TestFieldDescriptorProto(t *testing.T) {
 	)
 }
 
+func TestServiceDescriptorProto(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "ExcitedService",
+  "method": [
+    {
+      "name": "Exclamation",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      }
+    },
+    {
+      "name": "ExclamationClientStream",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      },
+      "clientStreaming": true
+    },
+    {
+      "name": "ExclamationServerStream",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      },
+      "serverStreaming": true
+    },
+    {
+      "name": "ExclamationBidiStream",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      },
+      "clientStreaming": true,
+      "serverStreaming": true
+    }
+  ]
+}`,
+		"service-descriptor-proto", "testdata/grpc", "grpc.ExcitedService",
+	)
+}
+
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
 	lines := getCleanLines(expectedLinePrefixes)
 	expectedExitCode := 0
