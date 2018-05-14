@@ -351,6 +351,22 @@ func TestDescriptorProto(t *testing.T) {
 	)
 }
 
+func TestFieldDescriptorProto(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "dep",
+  "number": 2,
+  "label": "LABEL_OPTIONAL",
+  "type": "TYPE_MESSAGE",
+  "typeName": ".bar.Dep",
+  "jsonName": "dep"
+}`,
+		"field-descriptor-proto", "testdata/foo/success.proto", "foo.Baz.dep",
+	)
+}
+
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
 	lines := getCleanLines(expectedLinePrefixes)
 	expectedExitCode := 0
