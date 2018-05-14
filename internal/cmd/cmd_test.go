@@ -29,6 +29,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
@@ -37,6 +38,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
 	"github.com/uber/prototool/internal/x/settings"
+	"github.com/uber/prototool/internal/x/vars"
 	"google.golang.org/grpc"
 )
 
@@ -303,6 +305,17 @@ func TestGRPC(t *testing.T) {
 		`{"value":"hello"}
 		{"value":"salutations"}`,
 	)
+}
+
+func TestVersion(t *testing.T) {
+	stdout, exitCode := testDo(t, "version")
+	assert.Equal(t, 0, exitCode)
+	matched, err := regexp.MatchString(
+		fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion),
+		stdout,
+	)
+	assert.NoError(t, err)
+	assert.True(t, matched, stdout)
 }
 
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
