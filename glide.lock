@@ -1,5 +1,5 @@
-hash: 279ab5f6a82b352754728ac6a1b061537653aca77ac269f1defef967f0979ab6
-updated: 2018-05-04T13:08:16.519777472+02:00
+hash: 551fbff2ea2d0bb3df407b27bf0e126f5be3812c9fc862c7ebde653f8dcfb608
+updated: 2018-05-14T14:18:45.794295675+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 3a771d992973f24aa725d07868b467d1ddfceafb
@@ -10,9 +10,7 @@ imports:
   subpackages:
   - md2man
 - name: github.com/emicklei/proto
-  version: 0cbee195654dd0aab66561d51e08d37554fd8cfe
-- name: github.com/facebookgo/clock
-  version: 600d898af40aa09a7a93ecb9265d87b0504b6f03
+  version: 43f8fb7abe35485d1ca39fe380c5b6d39aa931c2
 - name: github.com/fullstorydev/grpcurl
   version: ca5693f42cec84648010662ab404d66127bc5bf1
 - name: github.com/gogo/protobuf
@@ -97,7 +95,7 @@ imports:
   subpackages:
   - utils
 - name: github.com/uber-go/tally
-  version: 522328b48efad0c6034dba92bf39228694e9d31f
+  version: 6f121596292a5ec8618b71ee3687fe42da73d289
 - name: github.com/uber/tchannel-go
   version: cc0c40929b0dbdb755b727a8c253de2b5d4af46b
   subpackages:
@@ -162,7 +160,7 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/net
-  version: 640f4622ab692b87c2f3a94265e6f579fe38263d
+  version: 2491c5de3490fced2f6cff376127c667efeed857
   subpackages:
   - bpf
   - context
@@ -175,7 +173,6 @@ imports:
   - internal/timeseries
   - ipv4
   - ipv6
-  - lex/httplex
   - trace
 - name: golang.org/x/text
   version: 7922cc490dd5a7dbaa7fd5d6196b49db59ac042f
@@ -190,7 +187,7 @@ imports:
   - googleapis/api/annotations
   - googleapis/rpc/status
 - name: google.golang.org/grpc
-  version: b412d5aa54a1f82a55b21f3a8862d6d73baee3d9
+  version: a36eb4675a1a7cbb473953b7cb273855c3bd555a
   repo: https://github.com/grpc/grpc-go
   subpackages:
   - balancer

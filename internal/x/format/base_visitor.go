@@ -138,12 +138,15 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 		if len(o.Constant.Array) == 0 && len(o.Constant.OrderedMap) == 0 {
 			v.PWithInlineComment(o.InlineComment, prefix, o.Name, ` = `, o.Constant.SourceRepresentation(), suffix)
 		} else if len(o.Constant.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
-			// TODO https://github.com/uber/prototool/issues/59
+			v.Failures = append(
+				v.Failures,
+				text.NewFailuref(o.Position, "INVALID_PROTOBUF", "top-level options should never be arrays, this should not compile with protoc"),
+			)
 		} else { // len(o.Constant.OrderedMap) > 0
 			v.P(prefix, o.Name, ` = {`)
 			v.In()
 			for _, namedLiteral := range o.Constant.OrderedMap {
-				v.pInnerLiteral(namedLiteral.Name, *namedLiteral.Literal)
+				v.pInnerLiteral(namedLiteral.Name, *namedLiteral.Literal, "")
 			}
 			v.Out()
 			v.PWithInlineComment(o.InlineComment, `}`, suffix)
@@ -152,24 +155,34 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 }
 
 // should only be called by Poptions
-func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal) {
+func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal, suffix string) {
 	prefix := ""
 	if name != "" {
 		prefix = name + ": "
 	}
 	// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
 	if len(literal.Array) == 0 && len(literal.OrderedMap) == 0 {
-		v.P(prefix, literal.SourceRepresentation())
+		v.P(prefix, literal.SourceRepresentation(), suffix)
 	} else if len(literal.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
-		// TODO https://github.com/uber/prototool/issues/59
+		v.P(prefix, `[`)
+		v.In()
+		for i, iLiteral := range literal.Array {
+			iSuffix := ""
+			if len(literal.Array) > 1 && i != len(literal.Array)-1 {
+				iSuffix = ","
+			}
+			v.pInnerLiteral("", *iLiteral, iSuffix)
+		}
+		v.Out()
+		v.P(`]`, suffix)
 	} else { // len(literal.OrderedMap) > 0
 		v.P(prefix, `{`)
 		v.In()
 		for _, namedLiteral := range literal.OrderedMap {
-			v.pInnerLiteral(namedLiteral.Name, *namedLiteral.Literal)
+			v.pInnerLiteral(namedLiteral.Name, *namedLiteral.Literal, "")
 		}
 		v.Out()
-		v.P(`}`)
+		v.P(`}`, suffix)
 	}
 }
 
