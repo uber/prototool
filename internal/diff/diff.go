@@ -81,13 +81,13 @@ func writeTempFile(dir, prefix string, data []byte) (string, error) {
 
 // replaceTempFilename replaces temporary filenames in diff with actual one.
 //
-// --- /tmp/gofmt316145376	2017-02-03 19:13:00.280468375 -0500
-// +++ /tmp/gofmt617882815	2017-02-03 19:13:00.280468375 -0500
-// ...
-// ->
-// --- path/to/file.go.orig	2017-02-03 19:13:00.280468375 -0500
-// +++ path/to/file.go	2017-02-03 19:13:00.280468375 -0500
-// ...
+//   --- /tmp/gofmt316145376	2017-02-03 19:13:00.280468375 -0500
+//   +++ /tmp/gofmt617882815	2017-02-03 19:13:00.280468375 -0500
+//   ...
+//   ->
+//   --- path/to/file.go.orig	2017-02-03 19:13:00.280468375 -0500
+//   +++ path/to/file.go	2017-02-03 19:13:00.280468375 -0500
+//   ...
 func replaceTempFilename(diff []byte, filename string) ([]byte, error) {
 	bs := bytes.SplitN(diff, []byte{'\n'}, 3)
 	if len(bs) < 3 {
