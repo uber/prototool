@@ -30,6 +30,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"testing"
@@ -37,6 +38,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/internal/x/lint"
 	"github.com/uber/prototool/internal/x/settings"
 	"github.com/uber/prototool/internal/x/vars"
 	"google.golang.org/grpc"
@@ -414,6 +416,23 @@ func TestServiceDescriptorProto(t *testing.T) {
 }`,
 		"service-descriptor-proto", "testdata/grpc", "grpc.ExcitedService",
 	)
+}
+
+func TestListLinters(t *testing.T) {
+	assertLinters(t, lint.DefaultCheckers, "list-linters")
+}
+
+func TestListAllLinters(t *testing.T) {
+	assertLinters(t, lint.AllCheckers, "list-all-linters")
+}
+
+func assertLinters(t *testing.T, checkers []lint.Checker, args ...string) {
+	checkerIDs := make([]string, 0, len(checkers))
+	for _, checker := range checkers {
+		checkerIDs = append(checkerIDs, checker.ID())
+	}
+	sort.Strings(checkerIDs)
+	assertDo(t, 0, strings.Join(checkerIDs, "\n"), args...)
 }
 
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
