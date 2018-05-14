@@ -28,6 +28,7 @@ package strs
 import (
 	"sort"
 	"strings"
+	"unicode"
 )
 
 // IsCapitalized returns true if is not empty and the first letter is
@@ -123,7 +124,7 @@ func ToUpperSnakeCase(s string) string {
 func ToSnakeCase(s string) string {
 	output := ""
 	for i, c := range s {
-		if i > 0 && isUppercaseRune(c) && output[len(output)-1] != '_' && i < len(s)-1 && !isUppercaseRune(rune(s[i+1])) {
+		if i > 0 && unicode.IsUpper(c) && output[len(output)-1] != '_' && i < len(s)-1 && !unicode.IsUpper(rune(s[i+1])) {
 			output += "_" + string(c)
 		} else {
 			output += string(c)
@@ -208,8 +209,4 @@ func containsRune(r rune, s []rune) bool {
 		}
 	}
 	return false
-}
-
-func isUppercaseRune(c rune) bool {
-	return c >= 'A' && c <= 'Z'
 }
