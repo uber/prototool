@@ -380,7 +380,12 @@ func (r *runner) ListLintGroup(group string) error {
 }
 
 func (r *runner) ListAllLintGroups() error {
+	groups := make([]string, 0, len(lint.GroupToCheckers))
 	for group := range lint.GroupToCheckers {
+		groups = append(groups, group)
+	}
+	sort.Strings(groups)
+	for _, group := range groups {
 		if err := r.println(group); err != nil {
 			return err
 		}
