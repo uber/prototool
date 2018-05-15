@@ -25,6 +25,7 @@ option java_package = "com.foo.pb"; // inline comment23
 // comment16
 option (bar.file_dep_option) = {
 	hello: 1
+	bar: 2
 }; // inline comment16
 // comment6
 option (bar.file_option) = true; // inline comment6

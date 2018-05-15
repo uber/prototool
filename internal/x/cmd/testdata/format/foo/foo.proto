@@ -34,7 +34,11 @@ option (bar.file_option) = true; // inline comment6
 // comment7
 option (bar.file_option_proto2) = true; //inline comment7
 // comment16
-option (bar.file_dep_option) = { hello: 1 }; // inline comment16
+option (bar.file_dep_option) = {
+  hello: 1
+  recursive: {}
+  bar: 2
+}; // inline comment16
 
 // Baz is a baz.
 message Baz {
