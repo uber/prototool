@@ -29,99 +29,70 @@ import (
 	"sort"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // IsCapitalized returns true if is not empty and the first letter is
-// between 'A' and 'Z'.
+// an uppercase character.
 func IsCapitalized(s string) bool {
 	if s == "" {
 		return false
 	}
-	firstLetter := s[0]
-	return firstLetter >= 'A' && firstLetter <= 'Z'
+	r, _ := utf8.DecodeRuneInString(s)
+	return isUpper(r)
 }
 
 // IsCamelCase returns false if s is empty or contains any character that is
 // not between 'A' and 'Z', 'a' and 'z', '0' and '9', or in extraRunes.
 // It does not care about lowercase or uppercase.
-func IsCamelCase(s string, extraRunes ...rune) bool {
+func IsCamelCase(s string) bool {
 	if s == "" {
 		return false
 	}
 	for _, c := range s {
-		if !((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) && !containsRune(c, extraRunes) {
+		if !(isLetter(c) || isDigit(c)) {
 			return false
 		}
 	}
 	return true
 }
 
-// IsLowerSnakeCase returns false if s is empty or contains any character that is
-// not between 'a' and 'z' or '0' and '9' or '_', or if s begins or ends
-// with '_'.
-func IsLowerSnakeCase(s string, extraRunes ...rune) bool {
-	if s == "" {
+// IsLowerSnakeCase returns true if s only contains lowercase letters,
+// digits, and/or underscores. s MUST NOT begin or end with an underscore.
+func IsLowerSnakeCase(s string) bool {
+	if s == "" || s[0] == '_' || s[len(s)-1] == '_' {
 		return false
 	}
-	if s[0] == '_' {
-		return false
-	}
-	if s[len(s)-1] == '_' {
-		return false
-	}
-	for _, c := range s {
-		if !((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_') && !containsRune(c, extraRunes) {
+	for _, r := range s {
+		if !(isLower(r) || isDigit(r) || r == '_') {
 			return false
 		}
 	}
 	return true
 }
 
-// IsUpperSnakeCase returns false if s is empty or contains any character that is
-// not between 'A' and 'Z' or '0' and '9' or '_', or if s begins or ends
-// with '_'.
-func IsUpperSnakeCase(s string, extraRunes ...rune) bool {
-	if s == "" {
+// IsUpperSnakeCase returns true if s only contains uppercase letters,
+// digits, and/or underscores. s MUST NOT begin or end with an underscore.
+func IsUpperSnakeCase(s string) bool {
+	if s == "" || s[0] == '_' || s[len(s)-1] == '_' {
 		return false
 	}
-	if s[0] == '_' {
-		return false
-	}
-	if s[len(s)-1] == '_' {
-		return false
-	}
-	for _, c := range s {
-		if !((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') && !containsRune(c, extraRunes) {
+	for _, r := range s {
+		if !(isUpper(r) || isDigit(r) || r == '_') {
 			return false
 		}
 	}
 	return true
-}
-
-// IsLowercase returns true if s is not empty and is all lowercase.
-func IsLowercase(s string) bool {
-	if s == "" {
-		return false
-	}
-	return strings.ToLower(s) == s
-}
-
-// IsUppercase returns true if s is not empty and is all uppercase.
-func IsUppercase(s string) bool {
-	if s == "" {
-		return false
-	}
-	return strings.ToUpper(s) == s
 }
 
 // ToUpperSnakeCase converts s to UPPER_SNAKE_CASE.
 func ToUpperSnakeCase(s string) string {
-	return strings.ToUpper(ToSnakeCase(s))
+	return strings.ToUpper(toSnake(s))
 }
 
-// ToSnakeCase converts s to Snake_case.
+// toSnake converts s to snake_case.
 // It is assumed s has no spaces.
-func ToSnakeCase(s string) string {
+func toSnake(s string) string {
 	output := ""
 	for i, c := range s {
 		if i > 0 && unicode.IsUpper(c) && output[len(output)-1] != '_' && i < len(s)-1 && !unicode.IsUpper(rune(s[i+1])) {
@@ -133,20 +104,10 @@ func ToSnakeCase(s string) string {
 	return output
 }
 
-// DedupeSlice returns s with no duplicates and no empty strings, in the same order.
+// Dedupe returns s with no duplicates and no empty strings, sorted.
 // If modifier is not nil, modifier will be applied to each element in s.
-func DedupeSlice(s []string, modifier func(string) string) []string {
-	m := make(map[string]struct{})
-	for _, e := range s {
-		if e == "" {
-			continue
-		}
-		key := e
-		if modifier != nil {
-			key = modifier(e)
-		}
-		m[key] = struct{}{}
-	}
+func Dedupe(s []string, modifier func(string) string) []string {
+	m := make(map[string]struct{}, len(s))
 	o := make([]string, 0, len(m))
 	for _, e := range s {
 		if e == "" {
@@ -157,24 +118,18 @@ func DedupeSlice(s []string, modifier func(string) string) []string {
 			key = modifier(e)
 		}
 		if _, ok := m[key]; ok {
-			o = append(o, key)
-			delete(m, key)
+			continue
 		}
+		m[key] = struct{}{}
+		o = append(o, key)
 	}
-	return o
-}
-
-// DedupeSortSlice returns s with no duplicates and no empty strings, sorted.
-// If modifier is not nil, modifier will be applied to each element in s.
-func DedupeSortSlice(s []string, modifier func(string) string) []string {
-	o := DedupeSlice(s, modifier)
 	sort.Strings(o)
 	return o
 }
 
-// IntersectionSlice return the intersection between one and
+// Intersection return the intersection between one and
 // two, sorted and dropping empty strings.
-func IntersectionSlice(one []string, two []string) []string {
+func Intersection(one []string, two []string) []string {
 	m1 := make(map[string]struct{})
 	for _, e := range one {
 		if e == "" {
@@ -202,11 +157,34 @@ func IntersectionSlice(one []string, two []string) []string {
 	return s
 }
 
-func containsRune(r rune, s []rune) bool {
-	for _, e := range s {
-		if e == r {
-			return true
-		}
+// IsLowercase returns true if s is not empty and is all lowercase.
+func IsLowercase(s string) bool {
+	if s == "" {
+		return false
 	}
-	return false
+	return strings.ToLower(s) == s
+}
+
+// IsUppercase returns true if s is not empty and is all uppercase.
+func IsUppercase(s string) bool {
+	if s == "" {
+		return false
+	}
+	return strings.ToUpper(s) == s
+}
+
+func isLetter(r rune) bool {
+	return isUpper(r) || isLower(r)
+}
+
+func isLower(r rune) bool {
+	return 'a' <= r && r <= 'z'
+}
+
+func isUpper(r rune) bool {
+	return 'A' <= r && r <= 'Z'
+}
+
+func isDigit(r rune) bool {
+	return '0' <= r && r <= '9'
 }
