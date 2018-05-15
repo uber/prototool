@@ -164,7 +164,7 @@ func (d *downloader) downloadInternal(basePath string, goos string, goarch strin
 		// download this from GitHub Releases, so add
 		// extra context to the error message
 		if d.protocURL == "" {
-			return fmt.Errorf("error downloading %s: %v\nmake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/google/protobuf/releases/v%s\nnote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
+			return fmt.Errorf("error downloading %s: %v\nMake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/google/protobuf/releases/v%s\nNote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
 		}
 		return err
 	}
