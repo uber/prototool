@@ -18,37 +18,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package lint
+// Package vars contains static variables used in Prototool.
+//
+// Some variables are populated at build time using ldflags.
+package vars
 
-import (
-	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/x/text"
+const (
+	// Version is the current version.
+	Version = "0.2.0-dev"
+
+	// DefaultProtocVersion is the default version of protoc from
+	// github.com/google/protobuf to use.
+	//
+	// See https://github.com/google/protobuf/releases for the latest release.
+	DefaultProtocVersion = "3.5.1"
 )
 
-var enumNamesCamelCaseChecker = NewAddChecker(
-	"ENUM_NAMES_CAMEL_CASE",
-	"Verifies that all enum names are CamelCase.",
-	checkEnumNamesCamelCase,
+var (
+	// GitCommit is the git commit used to build the binary.
+	//
+	// This is populated at build time using ldflags.
+	GitCommit string
+
+	// BuiltTimestamp is the time at which the binary was built.
+	//
+	// This is populated at build time using ldflags.
+	BuiltTimestamp string
 )
-
-func checkEnumNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
-	return runVisitor(enumNamesCamelCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
-}
-
-type enumNamesCamelCaseVisitor struct {
-	baseAddVisitor
-}
-
-func (v enumNamesCamelCaseVisitor) VisitMessage(message *proto.Message) {
-	// for nested enums
-	for _, child := range message.Elements {
-		child.Accept(v)
-	}
-}
-
-func (v enumNamesCamelCaseVisitor) VisitEnum(enum *proto.Enum) {
-	if !strs.IsCamelCase(enum.Name) {
-		v.AddFailuref(enum.Position, "Enum name %q must be CamelCase.", enum.Name)
-	}
-}

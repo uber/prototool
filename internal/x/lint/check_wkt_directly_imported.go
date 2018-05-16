@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/wkt"
 	"github.com/uber/prototool/internal/x/text"
-	"github.com/uber/prototool/internal/x/wkt"
 )
 
 // TODO: This will not detect things like "timestamp.proto" or "protobuf/timestamp.proto"
@@ -48,7 +48,7 @@ type wktDirectlyImportedVisitor struct {
 }
 
 func (v wktDirectlyImportedVisitor) VisitImport(element *proto.Import) {
-	for _, wktFilename := range wkt.Filenames {
+	for wktFilename := range wkt.Filenames {
 		if strings.HasSuffix(element.Filename, wktFilename) && element.Filename != wktFilename {
 			v.AddFailuref(element.Position, "Import %q is a Well-Known Type import but should be imported using google/protobuf as the base.", element.Filename)
 		}
