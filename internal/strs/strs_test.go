@@ -52,6 +52,7 @@ func TestIsLowerSnakeCase(t *testing.T) {
 	assert.False(t, IsLowerSnakeCase("Hello_world"))
 	assert.False(t, IsLowerSnakeCase("_hello_world"))
 	assert.False(t, IsLowerSnakeCase("hello_world_"))
+	assert.False(t, IsLowerSnakeCase("hello_world.foo"))
 }
 
 func TestIsUpperSnakeCase(t *testing.T) {
@@ -64,6 +65,7 @@ func TestIsUpperSnakeCase(t *testing.T) {
 	assert.False(t, IsUpperSnakeCase("Hello_world"))
 	assert.False(t, IsUpperSnakeCase("_HELLO_WORLD"))
 	assert.False(t, IsUpperSnakeCase("HELLO_WORLD_"))
+	assert.False(t, IsUpperSnakeCase("HELLO_WORLD.FOO"))
 }
 
 func TestIsLowercase(t *testing.T) {
@@ -90,15 +92,15 @@ func TestToUpperSnakeCase(t *testing.T) {
 	assert.Equal(t, "ABBR_CAMEL", ToUpperSnakeCase("ABBRCamel"))
 }
 
-func TestDedupe(t *testing.T) {
-	assert.Equal(t, []string{"a", "b", "c"}, Dedupe([]string{"b", "A", "c"}, strings.ToLower))
-	assert.Equal(t, []string{"a", "b", "c"}, Dedupe([]string{"b", "A", "c", "a"}, strings.ToLower))
-	assert.Equal(t, []string{"a", "b", "c"}, Dedupe([]string{"b", "A", "c", "a", "B"}, strings.ToLower))
-	assert.Equal(t, []string{"a", "b", "c"}, Dedupe([]string{"b", "A", "c", "a", "B", "b"}, strings.ToLower))
-	assert.Equal(t, []string{"A", "b", "c"}, Dedupe([]string{"b", "A", "c"}, nil))
-	assert.Equal(t, []string{"A", "a", "b", "c"}, Dedupe([]string{"b", "A", "c", "a"}, nil))
-	assert.Equal(t, []string{"A", "B", "b", "c"}, Dedupe([]string{"b", "A", "c", "A", "B"}, nil))
-	assert.Equal(t, []string{"A", "B", "b", "c"}, Dedupe([]string{"b", "A", "c", "", "A", "B"}, nil))
+func TestDedupeSort(t *testing.T) {
+	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c"}, strings.ToLower))
+	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a"}, strings.ToLower))
+	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a", "B"}, strings.ToLower))
+	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a", "B", "b"}, strings.ToLower))
+	assert.Equal(t, []string{"A", "b", "c"}, DedupeSort([]string{"b", "A", "c"}, nil))
+	assert.Equal(t, []string{"A", "a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a"}, nil))
+	assert.Equal(t, []string{"A", "B", "b", "c"}, DedupeSort([]string{"b", "A", "c", "A", "B"}, nil))
+	assert.Equal(t, []string{"A", "B", "b", "c"}, DedupeSort([]string{"b", "A", "c", "", "A", "B"}, nil))
 }
 
 func TestIntersection(t *testing.T) {

@@ -207,7 +207,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		return Config{}, err
 	}
 	includePaths := make([]string, 0, len(e.ProtocIncludes))
-	for _, includePath := range strs.Dedupe(e.ProtocIncludes, nil) {
+	for _, includePath := range strs.DedupeSort(e.ProtocIncludes, nil) {
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -279,10 +279,10 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			AllowUnusedImports:    e.AllowUnusedImports,
 		},
 		Lint: LintConfig{
-			IDs:                 strs.Dedupe(e.Lint.IDs, strings.ToUpper),
+			IDs:                 strs.DedupeSort(e.Lint.IDs, strings.ToUpper),
 			Group:               strings.ToLower(e.Lint.Group),
-			IncludeIDs:          strs.Dedupe(e.Lint.IncludeIDs, strings.ToUpper),
-			ExcludeIDs:          strs.Dedupe(e.Lint.ExcludeIDs, strings.ToUpper),
+			IncludeIDs:          strs.DedupeSort(e.Lint.IncludeIDs, strings.ToUpper),
+			ExcludeIDs:          strs.DedupeSort(e.Lint.ExcludeIDs, strings.ToUpper),
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 		},
 		Format: FormatConfig{
@@ -355,7 +355,7 @@ func getExcludePrefixes(excludes []string, noDefaultExcludes bool, dirPath strin
 		excludes = append(DefaultExcludePrefixes, excludes...)
 	}
 	excludePrefixes := make([]string, 0, len(excludes))
-	for _, excludePrefix := range strs.Dedupe(excludes, nil) {
+	for _, excludePrefix := range strs.DedupeSort(excludes, nil) {
 		if !filepath.IsAbs(excludePrefix) {
 			excludePrefix = filepath.Join(dirPath, excludePrefix)
 		}

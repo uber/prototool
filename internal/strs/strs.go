@@ -90,23 +90,9 @@ func ToUpperSnakeCase(s string) string {
 	return strings.ToUpper(toSnake(s))
 }
 
-// toSnake converts s to snake_case.
-// It is assumed s has no spaces.
-func toSnake(s string) string {
-	output := ""
-	for i, c := range s {
-		if i > 0 && unicode.IsUpper(c) && output[len(output)-1] != '_' && i < len(s)-1 && !unicode.IsUpper(rune(s[i+1])) {
-			output += "_" + string(c)
-		} else {
-			output += string(c)
-		}
-	}
-	return output
-}
-
-// Dedupe returns s with no duplicates and no empty strings, sorted.
+// DedupeSort returns s with no duplicates and no empty strings, sorted.
 // If modifier is not nil, modifier will be applied to each element in s.
-func Dedupe(s []string, modifier func(string) string) []string {
+func DedupeSort(s []string, modifier func(string) string) []string {
 	m := make(map[string]struct{}, len(s))
 	o := make([]string, 0, len(m))
 	for _, e := range s {
@@ -171,6 +157,20 @@ func IsUppercase(s string) bool {
 		return false
 	}
 	return strings.ToUpper(s) == s
+}
+
+// toSnake converts s to snake_case.
+// It is assumed s has no spaces.
+func toSnake(s string) string {
+	output := ""
+	for i, c := range s {
+		if i > 0 && unicode.IsUpper(c) && output[len(output)-1] != '_' && i < len(s)-1 && !unicode.IsUpper(rune(s[i+1])) {
+			output += "_" + string(c)
+		} else {
+			output += string(c)
+		}
+	}
+	return output
 }
 
 func isLetter(r rune) bool {
