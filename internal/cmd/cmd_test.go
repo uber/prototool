@@ -38,9 +38,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/internal/vars"
 	"github.com/uber/prototool/internal/x/lint"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/vars"
 	"google.golang.org/grpc"
 )
 
@@ -314,7 +314,7 @@ func TestVersion(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, 0, "default", "list-all-lint-groups")
+	assertExact(t, 0, "all\ndefault", "list-all-lint-groups")
 }
 
 func TestDescriptorProto(t *testing.T) {
