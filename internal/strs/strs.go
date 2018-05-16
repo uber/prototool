@@ -28,7 +28,6 @@ package strs
 import (
 	"sort"
 	"strings"
-	"unicode"
 	"unicode/utf8"
 )
 
@@ -164,7 +163,7 @@ func IsUppercase(s string) bool {
 func toSnake(s string) string {
 	output := ""
 	for i, c := range s {
-		if i > 0 && unicode.IsUpper(c) && output[len(output)-1] != '_' && i < len(s)-1 && !unicode.IsUpper(rune(s[i+1])) {
+		if i > 0 && isUpper(c) && output[len(output)-1] != '_' && i < len(s)-1 && !isUpper(rune(s[i+1])) {
 			output += "_" + string(c)
 		} else {
 			output += string(c)
