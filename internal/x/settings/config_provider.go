@@ -207,7 +207,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		return Config{}, err
 	}
 	includePaths := make([]string, 0, len(e.ProtocIncludes))
-	for _, includePath := range strs.DedupeSortSlice(e.ProtocIncludes, nil) {
+	for _, includePath := range strs.DedupeSort(e.ProtocIncludes, nil) {
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -279,10 +279,10 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			AllowUnusedImports:    e.AllowUnusedImports,
 		},
 		Lint: LintConfig{
-			IDs:                 strs.DedupeSortSlice(e.Lint.IDs, strings.ToUpper),
+			IDs:                 strs.DedupeSort(e.Lint.IDs, strings.ToUpper),
 			Group:               strings.ToLower(e.Lint.Group),
-			IncludeIDs:          strs.DedupeSortSlice(e.Lint.IncludeIDs, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSortSlice(e.Lint.ExcludeIDs, strings.ToUpper),
+			IncludeIDs:          strs.DedupeSort(e.Lint.IncludeIDs, strings.ToUpper),
+			ExcludeIDs:          strs.DedupeSort(e.Lint.ExcludeIDs, strings.ToUpper),
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 		},
 		Format: FormatConfig{
@@ -321,7 +321,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	if len(config.Lint.IDs) > 0 && (len(config.Lint.Group) > 0 || len(config.Lint.IncludeIDs) > 0 || len(config.Lint.ExcludeIDs) > 0) {
 		return Config{}, fmt.Errorf("config was %v but can only specify either linters, or lint_group/lint_include/lint_exclude", e)
 	}
-	if intersection := strs.IntersectionSlice(config.Lint.IncludeIDs, config.Lint.ExcludeIDs); len(intersection) > 0 {
+	if intersection := strs.Intersection(config.Lint.IncludeIDs, config.Lint.ExcludeIDs); len(intersection) > 0 {
 		return Config{}, fmt.Errorf("config had intersection of %v between lint_include and lint_exclude", intersection)
 	}
 	return config, nil
@@ -355,7 +355,7 @@ func getExcludePrefixes(excludes []string, noDefaultExcludes bool, dirPath strin
 		excludes = append(DefaultExcludePrefixes, excludes...)
 	}
 	excludePrefixes := make([]string, 0, len(excludes))
-	for _, excludePrefix := range strs.DedupeSortSlice(excludes, nil) {
+	for _, excludePrefix := range strs.DedupeSort(excludes, nil) {
 		if !filepath.IsAbs(excludePrefix) {
 			excludePrefix = filepath.Join(dirPath, excludePrefix)
 		}

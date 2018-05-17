@@ -17,7 +17,7 @@ import "google/protobuf/timestamp.proto"; // inline comment9
 import "bar/bar.proto"; //inline comment10
 
 // comment2
-import "bar/bar_proto2.proto"; // inline comment2
+import public "bar/bar_proto2.proto"; // inline comment2
 
 
 

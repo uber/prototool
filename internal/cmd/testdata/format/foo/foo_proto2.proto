@@ -16,7 +16,7 @@ package foo; // inline comment3
 import "bar/bar.proto"; //inline comment10
 
 // comment2
-import "bar/bar_proto2.proto"; // inline comment2
+import weak "bar/bar_proto2.proto"; // inline comment2
 
 
 
