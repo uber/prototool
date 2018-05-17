@@ -722,6 +722,9 @@ func assertDoInternal(t *testing.T, stdin io.Reader, expectedExitCode int, expec
 func testDownload(t *testing.T) {
 	testLock.Lock()
 	defer testLock.Unlock()
+	// download checks if protoc is already downloaded to the cache location
+	// if it is, then this is effectively a no-op
+	// if it isn't, then this downloads to the cache
 	stdout, exitCode := testDoInternal(nil, "download")
 	require.Equal(t, 0, exitCode, "had non-zero exit code when downloading: %s", stdout)
 }
