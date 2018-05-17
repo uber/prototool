@@ -739,7 +739,6 @@ func testDownload(t *testing.T) {
 
 func testDoInternal(stdin io.Reader, args ...string) (string, int) {
 	args = append(args,
-		//"--debug",
 		"--print-fields", "filename:line:column:id:message",
 	)
 	if stdin == nil {
