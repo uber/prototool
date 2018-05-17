@@ -45,6 +45,7 @@ import (
 )
 
 var (
+	// testLock is to lock around prototool download in testDownload
 	testLock sync.Mutex
 )
 
