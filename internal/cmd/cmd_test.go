@@ -44,11 +44,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-const cleanEnvKey = "PROTOTOOL_TEST_CLEAN_CACHE"
-
 var (
-	testCleaned bool
-	testLock    sync.Mutex
+	testLock sync.Mutex
 )
 
 func TestCompile(t *testing.T) {
@@ -725,14 +722,6 @@ func assertDoInternal(t *testing.T, stdin io.Reader, expectedExitCode int, expec
 func testDownload(t *testing.T) {
 	testLock.Lock()
 	defer testLock.Unlock()
-	if os.Getenv(cleanEnvKey) != "" {
-		if !testCleaned {
-			testCleaned = true
-			stdout, exitCode := testDoInternal(nil, "clean")
-			require.Equal(t, 0, exitCode, "had non-zero exit code when cleaning")
-			require.Equal(t, "", stdout, "had output when cleaning")
-		}
-	}
 	stdout, exitCode := testDoInternal(nil, "download")
 	require.Equal(t, 0, exitCode, "had non-zero exit code when downloading: %s", stdout)
 }
