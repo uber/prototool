@@ -327,6 +327,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	rootCmd.AddCommand(serviceDescriptorProtoCmd)
 	rootCmd.AddCommand(versionCmd)
 
+	// flags bound to rootCmd are global flags
 	flags.bindCachePath(rootCmd.PersistentFlags())
 	flags.bindDebug(rootCmd.PersistentFlags())
 	flags.bindHarbormaster(rootCmd.PersistentFlags())
