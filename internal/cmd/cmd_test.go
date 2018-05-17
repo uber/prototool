@@ -585,7 +585,7 @@ func assertRegexp(t *testing.T, expectedExitCode int, expectedRegexp string, arg
 	assert.Equal(t, expectedExitCode, exitCode)
 	matched, err := regexp.MatchString(expectedRegexp, stdout)
 	assert.NoError(t, err)
-	assert.True(t, matched, stdout)
+	assert.True(t, matched, "Expected regex %s but got %s", expectedRegexp, stdout)
 }
 
 func assertExact(t *testing.T, expectedExitCode int, expectedStdout string, args ...string) {
