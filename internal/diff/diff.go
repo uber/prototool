@@ -31,23 +31,22 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 )
 
 // Do does a diff between an input and output.
 func Do(input []byte, output []byte, filename string) ([]byte, error) {
 	f1, err := writeTempFile("", "prototool-diff", input)
+	defer func() { _ = os.Remove(f1) }()
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = os.Remove(f1) }()
 
 	f2, err := writeTempFile("", "prototool-diff", output)
+	defer func() { _ = os.Remove(f2) }()
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = os.Remove(f2) }()
 
 	cmd := "diff"
 	if runtime.GOOS == "plan9" {
@@ -69,12 +68,11 @@ func writeTempFile(dir, prefix string, data []byte) (string, error) {
 		return "", err
 	}
 	_, err = file.Write(data)
-	if err1 := file.Close(); err == nil {
-		err = err1
-	}
 	if err != nil {
-		_ = os.Remove(file.Name())
-		return "", err
+		return file.Name(), err
+	}
+	if err := file.Close(); err != nil {
+		return file.Name(), err
 	}
 	return file.Name(), nil
 }
@@ -101,9 +99,7 @@ func replaceTempFilename(diff []byte, filename string) ([]byte, error) {
 	if i := bytes.LastIndexByte(bs[1], '\t'); i != -1 {
 		t1 = bs[1][i:]
 	}
-	// Always print filepath with slash separator.
-	f := filepath.ToSlash(filename)
-	bs[0] = []byte(fmt.Sprintf("--- %s%s", f+".orig", t0))
-	bs[1] = []byte(fmt.Sprintf("+++ %s%s", f, t1))
+	bs[0] = []byte(fmt.Sprintf("--- %s%s", filename+".orig", t0))
+	bs[1] = []byte(fmt.Sprintf("+++ %s%s", filename, t1))
 	return bytes.Join(bs, []byte{'\n'}), nil
 }
