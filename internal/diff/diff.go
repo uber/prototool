@@ -37,13 +37,13 @@ import (
 // Do does a diff between an input and output.
 func Do(input []byte, output []byte, filename string) ([]byte, error) {
 	f1, err := writeTempFile("", "prototool-diff", input)
-	defer func() { os.Remove(f1) }()
+	defer func() { _ = os.Remove(f1) }()
 	if err != nil {
 		return nil, err
 	}
 
 	f2, err := writeTempFile("", "prototool-diff", output)
-	defer func() { os.Remove(f2) }()
+	defer func() { _ = os.Remove(f2) }()
 	if err != nil {
 		return nil, err
 	}
