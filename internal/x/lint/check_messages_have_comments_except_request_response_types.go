@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/text"
 )
 
 var messagesHaveCommentsExceptRequestResponseTypesChecker = NewAddChecker(

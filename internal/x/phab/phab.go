@@ -29,7 +29,7 @@ package phab
 import (
 	"fmt"
 
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/text"
 )
 
 const (
