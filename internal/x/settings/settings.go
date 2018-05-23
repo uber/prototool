@@ -122,7 +122,7 @@ func ParseGenPluginType(s string) (GenPluginType, error) {
 //
 // All paths returned should be absolute paths. Outside of this package,
 // all other internal packages should verify that all given paths are
-// absolute, except for the internal/x/text package.
+// absolute, except for the internal/text package.
 type Config struct {
 	// The working directory path.
 	// Expected to be absolute path.

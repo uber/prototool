@@ -25,9 +25,9 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/wkt"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/text"
 )
 
 type firstPassVisitor struct {

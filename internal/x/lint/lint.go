@@ -26,9 +26,9 @@ import (
 	"path/filepath"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/text"
 	"go.uber.org/zap"
 )
 
