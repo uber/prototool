@@ -4,9 +4,9 @@
 /cover
 /cover.html
 /coverage.txt
-/internal/genmain/gen-prototool-bash-completion/gen-prototool-bash-completion
-/internal/genmain/gen-prototool-zsh-completion/gen-prototool-zsh-completion
-/internal/genmain/gen-prototool-manpages/gen-prototool-manpages
+/internal/cmd/gen-prototool-bash-completion/gen-prototool-bash-completion
+/internal/cmd/gen-prototool-zsh-completion/gen-prototool-zsh-completion
+/internal/cmd/gen-prototool-manpages/gen-prototool-manpages
 /cmd/prototool/prototool
 /main
 /prototool.iml
