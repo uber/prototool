@@ -54,6 +54,13 @@ const (
 	Lint
 	// Proto identitifes an invalid proto Failure.
 	Proto
+
+	// DefaultFilename is the default Failure filename.
+	DefaultFilename = "<input>"
+	// DefaultLine is the default Failure line.
+	DefaultLine = 1
+	// DefaultColumn is the default Failure column number.
+	DefaultColumn = 1
 )
 
 var (
@@ -134,7 +141,7 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 		case Filename:
 			filename := f.Filename
 			if filename == "" {
-				filename = "<input>"
+				filename = DefaultFilename
 			}
 			if _, err := writer.WriteString(filename); err != nil {
 				return err
@@ -142,7 +149,7 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 		case Line:
 			line := strconv.Itoa(f.Line)
 			if line == "0" {
-				line = "1"
+				line = strconv.Itoa(DefaultLine)
 			}
 			if _, err := writer.WriteString(line); err != nil {
 				return err
@@ -150,7 +157,7 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 		case Column:
 			column := strconv.Itoa(f.Column)
 			if column == "0" {
-				column = "1"
+				column = strconv.Itoa(DefaultColumn)
 			}
 			if _, err := writer.WriteString(column); err != nil {
 				return err

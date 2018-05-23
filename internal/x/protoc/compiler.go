@@ -518,10 +518,10 @@ func parseProtocOutput(cmdMeta *cmdMeta, output string) ([]*failure.Failure, err
 
 func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, error) {
 	if matches := pluginFailedRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-		return newFailure("", "protoc-gen-%s failed with status code %s.", matches[1], matches[2]), nil
+		return newFailure(failure.DefaultFilename, "protoc-gen-%s failed with status code %s.", matches[1], matches[2]), nil
 	}
 	if matches := otherPluginFailureRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-		return newFailure("", "protoc-gen-%s: %s", matches[1], matches[2]), nil
+		return newFailure(failure.DefaultFilename, "protoc-gen-%s: %s", matches[1], matches[2]), nil
 	}
 	split := strings.Split(protocLine, ":")
 	if len(split) != 4 {
@@ -536,7 +536,7 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, err
 		}
 		if matches := fileNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			// TODO: can we figure out the file name?
-			return newFailure("", "Import %q was not found.", matches[1]), nil
+			return newFailure(failure.DefaultFilename, "Import %q was not found.", matches[1]), nil
 		}
 		if matches := explicitDefaultValuesProto3Regexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			return newFailure(bestFilePath(cmdMeta, matches[1]), "Explicit default values are not allowed in proto3."), nil
@@ -559,7 +559,7 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, err
 			return newFailure(bestFilePath(cmdMeta, matches[1]), "Error while parsing option value for %q", matches[2]), nil
 		}
 		if matches := programNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
-			return newFailure("", "protoc-gen-%s not found or is not executable.", matches[1]), nil
+			return newFailure(failure.DefaultFilename, "protoc-gen-%s not found or is not executable.", matches[1]), nil
 		}
 		if matches := firstEnumValueZeroRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			return newFailure(bestFilePath(cmdMeta, matches[1]), "The first enum value must be zero in proto3."), nil
@@ -706,7 +706,7 @@ func tryRemoveTempFile(tempFilePath string) {
 
 func newFailure(filename string, format string, args ...interface{}) *failure.Failure {
 	return failure.Newf(
-		scanner.Position{Filename: filename, Line: 1, Column: 1}, // default position
+		scanner.Position{Filename: filename, Line: failure.DefaultLine, Column: failure.DefaultColumn},
 		failure.Proto,
 		format,
 		args...,
