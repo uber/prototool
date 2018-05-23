@@ -1,7 +1,7 @@
 package: github.com/uber/prototool
 import:
   - package: github.com/emicklei/proto
-    version: 0cbee195654dd0aab66561d51e08d37554fd8cfe
+    version: 43f8fb7abe35485d1ca39fe380c5b6d39aa931c2
   - package: github.com/fullstorydev/grpcurl
   - package: github.com/gogo/protobuf/protoc-gen-gogoslick
   - package: github.com/golang/protobuf/protoc-gen-go

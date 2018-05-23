@@ -39,9 +39,11 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/uber/prototool/internal/diff"
 	"github.com/uber/prototool/internal/protoc"
+	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/vars"
 	"github.com/uber/prototool/internal/x/cfginit"
-	"github.com/uber/prototool/internal/x/diff"
 	"github.com/uber/prototool/internal/x/extract"
 	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/format"
@@ -50,8 +52,6 @@ import (
 	"github.com/uber/prototool/internal/x/phab"
 	"github.com/uber/prototool/internal/x/reflect"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/text"
-	"github.com/uber/prototool/internal/x/vars"
 	"go.uber.org/zap"
 )
 
@@ -306,6 +306,7 @@ func (r *runner) compile(doGen bool, doFileDescriptorSet bool, meta *meta) ([]*d
 	if len(compileResult.Failures) > 0 {
 		return nil, newExitErrorf(255, "")
 	}
+	r.logger.Debug("protoc command exited without errors")
 	return compileResult.FileDescriptorSets, nil
 }
 
@@ -340,6 +341,7 @@ func (r *runner) Lint(args []string) error {
 }
 
 func (r *runner) lint(meta *meta) error {
+	r.logger.Debug("calling LintRunner")
 	failures, err := r.newLintRunner().Run(meta.ProtoSets...)
 	if err != nil {
 		return err
@@ -378,7 +380,12 @@ func (r *runner) ListLintGroup(group string) error {
 }
 
 func (r *runner) ListAllLintGroups() error {
+	groups := make([]string, 0, len(lint.GroupToCheckers))
 	for group := range lint.GroupToCheckers {
+		groups = append(groups, group)
+	}
+	sort.Strings(groups)
+	for _, group := range groups {
 		if err := r.println(group); err != nil {
 			return err
 		}

@@ -26,9 +26,9 @@ import (
 	"path/filepath"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/text"
 	"go.uber.org/zap"
 )
 
@@ -96,9 +96,13 @@ var (
 	// DefaultGroup is the default group.
 	DefaultGroup = "default"
 
+	// AllGroup is the group of all known linters.
+	AllGroup = "all"
+
 	// GroupToCheckers is the map from checker group to the corresponding slice of checkers.
 	GroupToCheckers = map[string][]Checker{
 		DefaultGroup: DefaultCheckers,
+		AllGroup:     AllCheckers,
 	}
 )
 

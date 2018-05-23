@@ -1,4 +1,4 @@
-# prototool [![Mit License][mit-img]][mit] [![Build Status][ci-img]][ci]
+# prototool [![Mit License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov]
 
 [Protobuf](https://developers.google.com/protocol-buffers) is one of the best interface description languages out there - it's widely adopted, and after over 15 years of use, it's practically bulletproof. However, working with Protobuf and maintaining consistency across your Protobuf files can be a pain - protoc, while being a tool that has stood the test of time, is non-trivial to use, and the Protobuf community has not developed common standards with regards to stub generation. Prototool aims to solve this by making working with Protobuf much simpler.
 
@@ -298,5 +298,11 @@ Prototool uses some external libraries that deserve special mention and thanks f
 [mit-img]: http://img.shields.io/badge/License-MIT-blue.svg
 [mit]: https://github.com/uber/prototool/blob/master/LICENSE
 
+[release-img]: https://img.shields.io/github/release/uber/prototool/all.svg
+[release]: https://github.com/uber/prototool/releases
+
 [ci-img]: https://img.shields.io/travis/uber/prototool/dev.svg
 [ci]: https://travis-ci.org/uber/prototool/builds
+
+[cov-img]: https://codecov.io/gh/uber/prototool/branch/dev/graph/badge.svg
+[cov]: https://codecov.io/gh/uber/prototool/branch/dev
