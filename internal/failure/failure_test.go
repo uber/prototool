@@ -28,13 +28,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//func TestFailureString(t *testing.T) {
-//assert.Equal(t, "<input>:1:1: hello", newTestFailure("", 0, 0, "", "hello").String())
-//assert.Equal(t, "<input>:1:2:ID hello", newTestFailure("", 0, 2, "ID", "hello").String())
-//assert.Equal(t, "<input>:2:2:ID hello", newTestFailure("", 2, 2, "ID", "hello").String())
-//assert.Equal(t, "foo:2:2:ID hello", newTestFailure("foo", 2, 2, "ID", "hello").String())
-//assert.Equal(t, "foo:2:2:BAR hello", newTestFailure("foo", 2, 2, Lint, "hello").String())
-//}
+func TestIDString(t *testing.T) {
+	assert.Equal(t, "FORMAT", Format.String())
+	assert.Equal(t, "LINT", Lint.String())
+	assert.Equal(t, "PROTO", Proto.String())
+}
 
 func TestFailureFprintln(t *testing.T) {
 	testFailureFprintln(t, "2:1:<input>:LINT", newTestFailure("", 0, 2, Lint, "hello"),
