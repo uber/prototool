@@ -21,8 +21,8 @@
 package format
 
 import (
+	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/text"
 	"go.uber.org/zap"
 )
 

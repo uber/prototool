@@ -25,9 +25,9 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/wkt"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/text"
 )
 
 type firstPassVisitor struct {
@@ -180,7 +180,15 @@ func (v *firstPassVisitor) PImports(imports []*proto.Import) {
 	sort.Slice(imports, func(i int, j int) bool { return imports[i].Filename < imports[j].Filename })
 	for _, i := range imports {
 		v.PComment(i.Comment)
-		v.PWithInlineComment(i.InlineComment, `import "`, i.Filename, `";`)
+		// kind can be "weak", "public", or empty
+		// if weak or public, just print it out but with a space afterwards
+		// otherwise do not print anything
+		// https://developers.google.com/protocol-buffers/docs/reference/proto3-spec#import_statement
+		kind := i.Kind
+		if kind != "" {
+			kind = kind + " "
+		}
+		v.PWithInlineComment(i.InlineComment, `import `, kind, `"`, i.Filename, `";`)
 	}
 }
 

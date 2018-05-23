@@ -21,9 +21,11 @@
 package lint
 
 import (
+	"strings"
+
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/x/strs"
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/strs"
+	"github.com/uber/prototool/internal/text"
 )
 
 var packageLowerSnakeCaseChecker = NewAddChecker(
@@ -59,7 +61,7 @@ func (v *packageLowerSnakeCaseVisitor) VisitPackage(pkg *proto.Package) {
 
 func (v *packageLowerSnakeCaseVisitor) Finally() error {
 	if v.pkg != nil {
-		if !strs.IsLowerSnakeCase(v.pkg.Name, '.') {
+		if !strs.IsLowerSnakeCase(strings.Replace(v.pkg.Name, ".", "", -1)) {
 			v.AddFailuref(v.pkg.Position, "Package should be lower_snake.case but was %q.", v.pkg.Name)
 		}
 	}

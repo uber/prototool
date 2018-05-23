@@ -22,8 +22,8 @@ package lint
 
 import (
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/x/strs"
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/strs"
+	"github.com/uber/prototool/internal/text"
 )
 
 var enumNamesCamelCaseChecker = NewAddChecker(

@@ -40,8 +40,9 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/cfginit"
+	"github.com/uber/prototool/internal/diff"
+	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
-	"github.com/uber/prototool/internal/x/diff"
 	"github.com/uber/prototool/internal/x/extract"
 	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/format"
@@ -51,7 +52,6 @@ import (
 	"github.com/uber/prototool/internal/x/protoc"
 	"github.com/uber/prototool/internal/x/reflect"
 	"github.com/uber/prototool/internal/x/settings"
-	"github.com/uber/prototool/internal/x/text"
 	"go.uber.org/zap"
 )
 

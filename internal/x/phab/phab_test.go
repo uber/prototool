@@ -24,7 +24,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/text"
 )
 
 func TestTextFailureToHarbormasterLintResult(t *testing.T) {

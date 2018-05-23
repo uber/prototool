@@ -27,7 +27,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/text"
 )
 
 type baseVisitor struct {
@@ -136,7 +136,11 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 		v.PComment(o.Comment)
 		// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
 		if len(o.Constant.Array) == 0 && len(o.Constant.OrderedMap) == 0 {
-			v.PWithInlineComment(o.InlineComment, prefix, o.Name, ` = `, o.Constant.SourceRepresentation(), suffix)
+			// SourceRepresentation() returns an empty string if the literal is empty
+			// if empty, we do not want to print the key or empty value
+			if source := o.Constant.SourceRepresentation(); source != "" {
+				v.PWithInlineComment(o.InlineComment, prefix, o.Name, ` = `, source, suffix)
+			}
 		} else if len(o.Constant.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
 			v.Failures = append(
 				v.Failures,
@@ -162,7 +166,11 @@ func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal, suffix s
 	}
 	// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
 	if len(literal.Array) == 0 && len(literal.OrderedMap) == 0 {
-		v.P(prefix, literal.SourceRepresentation(), suffix)
+		// SourceRepresentation() returns an empty string if the literal is empty
+		// if empty, we do not want to print the key or empty value
+		if source := literal.SourceRepresentation(); source != "" {
+			v.P(prefix, source, suffix)
+		}
 	} else if len(literal.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
 		v.P(prefix, `[`)
 		v.In()

@@ -10,7 +10,7 @@ import "google/protobuf/timestamp.proto"; // inline comment9
 //comment10
 import "bar/bar.proto"; //inline comment10
 // comment2
-import "bar/bar_proto2.proto"; // inline comment2
+import public "bar/bar_proto2.proto"; // inline comment2
 
 package foo; // inline comment3
 
@@ -25,6 +25,7 @@ option java_package = "com.foo.pb"; // inline comment23
 // comment16
 option (bar.file_dep_option) = {
 	hello: 1
+	bar: 2
 }; // inline comment16
 // comment6
 option (bar.file_option) = true; // inline comment6
