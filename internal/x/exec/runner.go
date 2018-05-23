@@ -444,7 +444,7 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, meta *
 		if lintMode {
 			if err := r.printFailures("", meta, failure.Newf(scanner.Position{
 				Filename: protoFile.DisplayPath,
-			}, "FORMAT_DIFF", "Format returned a diff.")); err != nil {
+			}, failure.Format, "Format returned a diff.")); err != nil {
 				return err
 			}
 		}

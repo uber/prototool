@@ -144,7 +144,7 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 		} else if len(o.Constant.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
 			v.Failures = append(
 				v.Failures,
-				failure.Newf(o.Position, "INVALID_PROTOBUF", "top-level options should never be arrays, this should not compile with protoc"),
+				failure.Newf(o.Position, failure.Proto, "top-level options should never be arrays, this should not compile with protoc"),
 			)
 		} else { // len(o.Constant.OrderedMap) > 0
 			v.P(prefix, o.Name, ` = {`)

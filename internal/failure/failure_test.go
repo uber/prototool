@@ -33,15 +33,15 @@ import (
 //assert.Equal(t, "<input>:1:2:ID hello", newTestFailure("", 0, 2, "ID", "hello").String())
 //assert.Equal(t, "<input>:2:2:ID hello", newTestFailure("", 2, 2, "ID", "hello").String())
 //assert.Equal(t, "foo:2:2:ID hello", newTestFailure("foo", 2, 2, "ID", "hello").String())
-//assert.Equal(t, "foo:2:2:BAR hello", newTestFailure("foo", 2, 2, "BAR", "hello").String())
+//assert.Equal(t, "foo:2:2:BAR hello", newTestFailure("foo", 2, 2, Lint, "hello").String())
 //}
 
 func TestFailureFprintln(t *testing.T) {
-	testFailureFprintln(t, "2:1:<input>:BAR", newTestFailure("", 0, 2, "BAR", "hello"),
+	testFailureFprintln(t, "2:1:<input>:LINT", newTestFailure("", 0, 2, Lint, "hello"),
 		Column,
 		Line,
 		Filename,
-		ID,
+		Identifier,
 	)
 }
 
@@ -54,7 +54,7 @@ func testFailureFprintln(t *testing.T, expected string, failure *Failure, failur
 func TestParseFields(t *testing.T) {
 	testParseFields(t, "", false, _defaultFields...)
 	testParseFields(t, "filename", false, Filename)
-	testParseFields(t, "filename:id", false, Filename, ID)
+	testParseFields(t, "filename:id", false, Filename, Identifier)
 	testParseFields(t, ":", true)
 	testParseFields(t, ":filename:id", true)
 	testParseFields(t, "filename:id:", true)
@@ -74,29 +74,29 @@ func testParseFields(t *testing.T, input string, expectError bool, expectedField
 func TestSort(t *testing.T) {
 	failures := []*Failure{
 		nil,
-		newTestFailure("foo", 3, 3, "BAT", "mello"),
-		newTestFailure("bar", 3, 3, "BAT", "mello"),
-		newTestFailure("foo", 3, 3, "BAT", "hello"),
-		newTestFailure("foo", 3, 3, "", "hello"),
-		newTestFailure("foo", 2, 3, "", "hello"),
-		newTestFailure("foo", 2, 2, "", "hello"),
-		newTestFailure("foo", 2, 0, "", "hello"),
-		newTestFailure("foo", 3, 3, "BAT", "mello"),
-		newTestFailure("foo", 3, 3, "", "hello"),
-		newTestFailure("foo", 0, 0, "", "hello"),
-		newTestFailure("", 0, 0, "", "hello"),
+		newTestFailure("foo", 3, 3, Proto, "mello"),
+		newTestFailure("bar", 3, 3, Proto, "mello"),
+		newTestFailure("foo", 3, 3, Proto, "hello"),
+		newTestFailure("foo", 3, 3, Format, "hello"),
+		newTestFailure("foo", 2, 3, Format, "hello"),
+		newTestFailure("foo", 2, 2, Format, "hello"),
+		newTestFailure("foo", 2, 0, Format, "hello"),
+		newTestFailure("foo", 3, 3, Proto, "mello"),
+		newTestFailure("foo", 3, 3, Format, "hello"),
+		newTestFailure("foo", 0, 0, Format, "hello"),
+		newTestFailure("", 0, 0, Format, "hello"),
 		nil,
 		nil,
-		newTestFailure("foo", 3, 3, "BAT", "mello"),
-		newTestFailure("foo", 3, 3, "BAT", "hello"),
-		newTestFailure("foo", 3, 3, "BAR", "hello"),
-		newTestFailure("foo", 2, 3, "", "hello"),
-		newTestFailure("foo", 2, 4, "", "hello"),
-		newTestFailure("foo", 2, 2, "", "hello"),
-		newTestFailure("foo", 3, 3, "BAR", "hello"),
-		newTestFailure("foo", 2, 0, "", "hello"),
-		newTestFailure("foo", 0, 0, "", "hello"),
-		newTestFailure("", 0, 0, "", "hello"),
+		newTestFailure("foo", 3, 3, Proto, "mello"),
+		newTestFailure("foo", 3, 3, Proto, "hello"),
+		newTestFailure("foo", 3, 3, Lint, "hello"),
+		newTestFailure("foo", 2, 3, Format, "hello"),
+		newTestFailure("foo", 2, 4, Format, "hello"),
+		newTestFailure("foo", 2, 2, Format, "hello"),
+		newTestFailure("foo", 3, 3, Lint, "hello"),
+		newTestFailure("foo", 2, 0, Format, "hello"),
+		newTestFailure("foo", 0, 0, Format, "hello"),
+		newTestFailure("", 0, 0, Format, "hello"),
 		nil,
 	}
 	Sort(failures)
@@ -107,32 +107,32 @@ func TestSort(t *testing.T) {
 			nil,
 			nil,
 			nil,
-			newTestFailure("", 0, 0, "", "hello"),
-			newTestFailure("", 0, 0, "", "hello"),
-			newTestFailure("bar", 3, 3, "BAT", "mello"),
-			newTestFailure("foo", 0, 0, "", "hello"),
-			newTestFailure("foo", 0, 0, "", "hello"),
-			newTestFailure("foo", 2, 0, "", "hello"),
-			newTestFailure("foo", 2, 0, "", "hello"),
-			newTestFailure("foo", 2, 2, "", "hello"),
-			newTestFailure("foo", 2, 2, "", "hello"),
-			newTestFailure("foo", 2, 3, "", "hello"),
-			newTestFailure("foo", 2, 3, "", "hello"),
-			newTestFailure("foo", 2, 4, "", "hello"),
-			newTestFailure("foo", 3, 3, "", "hello"),
-			newTestFailure("foo", 3, 3, "", "hello"),
-			newTestFailure("foo", 3, 3, "BAR", "hello"),
-			newTestFailure("foo", 3, 3, "BAR", "hello"),
-			newTestFailure("foo", 3, 3, "BAT", "hello"),
-			newTestFailure("foo", 3, 3, "BAT", "hello"),
-			newTestFailure("foo", 3, 3, "BAT", "mello"),
-			newTestFailure("foo", 3, 3, "BAT", "mello"),
-			newTestFailure("foo", 3, 3, "BAT", "mello"),
+			newTestFailure("", 0, 0, Format, "hello"),
+			newTestFailure("", 0, 0, Format, "hello"),
+			newTestFailure("bar", 3, 3, Proto, "mello"),
+			newTestFailure("foo", 0, 0, Format, "hello"),
+			newTestFailure("foo", 0, 0, Format, "hello"),
+			newTestFailure("foo", 2, 0, Format, "hello"),
+			newTestFailure("foo", 2, 0, Format, "hello"),
+			newTestFailure("foo", 2, 2, Format, "hello"),
+			newTestFailure("foo", 2, 2, Format, "hello"),
+			newTestFailure("foo", 2, 3, Format, "hello"),
+			newTestFailure("foo", 2, 3, Format, "hello"),
+			newTestFailure("foo", 2, 4, Format, "hello"),
+			newTestFailure("foo", 3, 3, Format, "hello"),
+			newTestFailure("foo", 3, 3, Format, "hello"),
+			newTestFailure("foo", 3, 3, Lint, "hello"),
+			newTestFailure("foo", 3, 3, Lint, "hello"),
+			newTestFailure("foo", 3, 3, Proto, "hello"),
+			newTestFailure("foo", 3, 3, Proto, "hello"),
+			newTestFailure("foo", 3, 3, Proto, "mello"),
+			newTestFailure("foo", 3, 3, Proto, "mello"),
+			newTestFailure("foo", 3, 3, Proto, "mello"),
 		},
 		failures,
 	)
 }
 
-func newTestFailure(filename string, line int, column int, id string, message string) *Failure {
+func newTestFailure(filename string, line int, column int, id ID, message string) *Failure {
 	return Newf(scanner.Position{Filename: filename, Line: line, Column: column}, id, message)
 }

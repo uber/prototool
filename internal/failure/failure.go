@@ -28,6 +28,14 @@ import (
 	"text/scanner"
 )
 
+type (
+	// Field references a Failure field.
+	Field int
+
+	// ID references a Failure identifier.
+	ID int
+)
+
 const (
 	// Filename references the Filename field of a Failure.
 	Filename Field = iota
@@ -35,10 +43,17 @@ const (
 	Line
 	// Column references the Column field of a Failure.
 	Column
-	// ID references the ID field of a Failure.
-	ID
+	// Identifier references the ID field of a Failure.
+	Identifier
 	// Message references the Message field of a Failure.
 	Message
+
+	// Format identifies a diff format Failure.
+	Format ID = iota
+	// Lint identifies a lint Failure.
+	Lint
+	// Proto identitifes an invalid proto Failure.
+	Proto
 )
 
 var (
@@ -52,13 +67,23 @@ var (
 		"filename": Filename,
 		"line":     Line,
 		"column":   Column,
-		"id":       ID,
+		"id":       Identifier,
 		"message":  Message,
+	}
+	_IDToString = map[ID]string{
+		Format: "FORMAT",
+		Lint:   "LINT",
+		Proto:  "PROTO",
 	}
 )
 
-// Field references a field of a Failure.
-type Field int
+// String implements fmt.Stringer.
+func (id ID) String() string {
+	if s, ok := _IDToString[id]; ok {
+		return s
+	}
+	return strconv.Itoa(int(id))
+}
 
 // ParseFields parses Fields from the given string.
 // Fields are expected to be colon-separated in the given string.
@@ -130,7 +155,7 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 			if _, err := writer.WriteString(column); err != nil {
 				return err
 			}
-		case ID:
+		case Identifier:
 			if _, err := writer.WriteString(f.ID); err != nil {
 				return err
 			}
@@ -154,9 +179,9 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 }
 
 // Newf is a helper that returns a new Failure.
-func Newf(position scanner.Position, id string, format string, args ...interface{}) *Failure {
+func Newf(position scanner.Position, id ID, format string, args ...interface{}) *Failure {
 	return &Failure{
-		ID:       id,
+		ID:       id.String(),
 		Filename: position.Filename,
 		Line:     position.Line,
 		Column:   position.Column,

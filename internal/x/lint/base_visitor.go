@@ -60,7 +60,7 @@ func newBaseAddVisitor(add func(*failure.Failure)) baseAddVisitor {
 }
 
 func (v baseAddVisitor) AddFailuref(position scanner.Position, format string, args ...interface{}) {
-	v.add(failure.Newf(position, "LINT", format, args...))
+	v.add(failure.Newf(position, failure.Lint, format, args...))
 }
 
 // extendedVisitor extends the proto.Visitor interface.
