@@ -38,8 +38,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/vars"
-	"github.com/uber/prototool/internal/x/lint"
 	"github.com/uber/prototool/internal/x/settings"
 	"google.golang.org/grpc"
 )
