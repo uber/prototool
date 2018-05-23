@@ -48,8 +48,10 @@ const (
 	// Message references the Message field of a Failure.
 	Message
 
+	// Error identifies a generic Failure.
+	Error ID = iota
 	// Format identifies a diff format Failure.
-	Format ID = iota
+	Format
 	// Lint identifies a lint Failure.
 	Lint
 	// Proto identitifes an invalid proto Failure.
@@ -78,6 +80,7 @@ var (
 		"message":  Message,
 	}
 	_IDToString = map[ID]string{
+		Error:  "ERROR",
 		Format: "FORMAT",
 		Lint:   "LINT",
 		Proto:  "PROTO",
@@ -163,7 +166,11 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 				return err
 			}
 		case Identifier:
-			if _, err := writer.WriteString(f.ID); err != nil {
+			id := f.ID
+			if id == "" {
+				id = Error.String()
+			}
+			if _, err := writer.WriteString(id); err != nil {
 				return err
 			}
 			printColon = false

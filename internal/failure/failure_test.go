@@ -29,6 +29,7 @@ import (
 )
 
 func TestIDString(t *testing.T) {
+	assert.Equal(t, "ERROR", Error.String())
 	assert.Equal(t, "FORMAT", Format.String())
 	assert.Equal(t, "LINT", Lint.String())
 	assert.Equal(t, "PROTO", Proto.String())
