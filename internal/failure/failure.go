@@ -113,13 +113,13 @@ type Writer interface {
 }
 
 // Fprintln prints the Failure to the writer with the given ordered fields.
+// The given fields will overwrite the fields already set in this Failure.
 func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 	if len(fields) == 0 {
 		fields = _defaultFields
 	}
-	written := false
+	printColon := true
 	for i, field := range fields {
-		printColon := true
 		switch field {
 		case Filename:
 			filename := f.Filename
@@ -129,7 +129,6 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 			if _, err := writer.WriteString(filename); err != nil {
 				return err
 			}
-			written = true
 		case Line:
 			line := strconv.Itoa(f.Line)
 			if line == "0" {
@@ -138,7 +137,6 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 			if _, err := writer.WriteString(line); err != nil {
 				return err
 			}
-			written = true
 		case Column:
 			column := strconv.Itoa(f.Column)
 			if column == "0" {
@@ -147,25 +145,16 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 			if _, err := writer.WriteString(column); err != nil {
 				return err
 			}
-			written = true
 		case ID:
-			if f.ID != "" {
-				if _, err := writer.WriteString(f.ID); err != nil {
-					return err
-				}
-				written = true
-			} else {
-				printColon = false
+			if _, err := writer.WriteString(f.ID); err != nil {
+				return err
 			}
+			printColon = false
 		case Message:
-			if f.Message != "" {
-				if _, err := writer.WriteString(f.Message); err != nil {
-					return err
-				}
-				written = true
-			} else {
-				printColon = false
+			if _, err := writer.WriteString(f.Message); err != nil {
+				return err
 			}
+			printColon = false
 		default:
 			return fmt.Errorf("unknown Field: %v", field)
 		}
@@ -173,35 +162,10 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 			if _, err := writer.WriteRune(':'); err != nil {
 				return err
 			}
-			written = true
 		}
 	}
-	if written {
-		_, err := writer.WriteRune('\n')
-		return err
-	}
-	return nil
-}
-
-// String implements fmt.Stringer. The Failure is
-// printed in the following format:
-//
-//  "<filename>:<line>:<column>:<id> <message>"
-func (f *Failure) String() string {
-	filename := f.Filename
-	if filename == "" {
-		filename = "<input>"
-	}
-	line := strconv.Itoa(f.Line)
-	if line == "0" {
-		line = "1"
-	}
-	column := strconv.Itoa(f.Column)
-	if column == "0" {
-		column = "1"
-	}
-
-	return fmt.Sprintf("%s:%s:%s:%s %s", filename, line, column, f.ID, f.Message)
+	_, err := writer.WriteRune('\n')
+	return err
 }
 
 // Newf is a helper that returns a new Failure.
