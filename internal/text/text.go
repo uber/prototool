@@ -21,7 +21,6 @@
 package text
 
 import (
-	"bytes"
 	"fmt"
 	"sort"
 	"strconv"
@@ -30,40 +29,38 @@ import (
 )
 
 const (
-	// FailureFieldFilename references the Filename field of a Failure.
-	FailureFieldFilename FailureField = iota
-	// FailureFieldLine references the Line field of a Failure.
-	FailureFieldLine
-	// FailureFieldColumn references the Column field of a Failure.
-	FailureFieldColumn
-	// FailureFieldID references the ID field of a Failure.
-	FailureFieldID
-	// FailureFieldMessage references the Message field of a Failure.
-	FailureFieldMessage
+	// Filename references the Filename field of a Failure.
+	Filename FailureField = iota
+	// Line references the Line field of a Failure.
+	Line
+	// Column references the Column field of a Failure.
+	Column
+	// ID references the ID field of a Failure.
+	ID
+	// Message references the Message field of a Failure.
+	Message
 )
 
 var (
-	// DefaultFailureFields are the default FailureFields.
-	DefaultFailureFields = []FailureField{
-		FailureFieldFilename,
-		FailureFieldLine,
-		FailureFieldColumn,
-		FailureFieldMessage,
+	_defaultFailureFields = []FailureField{
+		Filename,
+		Line,
+		Column,
+		Message,
 	}
-
 	_failureFieldToString = map[FailureField]string{
-		FailureFieldFilename: "filename",
-		FailureFieldLine:     "line",
-		FailureFieldColumn:   "column",
-		FailureFieldID:       "id",
-		FailureFieldMessage:  "message",
+		Filename: "filename",
+		Line:     "line",
+		Column:   "column",
+		ID:       "id",
+		Message:  "message",
 	}
 	_stringToFailureField = map[string]FailureField{
-		"filename": FailureFieldFilename,
-		"line":     FailureFieldLine,
-		"column":   FailureFieldColumn,
-		"id":       FailureFieldID,
-		"message":  FailureFieldMessage,
+		"filename": Filename,
+		"line":     Line,
+		"column":   Column,
+		"id":       ID,
+		"message":  Message,
 	}
 )
 
@@ -78,30 +75,22 @@ func (f FailureField) String() string {
 	return strconv.Itoa(int(f))
 }
 
-// ParseFailureField parses the FailureField from the given string.
-//
-// Input is case-insensitive.
-func ParseFailureField(s string) (FailureField, error) {
-	failureField, ok := _stringToFailureField[strings.ToLower(s)]
-	if !ok {
-		return 0, fmt.Errorf("could not parse %s to a FailureField", s)
-	}
-	return failureField, nil
-}
-
-// ParseColonSeparatedFailureFields parses FailureFields from the given string. FailureFields are expected to be colon-separated in the given string. Input is case-insensitive. If the string is empty, DefaultFailureFields will be returned.
-func ParseColonSeparatedFailureFields(s string) ([]FailureField, error) {
+// ParseFailureFields parses FailureFields from the given string.
+// FailureFields are expected to be colon-separated in the given string.
+// Input is case-insensitive. If the string is empty, _defaultFailureFields will be
+// returned.
+func ParseFailureFields(s string) ([]FailureField, error) {
 	if len(s) == 0 {
-		return DefaultFailureFields, nil
+		return _defaultFailureFields, nil
 	}
-	printFields := strings.Split(s, ":")
-	failureFields := make([]FailureField, len(printFields))
-	for i, failureFieldString := range printFields {
-		failureField, err := ParseFailureField(failureFieldString)
+	fields := strings.Split(s, ":")
+	failureFields := make([]FailureField, len(fields))
+	for i, f := range fields {
+		ff, err := parseFailureField(f)
 		if err != nil {
 			return nil, err
 		}
-		failureFields[i] = failureField
+		failureFields[i] = ff
 	}
 	return failureFields, nil
 }
@@ -126,13 +115,13 @@ type FailureWriter interface {
 // Fprintln prints the Failure to the writer with the given ordered fields.
 func (f *Failure) Fprintln(writer FailureWriter, fields ...FailureField) error {
 	if len(fields) == 0 {
-		fields = DefaultFailureFields
+		fields = _defaultFailureFields
 	}
 	written := false
 	for i, field := range fields {
 		printColon := true
 		switch field {
-		case FailureFieldFilename:
+		case Filename:
 			filename := f.Filename
 			if filename == "" {
 				filename = "<input>"
@@ -141,7 +130,7 @@ func (f *Failure) Fprintln(writer FailureWriter, fields ...FailureField) error {
 				return err
 			}
 			written = true
-		case FailureFieldLine:
+		case Line:
 			line := strconv.Itoa(f.Line)
 			if line == "0" {
 				line = "1"
@@ -150,7 +139,7 @@ func (f *Failure) Fprintln(writer FailureWriter, fields ...FailureField) error {
 				return err
 			}
 			written = true
-		case FailureFieldColumn:
+		case Column:
 			column := strconv.Itoa(f.Column)
 			if column == "0" {
 				column = "1"
@@ -159,7 +148,7 @@ func (f *Failure) Fprintln(writer FailureWriter, fields ...FailureField) error {
 				return err
 			}
 			written = true
-		case FailureFieldID:
+		case ID:
 			if f.ID != "" {
 				if _, err := writer.WriteString(f.ID); err != nil {
 					return err
@@ -168,7 +157,7 @@ func (f *Failure) Fprintln(writer FailureWriter, fields ...FailureField) error {
 			} else {
 				printColon = false
 			}
-		case FailureFieldMessage:
+		case Message:
 			if f.Message != "" {
 				if _, err := writer.WriteString(f.Message); err != nil {
 					return err
@@ -194,7 +183,10 @@ func (f *Failure) Fprintln(writer FailureWriter, fields ...FailureField) error {
 	return nil
 }
 
-// String implements fmt.Stringer.
+// String implements fmt.Stringer. The Failure is
+// printed in the following format:
+//
+//  "<filename>:<line>:<column>:<id> <message>"
 func (f *Failure) String() string {
 	filename := f.Filename
 	if filename == "" {
@@ -208,19 +200,8 @@ func (f *Failure) String() string {
 	if column == "0" {
 		column = "1"
 	}
-	buffer := bytes.NewBuffer(nil)
-	buffer.WriteString(filename)
-	buffer.WriteString(":")
-	buffer.WriteString(line)
-	buffer.WriteString(":")
-	buffer.WriteString(column)
-	buffer.WriteString(":")
-	if f.ID != "" {
-		buffer.WriteString(f.ID)
-		buffer.WriteString(" ")
-	}
-	buffer.WriteString(f.Message)
-	return buffer.String()
+
+	return fmt.Sprintf("%s:%s:%s:%s %s", filename, line, column, f.ID, f.Message)
 }
 
 // NewFailuref is a helper that returns a new Failure.
@@ -234,7 +215,9 @@ func NewFailuref(position scanner.Position, id string, format string, args ...in
 	}
 }
 
-// SortFailures sorts the Failures, by filename, line, column, id, message.
+// SortFailures sorts the Failures by the following precedence:
+//
+//  filename > line > column > id > message
 func SortFailures(failures []*Failure) {
 	sort.Stable(sortFailures(failures))
 }
@@ -281,4 +264,14 @@ func (f sortFailures) Less(i int, j int) bool {
 		return true
 	}
 	return false
+}
+
+// parseFailureField parses the FailureField from the given string.
+// Input is case-insensitive.
+func parseFailureField(s string) (FailureField, error) {
+	failureField, ok := _stringToFailureField[strings.ToLower(s)]
+	if !ok {
+		return 0, fmt.Errorf("could not parse %s to a FailureField", s)
+	}
+	return failureField, nil
 }

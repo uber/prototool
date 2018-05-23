@@ -796,7 +796,7 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 			failure.Filename = filename
 		}
 	}
-	failureFields, err := text.ParseColonSeparatedFailureFields(r.printFields)
+	failureFields, err := text.ParseFailureFields(r.printFields)
 	if err != nil {
 		return err
 	}

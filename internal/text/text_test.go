@@ -29,19 +29,19 @@ import (
 )
 
 func TestFailureString(t *testing.T) {
-	assert.Equal(t, "<input>:1:1:hello", newTestFailure("", 0, 0, "", "hello").String())
-	assert.Equal(t, "<input>:1:2:hello", newTestFailure("", 0, 2, "", "hello").String())
-	assert.Equal(t, "<input>:2:2:hello", newTestFailure("", 2, 2, "", "hello").String())
-	assert.Equal(t, "foo:2:2:hello", newTestFailure("foo", 2, 2, "", "hello").String())
+	assert.Equal(t, "<input>:1:1: hello", newTestFailure("", 0, 0, "", "hello").String())
+	assert.Equal(t, "<input>:1:2:ID hello", newTestFailure("", 0, 2, "ID", "hello").String())
+	assert.Equal(t, "<input>:2:2:ID hello", newTestFailure("", 2, 2, "ID", "hello").String())
+	assert.Equal(t, "foo:2:2:ID hello", newTestFailure("foo", 2, 2, "ID", "hello").String())
 	assert.Equal(t, "foo:2:2:BAR hello", newTestFailure("foo", 2, 2, "BAR", "hello").String())
 }
 
 func TestFailureFprintln(t *testing.T) {
 	testFailureFprintln(t, "2:1:<input>:BAR", newTestFailure("", 0, 2, "BAR", "hello"),
-		FailureFieldColumn,
-		FailureFieldLine,
-		FailureFieldFilename,
-		FailureFieldID,
+		Column,
+		Line,
+		Filename,
+		ID,
 	)
 }
 
@@ -51,18 +51,18 @@ func testFailureFprintln(t *testing.T, expected string, failure *Failure, failur
 	assert.Equal(t, expected+"\n", buffer.String())
 }
 
-func TestParseColonSeparatedFailureFields(t *testing.T) {
-	testParseColonSeparatedFailureFields(t, "", false, DefaultFailureFields...)
-	testParseColonSeparatedFailureFields(t, "filename", false, FailureFieldFilename)
-	testParseColonSeparatedFailureFields(t, "filename:id", false, FailureFieldFilename, FailureFieldID)
-	testParseColonSeparatedFailureFields(t, ":", true)
-	testParseColonSeparatedFailureFields(t, ":filename:id", true)
-	testParseColonSeparatedFailureFields(t, "filename:id:", true)
-	testParseColonSeparatedFailureFields(t, "filename:id2", true)
+func TestParseFailureFields(t *testing.T) {
+	testParseFailureFields(t, "", false, _defaultFailureFields...)
+	testParseFailureFields(t, "filename", false, Filename)
+	testParseFailureFields(t, "filename:id", false, Filename, ID)
+	testParseFailureFields(t, ":", true)
+	testParseFailureFields(t, ":filename:id", true)
+	testParseFailureFields(t, "filename:id:", true)
+	testParseFailureFields(t, "filename:id2", true)
 }
 
-func testParseColonSeparatedFailureFields(t *testing.T, input string, expectError bool, expectedFailureFields ...FailureField) {
-	failureFields, err := ParseColonSeparatedFailureFields(input)
+func testParseFailureFields(t *testing.T, input string, expectError bool, expectedFailureFields ...FailureField) {
+	failureFields, err := ParseFailureFields(input)
 	if expectError {
 		assert.Error(t, err)
 	} else {
