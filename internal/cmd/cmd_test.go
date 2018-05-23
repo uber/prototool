@@ -29,22 +29,24 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
 	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/x/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/internal/vars"
+	"github.com/uber/prototool/internal/x/lint"
 	"google.golang.org/grpc"
 )
 
-const cleanEnvKey = "PROTOTOOL_TEST_CLEAN_CACHE"
-
 var (
-	testCleaned bool
-	testLock    sync.Mutex
+	// testLock is to lock around prototool download in testDownload
+	testLock sync.Mutex
 )
 
 func TestCompile(t *testing.T) {
@@ -212,8 +214,104 @@ func TestLint(t *testing.T) {
 		64:7:ENUM_FIELD_PREFIXES
 		64:7:ENUM_ZERO_VALUES_INVALID
 		67:7:ENUM_ZERO_VALUES_INVALID
-		73:3:ENUM_ZERO_VALUES_INVALID`,
+		73:3:ENUM_ZERO_VALUES_INVALID
+		76:1:COMMENTS_NO_C_STYLE
+		80:3:COMMENTS_NO_C_STYLE
+		82:3:COMMENTS_NO_C_STYLE
+		84:5:COMMENTS_NO_C_STYLE
+		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+		93:1:ENUM_NAMES_CAMEL_CASE
+		`,
 		"testdata/lint/lots.proto",
+	)
+	assertDoLintFile(
+		t,
+		false,
+		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
+		3:1:PACKAGE_LOWER_SNAKE_CASE
+		7:1:MESSAGES_HAVE_COMMENTS
+		7:1:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		7:1:MESSAGE_NAMES_CAPITALIZED
+		9:1:MESSAGES_HAVE_COMMENTS
+		9:1:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		9:1:MESSAGE_NAMES_CAMEL_CASE
+		11:1:MESSAGES_HAVE_COMMENTS
+		11:1:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		12:3:MESSAGE_FIELD_NAMES_LOWERCASE
+		12:3:MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE
+		13:3:MESSAGE_FIELD_NAMES_LOWERCASE
+		13:3:MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE
+		14:3:MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE
+		15:3:MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE
+		22:3:COMMENTS_NO_C_STYLE
+		23:3:COMMENTS_NO_C_STYLE
+		26:1:SERVICES_HAVE_COMMENTS
+		26:1:SERVICE_NAMES_CAPITALIZED
+		28:1:SERVICES_HAVE_COMMENTS
+		28:1:SERVICE_NAMES_CAMEL_CASE
+		30:1:MESSAGES_HAVE_COMMENTS
+		31:1:MESSAGES_HAVE_COMMENTS
+		34:1:MESSAGES_HAVE_COMMENTS
+		36:5:MESSAGES_HAVE_COMMENTS
+		36:5:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		38:1:MESSAGES_HAVE_COMMENTS
+		40:1:MESSAGES_HAVE_COMMENTS
+		40:1:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		41:3:MESSAGES_HAVE_COMMENTS
+		44:1:SERVICES_HAVE_COMMENTS
+		45:3:RPCS_HAVE_COMMENTS
+		46:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		46:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		46:3:REQUEST_RESPONSE_TYPES_UNIQUE
+		46:3:REQUEST_RESPONSE_TYPES_UNIQUE
+		46:3:RPCS_HAVE_COMMENTS
+		47:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		47:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		47:3:REQUEST_RESPONSE_TYPES_UNIQUE
+		47:3:REQUEST_RESPONSE_TYPES_UNIQUE
+		47:3:RPCS_HAVE_COMMENTS
+		48:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		48:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		48:3:RPCS_HAVE_COMMENTS
+		48:3:RPC_NAMES_CAPITALIZED
+		49:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		49:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		49:3:REQUEST_RESPONSE_TYPES_IN_SAME_FILE
+		49:3:REQUEST_RESPONSE_TYPES_UNIQUE
+		49:3:RPCS_HAVE_COMMENTS
+		50:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		50:3:REQUEST_RESPONSE_NAMES_MATCH_RPC
+		50:3:REQUEST_RESPONSE_TYPES_IN_SAME_FILE
+		50:3:REQUEST_RESPONSE_TYPES_IN_SAME_FILE
+		50:3:REQUEST_RESPONSE_TYPES_UNIQUE
+		50:3:RPCS_HAVE_COMMENTS
+		53:1:ENUMS_HAVE_COMMENTS
+		58:3:ENUM_FIELD_PREFIXES
+		61:1:MESSAGES_HAVE_COMMENTS
+		61:1:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		62:3:MESSAGES_HAVE_COMMENTS
+		62:3:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		63:5:ENUMS_HAVE_COMMENTS
+		64:7:ENUM_FIELD_PREFIXES
+		64:7:ENUM_ZERO_VALUES_INVALID
+		66:5:ENUMS_HAVE_COMMENTS
+		67:7:ENUM_ZERO_VALUES_INVALID
+		72:1:ENUMS_HAVE_COMMENTS
+		73:3:ENUM_ZERO_VALUES_INVALID
+		76:1:COMMENTS_NO_C_STYLE
+		78:1:MESSAGES_HAVE_COMMENTS
+		78:1:MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+		80:3:COMMENTS_NO_C_STYLE
+		82:3:COMMENTS_NO_C_STYLE
+		84:5:COMMENTS_NO_C_STYLE
+		88:1:ENUMS_HAVE_COMMENTS
+		90:3:ENUM_FIELD_NAMES_UPPERCASE
+		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+		93:1:ENUMS_HAVE_COMMENTS
+		93:1:ENUM_NAMES_CAMEL_CASE`,
+		"testdata/lint/allgroup/lots.proto",
 	)
 }
 
@@ -298,6 +396,132 @@ func TestGRPC(t *testing.T) {
 	)
 }
 
+func TestVersion(t *testing.T) {
+	assertRegexp(t, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
+}
+
+func TestListAllLintGroups(t *testing.T) {
+	assertExact(t, 0, "all\ndefault", "list-all-lint-groups")
+}
+
+func TestDescriptorProto(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "Baz",
+  "field": [
+    {
+      "name": "hello",
+      "number": 1,
+      "label": "LABEL_OPTIONAL",
+      "type": "TYPE_INT64",
+      "jsonName": "hello"
+    },
+    {
+      "name": "dep",
+      "number": 2,
+      "label": "LABEL_OPTIONAL",
+      "type": "TYPE_MESSAGE",
+      "typeName": ".bar.Dep",
+      "jsonName": "dep"
+    },
+    {
+      "name": "timestamp",
+      "number": 3,
+      "label": "LABEL_OPTIONAL",
+      "type": "TYPE_MESSAGE",
+      "typeName": ".google.protobuf.Timestamp",
+      "jsonName": "timestamp"
+    }
+  ]
+}`,
+		"descriptor-proto", "testdata/foo/success.proto", "foo.Baz",
+	)
+}
+
+func TestFieldDescriptorProto(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "dep",
+  "number": 2,
+  "label": "LABEL_OPTIONAL",
+  "type": "TYPE_MESSAGE",
+  "typeName": ".bar.Dep",
+  "jsonName": "dep"
+}`,
+		"field-descriptor-proto", "testdata/foo/success.proto", "foo.Baz.dep",
+	)
+}
+
+func TestServiceDescriptorProto(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "ExcitedService",
+  "method": [
+    {
+      "name": "Exclamation",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      }
+    },
+    {
+      "name": "ExclamationClientStream",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      },
+      "clientStreaming": true
+    },
+    {
+      "name": "ExclamationServerStream",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      },
+      "serverStreaming": true
+    },
+    {
+      "name": "ExclamationBidiStream",
+      "inputType": ".grpc.ExclamationRequest",
+      "outputType": ".grpc.ExclamationResponse",
+      "options": {
+
+      },
+      "clientStreaming": true,
+      "serverStreaming": true
+    }
+  ]
+}`,
+		"service-descriptor-proto", "testdata/grpc", "grpc.ExcitedService",
+	)
+}
+
+func TestListLinters(t *testing.T) {
+	assertLinters(t, lint.DefaultCheckers, "list-linters")
+}
+
+func TestListAllLinters(t *testing.T) {
+	assertLinters(t, lint.AllCheckers, "list-all-linters")
+}
+
+func assertLinters(t *testing.T, checkers []lint.Checker, args ...string) {
+	checkerIDs := make([]string, 0, len(checkers))
+	for _, checker := range checkers {
+		checkerIDs = append(checkerIDs, checker.ID())
+	}
+	sort.Strings(checkerIDs)
+	assertDo(t, 0, strings.Join(checkerIDs, "\n"), args...)
+}
+
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
 	lines := getCleanLines(expectedLinePrefixes)
 	expectedExitCode := 0
@@ -352,6 +576,20 @@ func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string,
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
 	assertDoStdin(t, strings.NewReader(jsonData), expectedExitCode, expectedLinePrefixes, "grpc", filePath, excitedTestCase.Address(), method, "-")
+}
+
+func assertRegexp(t *testing.T, expectedExitCode int, expectedRegexp string, args ...string) {
+	stdout, exitCode := testDo(t, args...)
+	assert.Equal(t, expectedExitCode, exitCode)
+	matched, err := regexp.MatchString(expectedRegexp, stdout)
+	assert.NoError(t, err)
+	assert.True(t, matched, "Expected regex %s but got %s", expectedRegexp, stdout)
+}
+
+func assertExact(t *testing.T, expectedExitCode int, expectedStdout string, args ...string) {
+	stdout, exitCode := testDo(t, args...)
+	assert.Equal(t, expectedExitCode, exitCode)
+	assert.Equal(t, expectedStdout, stdout)
 }
 
 func assertDoStdin(t *testing.T, stdin io.Reader, expectedExitCode int, expectedLinePrefixes string, args ...string) {
@@ -485,21 +723,15 @@ func assertDoInternal(t *testing.T, stdin io.Reader, expectedExitCode int, expec
 func testDownload(t *testing.T) {
 	testLock.Lock()
 	defer testLock.Unlock()
-	if os.Getenv(cleanEnvKey) != "" {
-		if !testCleaned {
-			testCleaned = true
-			stdout, exitCode := testDoInternal(nil, "clean")
-			require.Equal(t, 0, exitCode, "had non-zero exit code when cleaning")
-			require.Equal(t, "", stdout, "had output when cleaning")
-		}
-	}
+	// download checks if protoc is already downloaded to the cache location
+	// if it is, then this is effectively a no-op
+	// if it isn't, then this downloads to the cache
 	stdout, exitCode := testDoInternal(nil, "download")
 	require.Equal(t, 0, exitCode, "had non-zero exit code when downloading: %s", stdout)
 }
 
 func testDoInternal(stdin io.Reader, args ...string) (string, int) {
 	args = append(args,
-		//"--debug",
 		"--print-fields", "filename:line:column:id:message",
 	)
 	if stdin == nil {

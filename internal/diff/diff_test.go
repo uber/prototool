@@ -18,37 +18,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package lint
+// Primarily adapted from https://github.com/golang/go/blob/e86168430f0aab8f971763e4b00c2aae7bec55f0/src/cmd/gofmt/gofmt.go.
+// Copyright 2009 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package diff
 
 import (
-	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/x/text"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
-var enumNamesCamelCaseChecker = NewAddChecker(
-	"ENUM_NAMES_CAMEL_CASE",
-	"Verifies that all enum names are CamelCase.",
-	checkEnumNamesCamelCase,
-)
-
-func checkEnumNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
-	return runVisitor(enumNamesCamelCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func TestDo(t *testing.T) {
+	testDo(t, "", "", nil)
+	testDo(t, "abc", "abc", nil)
+	testDo(t, "abc", "abd", nil, "-abc", "+abd")
+	testDo(t, "abc\nabc", "abc\nabd", nil, "-abc", "+abd")
+	testDo(t, "abc\nabc", "abc\nabc", nil)
 }
 
-type enumNamesCamelCaseVisitor struct {
-	baseAddVisitor
-}
-
-func (v enumNamesCamelCaseVisitor) VisitMessage(message *proto.Message) {
-	// for nested enums
-	for _, child := range message.Elements {
-		child.Accept(v)
+func testDo(
+	t *testing.T,
+	input string,
+	output string,
+	expectedError error,
+	expectedDiffs ...string,
+) {
+	diff, err := Do([]byte(input), []byte(output), "")
+	for _, expectedDiff := range expectedDiffs {
+		assert.Contains(t, string(diff), expectedDiff, "diff does not contain %s", expectedDiff)
 	}
-}
-
-func (v enumNamesCamelCaseVisitor) VisitEnum(enum *proto.Enum) {
-	if !strs.IsCamelCase(enum.Name) {
-		v.AddFailuref(enum.Position, "Enum name %q must be CamelCase.", enum.Name)
-	}
+	assert.Equal(t, expectedError, err)
 }

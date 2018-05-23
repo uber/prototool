@@ -33,10 +33,10 @@ license:
 
 .PHONY: golden
 golden: install
-	for file in $(shell find internal/x/cmd/testdata/format -name '*.proto.golden'); do \
+	for file in $(shell find internal/cmd/testdata/format -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
-	for file in $(shell find internal/x/cmd/testdata/format -name '*.proto'); do \
+	for file in $(shell find internal/cmd/testdata/format -name '*.proto'); do \
 		prototool format $${file} > $${file}.golden || true; \
 	done
 
@@ -57,7 +57,7 @@ example: install
 
 .PHONY: internalgen
 internalgen: install
-	prototool gen internal/x/cmd/testdata/grpc
+	prototool gen internal/cmd/testdata/grpc
 	rm -f etc/config/example/prototool.yaml
 	prototool init etc/config/example --uncomment
 

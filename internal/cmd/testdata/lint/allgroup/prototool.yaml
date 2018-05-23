@@ -1,0 +1,5 @@
+protoc_include_wkt: true
+protoc_includes:
+  - ../..
+lint:
+  group: all
