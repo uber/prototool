@@ -24,7 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/text"
 )
 
 var syntaxProto3Checker = NewAddChecker(

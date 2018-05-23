@@ -41,6 +41,7 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/diff"
 	"github.com/uber/prototool/internal/settings"
+	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
 	"github.com/uber/prototool/internal/x/cfginit"
 	"github.com/uber/prototool/internal/x/extract"
@@ -51,7 +52,6 @@ import (
 	"github.com/uber/prototool/internal/x/phab"
 	"github.com/uber/prototool/internal/x/protoc"
 	"github.com/uber/prototool/internal/x/reflect"
-	"github.com/uber/prototool/internal/x/text"
 	"go.uber.org/zap"
 )
 

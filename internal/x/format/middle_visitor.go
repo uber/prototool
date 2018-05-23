@@ -26,7 +26,7 @@ import (
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/x/text"
+	"github.com/uber/prototool/internal/text"
 )
 
 type middleVisitor struct {
