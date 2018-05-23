@@ -48,13 +48,6 @@ var (
 		Column,
 		Message,
 	}
-	_failureFieldToString = map[Field]string{
-		Filename: "filename",
-		Line:     "line",
-		Column:   "column",
-		ID:       "id",
-		Message:  "message",
-	}
 	_stringToField = map[string]Field{
 		"filename": Filename,
 		"line":     Line,
@@ -66,14 +59,6 @@ var (
 
 // Field references a field of a Failure.
 type Field int
-
-// String implements fmt.Stringer.
-func (f Field) String() string {
-	if s, ok := _failureFieldToString[f]; ok {
-		return s
-	}
-	return strconv.Itoa(int(f))
-}
 
 // ParseFields parses Fields from the given string.
 // Fields are expected to be colon-separated in the given string.
@@ -182,15 +167,15 @@ func Newf(position scanner.Position, id string, format string, args ...interface
 // Sort sorts the Failures by the following precedence:
 //
 //  filename > line > column > id > message
-func Sort(failures []*Failure) {
-	sort.Stable(sortFailures(failures))
+func Sort(fs []*Failure) {
+	sort.Stable(failures(fs))
 }
 
-type sortFailures []*Failure
+type failures []*Failure
 
-func (f sortFailures) Len() int          { return len(f) }
-func (f sortFailures) Swap(i int, j int) { f[i], f[j] = f[j], f[i] }
-func (f sortFailures) Less(i int, j int) bool {
+func (f failures) Len() int          { return len(f) }
+func (f failures) Swap(i int, j int) { f[i], f[j] = f[j], f[i] }
+func (f failures) Less(i int, j int) bool {
 	if f[i] == nil && f[j] == nil {
 		return false
 	}
