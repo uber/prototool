@@ -23,7 +23,7 @@ package lint
 import (
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var serviceNamesCapitalizedChecker = NewAddChecker(
@@ -32,7 +32,7 @@ var serviceNamesCapitalizedChecker = NewAddChecker(
 	checkServiceNamesCapitalized,
 )
 
-func checkServiceNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkServiceNamesCapitalized(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(serviceNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

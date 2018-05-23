@@ -25,7 +25,7 @@ import (
 	"path/filepath"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/settings"
 	"go.uber.org/zap"
@@ -105,7 +105,7 @@ func NewDownloader(config settings.Config, options ...DownloaderOption) Download
 // CompileResult is the result of a compile
 type CompileResult struct {
 	// The failures from all calls.
-	Failures []*text.Failure
+	Failures []*failure.Failure
 	// Will not be set if there are any failures.
 	FileDescriptorSets []*descriptor.FileDescriptorSet
 }

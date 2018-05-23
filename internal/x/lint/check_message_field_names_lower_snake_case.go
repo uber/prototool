@@ -23,7 +23,7 @@ package lint
 import (
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var messageFieldNamesLowerSnakeCaseChecker = NewAddChecker(
@@ -32,7 +32,7 @@ var messageFieldNamesLowerSnakeCaseChecker = NewAddChecker(
 	checkMessageFieldNamesLowerSnakeCase,
 )
 
-func checkMessageFieldNamesLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessageFieldNamesLowerSnakeCase(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(messageFieldNamesLowerSnakeCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

@@ -24,7 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var commentsNoCStyleChecker = NewAddChecker(
@@ -33,7 +33,7 @@ var commentsNoCStyleChecker = NewAddChecker(
 	checkCommentsNoCStyle,
 )
 
-func checkCommentsNoCStyle(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkCommentsNoCStyle(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&commentsNoCStyleVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

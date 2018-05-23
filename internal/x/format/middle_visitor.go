@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/x/settings"
 )
 
@@ -42,7 +42,7 @@ func newMiddleVisitor(config settings.Config, isProto2 bool) *middleVisitor {
 	return &middleVisitor{isProto2: isProto2, rpcUseSemicolons: config.Format.RPCUseSemicolons, baseVisitor: newBaseVisitor(config.Format.Indent)}
 }
 
-func (v *middleVisitor) Do() []*text.Failure {
+func (v *middleVisitor) Do() []*failure.Failure {
 	return v.Failures
 }
 

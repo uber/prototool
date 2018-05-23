@@ -25,7 +25,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var requestResponseTypesInSameFileChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var requestResponseTypesInSameFileChecker = NewAddChecker(
 	checkRequestResponseTypesInSameFile,
 )
 
-func checkRequestResponseTypesInSameFile(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseTypesInSameFile(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&requestResponseTypesInSameFileVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

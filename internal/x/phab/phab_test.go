@@ -24,12 +24,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 func TestTextFailureToHarbormasterLintResult(t *testing.T) {
 	harbormasterLintResult, err := TextFailureToHarbormasterLintResult(
-		&text.Failure{
+		&failure.Failure{
 			Filename: "path/to/foo.proto",
 			Line:     2,
 			Message:  "Foo is a foo.",
@@ -49,7 +49,7 @@ func TestTextFailureToHarbormasterLintResult(t *testing.T) {
 		harbormasterLintResult,
 	)
 	harbormasterLintResult, err = TextFailureToHarbormasterLintResult(
-		&text.Failure{
+		&failure.Failure{
 			Filename: "path/to/foo.proto",
 			Line:     2,
 			ID:       "FOO",

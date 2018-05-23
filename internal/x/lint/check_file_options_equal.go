@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var fileOptionsEqualGoPackagePbSuffixChecker = NewAddChecker(
@@ -60,8 +60,8 @@ var fileOptionsEqualJavaPackageComPbChecker = NewAddChecker(
 	}),
 )
 
-func newCheckFileOptionsEqual(fileOption string, expectedValueFunc func(*proto.Package) string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func newCheckFileOptionsEqual(fileOption string, expectedValueFunc func(*proto.Package) string) func(func(*failure.Failure), string, []*proto.Proto) error {
+	return func(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 		return runVisitor(&fileOptionsEqualVisitor{
 			baseAddVisitor:    newBaseAddVisitor(add),
 			fileOption:        fileOption,

@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package text
+package failure
 
 import (
 	"bytes"
@@ -45,33 +45,33 @@ func TestFailureFprintln(t *testing.T) {
 	)
 }
 
-func testFailureFprintln(t *testing.T, expected string, failure *Failure, failureFields ...FailureField) {
+func testFailureFprintln(t *testing.T, expected string, failure *Failure, failureFields ...Field) {
 	buffer := bytes.NewBuffer(nil)
 	assert.NoError(t, failure.Fprintln(buffer, failureFields...))
 	assert.Equal(t, expected+"\n", buffer.String())
 }
 
-func TestParseFailureFields(t *testing.T) {
-	testParseFailureFields(t, "", false, _defaultFailureFields...)
-	testParseFailureFields(t, "filename", false, Filename)
-	testParseFailureFields(t, "filename:id", false, Filename, ID)
-	testParseFailureFields(t, ":", true)
-	testParseFailureFields(t, ":filename:id", true)
-	testParseFailureFields(t, "filename:id:", true)
-	testParseFailureFields(t, "filename:id2", true)
+func TestParseFields(t *testing.T) {
+	testParseFields(t, "", false, _defaultFields...)
+	testParseFields(t, "filename", false, Filename)
+	testParseFields(t, "filename:id", false, Filename, ID)
+	testParseFields(t, ":", true)
+	testParseFields(t, ":filename:id", true)
+	testParseFields(t, "filename:id:", true)
+	testParseFields(t, "filename:id2", true)
 }
 
-func testParseFailureFields(t *testing.T, input string, expectError bool, expectedFailureFields ...FailureField) {
-	failureFields, err := ParseFailureFields(input)
+func testParseFields(t *testing.T, input string, expectError bool, expectedFields ...Field) {
+	failureFields, err := ParseFields(input)
 	if expectError {
 		assert.Error(t, err)
 	} else {
 		assert.NoError(t, err)
-		assert.Equal(t, expectedFailureFields, failureFields)
+		assert.Equal(t, expectedFields, failureFields)
 	}
 }
 
-func TestSortFailures(t *testing.T) {
+func TestSort(t *testing.T) {
 	failures := []*Failure{
 		nil,
 		newTestFailure("foo", 3, 3, "BAT", "mello"),
@@ -99,7 +99,7 @@ func TestSortFailures(t *testing.T) {
 		newTestFailure("", 0, 0, "", "hello"),
 		nil,
 	}
-	SortFailures(failures)
+	Sort(failures)
 	assert.Equal(
 		t,
 		[]*Failure{
@@ -134,5 +134,5 @@ func TestSortFailures(t *testing.T) {
 }
 
 func newTestFailure(filename string, line int, column int, id string, message string) *Failure {
-	return NewFailuref(scanner.Position{Filename: filename, Line: line, Column: column}, id, message)
+	return Newf(scanner.Position{Filename: filename, Line: line, Column: column}, id, message)
 }

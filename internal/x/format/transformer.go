@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/x/settings"
 	"go.uber.org/zap"
 )
@@ -45,7 +45,7 @@ func newTransformer(options ...TransformerOption) *transformer {
 	return transformer
 }
 
-func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []*text.Failure, error) {
+func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []*failure.Failure, error) {
 	descriptor, err := proto.NewParser(bytes.NewReader(data)).Parse()
 	if err != nil {
 		return nil, nil, err
@@ -86,7 +86,7 @@ func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []
 	failures = append(failures, middleVisitor.Do()...)
 	buffer.Write(middleVisitor.Bytes())
 
-	text.SortFailures(failures)
+	failure.Sort(failures)
 
 	// TODO: expensive
 	s := strings.TrimSpace(buffer.String())

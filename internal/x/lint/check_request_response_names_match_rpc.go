@@ -22,7 +22,7 @@ package lint
 
 import (
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var requestResponseNamesMatchRPCChecker = NewAddChecker(
@@ -31,7 +31,7 @@ var requestResponseNamesMatchRPCChecker = NewAddChecker(
 	checkRequestResponseNamesMatchRPC,
 )
 
-func checkRequestResponseNamesMatchRPC(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseNamesMatchRPC(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(requestResponseNamesMatchRPCVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

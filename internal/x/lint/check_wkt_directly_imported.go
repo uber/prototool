@@ -24,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/wkt"
 )
 
@@ -39,7 +39,7 @@ var (
 	)
 )
 
-func checkWKTDirectlyImported(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkWKTDirectlyImported(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&wktDirectlyImportedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

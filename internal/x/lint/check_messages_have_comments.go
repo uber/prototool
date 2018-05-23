@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var messagesHaveCommentsChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var messagesHaveCommentsChecker = NewAddChecker(
 	checkMessagesHaveComments,
 )
 
-func checkMessagesHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessagesHaveComments(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(messagesHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

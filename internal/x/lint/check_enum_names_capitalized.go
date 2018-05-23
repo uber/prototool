@@ -23,7 +23,7 @@ package lint
 import (
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var enumNamesCapitalizedChecker = NewAddChecker(
@@ -32,7 +32,7 @@ var enumNamesCapitalizedChecker = NewAddChecker(
 	checkEnumNamesCapitalized,
 )
 
-func checkEnumNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumNamesCapitalized(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(enumNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

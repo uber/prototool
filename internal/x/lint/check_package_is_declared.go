@@ -24,7 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var packageIsDeclaredChecker = NewAddChecker(
@@ -33,7 +33,7 @@ var packageIsDeclaredChecker = NewAddChecker(
 	checkPackageIsDeclared,
 )
 
-func checkPackageIsDeclared(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackageIsDeclared(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&packageIsDeclaredVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

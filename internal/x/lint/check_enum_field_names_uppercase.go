@@ -23,7 +23,7 @@ package lint
 import (
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var enumFieldNamesUppercaseChecker = NewAddChecker(
@@ -32,7 +32,7 @@ var enumFieldNamesUppercaseChecker = NewAddChecker(
 	checkEnumFieldNamesUppercase,
 )
 
-func checkEnumFieldNamesUppercase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumFieldNamesUppercase(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(enumFieldNamesUppercaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

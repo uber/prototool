@@ -21,7 +21,7 @@
 package lint
 
 import (
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/x/file"
 	"go.uber.org/zap"
 )
@@ -40,8 +40,8 @@ func newRunner(options ...RunnerOption) *runner {
 	return runner
 }
 
-func (r *runner) Run(protoSets ...*file.ProtoSet) ([]*text.Failure, error) {
-	var failures []*text.Failure
+func (r *runner) Run(protoSets ...*file.ProtoSet) ([]*failure.Failure, error) {
+	var failures []*failure.Failure
 	for _, protoSet := range protoSets {
 		checkers, err := GetCheckers(protoSet.Config.Lint)
 		if err != nil {

@@ -27,13 +27,13 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 type baseVisitor struct {
 	*printer
 
-	Failures []*text.Failure
+	Failures []*failure.Failure
 }
 
 func newBaseVisitor(indent string) *baseVisitor {
@@ -59,7 +59,7 @@ func newBaseVisitor(indent string) *baseVisitor {
 //func (v *baseVisitor) VisitExtensions(element *proto.Extensions)   {}
 
 func (v *baseVisitor) AddFailure(position scanner.Position, format string, args ...interface{}) {
-	v.Failures = append(v.Failures, &text.Failure{
+	v.Failures = append(v.Failures, &failure.Failure{
 		Line:    position.Line,
 		Column:  position.Column,
 		Message: fmt.Sprintf(format, args...),
@@ -144,7 +144,7 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 		} else if len(o.Constant.Array) > 0 { // both Array and OrderedMap should not be set simultaneously, need more followup with emicklei/proto
 			v.Failures = append(
 				v.Failures,
-				text.NewFailuref(o.Position, "INVALID_PROTOBUF", "top-level options should never be arrays, this should not compile with protoc"),
+				failure.Newf(o.Position, "INVALID_PROTOBUF", "top-level options should never be arrays, this should not compile with protoc"),
 			)
 		} else { // len(o.Constant.OrderedMap) > 0
 			v.P(prefix, o.Name, ` = {`)

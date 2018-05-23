@@ -24,7 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var fileOptionsRequireGoPackageChecker = NewAddChecker(
@@ -51,8 +51,8 @@ var fileOptionsRequireJavaPackageChecker = NewAddChecker(
 	newCheckFileOptionsRequire("java_package"),
 )
 
-func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func newCheckFileOptionsRequire(fileOption string) func(func(*failure.Failure), string, []*proto.Proto) error {
+	return func(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 		return runVisitor(&fileOptionsRequireVisitor{
 			baseAddVisitor: newBaseAddVisitor(add),
 			fileOption:     fileOption,

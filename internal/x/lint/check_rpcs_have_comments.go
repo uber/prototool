@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var rpcsHaveCommentsChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var rpcsHaveCommentsChecker = NewAddChecker(
 	checkRPCsHaveComments,
 )
 
-func checkRPCsHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRPCsHaveComments(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(rpcsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

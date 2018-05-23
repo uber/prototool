@@ -23,7 +23,7 @@ package lint
 import (
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var rpcNamesCamelCaseChecker = NewAddChecker(
@@ -32,7 +32,7 @@ var rpcNamesCamelCaseChecker = NewAddChecker(
 	checkRPCNamesCamelCase,
 )
 
-func checkRPCNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRPCNamesCamelCase(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(rpcNamesCamelCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
