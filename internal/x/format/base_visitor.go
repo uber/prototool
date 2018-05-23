@@ -21,7 +21,6 @@
 package format
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 	"text/scanner"
@@ -59,11 +58,7 @@ func newBaseVisitor(indent string) *baseVisitor {
 //func (v *baseVisitor) VisitExtensions(element *proto.Extensions)   {}
 
 func (v *baseVisitor) AddFailure(position scanner.Position, format string, args ...interface{}) {
-	v.Failures = append(v.Failures, &failure.Failure{
-		Line:    position.Line,
-		Column:  position.Column,
-		Message: fmt.Sprintf(format, args...),
-	})
+	v.Failures = append(v.Failures, failure.Newf(position, failure.Format, format, args...))
 }
 
 func (v *baseVisitor) PWithInlineComment(inlineComment *proto.Comment, args ...interface{}) {

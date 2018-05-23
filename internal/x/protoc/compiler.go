@@ -518,11 +518,13 @@ func parseProtocOutput(cmdMeta *cmdMeta, output string) ([]*failure.Failure, err
 func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, error) {
 	if matches := pluginFailedRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 		return &failure.Failure{
+			ID:      failure.Proto.String(),
 			Message: fmt.Sprintf("protoc-gen-%s failed with status code %s.", matches[1], matches[2]),
 		}, nil
 	}
 	if matches := otherPluginFailureRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 		return &failure.Failure{
+			ID:      failure.Proto.String(),
 			Message: fmt.Sprintf("protoc-gen-%s: %s", matches[1], matches[2]),
 		}, nil
 	}
@@ -531,6 +533,7 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, err
 		if matches := noSyntaxSpecifiedRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  `No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.`,
 			}, nil
 		}
@@ -540,19 +543,21 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, err
 			}
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  fmt.Sprintf(`Import "%s" was not used.`, matches[2]),
 			}, nil
 		}
 		if matches := fileNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			return &failure.Failure{
 				// TODO: can we figure out the file name?
-				Filename: "",
-				Message:  fmt.Sprintf(`Import "%s" was not found.`, matches[1]),
+				ID:      failure.Proto.String(),
+				Message: fmt.Sprintf(`Import "%s" was not found.`, matches[1]),
 			}, nil
 		}
 		if matches := explicitDefaultValuesProto3Regexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  `Explicit default values are not allowed in proto3.`,
 			}, nil
 		}
@@ -564,35 +569,41 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, err
 		if matches := jsonCamelCaseRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  matches[2],
 			}, nil
 		}
 		if matches := isNotDefinedRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  fmt.Sprintf(`%s is not defined.`, matches[2]),
 			}, nil
 		}
 		if matches := seemsToBeDefinedRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  matches[2],
 			}, nil
 		}
 		if matches := optionValueRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  fmt.Sprintf(`Error while parsing option value for %s`, matches[2]),
 			}, nil
 		}
 		if matches := programNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			return &failure.Failure{
 				Message: fmt.Sprintf("protoc-gen-%s not found or is not executable.", matches[1]),
+				ID:      failure.Proto.String(),
 			}, nil
 		}
 		if matches := firstEnumValueZeroRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
 			return &failure.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
+				ID:       failure.Proto.String(),
 				Message:  `The first enum value must be zero in proto3.`,
 			}, nil
 		}
@@ -620,6 +631,7 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, err
 	}
 	return &failure.Failure{
 		Filename: bestFilePath(cmdMeta, split[0]),
+		ID:       failure.Proto.String(),
 		Line:     line,
 		Column:   column,
 		Message:  message,

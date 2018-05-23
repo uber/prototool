@@ -161,6 +161,9 @@ func (f *Failure) Fprintln(writer Writer, fields ...Field) error {
 			}
 			printColon = false
 		case Message:
+			if _, err := writer.WriteRune(' '); err != nil {
+				return err
+			}
 			if _, err := writer.WriteString(f.Message); err != nil {
 				return err
 			}
