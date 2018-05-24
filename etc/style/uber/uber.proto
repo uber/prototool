@@ -43,6 +43,8 @@ package style.uber;
 // Package options should be alphabetized.
 // The below java and golang options are always specified.
 
+// Do not specify either "java_multiple_files" or "java_outer_classname".
+
 // The go package is always $(basename PACKAGE)pb.
 // Do not use the "long-form" package name with a directory path.
 option go_package = "uberpb";
