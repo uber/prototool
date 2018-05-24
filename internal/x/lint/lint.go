@@ -26,7 +26,7 @@ import (
 	"path/filepath"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/settings"
 	"go.uber.org/zap"
@@ -118,7 +118,7 @@ func init() {
 
 // Runner runs a lint job.
 type Runner interface {
-	Run(...*file.ProtoSet) ([]*text.Failure, error)
+	Run(...*file.ProtoSet) ([]*failure.Failure, error)
 }
 
 // RunnerOption is an option for a new Runner.
@@ -152,7 +152,7 @@ type Checker interface {
 	// slice and does not return an error. An error is returned if something
 	// unexpected happens. Callers should verify the files are compilable
 	// before running this.
-	Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error)
+	Check(dirPath string, descriptors []*proto.Proto) ([]*failure.Failure, error)
 }
 
 // NewChecker is a convenience function that returns a new Checker for the
@@ -161,7 +161,7 @@ type Checker interface {
 // The ID will be upper-cased.
 //
 // Failures returned from check do not need to set the ID, this will be overwritten.
-func NewChecker(id string, purpose string, check func(string, []*proto.Proto) ([]*text.Failure, error)) Checker {
+func NewChecker(id string, purpose string, check func(string, []*proto.Proto) ([]*failure.Failure, error)) Checker {
 	return newBaseChecker(id, purpose, check)
 }
 
@@ -171,7 +171,7 @@ func NewChecker(id string, purpose string, check func(string, []*proto.Proto) ([
 // The ID will be upper-cased.
 //
 // Failures returned from check do not need to set the ID, this will be overwritten.
-func NewAddChecker(id string, purpose string, addCheck func(func(*text.Failure), string, []*proto.Proto) error) Checker {
+func NewAddChecker(id string, purpose string, addCheck func(func(*failure.Failure), string, []*proto.Proto) error) Checker {
 	return newBaseAddChecker(id, purpose, addCheck)
 }
 
@@ -257,8 +257,8 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto
 }
 
 // CheckMultiple is a convenience function that checks multiple checkers and multiple descriptors.
-func CheckMultiple(checkers []Checker, dirPathToDescriptors map[string][]*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
-	var allFailures []*text.Failure
+func CheckMultiple(checkers []Checker, dirPathToDescriptors map[string][]*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*failure.Failure, error) {
+	var allFailures []*failure.Failure
 	for dirPath, descriptors := range dirPathToDescriptors {
 		for _, checker := range checkers {
 			failures, err := checkOne(checker, dirPath, descriptors, ignoreIDToFilePaths)
@@ -268,11 +268,11 @@ func CheckMultiple(checkers []Checker, dirPathToDescriptors map[string][]*proto.
 			allFailures = append(allFailures, failures...)
 		}
 	}
-	text.SortFailures(allFailures)
+	failure.Sort(allFailures)
 	return allFailures, nil
 }
 
-func checkOne(checker Checker, dirPath string, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
+func checkOne(checker Checker, dirPath string, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*failure.Failure, error) {
 	filteredDescriptors, err := filterIgnores(checker, descriptors, ignoreIDToFilePaths)
 	if err != nil {
 		return nil, err

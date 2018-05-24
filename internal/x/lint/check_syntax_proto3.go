@@ -24,7 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var syntaxProto3Checker = NewAddChecker(
@@ -33,7 +33,7 @@ var syntaxProto3Checker = NewAddChecker(
 	checkSyntaxProto3,
 )
 
-func checkSyntaxProto3(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkSyntaxProto3(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&syntaxProto3Visitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var messagesHaveCommentsExceptRequestResponseTypesChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var messagesHaveCommentsExceptRequestResponseTypesChecker = NewAddChecker(
 	checkMessagesHaveCommentsExceptRequestResponseTypes,
 )
 
-func checkMessagesHaveCommentsExceptRequestResponseTypes(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessagesHaveCommentsExceptRequestResponseTypes(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&messagesHaveCommentsExceptRequestResponseTypesVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

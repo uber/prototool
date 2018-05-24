@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var enumsHaveCommentsChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var enumsHaveCommentsChecker = NewAddChecker(
 	checkEnumsHaveComments,
 )
 
-func checkEnumsHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumsHaveComments(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(enumsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

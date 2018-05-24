@@ -23,7 +23,7 @@ package lint
 import (
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var rpcNamesCapitalizedChecker = NewAddChecker(
@@ -32,7 +32,7 @@ var rpcNamesCapitalizedChecker = NewAddChecker(
 	checkRPCNamesCapitalized,
 )
 
-func checkRPCNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRPCNamesCapitalized(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(rpcNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

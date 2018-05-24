@@ -29,7 +29,7 @@ package phab
 import (
 	"fmt"
 
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 const (
@@ -45,7 +45,7 @@ const (
 	DefaultHarbormasterLintResultSeverity = "error"
 )
 
-// HarbormasterLintResult represents a text.Failure in a structure
+// HarbormasterLintResult represents a failure.Failure in a structure
 // compatible with a Harbormaster Lint Result. It is meant to be
 // encoded to JSON.
 //
@@ -60,8 +60,8 @@ type HarbormasterLintResult struct {
 	Description string `json:"description,omitempty"`
 }
 
-// TextFailureToHarbormasterLintResult converts a text.Failure to a HarbormasterLintResult.
-func TextFailureToHarbormasterLintResult(textFailure *text.Failure) (*HarbormasterLintResult, error) {
+// TextFailureToHarbormasterLintResult converts a failure.Failure to a HarbormasterLintResult.
+func TextFailureToHarbormasterLintResult(textFailure *failure.Failure) (*HarbormasterLintResult, error) {
 	if textFailure == nil {
 		return nil, nil
 	}

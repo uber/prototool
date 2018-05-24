@@ -40,7 +40,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/diff"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/vars"
 	"github.com/uber/prototool/internal/x/cfginit"
 	"github.com/uber/prototool/internal/x/extract"
@@ -442,9 +442,9 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, meta *
 			return ioutil.WriteFile(protoFile.Path, data, os.ModePerm)
 		}
 		if lintMode {
-			if err := r.printFailures("", meta, text.NewFailuref(scanner.Position{
+			if err := r.printFailures("", meta, failure.Newf(scanner.Position{
 				Filename: protoFile.DisplayPath,
-			}, "FORMAT_DIFF", "Format returned a diff.")); err != nil {
+			}, failure.Format, "Format returned a diff.")); err != nil {
 				return err
 			}
 		}
@@ -790,17 +790,17 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 // filename is optional
 // if set, it will update the Failures to have this filename
 // will be sorted
-func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Failure) error {
+func (r *runner) printFailures(filename string, meta *meta, failures ...*failure.Failure) error {
 	for _, failure := range failures {
 		if filename != "" {
 			failure.Filename = filename
 		}
 	}
-	failureFields, err := text.ParseColonSeparatedFailureFields(r.printFields)
+	failureFields, err := failure.ParseFields(r.printFields)
 	if err != nil {
 		return err
 	}
-	text.SortFailures(failures)
+	failure.Sort(failures)
 	bufWriter := bufio.NewWriter(r.output)
 	for _, failure := range failures {
 		shouldPrint := false

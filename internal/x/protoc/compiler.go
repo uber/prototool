@@ -33,10 +33,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"text/scanner"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/wkt"
 	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/settings"
@@ -105,7 +106,7 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 			return nil, err
 		}
 	}
-	var failures []*text.Failure
+	var failures []*failure.Failure
 	var errs []error
 	var lock sync.Mutex
 	var wg sync.WaitGroup
@@ -124,7 +125,7 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 		}()
 	}
 	wg.Wait()
-	// errors are not text.Failures, these are actual unhandled
+	// errors are not failure.Failures, these are actual unhandled
 	// system errors from calling protoc, so we short circuit
 	if len(errs) > 0 {
 		// I want newlines instead of spaces so not using multierr
@@ -142,7 +143,7 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 	// as we should error out, so we do not do any parsing of file descriptor sets
 	// this decision could be revisited
 	if len(failures) > 0 {
-		text.SortFailures(failures)
+		failure.Sort(failures)
 		return &CompileResult{
 			Failures: failures,
 		}, nil
@@ -204,7 +205,7 @@ func (c *compiler) makeGenDirs(protoSets ...*file.ProtoSet) error {
 	return nil
 }
 
-func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
+func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*failure.Failure, error) {
 	c.logger.Debug("running protoc", zap.String("command", cmdMeta.String()))
 	buffer := bytes.NewBuffer(nil)
 	cmdMeta.execCmd.Stderr = buffer
@@ -214,7 +215,7 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	cmdMeta.execCmd.Stdout = ioutil.Discard
 	runErr := cmdMeta.execCmd.Run()
 	if runErr != nil {
-		// exit errors are ok, we can probably parse them into text.Failures
+		// exit errors are ok, we can probably parse them into failure.Failures
 		// if not an exec.ExitError, short circuit
 		if _, ok := runErr.(*exec.ExitError); !ok {
 			return nil, runErr
@@ -408,7 +409,7 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 		return genPlugin.Flags, nil
 	}
 	if genPlugin.Type.IsGo() && genPlugin.Type.IsGogo() {
-		return "", fmt.Errorf("internal error: plugin %s is both a go and gogo plugin", genPlugin.Name)
+		return "", fmt.Errorf("internal error: plugin %q is both a go and gogo plugin", genPlugin.Name)
 	}
 	var goFlags []string
 	if genPlugin.Flags != "" {
@@ -496,10 +497,10 @@ func getIncludes(
 	return includes, nil
 }
 
-// we try to handle all protoc errors to convert them into text.Failures
+// we try to handle all protoc errors to convert them into failure.Failures
 // so we can output failures in the standard filename:line:column:message format
-func parseProtocOutput(cmdMeta *cmdMeta, output string) ([]*text.Failure, error) {
-	var failures []*text.Failure
+func parseProtocOutput(cmdMeta *cmdMeta, output string) ([]*failure.Failure, error) {
+	var failures []*failure.Failure
 	for _, line := range strings.Split(strings.TrimSpace(output), "\n") {
 		line = strings.TrimSpace(line)
 		if line != "" {
@@ -515,46 +516,30 @@ func parseProtocOutput(cmdMeta *cmdMeta, output string) ([]*text.Failure, error)
 	return failures, nil
 }
 
-func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*text.Failure, error) {
+func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*failure.Failure, error) {
 	if matches := pluginFailedRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-		return &text.Failure{
-			Message: fmt.Sprintf("protoc-gen-%s failed with status code %s.", matches[1], matches[2]),
-		}, nil
+		return newFailure(failure.DefaultFilename, "protoc-gen-%s failed with status code %s.", matches[1], matches[2]), nil
 	}
 	if matches := otherPluginFailureRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-		return &text.Failure{
-			Message: fmt.Sprintf("protoc-gen-%s: %s", matches[1], matches[2]),
-		}, nil
+		return newFailure(failure.DefaultFilename, "protoc-gen-%s: %s", matches[1], matches[2]), nil
 	}
 	split := strings.Split(protocLine, ":")
 	if len(split) != 4 {
 		if matches := noSyntaxSpecifiedRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  `No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.`,
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), `No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.`), nil
 		}
 		if matches := extraImportRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			if cmdMeta.protoSet.Config.Compile.AllowUnusedImports {
 				return nil, nil
 			}
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  fmt.Sprintf(`Import "%s" was not used.`, matches[2]),
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), "Import %q was not used.", matches[2]), nil
 		}
 		if matches := fileNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
-			return &text.Failure{
-				// TODO: can we figure out the file name?
-				Filename: "",
-				Message:  fmt.Sprintf(`Import "%s" was not found.`, matches[1]),
-			}, nil
+			// TODO: can we figure out the file name?
+			return newFailure(failure.DefaultFilename, "Import %q was not found.", matches[1]), nil
 		}
 		if matches := explicitDefaultValuesProto3Regexp.FindStringSubmatch(protocLine); len(matches) > 1 {
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  `Explicit default values are not allowed in proto3.`,
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), "Explicit default values are not allowed in proto3."), nil
 		}
 		if matches := importNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			// handled by fileNotFoundRegexp
@@ -562,46 +547,29 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*text.Failure, error)
 			return nil, nil
 		}
 		if matches := jsonCamelCaseRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  matches[2],
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), matches[2]), nil
 		}
 		if matches := isNotDefinedRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  fmt.Sprintf(`%s is not defined.`, matches[2]),
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), "%q is not defined.", matches[2]), nil
 		}
 		if matches := seemsToBeDefinedRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  matches[2],
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), matches[2]), nil
 		}
 		if matches := optionValueRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  fmt.Sprintf(`Error while parsing option value for %s`, matches[2]),
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), "Error while parsing option value for %q", matches[2]), nil
 		}
 		if matches := programNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
-			return &text.Failure{
-				Message: fmt.Sprintf("protoc-gen-%s not found or is not executable.", matches[1]),
-			}, nil
+			return newFailure(failure.DefaultFilename, "protoc-gen-%s not found or is not executable.", matches[1]), nil
 		}
 		if matches := firstEnumValueZeroRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
-			return &text.Failure{
-				Filename: bestFilePath(cmdMeta, matches[1]),
-				Message:  `The first enum value must be zero in proto3.`,
-			}, nil
+			return newFailure(bestFilePath(cmdMeta, matches[1]), "The first enum value must be zero in proto3."), nil
 		}
 		// TODO: plugins can output to stderr as well and we have no way to redirect the output
 		// this will error if there are any logging line from a plugin
 		// I would prefer to error so that we signal that we don't know what the line is
 		// but if this becomes problematic with some plugin in the future, we should
 		// return nil, nil here
-		// TODO: this should probably be changed to return a generic *text.Failure with
+		// TODO: this should probably be changed to return a generic *failure.Failure with
 		// no file, line, or column, and just the message being protocLine
 		// https://github.com/uber/prototool/issues/14
 		return nil, fmt.Errorf("could not interpret protoc line: %s", protocLine)
@@ -618,8 +586,9 @@ func parseProtocLine(cmdMeta *cmdMeta, protocLine string) (*text.Failure, error)
 	if message == "" {
 		return nil, fmt.Errorf("could not interpret protoc line: %s", protocLine)
 	}
-	return &text.Failure{
+	return &failure.Failure{
 		Filename: bestFilePath(cmdMeta, split[0]),
+		ID:       failure.Proto.String(),
 		Line:     line,
 		Column:   column,
 		Message:  message,
@@ -733,4 +702,13 @@ func tryRemoveTempFile(tempFilePath string) {
 	if tempFilePath != "" {
 		_ = os.Remove(tempFilePath)
 	}
+}
+
+func newFailure(filename string, format string, args ...interface{}) *failure.Failure {
+	return failure.Newf(
+		scanner.Position{Filename: filename, Line: failure.DefaultLine, Column: failure.DefaultColumn},
+		failure.Proto,
+		format,
+		args...,
+	)
 }

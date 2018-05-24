@@ -22,7 +22,7 @@ package lint
 
 import (
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var messageFieldsNotFloatsChecker = NewAddChecker(
@@ -31,7 +31,7 @@ var messageFieldsNotFloatsChecker = NewAddChecker(
 	checkMessageFieldsNotFloats,
 )
 
-func checkMessageFieldsNotFloats(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessageFieldsNotFloats(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(messageFieldsNotFloatsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

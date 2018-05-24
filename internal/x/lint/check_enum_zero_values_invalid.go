@@ -25,7 +25,7 @@ import (
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var enumZeroValuesInvalidChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var enumZeroValuesInvalidChecker = NewAddChecker(
 	checkEnumZeroValuesInvalid,
 )
 
-func checkEnumZeroValuesInvalid(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumZeroValuesInvalid(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&enumZeroValuesInvalidVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

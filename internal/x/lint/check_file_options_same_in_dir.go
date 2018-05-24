@@ -26,7 +26,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var fileOptionsGoPackageSameInDirChecker = NewAddChecker(
@@ -41,8 +41,8 @@ var fileOptionsJavaPackageSameInDirChecker = NewAddChecker(
 	newCheckFileOptionsSameInDir("java_package"),
 )
 
-func newCheckFileOptionsSameInDir(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func newCheckFileOptionsSameInDir(fileOption string) func(func(*failure.Failure), string, []*proto.Proto) error {
+	return func(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 		visitor := &fileOptionsSameInDirVisitor{
 			baseAddVisitor:   newBaseAddVisitor(add),
 			fileOption:       fileOption,

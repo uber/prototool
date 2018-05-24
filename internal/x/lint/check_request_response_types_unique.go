@@ -22,7 +22,7 @@ package lint
 
 import (
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var requestResponseTypesUniqueChecker = NewAddChecker(
@@ -31,7 +31,7 @@ var requestResponseTypesUniqueChecker = NewAddChecker(
 	checkRequestResponseTypesUnique,
 )
 
-func checkRequestResponseTypesUnique(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseTypesUnique(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&requestResponseTypesUniqueVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

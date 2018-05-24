@@ -54,39 +54,39 @@ func TestCompile(t *testing.T) {
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/dep_errors.proto:6:1:Expected ";".`,
+		`testdata/compile/dep_errors.proto:6:1:PROTO Expected ";".`,
 		"testdata/compile/dep_errors.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`dep_errors.proto:6:1:Expected ";".
-		testdata/compile/errors_on_import.proto:10:3:"foo.DepError" is not defined.`,
+		`dep_errors.proto:6:1:PROTO Expected ";".
+		testdata/compile/errors_on_import.proto:10:3:PROTO "foo.DepError" is not defined.`,
 		"testdata/compile/errors_on_import.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/extra_import.proto:1:1:Import "dep.proto" was not used.`,
+		`testdata/compile/extra_import.proto:1:1:PROTO Import "dep.proto" was not used.`,
 		"testdata/compile/extra_import.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/json_camel_case_conflict.proto:1:1:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
+		`testdata/compile/json_camel_case_conflict.proto:1:1:PROTO The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
 		"testdata/compile/json_camel_case_conflict.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/missing_package_semicolon.proto:5:1:Expected ";".`,
+		`testdata/compile/missing_package_semicolon.proto:5:1:PROTO Expected ";".`,
 		"testdata/compile/missing_package_semicolon.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/missing_syntax.proto:1:1:No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.
-		testdata/compile/missing_syntax.proto:4:3:Expected "required", "optional", or "repeated".`,
+		`testdata/compile/missing_syntax.proto:1:1:PROTO No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.
+		testdata/compile/missing_syntax.proto:4:3:PROTO Expected "required", "optional", or "repeated".`,
 		"testdata/compile/missing_syntax.proto",
 	)
 	assertDoCompileFiles(
@@ -98,7 +98,7 @@ func TestCompile(t *testing.T) {
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/not_imported.proto:11:3:"foo.Dep" seems to be defined in "dep.proto", which is not imported by "not_imported.proto".  To use it here, please add the necessary import.`,
+		`testdata/compile/not_imported.proto:11:3:PROTO "foo.Dep" seems to be defined in "dep.proto", which is not imported by "not_imported.proto".  To use it here, please add the necessary import.`,
 		"testdata/compile/dep.proto",
 		"testdata/compile/not_imported.proto",
 	)

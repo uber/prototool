@@ -24,7 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 type baseVisitor struct{}
@@ -52,15 +52,15 @@ func (baseVisitor) VisitExtensions(e *proto.Extensions)   {}
 
 type baseAddVisitor struct {
 	baseVisitor
-	add func(*text.Failure)
+	add func(*failure.Failure)
 }
 
-func newBaseAddVisitor(add func(*text.Failure)) baseAddVisitor {
+func newBaseAddVisitor(add func(*failure.Failure)) baseAddVisitor {
 	return baseAddVisitor{add: add}
 }
 
 func (v baseAddVisitor) AddFailuref(position scanner.Position, format string, args ...interface{}) {
-	v.add(text.NewFailuref(position, "", format, args...))
+	v.add(failure.Newf(position, failure.Lint, format, args...))
 }
 
 // extendedVisitor extends the proto.Visitor interface.

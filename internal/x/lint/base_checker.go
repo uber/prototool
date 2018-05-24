@@ -25,28 +25,28 @@ import (
 	"sync"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 type baseChecker struct {
 	id      string
 	purpose string
-	check   func(string, []*proto.Proto) ([]*text.Failure, error)
+	check   func(string, []*proto.Proto) ([]*failure.Failure, error)
 }
 
 func newBaseAddChecker(
 	id string,
 	purpose string,
-	addCheck func(func(*text.Failure), string, []*proto.Proto) error,
+	addCheck func(func(*failure.Failure), string, []*proto.Proto) error,
 ) *baseChecker {
 	return newBaseChecker(
 		id,
 		purpose,
-		func(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
-			var failures []*text.Failure
+		func(dirPath string, descriptors []*proto.Proto) ([]*failure.Failure, error) {
+			var failures []*failure.Failure
 			var lock sync.Mutex
 			if err := addCheck(
-				func(failure *text.Failure) {
+				func(failure *failure.Failure) {
 					lock.Lock()
 					failures = append(failures, failure)
 					lock.Unlock()
@@ -64,7 +64,7 @@ func newBaseAddChecker(
 func newBaseChecker(
 	id string,
 	purpose string,
-	check func(string, []*proto.Proto) ([]*text.Failure, error),
+	check func(string, []*proto.Proto) ([]*failure.Failure, error),
 ) *baseChecker {
 	return &baseChecker{
 		id:      strings.ToUpper(id),
@@ -81,7 +81,7 @@ func (c *baseChecker) Purpose() string {
 	return c.purpose
 }
 
-func (c *baseChecker) Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
+func (c *baseChecker) Check(dirPath string, descriptors []*proto.Proto) ([]*failure.Failure, error) {
 	failures, err := c.check(dirPath, descriptors)
 	for _, failure := range failures {
 		failure.ID = c.id

@@ -26,7 +26,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var packagesSameInDirChecker = NewAddChecker(
@@ -35,7 +35,7 @@ var packagesSameInDirChecker = NewAddChecker(
 	checkPackagesSameInDir,
 )
 
-func checkPackagesSameInDir(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackagesSameInDir(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	visitor := &packagesSameInDirVisitor{baseAddVisitor: newBaseAddVisitor(add), pkgs: make(map[string]struct{})}
 	if err := runVisitor(visitor, descriptors); err != nil {
 		return err

@@ -25,7 +25,7 @@ import (
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var enumFieldPrefixesChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var enumFieldPrefixesChecker = NewAddChecker(
 	checkEnumFieldPrefixes,
 )
 
-func checkEnumFieldPrefixes(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumFieldPrefixes(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&enumFieldPrefixesVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

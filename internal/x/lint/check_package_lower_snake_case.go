@@ -25,7 +25,7 @@ import (
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 )
 
 var packageLowerSnakeCaseChecker = NewAddChecker(
@@ -34,7 +34,7 @@ var packageLowerSnakeCaseChecker = NewAddChecker(
 	checkPackageLowerSnakeCase,
 )
 
-func checkPackageLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackageLowerSnakeCase(add func(*failure.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(&packageLowerSnakeCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

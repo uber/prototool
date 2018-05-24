@@ -25,7 +25,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/failure"
 	"github.com/uber/prototool/internal/wkt"
 	"github.com/uber/prototool/internal/x/settings"
 )
@@ -47,7 +47,7 @@ func newFirstPassVisitor(config settings.Config) *firstPassVisitor {
 	return &firstPassVisitor{baseVisitor: newBaseVisitor(config.Format.Indent)}
 }
 
-func (v *firstPassVisitor) Do() []*text.Failure {
+func (v *firstPassVisitor) Do() []*failure.Failure {
 	if v.Syntax != nil {
 		v.PComment(v.Syntax.Comment)
 		if v.Syntax.Comment != nil {
