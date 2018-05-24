@@ -46,8 +46,7 @@ Install Prototool from GitHub Releases.
 ```
 curl -sSL https://github.com/uber/prototool/releases/download/v0.1.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
-  chmod +x /usr/local/bin/prototool && \
-  prototool -h
+  chmod +x /usr/local/bin/prototool
 ```
 
 ## Quick Start
