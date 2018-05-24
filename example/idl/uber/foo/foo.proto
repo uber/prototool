@@ -10,7 +10,6 @@ import "sub/sub.proto";
 package foo;
 
 option go_package = "foopb";
-option java_multiple_files = true;
 option java_package = "com.foo.pb";
 
 // Hello is a hello.
