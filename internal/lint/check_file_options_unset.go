@@ -64,7 +64,7 @@ func (v *fileOptionsUnsetVisitor) OnStart(descriptor *proto.Proto) error {
 }
 
 func (v *fileOptionsUnsetVisitor) VisitOption(element *proto.Option) {
-	// TODO: not validating this is a file option, or are we since we're not recursing on other elements?
+	// since we are not recursing on any elements, this is a file option
 	if element.Name == v.fileOption {
 		v.seen = true
 		v.position = element.Position
