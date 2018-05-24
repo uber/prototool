@@ -51,6 +51,8 @@ var (
 		fileOptionsRequireGoPackageChecker,
 		fileOptionsRequireJavaMultipleFilesChecker,
 		fileOptionsRequireJavaPackageChecker,
+		fileOptionsUnsetJavaMultipleFilesChecker,
+		fileOptionsUnsetJavaOuterClassnameChecker,
 		messageFieldsNotFloatsChecker,
 		messageFieldNamesLowerSnakeCaseChecker,
 		messageFieldNamesLowercaseChecker,
