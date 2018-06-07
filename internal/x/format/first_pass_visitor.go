@@ -26,7 +26,6 @@ import (
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
-	"github.com/uber/prototool/internal/wkt"
 	"github.com/uber/prototool/internal/x/settings"
 )
 
@@ -38,7 +37,6 @@ type firstPassVisitor struct {
 	Options               []*proto.Option
 	ProbablyCustomOptions []*proto.Option
 	Imports               []*proto.Import
-	WKTImports            []*proto.Import
 
 	haveHitNonComment bool
 }
@@ -57,14 +55,6 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		v.PWithInlineComment(v.Syntax.InlineComment, `syntax = "`, v.Syntax.Value, `";`)
 		v.P()
 	}
-	if len(v.WKTImports) > 0 {
-		v.PImports(v.WKTImports)
-		v.P()
-	}
-	if len(v.Imports) > 0 {
-		v.PImports(v.Imports)
-		v.P()
-	}
 	if v.Package != nil {
 		v.PComment(v.Package.Comment)
 		v.PWithInlineComment(v.Package.InlineComment, `package `, v.Package.Name, `;`)
@@ -73,6 +63,10 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 	if len(v.Options) > 0 || len(v.ProbablyCustomOptions) > 0 {
 		v.POptions(false, v.Options...)
 		v.POptions(false, v.ProbablyCustomOptions...)
+		v.P()
+	}
+	if len(v.Imports) > 0 {
+		v.PImports(v.Imports)
 		v.P()
 	}
 	return v.Failures
@@ -117,13 +111,7 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 
 func (v *firstPassVisitor) VisitImport(element *proto.Import) {
 	v.haveHitNonComment = true
-	// this won't hit filenames that aren't imported with "google/protobuf"
-	// prefix directly, but this should be caught by the linter
-	if _, ok := wkt.Filenames[element.Filename]; ok {
-		v.WKTImports = append(v.WKTImports, element)
-	} else {
-		v.Imports = append(v.Imports, element)
-	}
+	v.Imports = append(v.Imports, element)
 }
 
 func (v *firstPassVisitor) VisitNormalField(element *proto.NormalField) {
