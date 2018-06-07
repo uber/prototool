@@ -25,8 +25,8 @@ import (
 	"path/filepath"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/text"
-	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/settings"
 	"go.uber.org/zap"
 )
