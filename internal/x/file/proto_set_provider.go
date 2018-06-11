@@ -28,7 +28,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/uber/prototool/internal/x/settings"
+	"github.com/uber/prototool/internal/settings"
 	"go.uber.org/zap"
 )
 

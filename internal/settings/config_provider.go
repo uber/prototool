@@ -28,7 +28,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 
 	"github.com/uber/prototool/internal/strs"
 	"go.uber.org/zap"
@@ -36,19 +35,12 @@ import (
 )
 
 type configProvider struct {
-	logger                   *zap.Logger
-	filePathToConfig         map[string]Config
-	dirPathToFilePath        map[string]string
-	dirPathToExcludePrefixes map[string][]string
-	lock                     sync.RWMutex
+	logger *zap.Logger
 }
 
 func newConfigProvider(options ...ConfigProviderOption) *configProvider {
 	configProvider := &configProvider{
-		logger:                   zap.NewNop(),
-		filePathToConfig:         make(map[string]Config),
-		dirPathToFilePath:        make(map[string]string),
-		dirPathToExcludePrefixes: make(map[string][]string),
+		logger: zap.NewNop(),
 	}
 	for _, option := range options {
 		option(configProvider)
@@ -72,30 +64,7 @@ func (c *configProvider) GetFilePathForDir(dirPath string) (string, error) {
 		return "", fmt.Errorf("%s is not an absolute path", dirPath)
 	}
 	dirPath = filepath.Clean(dirPath)
-	c.lock.RLock()
-	filePath, ok := c.dirPathToFilePath[dirPath]
-	c.lock.RUnlock()
-	if !ok {
-		getFilePath, dirPaths := getFilePathForDir(dirPath)
-		if getFilePath == "" {
-			return "", nil
-		}
-		c.lock.Lock()
-		filePath, ok = c.dirPathToFilePath[dirPath]
-		if !ok {
-			filePath = getFilePath
-			for _, iDirPath := range dirPaths {
-				if _, ok := c.dirPathToFilePath[iDirPath]; !ok {
-					c.logger.Debug("adding dir to cache", zap.String("dirPath", iDirPath))
-					c.dirPathToFilePath[iDirPath] = filePath
-				}
-			}
-		}
-		c.lock.Unlock()
-	}
-	if ok {
-		c.logger.Debug("cache dir hit", zap.String("dirPath", dirPath))
-	}
+	filePath, _ := getFilePathForDir(dirPath)
 	return filePath, nil
 }
 
@@ -104,35 +73,7 @@ func (c *configProvider) Get(filePath string) (Config, error) {
 		return Config{}, fmt.Errorf("%s is not an absolute path", filePath)
 	}
 	filePath = filepath.Clean(filePath)
-	var err error
-	c.lock.RLock()
-	config, ok := c.filePathToConfig[filePath]
-	c.lock.RUnlock()
-	if !ok {
-		c.lock.Lock()
-		config, ok = c.filePathToConfig[filePath]
-		if !ok {
-			config, err = get(filePath)
-			if err != nil {
-				c.lock.Unlock()
-				return Config{}, err
-			}
-			c.logger.Debug("adding file to cache", zap.String("filePath", filePath), zap.Any("config", config))
-			c.filePathToConfig[filePath] = config
-			if filepath.Base(filePath) == DefaultConfigFilename {
-				dirPath := filepath.Dir(filePath)
-				if _, ok := c.dirPathToFilePath[dirPath]; !ok {
-					c.logger.Debug("adding dir to cache", zap.String("dirPath", dirPath))
-					c.dirPathToFilePath[dirPath] = filePath
-				}
-			}
-		}
-		c.lock.Unlock()
-	}
-	if ok {
-		c.logger.Debug("cache file hit", zap.String("filePath", filePath))
-	}
-	return config, nil
+	return get(filePath)
 }
 
 func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, error) {
@@ -140,25 +81,7 @@ func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, err
 		return nil, fmt.Errorf("%s is not an absolute path", dirPath)
 	}
 	dirPath = filepath.Clean(dirPath)
-	c.lock.RLock()
-	excludePrefixes, ok := c.dirPathToExcludePrefixes[dirPath]
-	var err error
-	c.lock.RUnlock()
-	if !ok {
-		c.lock.Lock()
-		excludePrefixes, ok = c.dirPathToExcludePrefixes[dirPath]
-		if !ok {
-			excludePrefixes, err = getExcludePrefixesForDir(dirPath)
-			if err != nil {
-				c.lock.Unlock()
-				return nil, err
-			}
-			c.logger.Debug("adding exclude prefixes for dir", zap.String("dirPath", dirPath), zap.Any("excludePrefixes", excludePrefixes))
-			c.dirPathToExcludePrefixes[dirPath] = excludePrefixes
-		}
-		c.lock.Unlock()
-	}
-	return excludePrefixes, nil
+	return getExcludePrefixesForDir(dirPath)
 }
 
 // getFilePathForDir tries to find a file named DefaultConfigFilename starting in the
