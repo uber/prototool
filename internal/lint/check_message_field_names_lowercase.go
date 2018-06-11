@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messageFieldNamesLowercaseChecker = NewAddChecker(
+var messageFieldNamesLowercaseLinter = NewAddLinter(
 	"MESSAGE_FIELD_NAMES_LOWERCASE",
 	"Verifies that all message field names are lowercase.",
 	checkMessageFieldNamesLowercase,

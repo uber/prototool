@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumFieldPrefixesChecker = NewAddChecker(
+var enumFieldPrefixesLinter = NewAddLinter(
 	"ENUM_FIELD_PREFIXES",
 	"Verifies that all enum fields are prefixed with [NESTED_MESSAGE_NAME_]ENUM_NAME_.",
 	checkEnumFieldPrefixes,

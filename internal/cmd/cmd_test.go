@@ -506,20 +506,20 @@ func TestServiceDescriptorProto(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	assertLinters(t, lint.DefaultCheckers, "list-linters")
+	assertLinters(t, lint.DefaultLinters, "list-linters")
 }
 
 func TestListAllLinters(t *testing.T) {
-	assertLinters(t, lint.AllCheckers, "list-all-linters")
+	assertLinters(t, lint.AllLinters, "list-all-linters")
 }
 
-func assertLinters(t *testing.T, checkers []lint.Checker, args ...string) {
-	checkerIDs := make([]string, 0, len(checkers))
-	for _, checker := range checkers {
-		checkerIDs = append(checkerIDs, checker.ID())
+func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
+	linterIDs := make([]string, 0, len(linters))
+	for _, linter := range linters {
+		linterIDs = append(linterIDs, linter.ID())
 	}
-	sort.Strings(checkerIDs)
-	assertDo(t, 0, strings.Join(checkerIDs, "\n"), args...)
+	sort.Strings(linterIDs)
+	assertDo(t, 0, strings.Join(linterIDs, "\n"), args...)
 }
 
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {

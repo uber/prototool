@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var rpcNamesCamelCaseChecker = NewAddChecker(
+var rpcNamesCamelCaseLinter = NewAddLinter(
 	"RPC_NAMES_CAMEL_CASE",
 	"Verifies that all RPC names are CamelCase.",
 	checkRPCNamesCamelCase,

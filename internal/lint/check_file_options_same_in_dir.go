@@ -29,13 +29,13 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var fileOptionsGoPackageSameInDirChecker = NewAddChecker(
+var fileOptionsGoPackageSameInDirLinter = NewAddLinter(
 	"FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR",
 	`Verifies that the file option "go_package" of all files in a directory are the same.`,
 	newCheckFileOptionsSameInDir("go_package"),
 )
 
-var fileOptionsJavaPackageSameInDirChecker = NewAddChecker(
+var fileOptionsJavaPackageSameInDirLinter = NewAddLinter(
 	"FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR",
 	`Verifies that the file option "java_package" of all files in a directory are the same.`,
 	newCheckFileOptionsSameInDir("java_package"),

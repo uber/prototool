@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var rpcsHaveCommentsChecker = NewAddChecker(
+var rpcsHaveCommentsLinter = NewAddLinter(
 	"RPCS_HAVE_COMMENTS",
 	`Verifies that all rpcs have a comment of the form "// RPCName ...".`,
 	checkRPCsHaveComments,

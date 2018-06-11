@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messageNamesCapitalizedChecker = NewAddChecker(
+var messageNamesCapitalizedLinter = NewAddLinter(
 	"MESSAGE_NAMES_CAPITALIZED",
 	"Verifies that all non-extended message names are Capitalized.",
 	checkMessageNamesCapitalized,

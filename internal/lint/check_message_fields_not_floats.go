@@ -25,7 +25,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messageFieldsNotFloatsChecker = NewAddChecker(
+var messageFieldsNotFloatsLinter = NewAddLinter(
 	"MESSAGE_FIELDS_NOT_FLOATS",
 	"Verifies that all message fields are not floats or doubles.",
 	checkMessageFieldsNotFloats,

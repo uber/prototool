@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var servicesHaveCommentsChecker = NewAddChecker(
+var servicesHaveCommentsLinter = NewAddLinter(
 	"SERVICES_HAVE_COMMENTS",
 	`Verifies that all services have a comment of the form "// ServiceName ...".`,
 	checkServicesHaveComments,

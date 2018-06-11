@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var requestResponseTypesInSameFileChecker = NewAddChecker(
+var requestResponseTypesInSameFileLinter = NewAddLinter(
 	"REQUEST_RESPONSE_TYPES_IN_SAME_FILE",
 	"Verifies that all request and response types are in the same file as their corresponding service and are not nested messages.",
 	checkRequestResponseTypesInSameFile,

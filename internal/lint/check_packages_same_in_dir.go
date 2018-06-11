@@ -29,7 +29,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var packagesSameInDirChecker = NewAddChecker(
+var packagesSameInDirLinter = NewAddLinter(
 	"PACKAGES_SAME_IN_DIR",
 	"Verifies that the packages of all files in a directory are the same.",
 	checkPackagesSameInDir,

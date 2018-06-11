@@ -33,64 +33,64 @@ import (
 )
 
 var (
-	// AllCheckers is the slice of all known Checkers.
-	AllCheckers = []Checker{
-		commentsNoCStyleChecker,
-		enumFieldNamesUppercaseChecker,
-		enumFieldNamesUpperSnakeCaseChecker,
-		enumFieldPrefixesChecker,
-		enumNamesCamelCaseChecker,
-		enumNamesCapitalizedChecker,
-		enumZeroValuesInvalidChecker,
-		enumsHaveCommentsChecker,
-		fileOptionsEqualGoPackagePbSuffixChecker,
-		fileOptionsEqualJavaMultipleFilesTrueChecker,
-		fileOptionsEqualJavaPackageComPbChecker,
-		fileOptionsGoPackageSameInDirChecker,
-		fileOptionsJavaPackageSameInDirChecker,
-		fileOptionsRequireGoPackageChecker,
-		fileOptionsRequireJavaMultipleFilesChecker,
-		fileOptionsRequireJavaPackageChecker,
-		messageFieldsNotFloatsChecker,
-		messageFieldNamesLowerSnakeCaseChecker,
-		messageFieldNamesLowercaseChecker,
-		messageNamesCamelCaseChecker,
-		messageNamesCapitalizedChecker,
-		messagesHaveCommentsChecker,
-		messagesHaveCommentsExceptRequestResponseTypesChecker,
-		oneofNamesLowerSnakeCaseChecker,
-		packageIsDeclaredChecker,
-		packageLowerSnakeCaseChecker,
-		packagesSameInDirChecker,
-		rpcsHaveCommentsChecker,
-		rpcNamesCamelCaseChecker,
-		rpcNamesCapitalizedChecker,
-		requestResponseTypesInSameFileChecker,
-		requestResponseTypesUniqueChecker,
-		requestResponseNamesMatchRPCChecker,
-		servicesHaveCommentsChecker,
-		serviceNamesCamelCaseChecker,
-		serviceNamesCapitalizedChecker,
-		syntaxProto3Checker,
-		wktDirectlyImportedChecker,
+	// AllLinters is the slice of all known Linters.
+	AllLinters = []Linter{
+		commentsNoCStyleLinter,
+		enumFieldNamesUppercaseLinter,
+		enumFieldNamesUpperSnakeCaseLinter,
+		enumFieldPrefixesLinter,
+		enumNamesCamelCaseLinter,
+		enumNamesCapitalizedLinter,
+		enumZeroValuesInvalidLinter,
+		enumsHaveCommentsLinter,
+		fileOptionsEqualGoPackagePbSuffixLinter,
+		fileOptionsEqualJavaMultipleFilesTrueLinter,
+		fileOptionsEqualJavaPackageComPbLinter,
+		fileOptionsGoPackageSameInDirLinter,
+		fileOptionsJavaPackageSameInDirLinter,
+		fileOptionsRequireGoPackageLinter,
+		fileOptionsRequireJavaMultipleFilesLinter,
+		fileOptionsRequireJavaPackageLinter,
+		messageFieldsNotFloatsLinter,
+		messageFieldNamesLowerSnakeCaseLinter,
+		messageFieldNamesLowercaseLinter,
+		messageNamesCamelCaseLinter,
+		messageNamesCapitalizedLinter,
+		messagesHaveCommentsLinter,
+		messagesHaveCommentsExceptRequestResponseTypesLinter,
+		oneofNamesLowerSnakeCaseLinter,
+		packageIsDeclaredLinter,
+		packageLowerSnakeCaseLinter,
+		packagesSameInDirLinter,
+		rpcsHaveCommentsLinter,
+		rpcNamesCamelCaseLinter,
+		rpcNamesCapitalizedLinter,
+		requestResponseTypesInSameFileLinter,
+		requestResponseTypesUniqueLinter,
+		requestResponseNamesMatchRPCLinter,
+		servicesHaveCommentsLinter,
+		serviceNamesCamelCaseLinter,
+		serviceNamesCapitalizedLinter,
+		syntaxProto3Linter,
+		wktDirectlyImportedLinter,
 	}
 
-	// DefaultCheckers is the slice of default Checkers.
-	DefaultCheckers = copyCheckersWithout(
-		AllCheckers,
-		enumFieldNamesUppercaseChecker,
-		enumsHaveCommentsChecker,
-		fileOptionsEqualJavaMultipleFilesTrueChecker,
-		fileOptionsEqualJavaOuterClassnameProtoSuffixChecker,
-		fileOptionsRequireJavaMultipleFilesChecker,
-		fileOptionsRequireJavaOuterClassnameChecker,
-		messageFieldsNotFloatsChecker,
-		messagesHaveCommentsChecker,
-		messagesHaveCommentsExceptRequestResponseTypesChecker,
-		messageFieldNamesLowercaseChecker,
-		requestResponseNamesMatchRPCChecker,
-		rpcsHaveCommentsChecker,
-		servicesHaveCommentsChecker,
+	// DefaultLinters is the slice of default Linters.
+	DefaultLinters = copyLintersWithout(
+		AllLinters,
+		enumFieldNamesUppercaseLinter,
+		enumsHaveCommentsLinter,
+		fileOptionsEqualJavaMultipleFilesTrueLinter,
+		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
+		fileOptionsRequireJavaMultipleFilesLinter,
+		fileOptionsRequireJavaOuterClassnameLinter,
+		messageFieldsNotFloatsLinter,
+		messagesHaveCommentsLinter,
+		messagesHaveCommentsExceptRequestResponseTypesLinter,
+		messageFieldNamesLowercaseLinter,
+		requestResponseNamesMatchRPCLinter,
+		rpcsHaveCommentsLinter,
+		servicesHaveCommentsLinter,
 	)
 
 	// DefaultGroup is the default group.
@@ -99,20 +99,20 @@ var (
 	// AllGroup is the group of all known linters.
 	AllGroup = "all"
 
-	// GroupToCheckers is the map from checker group to the corresponding slice of checkers.
-	GroupToCheckers = map[string][]Checker{
-		DefaultGroup: DefaultCheckers,
-		AllGroup:     AllCheckers,
+	// GroupToLinters is the map from linter group to the corresponding slice of linters.
+	GroupToLinters = map[string][]Linter{
+		DefaultGroup: DefaultLinters,
+		AllGroup:     AllLinters,
 	}
 )
 
 func init() {
 	ids := make(map[string]struct{})
-	for _, checker := range AllCheckers {
-		if _, ok := ids[checker.ID()]; ok {
-			panic(fmt.Sprintf("duplicate checker id %s", checker.ID()))
+	for _, linter := range AllLinters {
+		if _, ok := ids[linter.ID()]; ok {
+			panic(fmt.Sprintf("duplicate linter id %s", linter.ID()))
 		}
-		ids[checker.ID()] = struct{}{}
+		ids[linter.ID()] = struct{}{}
 	}
 }
 
@@ -141,11 +141,11 @@ func NewRunner(options ...RunnerOption) Runner {
 // The below should not be needed in the CLI
 // TODO make private
 
-// Checker is a linter for Protobuf files.
-type Checker interface {
-	// Return the ID of this Checker. This should be all UPPER_SNAKE_CASE.
+// Linter is a linter for Protobuf files.
+type Linter interface {
+	// Return the ID of this Linter. This should be all UPPER_SNAKE_CASE.
 	ID() string
-	// Return the purpose of this Checker. This should be a human-readable string.
+	// Return the purpose of this Linter. This should be a human-readable string.
 	Purpose() string
 	// Check the file data for the descriptors in a common directgory.
 	// If there is a lint failure, this returns it in the
@@ -155,80 +155,80 @@ type Checker interface {
 	Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error)
 }
 
-// NewChecker is a convenience function that returns a new Checker for the
+// NewLinter is a convenience function that returns a new Linter for the
 // given parameters.
 //
 // The ID will be upper-cased.
 //
 // Failures returned from check do not need to set the ID, this will be overwritten.
-func NewChecker(id string, purpose string, check func(string, []*proto.Proto) ([]*text.Failure, error)) Checker {
-	return newBaseChecker(id, purpose, check)
+func NewLinter(id string, purpose string, check func(string, []*proto.Proto) ([]*text.Failure, error)) Linter {
+	return newBaseLinter(id, purpose, check)
 }
 
-// NewAddChecker is a convenience function that returns a new Checker for the
+// NewAddLinter is a convenience function that returns a new Linter for the
 // given parameters, using a function to record failures.
 //
 // The ID will be upper-cased.
 //
 // Failures returned from check do not need to set the ID, this will be overwritten.
-func NewAddChecker(id string, purpose string, addCheck func(func(*text.Failure), string, []*proto.Proto) error) Checker {
-	return newBaseAddChecker(id, purpose, addCheck)
+func NewAddLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*proto.Proto) error) Linter {
+	return newBaseAddLinter(id, purpose, addCheck)
 }
 
-// GetCheckers returns the Checkers for the LintConfig.
+// GetLinters returns the Linters for the LintConfig.
 //
 // The config is expected to be valid, ie slices deduped, all upper-case,
 // and only either IDs or Group/IncludeIDs/ExcludeIDs, with no overlap between
 // IncludeIDs and ExcludeIDs.
 //
 // If the config came from the settings package, this is already validated.
-func GetCheckers(config settings.LintConfig) ([]Checker, error) {
+func GetLinters(config settings.LintConfig) ([]Linter, error) {
 	if len(config.IDs) == 0 && (len(config.Group) == 0 || config.Group == DefaultGroup) && len(config.IncludeIDs) == 0 && len(config.ExcludeIDs) == 0 {
-		return DefaultCheckers, nil
+		return DefaultLinters, nil
 	}
 
 	if len(config.IDs) > 0 {
-		var checkers []Checker
+		var linters []Linter
 		// n^2 woot
-		for _, checker := range AllCheckers {
+		for _, linter := range AllLinters {
 			for _, id := range config.IDs {
-				if checker.ID() == id {
-					checkers = append(checkers, checker)
+				if linter.ID() == id {
+					linters = append(linters, linter)
 				}
 			}
 		}
-		return checkers, nil
+		return linters, nil
 	}
 
-	baseCheckers := DefaultCheckers
+	baseLinters := DefaultLinters
 	var ok bool
 	if len(config.Group) > 0 && config.Group != DefaultGroup {
-		baseCheckers, ok = GroupToCheckers[config.Group]
+		baseLinters, ok = GroupToLinters[config.Group]
 		if !ok {
 			return nil, fmt.Errorf("unknown lint group: %s", config.Group)
 		}
 	}
 
-	checkersMap := make(map[string]Checker, len(baseCheckers))
-	for _, checker := range baseCheckers {
-		checkersMap[checker.ID()] = checker
+	lintersMap := make(map[string]Linter, len(baseLinters))
+	for _, linter := range baseLinters {
+		lintersMap[linter.ID()] = linter
 	}
 	for _, excludeID := range config.ExcludeIDs {
-		delete(checkersMap, excludeID)
+		delete(lintersMap, excludeID)
 	}
 	// n^2 woot
-	for _, checker := range AllCheckers {
+	for _, linter := range AllLinters {
 		for _, id := range config.IncludeIDs {
-			if checker.ID() == id {
-				checkersMap[checker.ID()] = checker
+			if linter.ID() == id {
+				lintersMap[linter.ID()] = linter
 			}
 		}
 	}
-	checkers := make([]Checker, 0, len(checkersMap))
-	for _, checker := range checkersMap {
-		checkers = append(checkers, checker)
+	linters := make([]Linter, 0, len(lintersMap))
+	for _, linter := range lintersMap {
+		linters = append(linters, linter)
 	}
-	return checkers, nil
+	return linters, nil
 }
 
 // GetDirPathToDescriptors is a convenience function that gets the
@@ -256,12 +256,12 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto
 	return dirPathToDescriptors, nil
 }
 
-// CheckMultiple is a convenience function that checks multiple checkers and multiple descriptors.
-func CheckMultiple(checkers []Checker, dirPathToDescriptors map[string][]*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
+// CheckMultiple is a convenience function that checks multiple linters and multiple descriptors.
+func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
 	var allFailures []*text.Failure
 	for dirPath, descriptors := range dirPathToDescriptors {
-		for _, checker := range checkers {
-			failures, err := checkOne(checker, dirPath, descriptors, ignoreIDToFilePaths)
+		for _, linter := range linters {
+			failures, err := checkOne(linter, dirPath, descriptors, ignoreIDToFilePaths)
 			if err != nil {
 				return nil, err
 			}
@@ -272,18 +272,18 @@ func CheckMultiple(checkers []Checker, dirPathToDescriptors map[string][]*proto.
 	return allFailures, nil
 }
 
-func checkOne(checker Checker, dirPath string, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
-	filteredDescriptors, err := filterIgnores(checker, descriptors, ignoreIDToFilePaths)
+func checkOne(linter Linter, dirPath string, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
+	filteredDescriptors, err := filterIgnores(linter, descriptors, ignoreIDToFilePaths)
 	if err != nil {
 		return nil, err
 	}
-	return checker.Check(dirPath, filteredDescriptors)
+	return linter.Check(dirPath, filteredDescriptors)
 }
 
-func filterIgnores(checker Checker, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*proto.Proto, error) {
+func filterIgnores(linter Linter, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*proto.Proto, error) {
 	var filteredDescriptors []*proto.Proto
 	for _, descriptor := range descriptors {
-		ignore, err := shouldIgnore(checker, descriptor, ignoreIDToFilePaths)
+		ignore, err := shouldIgnore(linter, descriptor, ignoreIDToFilePaths)
 		if err != nil {
 			return nil, err
 		}
@@ -294,7 +294,7 @@ func filterIgnores(checker Checker, descriptors []*proto.Proto, ignoreIDToFilePa
 	return filteredDescriptors, nil
 }
 
-func shouldIgnore(checker Checker, descriptor *proto.Proto, ignoreIDToFilePaths map[string][]string) (bool, error) {
+func shouldIgnore(linter Linter, descriptor *proto.Proto, ignoreIDToFilePaths map[string][]string) (bool, error) {
 	filePath := descriptor.Filename
 	var err error
 	if !filepath.IsAbs(filePath) {
@@ -303,7 +303,7 @@ func shouldIgnore(checker Checker, descriptor *proto.Proto, ignoreIDToFilePaths 
 			return false, err
 		}
 	}
-	ignoreFilePaths, ok := ignoreIDToFilePaths[checker.ID()]
+	ignoreFilePaths, ok := ignoreIDToFilePaths[linter.ID()]
 	if !ok {
 		return false, nil
 	}
@@ -315,19 +315,19 @@ func shouldIgnore(checker Checker, descriptor *proto.Proto, ignoreIDToFilePaths 
 	return false, nil
 }
 
-func copyCheckersWithout(checkers []Checker, remove ...Checker) []Checker {
-	c := make([]Checker, 0, len(checkers))
-	for _, checker := range checkers {
-		if !checkerIn(checker, remove) {
-			c = append(c, checker)
+func copyLintersWithout(linters []Linter, remove ...Linter) []Linter {
+	c := make([]Linter, 0, len(linters))
+	for _, linter := range linters {
+		if !linterIn(linter, remove) {
+			c = append(c, linter)
 		}
 	}
 	return c
 }
 
-func checkerIn(checker Checker, s []Checker) bool {
+func linterIn(linter Linter, s []Linter) bool {
 	for _, e := range s {
-		if e == checker {
+		if e == linter {
 			return true
 		}
 	}
