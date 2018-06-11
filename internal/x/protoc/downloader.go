@@ -35,8 +35,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
-	"github.com/uber/prototool/internal/x/settings"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )

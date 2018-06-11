@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Package cfginit contains the template for prototool.yaml files, as well
+// as a function to generate a prototool.yaml file given a specific protoc
+// version, with or without commenting out the remainder of the options.
 package cfginit
 
 import (

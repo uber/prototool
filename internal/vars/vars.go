@@ -25,7 +25,7 @@ package vars
 
 const (
 	// Version is the current version.
-	Version = "0.2.0-dev"
+	Version = "0.3.0-dev"
 
 	// DefaultProtocVersion is the default version of protoc from
 	// github.com/google/protobuf to use.
