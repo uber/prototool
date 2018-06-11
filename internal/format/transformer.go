@@ -51,14 +51,6 @@ func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []
 		return nil, nil, err
 	}
 
-	// log statements are at debug level so
-	// this will trigger if debug is set
-	// TODO maybe remove
-	logVisitor := newLogVisitor(t.logger)
-	for _, element := range descriptor.Elements {
-		element.Accept(logVisitor)
-	}
-
 	firstPassVisitor := newFirstPassVisitor(config)
 	for _, element := range descriptor.Elements {
 		element.Accept(firstPassVisitor)
