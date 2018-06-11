@@ -27,7 +27,7 @@ import (
 
 var requestResponseTypesUniqueChecker = NewAddChecker(
 	"REQUEST_RESPONSE_TYPES_UNIQUE",
-	"Verifies that all request and response types are unique to each rpc.",
+	"Verifies that all request and response types are unique to each RPC.",
 	checkRequestResponseTypesUnique,
 )
 

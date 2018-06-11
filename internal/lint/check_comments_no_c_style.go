@@ -116,7 +116,7 @@ func (v commentsNoCStyleVisitor) VisitReserved(element *proto.Reserved) {
 
 func (v commentsNoCStyleVisitor) VisitRPC(element *proto.RPC) {
 	v.checkComments(element.Position, element.Comment, element.InlineComment)
-	for _, child := range element.Options {
+	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }
