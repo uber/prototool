@@ -25,7 +25,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var requestResponseNamesMatchRPCLinter = NewAddLinter(
+var requestResponseNamesMatchRPCLinter = NewLinter(
 	"REQUEST_RESPONSE_NAMES_MATCH_RPC",
 	"Verifies that all request names are RpcNameRequest and all response names are RpcNameResponse.",
 	checkRequestResponseNamesMatchRPC,

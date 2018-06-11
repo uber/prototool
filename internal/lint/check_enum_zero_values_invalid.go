@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumZeroValuesInvalidLinter = NewAddLinter(
+var enumZeroValuesInvalidLinter = NewLinter(
 	"ENUM_ZERO_VALUES_INVALID",
 	"Verifies that all enum zero value names are [NESTED_MESSAGE_NAME_]ENUM_NAME_INVALID.",
 	checkEnumZeroValuesInvalid,

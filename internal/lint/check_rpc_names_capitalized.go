@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var rpcNamesCapitalizedLinter = NewAddLinter(
+var rpcNamesCapitalizedLinter = NewLinter(
 	"RPC_NAMES_CAPITALIZED",
 	"Verifies that all RPC names are Capitalized.",
 	checkRPCNamesCapitalized,

@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messageNamesCamelCaseLinter = NewAddLinter(
+var messageNamesCamelCaseLinter = NewLinter(
 	"MESSAGE_NAMES_CAMEL_CASE",
 	"Verifies that all non-extended message names are CamelCase.",
 	checkMessageNamesCamelCase,

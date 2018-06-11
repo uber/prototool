@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messageFieldNamesLowerSnakeCaseLinter = NewAddLinter(
+var messageFieldNamesLowerSnakeCaseLinter = NewLinter(
 	"MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE",
 	"Verifies that all message field names are lower_snake_case.",
 	checkMessageFieldNamesLowerSnakeCase,

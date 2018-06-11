@@ -27,7 +27,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var fileOptionsEqualGoPackagePbSuffixLinter = NewAddLinter(
+var fileOptionsEqualGoPackagePbSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX",
 	`Verifies that the file option "go_package" is equal to $(basename PACKAGE)pb.`,
 	newCheckFileOptionsEqual("go_package", func(pkg *proto.Package) string {
@@ -35,7 +35,7 @@ var fileOptionsEqualGoPackagePbSuffixLinter = NewAddLinter(
 	}),
 )
 
-var fileOptionsEqualJavaMultipleFilesTrueLinter = NewAddLinter(
+var fileOptionsEqualJavaMultipleFilesTrueLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE",
 	`Verifies that the file option "java_multiple_files" is equal to true.`,
 	newCheckFileOptionsEqual("java_multiple_files", func(pkg *proto.Package) string {
@@ -43,7 +43,7 @@ var fileOptionsEqualJavaMultipleFilesTrueLinter = NewAddLinter(
 	}),
 )
 
-var fileOptionsEqualJavaOuterClassnameProtoSuffixLinter = NewAddLinter(
+var fileOptionsEqualJavaOuterClassnameProtoSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX",
 	`Verifies that the file option "java_outer_classname" is equal to $(capitalize $(basename PACKAGE))Proto.`,
 	newCheckFileOptionsEqual("java_outer_classname", func(pkg *proto.Package) string {
@@ -52,7 +52,7 @@ var fileOptionsEqualJavaOuterClassnameProtoSuffixLinter = NewAddLinter(
 	}),
 )
 
-var fileOptionsEqualJavaPackageComPbLinter = NewAddLinter(
+var fileOptionsEqualJavaPackageComPbLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB",
 	`Verifies that the file option "java_package" is equal to com.PACKAGE.pb.`,
 	newCheckFileOptionsEqual("java_package", func(pkg *proto.Package) string {

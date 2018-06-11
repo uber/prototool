@@ -27,7 +27,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var syntaxProto3Linter = NewAddLinter(
+var syntaxProto3Linter = NewLinter(
 	"SYNTAX_PROTO3",
 	"Verifies that the syntax is proto3.",
 	checkSyntaxProto3,

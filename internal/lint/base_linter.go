@@ -22,54 +22,26 @@ package lint
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
 
 type baseLinter struct {
-	id      string
-	purpose string
-	check   func(string, []*proto.Proto) ([]*text.Failure, error)
-}
-
-func newBaseAddLinter(
-	id string,
-	purpose string,
-	addCheck func(func(*text.Failure), string, []*proto.Proto) error,
-) *baseLinter {
-	return newBaseLinter(
-		id,
-		purpose,
-		func(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
-			var failures []*text.Failure
-			var lock sync.Mutex
-			if err := addCheck(
-				func(failure *text.Failure) {
-					lock.Lock()
-					failures = append(failures, failure)
-					lock.Unlock()
-				},
-				dirPath,
-				descriptors,
-			); err != nil {
-				return nil, err
-			}
-			return failures, nil
-		},
-	)
+	id       string
+	purpose  string
+	addCheck func(func(*text.Failure), string, []*proto.Proto) error
 }
 
 func newBaseLinter(
 	id string,
 	purpose string,
-	check func(string, []*proto.Proto) ([]*text.Failure, error),
+	addCheck func(func(*text.Failure), string, []*proto.Proto) error,
 ) *baseLinter {
 	return &baseLinter{
-		id:      strings.ToUpper(id),
-		purpose: purpose,
-		check:   check,
+		id:       strings.ToUpper(id),
+		purpose:  purpose,
+		addCheck: addCheck,
 	}
 }
 
@@ -82,7 +54,14 @@ func (c *baseLinter) Purpose() string {
 }
 
 func (c *baseLinter) Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
-	failures, err := c.check(dirPath, descriptors)
+	var failures []*text.Failure
+	err := c.addCheck(
+		func(failure *text.Failure) {
+			failures = append(failures, failure)
+		},
+		dirPath,
+		descriptors,
+	)
 	for _, failure := range failures {
 		failure.ID = c.id
 	}

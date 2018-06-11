@@ -27,25 +27,25 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var fileOptionsRequireGoPackageLinter = NewAddLinter(
+var fileOptionsRequireGoPackageLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_GO_PACKAGE",
 	`Verifies that the file option "go_package" is set.`,
 	newCheckFileOptionsRequire("go_package"),
 )
 
-var fileOptionsRequireJavaMultipleFilesLinter = NewAddLinter(
+var fileOptionsRequireJavaMultipleFilesLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES",
 	`Verifies that the file option "java_multiple_files" is set.`,
 	newCheckFileOptionsRequire("java_multiple_files"),
 )
 
-var fileOptionsRequireJavaOuterClassnameLinter = NewAddLinter(
+var fileOptionsRequireJavaOuterClassnameLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME",
 	`Verifies that the file option "java_outer_classname" is set.`,
 	newCheckFileOptionsRequire("java_outer_classname"),
 )
 
-var fileOptionsRequireJavaPackageLinter = NewAddLinter(
+var fileOptionsRequireJavaPackageLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_JAVA_PACKAGE",
 	`Verifies that the file option "java_package" is set.`,
 	newCheckFileOptionsRequire("java_package"),

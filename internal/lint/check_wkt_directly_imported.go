@@ -32,7 +32,7 @@ import (
 // A more robust solution might be needed
 
 var (
-	wktDirectlyImportedLinter = NewAddLinter(
+	wktDirectlyImportedLinter = NewLinter(
 		"WKT_DIRECTLY_IMPORTED",
 		`Verifies that the Well-Known Types are directly imported using "google/protobuf/" as the base of the import.`,
 		checkWKTDirectlyImported,

@@ -156,23 +156,13 @@ type Linter interface {
 }
 
 // NewLinter is a convenience function that returns a new Linter for the
-// given parameters.
-//
-// The ID will be upper-cased.
-//
-// Failures returned from check do not need to set the ID, this will be overwritten.
-func NewLinter(id string, purpose string, check func(string, []*proto.Proto) ([]*text.Failure, error)) Linter {
-	return newBaseLinter(id, purpose, check)
-}
-
-// NewAddLinter is a convenience function that returns a new Linter for the
 // given parameters, using a function to record failures.
 //
 // The ID will be upper-cased.
 //
 // Failures returned from check do not need to set the ID, this will be overwritten.
-func NewAddLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*proto.Proto) error) Linter {
-	return newBaseAddLinter(id, purpose, addCheck)
+func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*proto.Proto) error) Linter {
+	return newBaseLinter(id, purpose, addCheck)
 }
 
 // GetLinters returns the Linters for the LintConfig.

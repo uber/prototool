@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumNamesCapitalizedLinter = NewAddLinter(
+var enumNamesCapitalizedLinter = NewLinter(
 	"ENUM_NAMES_CAPITALIZED",
 	"Verifies that all enum names are Capitalized.",
 	checkEnumNamesCapitalized,

@@ -27,7 +27,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var commentsNoCStyleLinter = NewAddLinter(
+var commentsNoCStyleLinter = NewLinter(
 	"COMMENTS_NO_C_STYLE",
 	"Verifies that there are no /* c-style */ comments.",
 	checkCommentsNoCStyle,
