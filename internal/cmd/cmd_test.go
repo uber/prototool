@@ -135,7 +135,7 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
-		"11:1:MESSAGE_NAMES_CAPITALIZED",
+		"9:1:MESSAGE_NAMES_CAPITALIZED",
 		"testdata/lint/message_name_not_capitalized.proto",
 	)
 	assertDoLintFile(
@@ -157,7 +157,7 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
-		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB`,
+		6:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB`,
 		"testdata/lint/file_options_incorrect.proto",
 	)
 	assertDoLintFiles(
@@ -221,6 +221,8 @@ func TestLint(t *testing.T) {
 		84:5:COMMENTS_NO_C_STYLE
 		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 		93:1:ENUM_NAMES_CAMEL_CASE
+		97:1:FILE_OPTIONS_UNSET_JAVA_MULTIPLE_FILES
+		98:1:FILE_OPTIONS_UNSET_JAVA_OUTER_CLASSNAME
 		`,
 		"testdata/lint/lots.proto",
 	)

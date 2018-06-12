@@ -51,6 +51,8 @@ var (
 		fileOptionsRequireGoPackageLinter,
 		fileOptionsRequireJavaMultipleFilesLinter,
 		fileOptionsRequireJavaPackageLinter,
+		fileOptionsUnsetJavaMultipleFilesLinter,
+		fileOptionsUnsetJavaOuterClassnameLinter,
 		messageFieldsNotFloatsLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
 		messageFieldNamesLowercaseLinter,
