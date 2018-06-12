@@ -27,13 +27,13 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var fileOptionsUnsetJavaMultipleFilesChecker = NewAddChecker(
+var fileOptionsUnsetJavaMultipleFilesLinter = NewLinter(
 	"FILE_OPTIONS_UNSET_JAVA_MULTIPLE_FILES",
 	`Verifies that the file option "java_multiple_files" is unset.`,
 	newCheckFileOptionsUnset("java_multiple_files"),
 )
 
-var fileOptionsUnsetJavaOuterClassnameChecker = NewAddChecker(
+var fileOptionsUnsetJavaOuterClassnameLinter = NewLinter(
 	"FILE_OPTIONS_UNSET_JAVA_OUTER_CLASSNAME",
 	`Verifies that the file option "java_outer_classname" is unset.`,
 	newCheckFileOptionsUnset("java_outer_classname"),

@@ -27,6 +27,8 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var _ proto.Visitor = baseVisitor{}
+
 type baseVisitor struct{}
 
 func (baseVisitor) OnStart(*proto.Proto) error { return nil }

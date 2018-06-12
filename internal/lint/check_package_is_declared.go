@@ -27,7 +27,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var packageIsDeclaredChecker = NewAddChecker(
+var packageIsDeclaredLinter = NewLinter(
 	"PACKAGE_IS_DECLARED",
 	"Verifies that there is a package declaration.",
 	checkPackageIsDeclared,

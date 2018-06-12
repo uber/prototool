@@ -25,9 +25,9 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var requestResponseTypesUniqueChecker = NewAddChecker(
+var requestResponseTypesUniqueLinter = NewLinter(
 	"REQUEST_RESPONSE_TYPES_UNIQUE",
-	"Verifies that all request and response types are unique to each rpc.",
+	"Verifies that all request and response types are unique to each RPC.",
 	checkRequestResponseTypesUnique,
 )
 

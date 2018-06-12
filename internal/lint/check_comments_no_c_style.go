@@ -27,7 +27,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var commentsNoCStyleChecker = NewAddChecker(
+var commentsNoCStyleLinter = NewLinter(
 	"COMMENTS_NO_C_STYLE",
 	"Verifies that there are no /* c-style */ comments.",
 	checkCommentsNoCStyle,
@@ -116,7 +116,7 @@ func (v commentsNoCStyleVisitor) VisitReserved(element *proto.Reserved) {
 
 func (v commentsNoCStyleVisitor) VisitRPC(element *proto.RPC) {
 	v.checkComments(element.Position, element.Comment, element.InlineComment)
-	for _, child := range element.Options {
+	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }

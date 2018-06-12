@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumsHaveCommentsChecker = NewAddChecker(
+var enumsHaveCommentsLinter = NewLinter(
 	"ENUMS_HAVE_COMMENTS",
 	`Verifies that all enums have a comment of the form "// EnumName ...".`,
 	checkEnumsHaveComments,

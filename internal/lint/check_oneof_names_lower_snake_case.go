@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var oneofNamesLowerSnakeCaseChecker = NewAddChecker(
+var oneofNamesLowerSnakeCaseLinter = NewLinter(
 	"ONEOF_NAMES_LOWER_SNAKE_CASE",
 	"Verifies that all oneof names are lower_snake_case.",
 	checkOneofNamesLowerSnakeCase,

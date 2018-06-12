@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var serviceNamesCamelCaseChecker = NewAddChecker(
+var serviceNamesCamelCaseLinter = NewLinter(
 	"SERVICE_NAMES_CAMEL_CASE",
 	"Verifies that all service names are CamelCase.",
 	checkServiceNamesCamelCase,

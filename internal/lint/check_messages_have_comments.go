@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messagesHaveCommentsChecker = NewAddChecker(
+var messagesHaveCommentsLinter = NewLinter(
 	"MESSAGES_HAVE_COMMENTS",
 	`Verifies that all non-extended messages have a comment of the form "// MessageName ...".`,
 	checkMessagesHaveComments,

@@ -43,7 +43,7 @@ func newRunner(options ...RunnerOption) *runner {
 func (r *runner) Run(protoSets ...*file.ProtoSet) ([]*text.Failure, error) {
 	var failures []*text.Failure
 	for _, protoSet := range protoSets {
-		checkers, err := GetCheckers(protoSet.Config.Lint)
+		linters, err := GetLinters(protoSet.Config.Lint)
 		if err != nil {
 			return nil, err
 		}
@@ -51,7 +51,7 @@ func (r *runner) Run(protoSets ...*file.ProtoSet) ([]*text.Failure, error) {
 		if err != nil {
 			return nil, err
 		}
-		iFailures, err := CheckMultiple(checkers, dirPathToDescriptors, protoSet.Config.Lint.IgnoreIDToFilePaths)
+		iFailures, err := CheckMultiple(linters, dirPathToDescriptors, protoSet.Config.Lint.IgnoreIDToFilePaths)
 		if err != nil {
 			return nil, err
 		}

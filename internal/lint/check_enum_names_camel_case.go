@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumNamesCamelCaseChecker = NewAddChecker(
+var enumNamesCamelCaseLinter = NewLinter(
 	"ENUM_NAMES_CAMEL_CASE",
 	"Verifies that all enum names are CamelCase.",
 	checkEnumNamesCamelCase,

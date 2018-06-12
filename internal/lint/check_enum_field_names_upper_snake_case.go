@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumFieldNamesUpperSnakeCaseChecker = NewAddChecker(
+var enumFieldNamesUpperSnakeCaseLinter = NewLinter(
 	"ENUM_FIELD_NAMES_UPPER_SNAKE_CASE",
 	"Verifies that all enum field names are UPPER_SNAKE_CASE.",
 	checkEnumFieldNamesUpperSnakeCase,

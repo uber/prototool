@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var packageLowerSnakeCaseChecker = NewAddChecker(
+var packageLowerSnakeCaseLinter = NewLinter(
 	"PACKAGE_LOWER_SNAKE_CASE",
 	"Verifies that the package is lower_snake.case.",
 	checkPackageLowerSnakeCase,

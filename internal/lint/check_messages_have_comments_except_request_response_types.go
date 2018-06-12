@@ -28,7 +28,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messagesHaveCommentsExceptRequestResponseTypesChecker = NewAddChecker(
+var messagesHaveCommentsExceptRequestResponseTypesLinter = NewLinter(
 	"MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES",
 	`Verifies that all non-extended messages except for request and response types have a comment of the form "// MessageName ...".`,
 	checkMessagesHaveCommentsExceptRequestResponseTypes,

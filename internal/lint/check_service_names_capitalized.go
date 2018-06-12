@@ -26,7 +26,7 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var serviceNamesCapitalizedChecker = NewAddChecker(
+var serviceNamesCapitalizedLinter = NewLinter(
 	"SERVICE_NAMES_CAPITALIZED",
 	"Verifies that all service names are Capitalized.",
 	checkServiceNamesCapitalized,

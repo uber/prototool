@@ -4,14 +4,6 @@
 
 syntax = "proto3"; // inline comment1
 
-// comment9
-import "google/protobuf/timestamp.proto"; // inline comment9
-
-//comment10
-import "bar/bar.proto"; //inline comment10
-// comment2
-import public "bar/bar_proto2.proto"; // inline comment2
-
 package foo; // inline comment3
 
 // comment4
@@ -31,6 +23,13 @@ option (bar.file_dep_option) = {
 option (bar.file_option) = true; // inline comment6
 // comment7
 option (bar.file_option_proto2) = true; //inline comment7
+
+//comment10
+import "bar/bar.proto"; //inline comment10
+// comment2
+import public "bar/bar_proto2.proto"; // inline comment2
+// comment9
+import "google/protobuf/timestamp.proto"; // inline comment9
 
 // baz
 

@@ -22,67 +22,46 @@ package lint
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
 
-type baseChecker struct {
-	id      string
-	purpose string
-	check   func(string, []*proto.Proto) ([]*text.Failure, error)
+type baseLinter struct {
+	id       string
+	purpose  string
+	addCheck func(func(*text.Failure), string, []*proto.Proto) error
 }
 
-func newBaseAddChecker(
+func newBaseLinter(
 	id string,
 	purpose string,
 	addCheck func(func(*text.Failure), string, []*proto.Proto) error,
-) *baseChecker {
-	return newBaseChecker(
-		id,
-		purpose,
-		func(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
-			var failures []*text.Failure
-			var lock sync.Mutex
-			if err := addCheck(
-				func(failure *text.Failure) {
-					lock.Lock()
-					failures = append(failures, failure)
-					lock.Unlock()
-				},
-				dirPath,
-				descriptors,
-			); err != nil {
-				return nil, err
-			}
-			return failures, nil
-		},
-	)
-}
-
-func newBaseChecker(
-	id string,
-	purpose string,
-	check func(string, []*proto.Proto) ([]*text.Failure, error),
-) *baseChecker {
-	return &baseChecker{
-		id:      strings.ToUpper(id),
-		purpose: purpose,
-		check:   check,
+) *baseLinter {
+	return &baseLinter{
+		id:       strings.ToUpper(id),
+		purpose:  purpose,
+		addCheck: addCheck,
 	}
 }
 
-func (c *baseChecker) ID() string {
+func (c *baseLinter) ID() string {
 	return c.id
 }
 
-func (c *baseChecker) Purpose() string {
+func (c *baseLinter) Purpose() string {
 	return c.purpose
 }
 
-func (c *baseChecker) Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
-	failures, err := c.check(dirPath, descriptors)
+func (c *baseLinter) Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
+	var failures []*text.Failure
+	err := c.addCheck(
+		func(failure *text.Failure) {
+			failures = append(failures, failure)
+		},
+		dirPath,
+		descriptors,
+	)
 	for _, failure := range failures {
 		failure.ID = c.id
 	}
