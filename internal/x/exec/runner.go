@@ -557,7 +557,7 @@ func (r *runner) All(args []string, disableFormat bool, disableLint bool) error 
 	return nil
 }
 
-func (r *runner) GRPC(args []string, headers []string, callTimeout string, connectTimeout string, keepaliveTime string) error {
+func (r *runner) GRPC(args []string, headers []string, callTimeout string, connectTimeout string, keepaliveTime string, jsonOutput bool) error {
 	if len(args) < 3 {
 		return nil
 	}
@@ -614,6 +614,7 @@ func (r *runner) GRPC(args []string, headers []string, callTimeout string, conne
 		parsedCallTimeout,
 		parsedConnectTimeout,
 		parsedKeepaliveTime,
+		jsonOutput,
 	).Invoke(fileDescriptorSets, address, method, reader, r.output)
 }
 
@@ -696,6 +697,7 @@ func (r *runner) newGRPCHandler(
 	callTimeout time.Duration,
 	connectTimeout time.Duration,
 	keepaliveTime time.Duration,
+	jsonOutput bool,
 ) grpc.Handler {
 	handlerOptions := []grpc.HandlerOption{
 		grpc.HandlerWithLogger(r.logger),
@@ -711,6 +713,9 @@ func (r *runner) newGRPCHandler(
 	}
 	if keepaliveTime != 0 {
 		handlerOptions = append(handlerOptions, grpc.HandlerWithKeepaliveTime(keepaliveTime))
+	}
+	if jsonOutput {
+		handlerOptions = append(handlerOptions, grpc.HandlerWithJSONOutput())
 	}
 	return grpc.NewHandler(handlerOptions...)
 }

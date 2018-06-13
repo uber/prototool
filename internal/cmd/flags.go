@@ -36,6 +36,7 @@ type flags struct {
 	gen            bool
 	harbormaster   bool
 	headers        []string
+	jsonOutput     bool
 	keepaliveTime  string
 	lintMode       bool
 	overwrite      bool
@@ -86,6 +87,10 @@ func (f *flags) bindHarbormaster(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 	flagSet.StringSliceVarP(&f.headers, "header", "H", []string{}, "Additional request headers in 'name:value' format.")
+}
+
+func (f *flags) bindJSONOutput(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.jsonOutput, "json-output", false, "Output the response in JSON format along with header/trailer/status details.")
 }
 
 func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {

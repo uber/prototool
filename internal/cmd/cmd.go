@@ -200,7 +200,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Call a gRPC endpoint.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.GRPC(args, flags.headers, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime)
+				return runner.GRPC(args, flags.headers, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.jsonOutput)
 			})
 		},
 	}
@@ -208,6 +208,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	flags.bindConnectTimeout(grpcCmd.PersistentFlags())
 	flags.bindDirMode(grpcCmd.PersistentFlags())
 	flags.bindHeaders(grpcCmd.PersistentFlags())
+	flags.bindJSONOutput(grpcCmd.PersistentFlags())
 	flags.bindKeepaliveTime(grpcCmd.PersistentFlags())
 
 	initCmd := &cobra.Command{
