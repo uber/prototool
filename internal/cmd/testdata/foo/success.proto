@@ -5,8 +5,6 @@ package foo;
 import "google/protobuf/timestamp.proto";
 import "bar/dep.proto";
 
-option java_multiple_files = true;
-option java_outer_classname = "FooProto";
 option java_package = "com.foo.pb";
 option go_package = "foopb";
 

@@ -39,19 +39,19 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/diff"
 	"github.com/uber/prototool/internal/file"
+	"github.com/uber/prototool/internal/lint"
+	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
-	"github.com/uber/prototool/internal/x/cfginit"
 	"github.com/uber/prototool/internal/x/extract"
 	"github.com/uber/prototool/internal/x/format"
 	"github.com/uber/prototool/internal/x/grpc"
-	"github.com/uber/prototool/internal/x/lint"
 	"github.com/uber/prototool/internal/x/phab"
 	"github.com/uber/prototool/internal/x/protoc"
 	"github.com/uber/prototool/internal/x/reflect"
-	"github.com/uber/prototool/internal/x/settings"
 	"go.uber.org/zap"
 )
 
@@ -360,28 +360,28 @@ func (r *runner) ListLinters() error {
 	if err != nil {
 		return err
 	}
-	checkers, err := lint.GetCheckers(config.Lint)
+	linters, err := lint.GetLinters(config.Lint)
 	if err != nil {
 		return err
 	}
-	return r.printCheckers(checkers)
+	return r.printLinters(linters)
 }
 
 func (r *runner) ListAllLinters() error {
-	return r.printCheckers(lint.AllCheckers)
+	return r.printLinters(lint.AllLinters)
 }
 
 func (r *runner) ListLintGroup(group string) error {
-	checkers, ok := lint.GroupToCheckers[strings.ToLower(group)]
+	linters, ok := lint.GroupToLinters[strings.ToLower(group)]
 	if !ok {
 		return newExitErrorf(255, "unknown lint group: %s", strings.ToLower(group))
 	}
-	return r.printCheckers(checkers)
+	return r.printLinters(linters)
 }
 
 func (r *runner) ListAllLintGroups() error {
-	groups := make([]string, 0, len(lint.GroupToCheckers))
-	for group := range lint.GroupToCheckers {
+	groups := make([]string, 0, len(lint.GroupToLinters))
+	for group := range lint.GroupToLinters {
 		groups = append(groups, group)
 	}
 	sort.Strings(groups)
@@ -841,11 +841,11 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 	return bufWriter.Flush()
 }
 
-func (r *runner) printCheckers(checkers []lint.Checker) error {
-	sort.Slice(checkers, func(i int, j int) bool { return checkers[i].ID() < checkers[j].ID() })
+func (r *runner) printLinters(linters []lint.Linter) error {
+	sort.Slice(linters, func(i int, j int) bool { return linters[i].ID() < linters[j].ID() })
 	tabWriter := newTabWriter(r.output)
-	for _, checker := range checkers {
-		if _, err := fmt.Fprintf(tabWriter, "%s\t%s\n", checker.ID(), checker.Purpose()); err != nil {
+	for _, linter := range linters {
+		if _, err := fmt.Fprintf(tabWriter, "%s\t%s\n", linter.ID(), linter.Purpose()); err != nil {
 			return err
 		}
 	}

@@ -25,7 +25,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/uber/prototool/internal/x/settings"
+	"github.com/uber/prototool/internal/settings"
 	"go.uber.org/zap"
 )
 
