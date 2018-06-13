@@ -58,7 +58,7 @@ func (i *invocationEventHandler) OnReceiveHeaders(headers metadata.MD) {
 	if !i.jsonOutput {
 		return
 	}
-	i.println(i.marshalJSONOutputData(&jsonOutputData{Headers: headers}))
+	i.println(`{"headers":` + i.marshalJSON(headers) + "}")
 }
 
 func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
@@ -66,7 +66,7 @@ func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
 		i.println(i.marshal(message, true))
 		return
 	}
-	i.println(i.marshalJSONOutputData(&jsonOutputData{Response: i.marshal(message, false)}))
+	i.println(`{"response":` + i.marshal(message, false) + `}`)
 }
 
 func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, trailers metadata.MD) {
@@ -77,7 +77,7 @@ func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, trailers me
 	if !i.jsonOutput {
 		return
 	}
-	i.println(i.marshalJSONOutputData(&jsonOutputData{Status: i.marshal(s.Proto(), false), Trailers: trailers}))
+	i.println(`{"status":` + i.marshal(s.Proto(), false) + `,"trailers":` + i.marshalJSON(trailers) + `}`)
 }
 
 func (i *invocationEventHandler) Err() error {
@@ -100,11 +100,11 @@ func (i *invocationEventHandler) marshal(message proto.Message, pretty bool) str
 	return s
 }
 
-func (i *invocationEventHandler) marshalJSONOutputData(jsonOutputData *jsonOutputData) string {
-	if jsonOutputData == nil {
+func (i *invocationEventHandler) marshalJSON(input interface{}) string {
+	if input == nil {
 		return ""
 	}
-	data, err := json.Marshal(jsonOutputData)
+	data, err := json.Marshal(input)
 	if err != nil {
 		i.logger.Error("marshal error", zap.Error(err))
 		return ""
@@ -119,11 +119,4 @@ func (i *invocationEventHandler) println(s string) {
 	if _, err := i.output.Write([]byte(s + "\n")); err != nil {
 		i.logger.Error("write error", zap.Error(err))
 	}
-}
-
-type jsonOutputData struct {
-	Response string              `json:"response,omitempty"`
-	Headers  map[string][]string `json:"headers,omitempty"`
-	Trailers map[string][]string `json:"trailers,omitempty"`
-	Status   string              `json:"status,omitempty"`
 }
