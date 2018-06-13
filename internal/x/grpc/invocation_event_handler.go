@@ -58,7 +58,11 @@ func (i *invocationEventHandler) OnReceiveHeaders(headers metadata.MD) {
 	if !i.jsonOutput {
 		return
 	}
-	i.println(`{"headers":` + i.marshalJSON(headers) + "}")
+	if len(headers) != 0 {
+		if s := i.marshalJSON(headers); s != "" {
+			i.println(`{"headers":` + s + "}")
+		}
+	}
 }
 
 func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
@@ -66,7 +70,9 @@ func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
 		i.println(i.marshal(message, true))
 		return
 	}
-	i.println(`{"response":` + i.marshal(message, false) + `}`)
+	if s := i.marshal(message, false); s != "" && s != "{}" {
+		i.println(`{"response":` + s + `}`)
+	}
 }
 
 func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, trailers metadata.MD) {
@@ -77,7 +83,25 @@ func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, trailers me
 	if !i.jsonOutput {
 		return
 	}
-	i.println(`{"status":` + i.marshal(s.Proto(), false) + `,"trailers":` + i.marshalJSON(trailers) + `}`)
+	ss := i.marshal(s.Proto(), false)
+	if ss == "{}" {
+		ss = ""
+	}
+	if ss != "" {
+		ss = `"status":` + ss
+	}
+	var st string
+	if len(trailers) != 0 {
+		if st = i.marshalJSON(trailers); st != "" {
+			st = `"trailers":` + st
+			if ss != "" {
+				st = `,` + st
+			}
+		}
+	}
+	if ss != "" || st != "" {
+		i.println(`{` + ss + st + `}`)
+	}
 }
 
 func (i *invocationEventHandler) Err() error {
