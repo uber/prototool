@@ -25,9 +25,9 @@ import (
 	"path/filepath"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
-	"github.com/uber/prototool/internal/x/file"
 	"go.uber.org/zap"
 )
 
@@ -190,12 +190,8 @@ func absClean(path string) (string, error) {
 	if path == "" {
 		return path, nil
 	}
-	var err error
 	if !filepath.IsAbs(path) {
-		path, err = filepath.Abs(path)
-		if err != nil {
-			return "", err
-		}
+		return filepath.Abs(path)
 	}
 	return filepath.Clean(path), nil
 }

@@ -41,12 +41,12 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/diff"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
 	"github.com/uber/prototool/internal/x/extract"
-	"github.com/uber/prototool/internal/x/file"
 	"github.com/uber/prototool/internal/x/format"
 	"github.com/uber/prototool/internal/x/grpc"
 	"github.com/uber/prototool/internal/x/phab"
@@ -896,12 +896,8 @@ func absClean(path string) (string, error) {
 	if path == "" {
 		return path, nil
 	}
-	var err error
 	if !filepath.IsAbs(path) {
-		path, err = filepath.Abs(path)
-		if err != nil {
-			return "", err
-		}
+		return filepath.Abs(path)
 	}
 	return filepath.Clean(path), nil
 }

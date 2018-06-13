@@ -113,10 +113,6 @@ func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) 
 }
 
 func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*ProtoFile) ([]*ProtoSet, error) {
-	// TODO: this should be handled elsewhere
-	if len(dirPathToProtoFiles) == 0 {
-		return nil, nil
-	}
 	filePathToProtoSet := make(map[string]*ProtoSet)
 	for dirPath, protoFiles := range dirPathToProtoFiles {
 		configFilePath, err := c.configProvider.GetFilePathForDir(dirPath)
@@ -132,6 +128,7 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 		}
 		protoSet.DirPathToFiles[dirPath] = append(protoSet.DirPathToFiles[dirPath], protoFiles...)
 		var config settings.Config
+		// configFilePath is empty if no config file is found
 		if configFilePath != "" {
 			config, err = c.configProvider.Get(configFilePath)
 			if err != nil {
@@ -173,7 +170,9 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 				}
 				numWalkedFiles++
 				if timedOut {
-					return fmt.Errorf("walking the diectory structure looking for proto files timed out after %v and having seen %d files, are you sure you are operating in the right context?", c.walkTimeout, numWalkedFiles)
+					return fmt.Errorf("walking the diectory structure looking for proto files "+
+						"timed out after %v and having seen %d files, are you sure you are operating "+
+						"in the right context?", c.walkTimeout, numWalkedFiles)
 				}
 				absFilePath, err := absClean(filePath)
 				if err != nil {
@@ -202,14 +201,11 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 						return nil
 					}
 				}
-				//displayPath := filePath
-				//if !filepath.IsAbs(dirPath) {
 				displayPath, err := filepath.Rel(absWorkDirPath, filePath)
 				if err != nil {
 					//return err
 					displayPath = filePath
 				}
-				//}
 				displayPath = filepath.Clean(displayPath)
 				protoFiles = append(protoFiles, &ProtoFile{
 					Path:        absFilePath,
@@ -269,12 +265,8 @@ func absClean(path string) (string, error) {
 	if path == "" {
 		return path, nil
 	}
-	var err error
 	if !filepath.IsAbs(path) {
-		path, err = filepath.Abs(path)
-		if err != nil {
-			return "", err
-		}
+		return filepath.Abs(path)
 	}
 	return filepath.Clean(path), nil
 }
