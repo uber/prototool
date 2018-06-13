@@ -44,10 +44,9 @@ Prototool is stil in the early alpha stages, and should not be used in productio
 Install Prototool from GitHub Releases.
 
 ```
-curl -sSL https://github.com/uber/prototool/releases/download/v0.1.0/prototool-$(uname -s)-$(uname -m) \
+curl -sSL https://github.com/uber/prototool/releases/download/v0.2.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
-  chmod +x /usr/local/bin/prototool && \
-  prototool -h
+  chmod +x /usr/local/bin/prototool
 ```
 
 ## Quick Start
@@ -117,7 +116,7 @@ While almost all projects should not have multiple `prototool.yaml` files (and t
 └── prototool.yaml
 ```
 
-Everything under `a/d` will use `a/d/prototool.yaml`, everything under `b`, `b/g/h` will use `b/prototool.yaml`, and everything under `a`, `a/e`, `a/f`, `c`, `c/i` will use `prototool.yaml`. See [internal/x/file/testdata](internal/x/file/testdata) for the most current example.
+Everything under `a/d` will use `a/d/prototool.yaml`, everything under `b`, `b/g/h` will use `b/prototool.yaml`, and everything under `a`, `a/e`, `a/f`, `c`, `c/i` will use `prototool.yaml`. See [internal/file/testdata](internal/file/testdata) for the most current example.
 
 ## File Discovery
 

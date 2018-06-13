@@ -36,10 +36,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/uber/prototool/internal/file"
+	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/wkt"
-	"github.com/uber/prototool/internal/x/file"
-	"github.com/uber/prototool/internal/x/settings"
 	"go.uber.org/zap"
 )
 
@@ -83,17 +83,20 @@ func newCompiler(options ...CompilerOption) *compiler {
 
 func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) {
 	var allCmdMetas []*cmdMeta
-	// we potentially create temporary files if doFileDescriptorSet is true
-	// if so, we try to remove them when we return no matter what
-	// by putting this defer here, we get this catch early
-	defer cleanCmdMetas(allCmdMetas)
 	for _, protoSet := range protoSets {
 		cmdMetas, err := c.getCmdMetas(protoSet)
 		if err != nil {
+			cleanCmdMetas(allCmdMetas)
 			return nil, err
 		}
 		allCmdMetas = append(allCmdMetas, cmdMetas...)
 	}
+
+	// we potentially create temporary files if doFileDescriptorSet is true
+	// if so, we try to remove them when we return no matter what
+	// by putting this defer here, we get this catch early
+	defer cleanCmdMetas(allCmdMetas)
+
 	if c.doGen {
 		// the directories for the output files have to exist
 		// so if we are generating, we create them before running

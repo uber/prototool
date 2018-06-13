@@ -1,17 +1,15 @@
 syntax = "proto3";
 
-import "google/protobuf/duration.proto";
-import "google/protobuf/timestamp.proto";
-
-import "foo/dep.proto";
-import "google/api/annotations.proto";
-import "sub/sub.proto";
-
 package foo;
 
 option go_package = "foopb";
-option java_multiple_files = true;
 option java_package = "com.foo.pb";
+
+import "foo/dep.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "sub/sub.proto";
 
 // Hello is a hello.
 enum Hello {

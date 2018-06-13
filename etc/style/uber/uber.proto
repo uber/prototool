@@ -22,19 +22,7 @@
 // Syntax should always be "proto3".
 syntax = "proto3";
 
-// Imports come next.
-// There is one newline between the syntax line and imports.
-// Import lines have no newlines between them.
-// The imports should be alphabetized.
-
-// Google's Well-known Types come first. They should be used if appropriate.
-// Google's well-known types should be directly imported from
-// "google/protobuf" as shown.
-import "google/protobuf/empty.proto";
-
-// After the Well-Known Types, there is a newline followed by the other
-// imports. The imports should be alphabetized.
-import "dep/dep.proto";
+// Next is the package.
 
 package style.uber;
 
@@ -43,11 +31,23 @@ package style.uber;
 // Package options should be alphabetized.
 // The below java and golang options are always specified.
 
+// Do not specify either "java_multiple_files" or "java_outer_classname".
+
 // The go package is always $(basename PACKAGE)pb.
 // Do not use the "long-form" package name with a directory path.
 option go_package = "uberpb";
 // The java package is always com.PACKAGE.pb.
 option java_package = "com.style.uber.pb";
+
+// Imports come next.
+// There is one newline between the package/options and imports.
+// Import lines have no newlines between them.
+// The imports should be alphabetized.
+
+import "dep/dep.proto";
+// Google's well-known types should be directly imported from
+// "google/protobuf" as shown.
+import "google/protobuf/empty.proto";
 
 // Next come the definitions.
 // There is one newline between the package options and the definitions.
