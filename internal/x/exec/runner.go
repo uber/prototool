@@ -896,12 +896,8 @@ func absClean(path string) (string, error) {
 	if path == "" {
 		return path, nil
 	}
-	var err error
 	if !filepath.IsAbs(path) {
-		path, err = filepath.Abs(path)
-		if err != nil {
-			return "", err
-		}
+		return filepath.Abs(path)
 	}
 	return filepath.Clean(path), nil
 }
