@@ -44,7 +44,7 @@ Prototool is stil in the early alpha stages, and should not be used in productio
 Install Prototool from GitHub Releases.
 
 ```
-curl -sSL https://github.com/uber/prototool/releases/download/v0.2.0/prototool-$(uname -s)-$(uname -m) \
+curl -sSL https://github.com/uber/prototool/releases/download/v0.3.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
   chmod +x /usr/local/bin/prototool
 ```
