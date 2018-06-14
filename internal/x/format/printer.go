@@ -49,10 +49,10 @@ func newPrinter(indentString string) *printer {
 func (p *printer) P(args ...interface{}) {
 	lineBuffer := bytes.NewBuffer(nil)
 	if p.indentCount > 0 {
-		fmt.Fprint(lineBuffer, strings.Repeat(p.indentString, p.indentCount))
+		_, _ = fmt.Fprint(lineBuffer, strings.Repeat(p.indentString, p.indentCount))
 	}
 	for _, arg := range args {
-		fmt.Fprint(lineBuffer, arg)
+		_, _ = fmt.Fprint(lineBuffer, arg)
 	}
 	line := lineBuffer.Bytes()
 
