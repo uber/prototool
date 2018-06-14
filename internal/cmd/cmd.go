@@ -423,7 +423,7 @@ func getLogger(stderr io.Writer, debug bool) (*zap.Logger, error) {
 
 func printAndGetErrorExitCode(err error, stdout io.Writer) int {
 	if errString := err.Error(); errString != "" {
-		fmt.Fprintln(stdout, errString)
+		_, _ = fmt.Fprintln(stdout, errString)
 	}
 	if exitError, ok := err.(*exec.ExitError); ok {
 		return exitError.Code
