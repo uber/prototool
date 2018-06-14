@@ -5,7 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- No changes yet.
+### Added
+- Linters to verify that `java_multiple_files` and `java_outer_classname` are
+  unset.
+### Fixed
+- The formatting order now reflects
+  https://cloud.google.com/apis/design/file_structure by moving the location
+  of imports to be below syntax, package, and file options.
+- Temporary files used for `FileDescriptorSets` are now properly cleaned up.
+- Packages that begin with a keyword no longer produce an error when using
+  `prototool format` or `prototool lint`.
 
 
 ## [0.2.0] - 2018-05-29
