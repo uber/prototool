@@ -110,15 +110,11 @@ func (d *downloader) cache() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	downloaded, err := d.isDownloaded(basePath)
-	if err != nil {
-		return "", err
-	}
-	if !downloaded {
+	if err := d.checkDownloaded(basePath); err != nil {
 		if err := d.download(basePath); err != nil {
 			return "", err
 		}
-		if _, err := d.isDownloaded(basePath); err != nil {
+		if err := d.checkDownloaded(basePath); err != nil {
 			return "", err
 		}
 		d.logger.Debug("protobuf downloaded", zap.String("path", basePath))
@@ -130,23 +126,24 @@ func (d *downloader) cache() (string, error) {
 	return basePath, nil
 }
 
-func (d *downloader) isDownloaded(basePath string) (bool, error) {
+func (d *downloader) checkDownloaded(basePath string) error {
 	buffer := bytes.NewBuffer(nil)
 	cmd := exec.Command(filepath.Join(basePath, "bin", "protoc"), "--version")
 	cmd.Stdout = buffer
 	if err := cmd.Run(); err != nil {
-		return false, nil
+		return err
 	}
 	if d.protocURL != "" {
 		// skip version check since we do not know the version
-		return true, nil
+		return nil
 	}
 	output := strings.TrimSpace(buffer.String())
 	d.logger.Debug("output from protoc --version", zap.String("output", output))
-	if output != fmt.Sprintf("libprotoc %s", d.config.Compile.ProtobufVersion) {
-		return false, nil
+	expected := fmt.Sprintf("libprotoc %s", d.config.Compile.ProtobufVersion)
+	if output != expected {
+		return fmt.Errorf("expected %s from protoc --version, got %s", expected, output)
 	}
-	return true, nil
+	return nil
 }
 
 func (d *downloader) download(basePath string) (retErr error) {
@@ -227,18 +224,13 @@ func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {
 	if d.protocURL != "" {
 		return d.protocURL, nil
 	}
-	unameS, unameM, err := getUnameSUnameMPaths(goos, goarch)
+	_, unameM, err := getUnameSUnameMPaths(goos, goarch)
 	if err != nil {
 		return "", err
 	}
-	var protocS string
-	switch unameS {
-	case "Darwin":
-		protocS = "osx"
-	case "Linux":
-		protocS = "linux"
-	default:
-		return "", fmt.Errorf("invalid value for uname -s: %v", unameS)
+	protocS, err := getProtocSPath(goos)
+	if err != nil {
+		return "", err
 	}
 	return fmt.Sprintf(
 		"https://github.com/google/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
@@ -311,6 +303,17 @@ func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(stri
 		return filepath.Join(home, ".cache", "prototool", unameS, unameM), nil
 	default:
 		return "", fmt.Errorf("invalid value for uname -s: %v", unameS)
+	}
+}
+
+func getProtocSPath(goos string) (string, error) {
+	switch goos {
+	case "darwin":
+		return "osx", nil
+	case "linux":
+		return "linux", nil
+	default:
+		return "", fmt.Errorf("unsupported value for runtime.GOOS: %v", goos)
 	}
 }
 

@@ -261,6 +261,13 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 		// or otherwise things can get weird
 		// we make best effort to make sure we have the a parent directory of the file
 		// if we have a config, use that directory, otherwise use the working directory
+		//
+		// This does what I'd expect `prototool` to do out of the box:
+		//
+		// - If a prototool.yaml file is present, use that as the root for your imports.
+		//   So if you have a/b/prototool.yaml and a/b/c/d/one.proto, a/b/c/e/two.proto,
+		//   you'd import c/d/one.proto in two.proto.
+		// - If there's no prototool.yaml file, I expect my imports to start with the current directory.
 		configDirPath := protoSet.Config.DirPath
 		if configDirPath == "" {
 			configDirPath = protoSet.WorkDirPath
@@ -443,8 +450,7 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 			// one of these two must be true, we validate this above
 			if genPlugin.Type.IsGo() {
 				modifiers = wkt.FilenameToGoModifierMap
-			}
-			if genPlugin.Type.IsGogo() {
+			} else if genPlugin.Type.IsGogo() {
 				modifiers = wkt.FilenameToGogoModifierMap
 			}
 			for key, value := range modifiers {
@@ -458,12 +464,7 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 	return strings.Join(goFlags, ","), nil
 }
 
-func getIncludes(
-	downloader Downloader,
-	config settings.Config,
-	dirPath string,
-	configDirPath string,
-) ([]string, error) {
+func getIncludes(downloader Downloader, config settings.Config, dirPath string, configDirPath string) ([]string, error) {
 	var includes []string
 	fileInIncludePath := false
 	includedConfigDirPath := false
@@ -680,10 +681,6 @@ func getFileDescriptorSet(cmdMeta *cmdMeta) (*descriptor.FileDescriptorSet, erro
 	if err := proto.Unmarshal(data, fileDescriptorSet); err != nil {
 		return nil, err
 	}
-	//for _, fileDescriptorProto := range fileDescriptorSet.File {
-	//displayFilePath := bestFilePath(cmdMeta, fileDescriptorProto.GetName())
-	//fileDescriptorProto.Name = proto.String(displayFilePath)
-	//}
 	return fileDescriptorSet, nil
 }
 
@@ -699,12 +696,7 @@ func devNull() (string, error) {
 }
 
 func getTempFilePath() (string, error) {
-	prefix := ""
-	// TODO: what were we doing here?
-	if len(os.Args) > 0 {
-		prefix = "prototool"
-	}
-	tempFile, err := ioutil.TempFile("", prefix)
+	tempFile, err := ioutil.TempFile("", "prototool")
 	if err != nil {
 		return "", err
 	}
