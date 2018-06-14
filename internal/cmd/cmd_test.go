@@ -315,6 +315,13 @@ func TestLint(t *testing.T) {
 		93:1:ENUM_NAMES_CAMEL_CASE`,
 		"testdata/lint/allgroup/lots.proto",
 	)
+	assertDoLintFile(
+		t,
+		false,
+		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
+		"testdata/lint/package_starts_with_keyword.proto",
+	)
 }
 
 func TestGoldenFormat(t *testing.T) {
