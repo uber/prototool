@@ -80,7 +80,6 @@ func DownloaderWithLogger(logger *zap.Logger) DownloaderOption {
 
 // DownloaderWithCachePath returns a DownloaderOption that uses the given cachePath.
 //
-//
 // The default is ${XDG_CACHE_HOME}/prototool/$(uname -s)/$(uname -m).
 func DownloaderWithCachePath(cachePath string) DownloaderOption {
 	return func(downloader *downloader) {
@@ -142,7 +141,6 @@ func CompilerWithLogger(logger *zap.Logger) CompilerOption {
 }
 
 // CompilerWithCachePath returns a CompilerOption that uses the given cachePath.
-//
 //
 // The default is ${XDG_CACHE_HOME}/prototool/$(uname -s)/$(uname -m).
 func CompilerWithCachePath(cachePath string) CompilerOption {

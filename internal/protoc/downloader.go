@@ -227,18 +227,13 @@ func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {
 	if d.protocURL != "" {
 		return d.protocURL, nil
 	}
-	unameS, unameM, err := getUnameSUnameMPaths(goos, goarch)
+	_, unameM, err := getUnameSUnameMPaths(goos, goarch)
 	if err != nil {
 		return "", err
 	}
-	var protocS string
-	switch unameS {
-	case "Darwin":
-		protocS = "osx"
-	case "Linux":
-		protocS = "linux"
-	default:
-		return "", fmt.Errorf("invalid value for uname -s: %v", unameS)
+	protocS, err := getProtocSPath(goos)
+	if err != nil {
+		return "", err
 	}
 	return fmt.Sprintf(
 		"https://github.com/google/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
@@ -311,6 +306,17 @@ func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(stri
 		return filepath.Join(home, ".cache", "prototool", unameS, unameM), nil
 	default:
 		return "", fmt.Errorf("invalid value for uname -s: %v", unameS)
+	}
+}
+
+func getProtocSPath(goos string) (string, error) {
+	switch goos {
+	case "darwin":
+		return "osx", nil
+	case "linux":
+		return "linux", nil
+	default:
+		return "", fmt.Errorf("unsupported value for runtime.GOOS: %v", goos)
 	}
 }
 

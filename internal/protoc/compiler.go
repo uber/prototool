@@ -680,10 +680,6 @@ func getFileDescriptorSet(cmdMeta *cmdMeta) (*descriptor.FileDescriptorSet, erro
 	if err := proto.Unmarshal(data, fileDescriptorSet); err != nil {
 		return nil, err
 	}
-	//for _, fileDescriptorProto := range fileDescriptorSet.File {
-	//displayFilePath := bestFilePath(cmdMeta, fileDescriptorProto.GetName())
-	//fileDescriptorProto.Name = proto.String(displayFilePath)
-	//}
 	return fileDescriptorSet, nil
 }
 
@@ -699,12 +695,7 @@ func devNull() (string, error) {
 }
 
 func getTempFilePath() (string, error) {
-	prefix := ""
-	// TODO: what were we doing here?
-	if len(os.Args) > 0 {
-		prefix = "prototool"
-	}
-	tempFile, err := ioutil.TempFile("", prefix)
+	tempFile, err := ioutil.TempFile("", "prototool")
 	if err != nil {
 		return "", err
 	}
