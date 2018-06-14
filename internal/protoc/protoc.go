@@ -106,6 +106,9 @@ type CompileResult struct {
 	// The failures from all calls.
 	Failures []*text.Failure
 	// Will not be set if there are any failures.
+	//
+	// Will only be set if the CompilerWithFileDescriptorSet
+	// option is used.
 	FileDescriptorSets []*descriptor.FileDescriptorSet
 }
 
@@ -117,9 +120,6 @@ type Compiler interface {
 	// and there will be no error. The caller can determine if this is
 	// an error case. If there is any other type of error, or some output
 	// from protoc cannot be interpreted, an error will be returned.
-	//
-	// FileDescriptorSet will only be set if the CompilerWithFileDescriptorSet
-	// option is used.
 	Compile(...*file.ProtoSet) (*CompileResult, error)
 
 	// Return the protoc commands that would be run on Compile.

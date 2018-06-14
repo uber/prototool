@@ -110,7 +110,7 @@ func (d *downloader) cache() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if d.checkDownloaded(basePath) != nil {
+	if err := d.checkDownloaded(basePath); err != nil {
 		if err := d.download(basePath); err != nil {
 			return "", err
 		}
