@@ -18,30 +18,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
+import (
+	"strings"
 
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
+	"github.com/uber/prototool/internal/wkt"
 )
+
+// TODO: This will not detect things like "timestamp.proto" or "protobuf/timestamp.proto"
+// A more robust solution might be needed
 
 var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
+	wktDirectlyImportedLinter = NewLinter(
+		"WKT_DIRECTLY_IMPORTED",
+		`Verifies that the Well-Known Types are directly imported using "google/protobuf/" as the base of the import.`,
+		checkWKTDirectlyImported,
+	)
 )
+
+func checkWKTDirectlyImported(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(&wktDirectlyImportedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+}
+
+type wktDirectlyImportedVisitor struct {
+	baseAddVisitor
+}
+
+func (v wktDirectlyImportedVisitor) VisitImport(element *proto.Import) {
+	for wktFilename := range wkt.Filenames {
+		if strings.HasSuffix(element.Filename, wktFilename) && element.Filename != wktFilename {
+			v.AddFailuref(element.Position, "Import %q is a Well-Known Type import but should be imported using google/protobuf as the base.", element.Filename)
+		}
+	}
+}

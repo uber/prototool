@@ -18,30 +18,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
-
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+import (
+	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/strs"
+	"github.com/uber/prototool/internal/text"
 )
 
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
+var serviceNamesCapitalizedLinter = NewLinter(
+	"SERVICE_NAMES_CAPITALIZED",
+	"Verifies that all service names are Capitalized.",
+	checkServiceNamesCapitalized,
 )
+
+func checkServiceNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(serviceNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+}
+
+type serviceNamesCapitalizedVisitor struct {
+	baseAddVisitor
+}
+
+func (v serviceNamesCapitalizedVisitor) VisitService(service *proto.Service) {
+	if !strs.IsCapitalized(service.Name) {
+		v.AddFailuref(service.Position, "Service name %q must be capitalized.", service.Name)
+	}
+}

@@ -18,30 +18,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
-
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+import (
+	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/strs"
+	"github.com/uber/prototool/internal/text"
 )
 
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
+var rpcNamesCamelCaseLinter = NewLinter(
+	"RPC_NAMES_CAMEL_CASE",
+	"Verifies that all RPC names are CamelCase.",
+	checkRPCNamesCamelCase,
 )
+
+func checkRPCNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(rpcNamesCamelCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+}
+
+type rpcNamesCamelCaseVisitor struct {
+	baseAddVisitor
+}
+
+func (v rpcNamesCamelCaseVisitor) VisitService(service *proto.Service) {
+	for _, child := range service.Elements {
+		child.Accept(v)
+	}
+}
+
+func (v rpcNamesCamelCaseVisitor) VisitRPC(rpc *proto.RPC) {
+	if !strs.IsCamelCase(rpc.Name) {
+		v.AddFailuref(rpc.Position, "RPC name %q must be CamelCase.", rpc.Name)
+	}
+}

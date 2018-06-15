@@ -38,9 +38,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
-	"github.com/uber/prototool/internal/x/lint"
 	"google.golang.org/grpc"
 )
 
@@ -135,7 +135,7 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
-		"11:1:MESSAGE_NAMES_CAPITALIZED",
+		"9:1:MESSAGE_NAMES_CAPITALIZED",
 		"testdata/lint/message_name_not_capitalized.proto",
 	)
 	assertDoLintFile(
@@ -157,7 +157,7 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
-		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB`,
+		6:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB`,
 		"testdata/lint/file_options_incorrect.proto",
 	)
 	assertDoLintFiles(
@@ -221,6 +221,8 @@ func TestLint(t *testing.T) {
 		84:5:COMMENTS_NO_C_STYLE
 		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 		93:1:ENUM_NAMES_CAMEL_CASE
+		97:1:FILE_OPTIONS_UNSET_JAVA_MULTIPLE_FILES
+		98:1:FILE_OPTIONS_UNSET_JAVA_OUTER_CLASSNAME
 		`,
 		"testdata/lint/lots.proto",
 	)
@@ -312,6 +314,13 @@ func TestLint(t *testing.T) {
 		93:1:ENUMS_HAVE_COMMENTS
 		93:1:ENUM_NAMES_CAMEL_CASE`,
 		"testdata/lint/allgroup/lots.proto",
+	)
+	assertDoLintFile(
+		t,
+		false,
+		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
+		"testdata/lint/package_starts_with_keyword.proto",
 	)
 }
 
@@ -506,20 +515,20 @@ func TestServiceDescriptorProto(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	assertLinters(t, lint.DefaultCheckers, "list-linters")
+	assertLinters(t, lint.DefaultLinters, "list-linters")
 }
 
 func TestListAllLinters(t *testing.T) {
-	assertLinters(t, lint.AllCheckers, "list-all-linters")
+	assertLinters(t, lint.AllLinters, "list-all-linters")
 }
 
-func assertLinters(t *testing.T, checkers []lint.Checker, args ...string) {
-	checkerIDs := make([]string, 0, len(checkers))
-	for _, checker := range checkers {
-		checkerIDs = append(checkerIDs, checker.ID())
+func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
+	linterIDs := make([]string, 0, len(linters))
+	for _, linter := range linters {
+		linterIDs = append(linterIDs, linter.ID())
 	}
-	sort.Strings(checkerIDs)
-	assertDo(t, 0, strings.Join(checkerIDs, "\n"), args...)
+	sort.Strings(linterIDs)
+	assertDo(t, 0, strings.Join(linterIDs, "\n"), args...)
 }
 
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {

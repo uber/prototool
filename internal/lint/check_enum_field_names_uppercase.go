@@ -18,30 +18,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
-
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+import (
+	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/strs"
+	"github.com/uber/prototool/internal/text"
 )
 
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
+var enumFieldNamesUppercaseLinter = NewLinter(
+	"ENUM_FIELD_NAMES_UPPERCASE",
+	"Verifies that all enum field names are UPPERCASE.",
+	checkEnumFieldNamesUppercase,
 )
+
+func checkEnumFieldNamesUppercase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(enumFieldNamesUppercaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+}
+
+type enumFieldNamesUppercaseVisitor struct {
+	baseAddVisitor
+}
+
+func (v enumFieldNamesUppercaseVisitor) VisitMessage(message *proto.Message) {
+	for _, element := range message.Elements {
+		element.Accept(v)
+	}
+}
+
+func (v enumFieldNamesUppercaseVisitor) VisitEnum(enum *proto.Enum) {
+	for _, element := range enum.Elements {
+		element.Accept(v)
+	}
+}
+
+func (v enumFieldNamesUppercaseVisitor) VisitEnumField(field *proto.EnumField) {
+	if !strs.IsUppercase(field.Name) {
+		v.AddFailuref(field.Position, "Field name %q must be uppercase.", field.Name)
+	}
+}

@@ -18,30 +18,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
+import (
+	"strings"
 
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
 )
 
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
+type baseLinter struct {
+	id       string
+	purpose  string
+	addCheck func(func(*text.Failure), string, []*proto.Proto) error
+}
 
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
-)
+func newBaseLinter(
+	id string,
+	purpose string,
+	addCheck func(func(*text.Failure), string, []*proto.Proto) error,
+) *baseLinter {
+	return &baseLinter{
+		id:       strings.ToUpper(id),
+		purpose:  purpose,
+		addCheck: addCheck,
+	}
+}
+
+func (c *baseLinter) ID() string {
+	return c.id
+}
+
+func (c *baseLinter) Purpose() string {
+	return c.purpose
+}
+
+func (c *baseLinter) Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
+	var failures []*text.Failure
+	err := c.addCheck(
+		func(failure *text.Failure) {
+			failures = append(failures, failure)
+		},
+		dirPath,
+		descriptors,
+	)
+	for _, failure := range failures {
+		failure.ID = c.id
+	}
+	return failures, err
+}

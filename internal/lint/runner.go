@@ -18,30 +18,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
-
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+import (
+	"github.com/uber/prototool/internal/file"
+	"github.com/uber/prototool/internal/text"
+	"go.uber.org/zap"
 )
 
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
+type runner struct {
+	logger *zap.Logger
+}
 
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
-)
+func newRunner(options ...RunnerOption) *runner {
+	runner := &runner{
+		logger: zap.NewNop(),
+	}
+	for _, option := range options {
+		option(runner)
+	}
+	return runner
+}
+
+func (r *runner) Run(protoSets ...*file.ProtoSet) ([]*text.Failure, error) {
+	var failures []*text.Failure
+	for _, protoSet := range protoSets {
+		linters, err := GetLinters(protoSet.Config.Lint)
+		if err != nil {
+			return nil, err
+		}
+		dirPathToDescriptors, err := GetDirPathToDescriptors(protoSet)
+		if err != nil {
+			return nil, err
+		}
+		iFailures, err := CheckMultiple(linters, dirPathToDescriptors, protoSet.Config.Lint.IgnoreIDToFilePaths)
+		if err != nil {
+			return nil, err
+		}
+		failures = append(failures, iFailures...)
+	}
+	return failures, nil
+}

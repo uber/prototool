@@ -18,30 +18,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
+import (
+	"fmt"
+	"strings"
 
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
 )
 
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
+var messagesHaveCommentsLinter = NewLinter(
+	"MESSAGES_HAVE_COMMENTS",
+	`Verifies that all non-extended messages have a comment of the form "// MessageName ...".`,
+	checkMessagesHaveComments,
 )
+
+func checkMessagesHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(messagesHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+}
+
+type messagesHaveCommentsVisitor struct {
+	baseAddVisitor
+}
+
+func (v messagesHaveCommentsVisitor) VisitMessage(message *proto.Message) {
+	// for nested messages
+	for _, child := range message.Elements {
+		child.Accept(v)
+	}
+	if message.IsExtend {
+		return
+	}
+	if message.Comment == nil || len(message.Comment.Lines) == 0 || !strings.HasPrefix(message.Comment.Lines[0], fmt.Sprintf(" %s ", message.Name)) {
+		v.AddFailuref(message.Position, `Message %q needs a comment of the form "// %s ..."`, message.Name, message.Name)
+	}
+}

@@ -18,30 +18,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
-package vars
+package lint
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
+import (
+	"fmt"
+	"strings"
 
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
+	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/text"
 )
 
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
+var rpcsHaveCommentsLinter = NewLinter(
+	"RPCS_HAVE_COMMENTS",
+	`Verifies that all rpcs have a comment of the form "// RPCName ...".`,
+	checkRPCsHaveComments,
 )
+
+func checkRPCsHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(rpcsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+}
+
+type rpcsHaveCommentsVisitor struct {
+	baseAddVisitor
+}
+
+func (v rpcsHaveCommentsVisitor) VisitService(service *proto.Service) {
+	for _, child := range service.Elements {
+		child.Accept(v)
+	}
+}
+
+func (v rpcsHaveCommentsVisitor) VisitRPC(rpc *proto.RPC) {
+	if rpc.Comment == nil || len(rpc.Comment.Lines) == 0 || !strings.HasPrefix(rpc.Comment.Lines[0], fmt.Sprintf(" %s ", rpc.Name)) {
+		v.AddFailuref(rpc.Position, `RPC %q needs a comment of the form "// %s ..."`, rpc.Name, rpc.Name)
+	}
+}
