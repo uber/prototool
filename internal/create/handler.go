@@ -135,12 +135,24 @@ func (h *handler) getPkg(filePath string) (string, error) {
 		return DefaultPackage, nil
 	}
 	for createDirPath, basePkg := range config.Create.DirPathToBasePackage {
-		rel, err := filepath.Rel(createDirPath, absDirPath)
-		if err == nil {
-			return getPkgFromRel(rel, basePkg), nil
+		// TODO: cannot do rel right away because it will do ../.. if necessary
+		// strings.HasPrefix is not OS independent however
+		if !strings.HasPrefix(absDirPath, createDirPath) {
+			continue
 		}
+		rel, err := filepath.Rel(createDirPath, absDirPath)
+		if err != nil {
+			return "", err
+		}
+		return getPkgFromRel(rel, basePkg), nil
 	}
 	// no package mapping found, do default logic
+
+	// TODO: cannot do rel right away because it will do ../.. if necessary
+	// strings.HasPrefix is not OS independent however
+	if !strings.HasPrefix(absDirPath, config.DirPath) {
+		return DefaultPackage, nil
+	}
 	rel, err := filepath.Rel(config.DirPath, absDirPath)
 	if err != nil {
 		return "", err
