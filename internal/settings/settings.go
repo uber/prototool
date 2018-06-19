@@ -133,6 +133,8 @@ type Config struct {
 	ExcludePrefixes []string
 	// The compile config.
 	Compile CompileConfig
+	// The create config.
+	Create CreateConfig
 	// Lint is a special case. If nothing is set, the defaults are used. Either IDs,
 	// or Group/IncludeIDs/ExcludeIDs can be set, but not both. There can be no overlap
 	// between IncludeIDs and ExcludeIDs.
@@ -157,6 +159,13 @@ type CompileConfig struct {
 	IncludeWellKnownTypes bool
 	// AllowUnusedImports says to not error when an import is not used.
 	AllowUnusedImports bool
+}
+
+// CreateConfig is the create config.
+type CreateConfig struct {
+	// The map from directory to the package to use as the base.
+	// Directories expected to be absolute paths.
+	DirPathToBasePackage map[string]string
 }
 
 // LintConfig is the lint config.
@@ -271,7 +280,10 @@ type ExternalConfig struct {
 	ProtocIncludes     []string `json:"protoc_includes,omitempty" yaml:"protoc_includes,omitempty"`
 	ProtocIncludeWKT   bool     `json:"protoc_include_wkt,omitempty" yaml:"protoc_include_wkt,omitempty"`
 	AllowUnusedImports bool     `json:"allow_unused_imports,omitempty" yaml:"allow_unused_imports,omitempty"`
-	Lint               struct {
+	Create             struct {
+		DirToBasePackage map[string]string `json:"dir_to_base_package,omitempty" yaml:"dir_to_base_package,omitempty"`
+	} `json:"create,omitempty" yaml:"create,omitempty"`
+	Lint struct {
 		IDs             []string            `json:"ids,omitempty" yaml:"ids,omitempty"`
 		Group           string              `json:"group,omitempty" yaml:"group,omitempty"`
 		IncludeIDs      []string            `json:"include_ids,omitempty" yaml:"include_ids,omitempty"`

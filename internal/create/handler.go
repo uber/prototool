@@ -131,18 +131,32 @@ func (h *handler) getPkg(filePath string) (string, error) {
 	if config.DirPath == "" {
 		return DefaultPackage, nil
 	}
-	if config.DirPath == absDirPath {
-		return DefaultPackage, nil
+	for createDirPath, basePkg := range config.Create.DirPathToBasePackage {
+		rel, err := filepath.Rel(createDirPath, absDirPath)
+		if err == nil {
+			return getPkgFromRel(rel, basePkg), nil
+		}
 	}
+	// no package mapping found, do default logic
 	rel, err := filepath.Rel(config.DirPath, absDirPath)
 	if err != nil {
 		return "", err
 	}
-	// TODO
+	return getPkgFromRel(rel, ""), nil
+}
+
+func getPkgFromRel(rel string, basePkg string) string {
 	if rel == "." {
-		return "", fmt.Errorf("big problem")
+		if basePkg == "" {
+			return DefaultPackage
+		}
+		return basePkg
 	}
-	return strings.Join(strings.Split(rel, string(os.PathSeparator)), "."), nil
+	relPkg := strings.Join(strings.Split(rel, string(os.PathSeparator)), ".")
+	if basePkg == "" {
+		return relPkg
+	}
+	return basePkg + "." + relPkg
 }
 
 func getGoPkg(pkg string) string {
