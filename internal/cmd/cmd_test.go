@@ -361,6 +361,20 @@ option java_package = "com.foo.bar.pb";`,
 		"",
 		``,
 	)
+	// use the --package flag
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/one/a/b/bar/baz.proto",
+		"bat", // --package value
+		`syntax = "proto3";
+
+package bat;
+
+option go_package = "batpb";
+option java_package = "com.bat.pb";`,
+	)
 	// no package override, do default a.c.bar
 	assertDoCreateFile(
 		t,
