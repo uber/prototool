@@ -118,7 +118,31 @@ func (h *handler) create(filePath string) error {
 }
 
 func (h *handler) getPkg(filePath string) (string, error) {
-	return DefaultPackage, nil
+	absFilePath, err := filepath.Abs(filePath)
+	if err != nil {
+		return "", err
+	}
+	absDirPath := filepath.Dir(absFilePath)
+	config, err := h.configProvider.GetForDir(absDirPath)
+	if err != nil {
+		return "", err
+	}
+	// no config file found
+	if config.DirPath == "" {
+		return DefaultPackage, nil
+	}
+	if config.DirPath == absDirPath {
+		return DefaultPackage, nil
+	}
+	rel, err := filepath.Rel(config.DirPath, absDirPath)
+	if err != nil {
+		return "", err
+	}
+	// TODO
+	if rel == "." {
+		return "", fmt.Errorf("big problem")
+	}
+	return strings.Join(strings.Split(rel, string(os.PathSeparator)), "."), nil
 }
 
 func getGoPkg(pkg string) string {
