@@ -26,7 +26,7 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
-	intdesc "github.com/uber/prototool/internal/x/desc"
+	intdesc "github.com/uber/prototool/internal/desc"
 	"github.com/uber/prototool/internal/x/extract"
 	"go.uber.org/zap"
 )
