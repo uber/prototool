@@ -6,14 +6,6 @@ syntax = "proto3"; // inline comment1
 
 package foo; // inline comment3
 
-// comment4
-option go_package = "foopb"; // inline comment4
-// comment11
-option java_multiple_files = true; //inline comment11
-// comment5
-option java_outer_classname = "FooProto"; // inline comment5
-// comment12
-option java_package = "com.foo.pb"; // inline comment23
 // comment16
 option (bar.file_dep_option) = {
 	hello: 1
@@ -23,6 +15,14 @@ option (bar.file_dep_option) = {
 option (bar.file_option) = true; // inline comment6
 // comment7
 option (bar.file_option_proto2) = true; //inline comment7
+// comment4
+option go_package = "foopb"; // inline comment4
+// comment11
+option java_multiple_files = true; //inline comment11
+// comment5
+option java_outer_classname = "FooProto"; // inline comment5
+// comment12
+option java_package = "com.foo.pb"; // inline comment23
 
 //comment10
 import "bar/bar.proto"; //inline comment10
