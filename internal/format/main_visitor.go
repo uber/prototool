@@ -29,7 +29,9 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-type middleVisitor struct {
+var _ proto.Visitor = &mainVisitor{}
+
+type mainVisitor struct {
 	*baseVisitor
 
 	isProto2          bool
@@ -38,15 +40,15 @@ type middleVisitor struct {
 	parent            proto.Visitee
 }
 
-func newMiddleVisitor(config settings.Config, isProto2 bool) *middleVisitor {
-	return &middleVisitor{isProto2: isProto2, rpcUseSemicolons: config.Format.RPCUseSemicolons, baseVisitor: newBaseVisitor(config.Format.Indent)}
+func newMainVisitor(config settings.Config, isProto2 bool) *mainVisitor {
+	return &mainVisitor{isProto2: isProto2, rpcUseSemicolons: config.Format.RPCUseSemicolons, baseVisitor: newBaseVisitor(config.Format.Indent)}
 }
 
-func (v *middleVisitor) Do() []*text.Failure {
+func (v *mainVisitor) Do() []*text.Failure {
 	return v.Failures
 }
 
-func (v *middleVisitor) VisitMessage(element *proto.Message) {
+func (v *mainVisitor) VisitMessage(element *proto.Message) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	prefix := "message "
@@ -73,7 +75,7 @@ func (v *middleVisitor) VisitMessage(element *proto.Message) {
 	}
 }
 
-func (v *middleVisitor) VisitService(element *proto.Service) {
+func (v *mainVisitor) VisitService(element *proto.Service) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	if len(element.Elements) == 0 {
@@ -94,17 +96,17 @@ func (v *middleVisitor) VisitService(element *proto.Service) {
 	v.P()
 }
 
-func (v *middleVisitor) VisitSyntax(element *proto.Syntax) {
+func (v *mainVisitor) VisitSyntax(element *proto.Syntax) {
 	// done in first pass visitor
 	v.haveHitNonComment = true
 }
 
-func (v *middleVisitor) VisitPackage(element *proto.Package) {
+func (v *mainVisitor) VisitPackage(element *proto.Package) {
 	// done in first pass visitor
 	v.haveHitNonComment = true
 }
 
-func (v *middleVisitor) VisitOption(element *proto.Option) {
+func (v *mainVisitor) VisitOption(element *proto.Option) {
 	v.haveHitNonComment = true
 	// file options done in first pass visitor
 	if v.parent == nil {
@@ -124,12 +126,12 @@ func (v *middleVisitor) VisitOption(element *proto.Option) {
 	}
 }
 
-func (v *middleVisitor) VisitImport(element *proto.Import) {
+func (v *mainVisitor) VisitImport(element *proto.Import) {
 	// done in first pass visitor
 	v.haveHitNonComment = true
 }
 
-func (v *middleVisitor) VisitNormalField(element *proto.NormalField) {
+func (v *mainVisitor) VisitNormalField(element *proto.NormalField) {
 	v.haveHitNonComment = true
 	prefix := ""
 	if element.Repeated {
@@ -137,7 +139,7 @@ func (v *middleVisitor) VisitNormalField(element *proto.NormalField) {
 	}
 	if v.isProto2 {
 		// technically these are only set if the file is proto2
-		// but doing this just to make srue
+		// but doing this just to make sure
 		if element.Required {
 			prefix = "required "
 		} else {
@@ -147,7 +149,7 @@ func (v *middleVisitor) VisitNormalField(element *proto.NormalField) {
 	v.PField(prefix, element.Type, element.Field)
 }
 
-func (v *middleVisitor) VisitEnumField(element *proto.EnumField) {
+func (v *mainVisitor) VisitEnumField(element *proto.EnumField) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	if element.ValueOption == nil {
@@ -161,7 +163,7 @@ func (v *middleVisitor) VisitEnumField(element *proto.EnumField) {
 	v.PWithInlineComment(element.InlineComment, "];")
 }
 
-func (v *middleVisitor) VisitEnum(element *proto.Enum) {
+func (v *mainVisitor) VisitEnum(element *proto.Enum) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	if len(element.Elements) == 0 {
@@ -184,14 +186,14 @@ func (v *middleVisitor) VisitEnum(element *proto.Enum) {
 	}
 }
 
-func (v *middleVisitor) VisitComment(element *proto.Comment) {
+func (v *mainVisitor) VisitComment(element *proto.Comment) {
 	if v.haveHitNonComment {
 		v.PComment(element)
 		v.P()
 	}
 }
 
-func (v *middleVisitor) VisitOneof(element *proto.Oneof) {
+func (v *mainVisitor) VisitOneof(element *proto.Oneof) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	if len(element.Elements) == 0 {
@@ -211,12 +213,12 @@ func (v *middleVisitor) VisitOneof(element *proto.Oneof) {
 	v.P("}")
 }
 
-func (v *middleVisitor) VisitOneofField(element *proto.OneOfField) {
+func (v *mainVisitor) VisitOneofField(element *proto.OneOfField) {
 	v.haveHitNonComment = true
 	v.PField("", element.Type, element.Field)
 }
 
-func (v *middleVisitor) VisitReserved(element *proto.Reserved) {
+func (v *mainVisitor) VisitReserved(element *proto.Reserved) {
 	v.haveHitNonComment = true
 	if len(element.Ranges) > 0 && len(element.FieldNames) > 0 {
 		v.AddFailure(element.Position, "reserved had both integer ranges and field names which is unexpected")
@@ -240,7 +242,7 @@ func (v *middleVisitor) VisitReserved(element *proto.Reserved) {
 	}
 }
 
-func (v *middleVisitor) VisitRPC(element *proto.RPC) {
+func (v *mainVisitor) VisitRPC(element *proto.RPC) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	requestStream := ""
@@ -266,12 +268,12 @@ func (v *middleVisitor) VisitRPC(element *proto.RPC) {
 	v.PWithInlineComment(element.InlineComment, "}")
 }
 
-func (v *middleVisitor) VisitMapField(element *proto.MapField) {
+func (v *mainVisitor) VisitMapField(element *proto.MapField) {
 	v.haveHitNonComment = true
 	v.PField("", fmt.Sprintf("map<%s, %s>", element.KeyType, element.Type), element.Field)
 }
 
-func (v *middleVisitor) VisitGroup(element *proto.Group) {
+func (v *mainVisitor) VisitGroup(element *proto.Group) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	prefix := ""
@@ -295,7 +297,7 @@ func (v *middleVisitor) VisitGroup(element *proto.Group) {
 	v.P("}")
 }
 
-func (v *middleVisitor) VisitExtensions(element *proto.Extensions) {
+func (v *mainVisitor) VisitExtensions(element *proto.Extensions) {
 	v.haveHitNonComment = true
 	v.PComment(element.Comment)
 	rangeStrings := make([]string, len(element.Ranges))
