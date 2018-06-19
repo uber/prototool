@@ -29,6 +29,8 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var _ proto.Visitor = &middleVisitor{}
+
 type middleVisitor struct {
 	*baseVisitor
 
@@ -137,7 +139,7 @@ func (v *middleVisitor) VisitNormalField(element *proto.NormalField) {
 	}
 	if v.isProto2 {
 		// technically these are only set if the file is proto2
-		// but doing this just to make srue
+		// but doing this just to make sure
 		if element.Required {
 			prefix = "required "
 		} else {

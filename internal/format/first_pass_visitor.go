@@ -22,21 +22,21 @@ package format
 
 import (
 	"sort"
-	"strings"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 )
 
+var _ proto.Visitor = &firstPassVisitor{}
+
 type firstPassVisitor struct {
 	*baseVisitor
 
-	Syntax                *proto.Syntax
-	Package               *proto.Package
-	Options               []*proto.Option
-	ProbablyCustomOptions []*proto.Option
-	Imports               []*proto.Import
+	Syntax  *proto.Syntax
+	Package *proto.Package
+	Options []*proto.Option
+	Imports []*proto.Import
 
 	haveHitNonComment bool
 }
@@ -60,9 +60,8 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		v.PWithInlineComment(v.Package.InlineComment, `package `, v.Package.Name, `;`)
 		v.P()
 	}
-	if len(v.Options) > 0 || len(v.ProbablyCustomOptions) > 0 {
+	if len(v.Options) > 0 {
 		v.POptions(false, v.Options...)
-		v.POptions(false, v.ProbablyCustomOptions...)
 		v.P()
 	}
 	if len(v.Imports) > 0 {
@@ -102,11 +101,7 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 	// this will only hit file options since we don't do any
 	// visiting of children in this visitor
 	v.haveHitNonComment = true
-	if isProbablyCustomOption(element) {
-		v.ProbablyCustomOptions = append(v.ProbablyCustomOptions, element)
-	} else {
-		v.Options = append(v.Options, element)
-	}
+	v.Options = append(v.Options, element)
 }
 
 func (v *firstPassVisitor) VisitImport(element *proto.Import) {
@@ -127,6 +122,8 @@ func (v *firstPassVisitor) VisitEnum(element *proto.Enum) {
 }
 
 func (v *firstPassVisitor) VisitComment(element *proto.Comment) {
+	// We only print file-level comments before syntax, package, file-level options,
+	// or package if they are at the top of the file
 	if !v.haveHitNonComment {
 		v.PComment(element)
 		v.P()
@@ -178,10 +175,4 @@ func (v *firstPassVisitor) PImports(imports []*proto.Import) {
 		}
 		v.PWithInlineComment(i.InlineComment, `import `, kind, `"`, i.Filename, `";`)
 	}
-}
-
-func isProbablyCustomOption(option *proto.Option) bool {
-	// you can technically do ie google.protobuf.java_package
-	// but we're not going to handle this as I mean come on
-	return strings.HasPrefix(option.Name, "(")
 }
