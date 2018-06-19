@@ -118,6 +118,9 @@ func (h *handler) create(filePath string) error {
 }
 
 func (h *handler) getPkg(filePath string) (string, error) {
+	if h.pkg != "" {
+		return h.pkg, nil
+	}
 	absFilePath, err := filepath.Abs(filePath)
 	if err != nil {
 		return "", err
