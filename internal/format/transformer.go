@@ -71,12 +71,12 @@ func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []
 		}
 	}
 
-	middleVisitor := newMiddleVisitor(config, syntaxVersion == 2)
+	mainVisitor := newMainVisitor(config, syntaxVersion == 2)
 	for _, element := range descriptor.Elements {
-		element.Accept(middleVisitor)
+		element.Accept(mainVisitor)
 	}
-	failures = append(failures, middleVisitor.Do()...)
-	buffer.Write(middleVisitor.Bytes())
+	failures = append(failures, mainVisitor.Do()...)
+	buffer.Write(mainVisitor.Bytes())
 
 	text.SortFailures(failures)
 

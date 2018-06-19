@@ -49,7 +49,8 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 	if v.Syntax != nil {
 		v.PComment(v.Syntax.Comment)
 		if v.Syntax.Comment != nil {
-			// special case
+			// special case, we add a newline in between the first comment and syntax
+			// to separate licenses, file descriptions, etc.
 			v.P()
 		}
 		v.PWithInlineComment(v.Syntax.InlineComment, `syntax = "`, v.Syntax.Value, `";`)

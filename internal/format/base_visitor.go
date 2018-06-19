@@ -56,13 +56,8 @@ func (v *baseVisitor) PWithInlineComment(inlineComment *proto.Comment, args ...i
 	// https://github.com/emicklei/proto/commit/5a91db7561a4dedab311f36304fcf0512343a9b1
 	args = append(args, ` //`, cleanCommentLine(inlineComment.Lines[0]))
 	v.P(args...)
-	for i, line := range inlineComment.Lines[1:] {
-		line = cleanCommentLine(line)
-		if line == "" && i != len(inlineComment.Lines)-1 {
-			v.P(`//`)
-		} else {
-			v.P(`//`, line)
-		}
+	for _, line := range inlineComment.Lines[1:] {
+		v.P(`//`, cleanCommentLine(line))
 	}
 }
 
@@ -73,13 +68,8 @@ func (v *baseVisitor) PComment(comment *proto.Comment) {
 	// https://github.com/emicklei/proto/commit/5a91db7561a4dedab311f36304fcf0512343a9b1
 	// this is weird for now
 	// we always want non-c-style after formatting
-	for i, line := range comment.Lines {
-		line = cleanCommentLine(line)
-		if line == "" && !(i == 0 || i == len(comment.Lines)-1) {
-			v.P(`//`)
-		} else {
-			v.P(`//`, line)
-		}
+	for _, line := range comment.Lines {
+		v.P(`//`, cleanCommentLine(line))
 	}
 }
 
