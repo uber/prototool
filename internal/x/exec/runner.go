@@ -40,6 +40,7 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/cfginit"
+	"github.com/uber/prototool/internal/create"
 	"github.com/uber/prototool/internal/diff"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/format"
@@ -137,6 +138,10 @@ func (r *runner) Init(args []string, uncomment bool) error {
 		return err
 	}
 	return ioutil.WriteFile(filePath, data, 0644)
+}
+
+func (r *runner) Create(args []string, pkg string) error {
+	return r.newCreateHandler(pkg).Create(args...)
 }
 
 func (r *runner) Download() error {
@@ -691,6 +696,14 @@ func (r *runner) newReflectHandler() reflect.Handler {
 	return reflect.NewHandler(
 		reflect.HandlerWithLogger(r.logger),
 	)
+}
+
+func (r *runner) newCreateHandler(pkg string) create.Handler {
+	handlerOptions := []create.HandlerOption{create.HandlerWithLogger(r.logger)}
+	if pkg != "" {
+		handlerOptions = append(handlerOptions, create.HandlerWithPackage(pkg))
+	}
+	return create.NewHandler(handlerOptions...)
 }
 
 func (r *runner) newGRPCHandler(

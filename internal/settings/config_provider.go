@@ -192,6 +192,18 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	}
 	sort.Slice(genPlugins, func(i int, j int) bool { return genPlugins[i].Name < genPlugins[j].Name })
 
+	createDirPathToBasePackage := make(map[string]string)
+	for relDirPath, basePackage := range e.Create.DirToBasePackage {
+		if filepath.IsAbs(relDirPath) {
+			return Config{}, fmt.Errorf("directory for dir_to_base package must be relative: %s", relDirPath)
+		}
+		createDirPathToBasePackage[filepath.Clean(filepath.Join(dirPath, relDirPath))] = basePackage
+	}
+	// to make testing easier
+	if len(createDirPathToBasePackage) == 0 {
+		createDirPathToBasePackage = nil
+	}
+
 	config := Config{
 		DirPath:         dirPath,
 		ExcludePrefixes: excludePrefixes,
@@ -200,6 +212,9 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			IncludePaths:          includePaths,
 			IncludeWellKnownTypes: e.ProtocIncludeWKT,
 			AllowUnusedImports:    e.AllowUnusedImports,
+		},
+		Create: CreateConfig{
+			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
 			IDs:                 strs.DedupeSort(e.Lint.IDs, strings.ToUpper),

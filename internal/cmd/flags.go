@@ -39,6 +39,7 @@ type flags struct {
 	keepaliveTime     string
 	lintMode          bool
 	overwrite         bool
+	pkg               string
 	printFields       string
 	protocURL         string
 	uncomment         bool
@@ -99,6 +100,10 @@ func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.overwrite, "overwrite", "w", false, "Overwrite the existing file instead of writing the formatted file to stdout.")
+}
+
+func (f *flags) bindPackage(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.pkg, "package", "", "The Protobuf package to use in the created file.")
 }
 
 func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
