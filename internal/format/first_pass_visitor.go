@@ -22,6 +22,7 @@ package format
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/settings"
@@ -39,10 +40,14 @@ type firstPassVisitor struct {
 	Imports []*proto.Import
 
 	haveHitNonComment bool
+
+	updateFileOptions bool
+	goPackageOption   *proto.Option
+	javaPackageOption *proto.Option
 }
 
-func newFirstPassVisitor(config settings.Config) *firstPassVisitor {
-	return &firstPassVisitor{baseVisitor: newBaseVisitor(config.Format.Indent)}
+func newFirstPassVisitor(config settings.Config, updateFileOptions bool) *firstPassVisitor {
+	return &firstPassVisitor{baseVisitor: newBaseVisitor(config.Format.Indent), updateFileOptions: updateFileOptions}
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {
@@ -62,6 +67,27 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		v.P()
 	}
 	if len(v.Options) > 0 {
+		if v.updateFileOptions && v.Package != nil {
+			if v.goPackageOption == nil {
+				v.goPackageOption = &proto.Option{Name: "go_package"}
+			}
+			if v.javaPackageOption == nil {
+				v.javaPackageOption = &proto.Option{Name: "java_package"}
+			}
+			v.goPackageOption.Constant = proto.Literal{
+				Source:   packageBasename(v.Package.Name) + "pb",
+				IsString: true,
+			}
+			v.javaPackageOption.Constant = proto.Literal{
+				Source:   "com." + v.Package.Name + ".pb",
+				IsString: true,
+			}
+			v.Options = append(
+				v.Options,
+				v.goPackageOption,
+				v.javaPackageOption,
+			)
+		}
 		v.POptions(false, v.Options...)
 		v.P()
 	}
@@ -102,6 +128,16 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 	// this will only hit file options since we don't do any
 	// visiting of children in this visitor
 	v.haveHitNonComment = true
+	if v.updateFileOptions {
+		switch element.Name {
+		case "go_package":
+			v.goPackageOption = element
+			return
+		case "java_package":
+			v.javaPackageOption = element
+			return
+		}
+	}
 	v.Options = append(v.Options, element)
 }
 
@@ -176,4 +212,9 @@ func (v *firstPassVisitor) PImports(imports []*proto.Import) {
 		}
 		v.PWithInlineComment(i.InlineComment, `import `, kind, `"`, i.Filename, `";`)
 	}
+}
+
+func packageBasename(pkg string) string {
+	split := strings.Split(pkg, ".")
+	return split[len(split)-1]
 }
