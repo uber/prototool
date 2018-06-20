@@ -156,7 +156,7 @@ releaseclean:
 .PHONY: clean
 clean:
 	go clean -i $(PKGS)
-	git clean -xdf
+	git clean -xdf --exclude vendor
 
 .PHONY: cleanall
 cleanall: clean releaseclean
