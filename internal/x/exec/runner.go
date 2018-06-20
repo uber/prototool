@@ -46,13 +46,13 @@ import (
 	"github.com/uber/prototool/internal/format"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/protoc"
+	"github.com/uber/prototool/internal/reflect"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
 	"github.com/uber/prototool/internal/x/extract"
 	"github.com/uber/prototool/internal/x/grpc"
 	"github.com/uber/prototool/internal/x/phab"
-	"github.com/uber/prototool/internal/x/reflect"
 	"go.uber.org/zap"
 )
 
