@@ -212,7 +212,7 @@ create:
 - `prototool create repo/idl/bar.proto` will have the package `uber`.
 - `prototool create repo/idl/baz/baz.proto` will have the package `special`.
 - `prototool create repo/idl/baz/bat/bat.proto` will have the package `special.bat`.
-- `prototool create repo/another/dir/bar.proto` will have the package `another/dir`.
+- `prototool create repo/another/dir/bar.proto` will have the package `another.dir`.
 - `prototool create repo/bar.proto` will have the package `uber.prototool.generated`.
 
 This is meant to mimic what you generally want - a base package for your idl directory, followed
