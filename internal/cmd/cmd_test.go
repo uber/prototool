@@ -326,10 +326,11 @@ func TestLint(t *testing.T) {
 
 func TestGoldenFormat(t *testing.T) {
 	t.Parallel()
-	assertGoldenFormat(t, false, "testdata/format/bar/bar.proto")
-	assertGoldenFormat(t, false, "testdata/format/bar/bar_proto2.proto")
-	assertGoldenFormat(t, false, "testdata/format/foo/foo.proto")
-	assertGoldenFormat(t, false, "testdata/format/foo/foo_proto2.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/bar/bar.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/bar/bar_proto2.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/foo/foo.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/foo/foo_proto2.proto")
+	assertGoldenFormat(t, false, true, "testdata/format-update-file-options/foo_update_file_options.proto")
 }
 
 func TestJSONToBinaryToJSON(t *testing.T) {
@@ -561,8 +562,13 @@ func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes st
 	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint"}, filePaths...)...)
 }
 
-func assertGoldenFormat(t *testing.T, expectSuccess bool, filePath string) {
-	output, exitCode := testDo(t, "format", filePath)
+func assertGoldenFormat(t *testing.T, expectSuccess bool, updateFileOptions bool, filePath string) {
+	args := []string{"format"}
+	if updateFileOptions {
+		args = append(args, "--update-file-options")
+	}
+	args = append(args, filePath)
+	output, exitCode := testDo(t, args...)
 	expectedExitCode := 0
 	if !expectSuccess {
 		expectedExitCode = 255

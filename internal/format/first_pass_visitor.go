@@ -66,28 +66,28 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		v.PWithInlineComment(v.Package.InlineComment, `package `, v.Package.Name, `;`)
 		v.P()
 	}
-	if len(v.Options) > 0 {
-		if v.updateFileOptions && v.Package != nil {
-			if v.goPackageOption == nil {
-				v.goPackageOption = &proto.Option{Name: "go_package"}
-			}
-			if v.javaPackageOption == nil {
-				v.javaPackageOption = &proto.Option{Name: "java_package"}
-			}
-			v.goPackageOption.Constant = proto.Literal{
-				Source:   packageBasename(v.Package.Name) + "pb",
-				IsString: true,
-			}
-			v.javaPackageOption.Constant = proto.Literal{
-				Source:   "com." + v.Package.Name + ".pb",
-				IsString: true,
-			}
-			v.Options = append(
-				v.Options,
-				v.goPackageOption,
-				v.javaPackageOption,
-			)
+	if v.updateFileOptions && v.Package != nil {
+		if v.goPackageOption == nil {
+			v.goPackageOption = &proto.Option{Name: "go_package"}
 		}
+		if v.javaPackageOption == nil {
+			v.javaPackageOption = &proto.Option{Name: "java_package"}
+		}
+		v.goPackageOption.Constant = proto.Literal{
+			Source:   packageBasename(v.Package.Name) + "pb",
+			IsString: true,
+		}
+		v.javaPackageOption.Constant = proto.Literal{
+			Source:   "com." + v.Package.Name + ".pb",
+			IsString: true,
+		}
+		v.Options = append(
+			v.Options,
+			v.goPackageOption,
+			v.javaPackageOption,
+		)
+	}
+	if len(v.Options) > 0 {
 		v.POptions(false, v.Options...)
 		v.P()
 	}
@@ -135,6 +135,9 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 			return
 		case "java_package":
 			v.javaPackageOption = element
+			return
+		case "java_outer_classname", "java_multiple_files":
+			// ignore
 			return
 		}
 	}
