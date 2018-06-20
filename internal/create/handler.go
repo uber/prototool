@@ -130,22 +130,35 @@ func (h *handler) getPkg(filePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// no config file found
+	// no config file found, can't compute package
 	if config.DirPath == "" {
 		return DefaultPackage, nil
 	}
+	// we need to get all the matching directories and then choose the longest
+	// ie if you have a, a/b, we choose a/b
+	var longestCreateDirPath string
+	var longestBasePkg string
+	// note that createDirPath will always be absolute per the spec in
+	// the settings package
 	for createDirPath, basePkg := range config.Create.DirPathToBasePackage {
 		// TODO: cannot do rel right away because it will do ../.. if necessary
 		// strings.HasPrefix is not OS independent however
 		if !strings.HasPrefix(absDirPath, createDirPath) {
 			continue
 		}
-		rel, err := filepath.Rel(createDirPath, absDirPath)
+		if len(createDirPath) > len(longestCreateDirPath) {
+			longestCreateDirPath = createDirPath
+			longestBasePkg = basePkg
+		}
+	}
+	if longestCreateDirPath != "" {
+		rel, err := filepath.Rel(longestCreateDirPath, absDirPath)
 		if err != nil {
 			return "", err
 		}
-		return getPkgFromRel(rel, basePkg), nil
+		return getPkgFromRel(rel, longestBasePkg), nil
 	}
+
 	// no package mapping found, do default logic
 
 	// TODO: cannot do rel right away because it will do ../.. if necessary

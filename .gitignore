@@ -9,6 +9,7 @@
 /internal/cmd/gen-prototool-manpages/gen-prototool-manpages
 /internal/cmd/testdata/create/one/a/b/bar/baz.proto
 /internal/cmd/testdata/create/one/a/c/bar/baz.proto
+/internal/cmd/testdata/create/one/b/c/bar/baz.proto
 /internal/cmd/testdata/create/one/baz.proto
 /internal/cmd/testdata/create/two/baz.proto
 /cmd/prototool/prototool

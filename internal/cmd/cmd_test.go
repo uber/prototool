@@ -339,6 +339,8 @@ func TestJSONToBinaryToJSON(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	t.Parallel()
+	// package override with also matching shorter override "a"
+	// make sure uses "a/b"
 	assertDoCreateFile(
 		t,
 		true,
@@ -375,7 +377,7 @@ package bat;
 option go_package = "batpb";
 option java_package = "com.bat.pb";`,
 	)
-	// no package override, do default a.c.bar
+	// package override but a shorter one "a"
 	assertDoCreateFile(
 		t,
 		true,
@@ -384,10 +386,24 @@ option java_package = "com.bat.pb";`,
 		"",
 		`syntax = "proto3";
 
-package a.c.bar;
+package foobar.c.bar;
 
 option go_package = "barpb";
-option java_package = "com.a.c.bar.pb";`,
+option java_package = "com.foobar.c.bar.pb";`,
+	)
+	// no package override, do default b.c.bar
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/one/b/c/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package b.c.bar;
+
+option go_package = "barpb";
+option java_package = "com.b.c.bar.pb";`,
 	)
 	// in dir with prototool.yaml, use default package
 	assertDoCreateFile(
