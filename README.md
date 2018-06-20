@@ -218,13 +218,17 @@ create:
 This is meant to mimic what you generally want - a base package for your idl directory, followed
 by packages matching the directory structure.
 
-Note you can override the directory that the `prototool.yaml` file is in as well:
+Note you can override the directory that the `prototool.yaml` file is in as well. If we update our
+file at `repo/prototool.yaml` to this:
 
 ```yaml
 create:
   dir_to_base_package:
     .: foo.bar
 ```
+
+Then `prototool create repo/bar.proto` will have the package `foo.bar`, and `prototool create repo/another/dir/bar.proto`
+will have the package `foo.bar.another.dir`.
 
 If [Vim integration](#vim-integration) is set up, files will be generated when you open a new Protobuf file.
 
