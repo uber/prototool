@@ -1,0 +1,66 @@
+// foo
+
+// bar
+
+syntax = "proto3"; // inline comment1
+
+package foo; // inline comment3
+
+// comment4
+option go_package = "foopb"; // inline comment4
+option java_package = "com.foo.pb";
+
+// comment9
+import "google/protobuf/timestamp.proto"; // inline comment9
+
+// baz
+
+// bat
+// ban
+
+// Baz is a baz.
+message Baz {
+  int64 hello = 1;
+  // unassociated comment
+
+  // another unassociated comment
+
+  google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
+  map<string, int64> m = 11;
+  oneof test_oneof {
+    int64 foo1 = 8;
+    string foo2 = 9;
+    // comment18
+
+  }
+}
+
+// Bat is a bat.
+message Bat {
+  reserved 2 to 10, 1000 to 1100;
+  reserved "foo";
+  reserved "bar", "baz";
+  // NestedBat is a nested bat.
+  message NestedBat {
+    int64 hello = 1;
+  }
+}
+
+// Empty is an empty message.
+message Empty {}
+
+// Something is something.
+enum Something {
+  // comment25
+  SOMETHING_INVALID = 0; // inline comment25
+  // comment27
+  SOMETHING_UNSET = 1; // inline comment27
+  // comment28
+  SOMETHING_FOO = 2; // inline comment28
+}
+
+// Daylight is the daylight service.
+service Daylight {
+  rpc Hello(Bat) returns (Empty) {} // inline comment23
+  rpc Foo(Empty) returns (Bat) {} // inline comment24
+}

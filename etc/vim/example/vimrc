@@ -17,6 +17,10 @@ let g:ale_lint_on_text_changed = 'never'
 
 " ,f will toggle formatting on and off
 nnoremap <silent> <leader>f :call PrototoolFormatToggle()<CR>
+" ,c will toggle create on and off
+nnoremap <silent> <leader>c :call PrototoolCreateToggle()<CR>
 
 " Uncomment this to enable formatting by default
 "call PrototoolFormatEnable()
+" Uncomment this to disable creating Protobuf files from a template by default
+"call PrototoolCreateDisable()

@@ -25,23 +25,25 @@ import (
 )
 
 type flags struct {
-	cachePath      string
-	callTimeout    string
-	connectTimeout string
-	debug          bool
-	diffMode       bool
-	dirMode        bool
-	disableFormat  bool
-	disableLint    bool
-	gen            bool
-	harbormaster   bool
-	headers        []string
-	keepaliveTime  string
-	lintMode       bool
-	overwrite      bool
-	printFields    string
-	protocURL      string
-	uncomment      bool
+	cachePath         string
+	callTimeout       string
+	connectTimeout    string
+	debug             bool
+	diffMode          bool
+	dirMode           bool
+	disableFormat     bool
+	disableLint       bool
+	gen               bool
+	harbormaster      bool
+	headers           []string
+	keepaliveTime     string
+	lintMode          bool
+	overwrite         bool
+	pkg               string
+	printFields       string
+	protocURL         string
+	uncomment         bool
+	updateFileOptions bool
 }
 
 func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
@@ -100,6 +102,10 @@ func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.overwrite, "overwrite", "w", false, "Overwrite the existing file instead of writing the formatted file to stdout.")
 }
 
+func (f *flags) bindPackage(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.pkg, "package", "", "The Protobuf package to use in the created file.")
+}
+
 func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.printFields, "print-fields", "filename:line:column:message", "The colon-separated fields to print out on error.")
 }
@@ -110,4 +116,8 @@ func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
+}
+
+func (f *flags) bindUpdateFileOptions(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.updateFileOptions, "update-file-options", false, "Update the file options go_package and java_package to match the package per the guidelines of the style guide.")
 }

@@ -7,6 +7,11 @@
 /internal/cmd/gen-prototool-bash-completion/gen-prototool-bash-completion
 /internal/cmd/gen-prototool-zsh-completion/gen-prototool-zsh-completion
 /internal/cmd/gen-prototool-manpages/gen-prototool-manpages
+/internal/cmd/testdata/create/one/a/b/bar/baz.proto
+/internal/cmd/testdata/create/one/a/c/bar/baz.proto
+/internal/cmd/testdata/create/one/b/c/bar/baz.proto
+/internal/cmd/testdata/create/one/baz.proto
+/internal/cmd/testdata/create/two/baz.proto
 /cmd/prototool/prototool
 /main
 /prototool.iml

@@ -39,6 +39,12 @@ golden: install
 	for file in $(shell find internal/cmd/testdata/format -name '*.proto'); do \
 		prototool format $${file} > $${file}.golden || true; \
 	done
+	for file in $(shell find internal/cmd/testdata/format-update-file-options -name '*.proto.golden'); do \
+		rm -f $${file}; \
+	done
+	for file in $(shell find internal/cmd/testdata/format-update-file-options -name '*.proto'); do \
+		prototool format --update-file-options $${file} > $${file}.golden || true; \
+	done
 
 .PHONY: example
 example: install
@@ -156,7 +162,7 @@ releaseclean:
 .PHONY: clean
 clean:
 	go clean -i $(PKGS)
-	git clean -xdf
+	git clean -xdf --exclude vendor
 
 .PHONY: cleanall
 cleanall: clean releaseclean

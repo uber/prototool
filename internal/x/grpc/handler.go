@@ -30,8 +30,8 @@ import (
 
 	"github.com/fullstorydev/grpcurl"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/uber/prototool/internal/desc"
 	"github.com/uber/prototool/internal/extract"
-	"github.com/uber/prototool/internal/x/desc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"

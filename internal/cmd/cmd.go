@@ -100,13 +100,14 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.All(args, flags.disableFormat, flags.disableLint)
+				return runner.All(args, flags.disableFormat, flags.disableLint, flags.updateFileOptions)
 			})
 		},
 	}
 	flags.bindDirMode(allCmd.PersistentFlags())
 	flags.bindDisableFormat(allCmd.PersistentFlags())
 	flags.bindDisableLint(allCmd.PersistentFlags())
+	flags.bindUpdateFileOptions(allCmd.PersistentFlags())
 
 	binaryToJSONCmd := &cobra.Command{
 		Use:   "binary-to-json dirOrProtoFiles... messagePath data",
@@ -135,6 +136,18 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		},
 	}
 	flags.bindDirMode(compileCmd.PersistentFlags())
+
+	createCmd := &cobra.Command{
+		Use:   "create files...",
+		Short: "Create the given Protobuf files according to a template that passes default prototool lint.",
+		Args:  cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
+				return runner.Create(args, flags.pkg)
+			})
+		},
+	}
+	flags.bindPackage(createCmd.PersistentFlags())
 
 	descriptorProtoCmd := &cobra.Command{
 		Use:   "descriptor-proto dirOrProtoFiles... messagePath",
@@ -178,13 +191,14 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Format a proto file and compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode)
+				return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, flags.updateFileOptions)
 			})
 		},
 	}
 	flags.bindDiffMode(formatCmd.PersistentFlags())
 	flags.bindLintMode(formatCmd.PersistentFlags())
 	flags.bindOverwrite(formatCmd.PersistentFlags())
+	flags.bindUpdateFileOptions(formatCmd.PersistentFlags())
 
 	genCmd := &cobra.Command{
 		Use:   "gen dirOrProtoFiles...",
@@ -309,6 +323,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	rootCmd.AddCommand(binaryToJSONCmd)
 	rootCmd.AddCommand(cleanCmd)
 	rootCmd.AddCommand(compileCmd)
+	rootCmd.AddCommand(createCmd)
 	rootCmd.AddCommand(descriptorProtoCmd)
 	rootCmd.AddCommand(downloadCmd)
 	rootCmd.AddCommand(fieldDescriptorProtoCmd)
