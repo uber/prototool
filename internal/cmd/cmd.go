@@ -136,6 +136,18 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	}
 	flags.bindDirMode(compileCmd.PersistentFlags())
 
+	createCmd := &cobra.Command{
+		Use:   "create files...",
+		Short: "Create the given Protobuf files according to a template that passes default prototool lint.",
+		Args:  cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
+				return runner.Create(args, flags.pkg)
+			})
+		},
+	}
+	flags.bindPackage(createCmd.PersistentFlags())
+
 	descriptorProtoCmd := &cobra.Command{
 		Use:   "descriptor-proto dirOrProtoFiles... messagePath",
 		Short: "Get the descriptor proto for the message path.",
@@ -309,6 +321,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	rootCmd.AddCommand(binaryToJSONCmd)
 	rootCmd.AddCommand(cleanCmd)
 	rootCmd.AddCommand(compileCmd)
+	rootCmd.AddCommand(createCmd)
 	rootCmd.AddCommand(descriptorProtoCmd)
 	rootCmd.AddCommand(downloadCmd)
 	rootCmd.AddCommand(fieldDescriptorProtoCmd)

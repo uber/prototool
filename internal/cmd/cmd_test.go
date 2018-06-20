@@ -337,6 +337,104 @@ func TestJSONToBinaryToJSON(t *testing.T) {
 	assertJSONToBinaryToJSON(t, "testdata/foo/success.proto", "foo.Baz", `{"hello":100}`)
 }
 
+func TestCreate(t *testing.T) {
+	t.Parallel()
+	// package override with also matching shorter override "a"
+	// make sure uses "a/b"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/one/a/b/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo.bar;
+
+option go_package = "barpb";
+option java_package = "com.foo.bar.pb";`,
+	)
+	// create same file again but do not remove, should fail
+	assertDoCreateFile(
+		t,
+		false, // do not expect success
+		false, // do not remove
+		"testdata/create/one/a/b/bar/baz.proto",
+		"",
+		``,
+	)
+	// use the --package flag
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/one/a/b/bar/baz.proto",
+		"bat", // --package value
+		`syntax = "proto3";
+
+package bat;
+
+option go_package = "batpb";
+option java_package = "com.bat.pb";`,
+	)
+	// package override but a shorter one "a"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/one/a/c/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foobar.c.bar;
+
+option go_package = "barpb";
+option java_package = "com.foobar.c.bar.pb";`,
+	)
+	// no package override, do default b.c.bar
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/one/b/c/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package b.c.bar;
+
+option go_package = "barpb";
+option java_package = "com.b.c.bar.pb";`,
+	)
+	// in dir with prototool.yaml, use default package
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/one/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package uber.prototool.generated;
+
+option go_package = "generatedpb";
+option java_package = "com.uber.prototool.generated.pb";`,
+	)
+	// in dir with prototool.yaml with override
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/two/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo;
+
+option go_package = "foopb";
+option java_package = "com.foo.pb";`,
+	)
+}
+
 func TestGRPC(t *testing.T) {
 	t.Parallel()
 	assertGRPC(t,
@@ -538,6 +636,26 @@ func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes
 		expectedExitCode = 255
 	}
 	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"compile"}, filePaths...)...)
+}
+
+func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath string, pkgOverride string, expectedFileData string) {
+	assert.NoError(t, os.MkdirAll(filepath.Dir(filePath), 0755))
+	if remove {
+		_ = os.Remove(filePath)
+	}
+	args := []string{"create", filePath}
+	if pkgOverride != "" {
+		args = append(args, "--package", pkgOverride)
+	}
+	_, exitCode := testDo(t, args...)
+	if expectSuccess {
+		assert.Equal(t, 0, exitCode)
+		fileData, err := ioutil.ReadFile(filePath)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedFileData, string(fileData))
+	} else {
+		assert.NotEqual(t, 0, exitCode)
+	}
 }
 
 func assertDoLintFile(t *testing.T, expectSuccess bool, expectedLinePrefixesWithoutFile string, filePath string) {

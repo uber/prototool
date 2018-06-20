@@ -8,6 +8,7 @@ Prototool lets you:
 - Standardize building of your Protobuf files with a common configuration, abstracting away all of the pain of protoc for you.
 - Lint your Protobuf files with common linting rules according to a Style Guide.
 - Format your Protobuf files in a consistent manner.
+- Generate Protobuf files from a template that passes lint, taking care of package naming for you.
 - Generate stubs using any plugin based on a simple configuration file, including handling imports of all the Well-Known Types.
 - Call gRPC endpoints with ease, taking care of the JSON to binary conversion for you.
 - Output errors and lint failures in a common file:line:column:message format, making integration with editors possible, Vim integration is provided out of the box.
@@ -26,6 +27,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
     * [prototool gen](#prototool-gen)
     * [prototool lint](#prototool-lint)
     * [prototool format](#prototool-format)
+    * [prototool create](#prototool-create)
     * [prototool files](#prototool-files)
     * [prototool protoc-commands](#prototool-protoc-commands)
     * [prototool grpc](#prototool-grpc)
@@ -58,6 +60,7 @@ prototool help
 prototool lint path/to/foo.proto path/to/bar.proto # file mode, specify multiple specific files
 prototool lint idl/uber # directory mode, search for all .proto files recursively, obeying exclude_paths in prototool.yaml files
 prototool lint # same as "prototool lint .", by default the current directory is used in directory mode
+prototool create foo.proto # create the file foo.proto from a template that passes lint
 prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml files
 prototool list-linters # list all current lint rules being used
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
@@ -170,6 +173,64 @@ Format a Protobuf file and print the formatted file to stdout. There are flags t
 - `-d` Write a diff instead.
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
+
+##### `prototool create`
+
+Create a Protobuf file from a template that passes lint. The file will look like the following:
+
+```proto
+syntax = "proto3";
+
+package SOME.PKG;
+
+option go_package = "PKGpb";
+option java_package = "com.SOME.PKG.pb";
+```
+
+This matches what the linter expects. `SOME.PKG` will be computed as follows:
+
+- If `--package` is specified, `SOME.PKG` will be the value passed to `--package`.
+- Otherwise, if there is no `prototool.yaml` that would apply to the new file, use `uber.prototool.generated`.
+- Otherwise, if there is a `prototool.yaml` file, check if it has a `dir_to_base_package` setting under the
+  `create` section (see [etc/config/example/prototool.yaml](etc/config/example.prototool.yaml) for an example).
+  If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml`
+  will be used.
+- Otherwise, if there is no `dir_to_base_package` directive, just use the relative path from the directory
+  with the `prototool.yaml` file. If the file is in the same directory as the `prototoo.yaml` file,
+  use `uber.prototool.generated`
+
+For example, assume you have the following file at `repo/prototool.yaml`:
+
+```yaml
+create:
+  dir_to_base_package:
+    idl: uber
+    idl/baz: special
+```
+
+- `prototool create repo/idl/foo/bar/bar.proto` will have the package `uber.foo.bar`.
+- `prototool create repo/idl/bar.proto` will have the package `uber`.
+- `prototool create repo/idl/baz/baz.proto` will have the package `special`.
+- `prototool create repo/idl/baz/bat/bat.proto` will have the package `special.bat`.
+- `prototool create repo/another/dir/bar.proto` will have the package `another.dir`.
+- `prototool create repo/bar.proto` will have the package `uber.prototool.generated`.
+
+This is meant to mimic what you generally want - a base package for your idl directory, followed
+by packages matching the directory structure.
+
+Note you can override the directory that the `prototool.yaml` file is in as well. If we update our
+file at `repo/prototool.yaml` to this:
+
+```yaml
+create:
+  dir_to_base_package:
+    .: foo.bar
+```
+
+Then `prototool create repo/bar.proto` will have the package `foo.bar`, and `prototool create repo/another/dir/bar.proto`
+will have the package `foo.bar.another.dir`.
+
+If [Vim integration](#vim-integration) is set up, files will be generated when you open a new Protobuf file.
 
 ##### `prototool files`
 

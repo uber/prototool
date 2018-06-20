@@ -5,7 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- No changes yet.
+### Added
+- A new command `prototool create` to auto-generate Protobuf files from a
+  template. The generated files have the Protobuf package, go_package, and
+  java_package values set depending on the location of your file and config
+  settings. Make sure to update your Vim plugin setup as well if using the
+  Vim integration.
 
 
 ## [0.3.0] - 2018-06-14
