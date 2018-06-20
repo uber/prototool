@@ -650,13 +650,11 @@ func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath 
 	_, exitCode := testDo(t, args...)
 	if expectSuccess {
 		assert.Equal(t, 0, exitCode)
-	} else {
-		assert.NotEqual(t, 0, exitCode)
-	}
-	if expectSuccess {
 		fileData, err := ioutil.ReadFile(filePath)
 		assert.NoError(t, err)
 		assert.Equal(t, expectedFileData, string(fileData))
+	} else {
+		assert.NotEqual(t, 0, exitCode)
 	}
 }
 
