@@ -398,7 +398,7 @@ func (r *runner) ListAllLintGroups() error {
 	return nil
 }
 
-func (r *runner) Format(args []string, overwrite bool, diffMode bool, lintMode bool) error {
+func (r *runner) Format(args []string, overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
@@ -407,15 +407,15 @@ func (r *runner) Format(args []string, overwrite bool, diffMode bool, lintMode b
 	if _, err := r.compile(false, false, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, meta)
+	return r.format(overwrite, diffMode, lintMode, updateFileOptions, meta)
 }
 
-func (r *runner) format(overwrite bool, diffMode bool, lintMode bool, meta *meta) error {
+func (r *runner) format(overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool, meta *meta) error {
 	var retErr error
 	for _, protoSet := range meta.ProtoSets {
 		for _, protoFiles := range protoSet.DirPathToFiles {
 			for _, protoFile := range protoFiles {
-				if err := r.formatFile(overwrite, diffMode, lintMode, meta, protoSet.Config, protoFile); err != nil {
+				if err := r.formatFile(overwrite, diffMode, lintMode, updateFileOptions, meta, protoSet.Config, protoFile); err != nil {
 					if _, ok := err.(*ExitError); !ok {
 						return err
 					}
@@ -427,12 +427,12 @@ func (r *runner) format(overwrite bool, diffMode bool, lintMode bool, meta *meta
 	return retErr
 }
 
-func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, meta *meta, config settings.Config, protoFile *file.ProtoFile) error {
+func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool, meta *meta, config settings.Config, protoFile *file.ProtoFile) error {
 	input, err := ioutil.ReadFile(protoFile.Path)
 	if err != nil {
 		return err
 	}
-	data, failures, err := r.newTransformer().Transform(config, input)
+	data, failures, err := r.newTransformer(updateFileOptions).Transform(config, input)
 	if err != nil {
 		return err
 	}
@@ -539,7 +539,7 @@ func (r *runner) JSONToBinary(args []string) error {
 	return err
 }
 
-func (r *runner) All(args []string, disableFormat bool, disableLint bool) error {
+func (r *runner) All(args []string, disableFormat bool, disableLint bool, updateFileOptions bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
@@ -549,7 +549,7 @@ func (r *runner) All(args []string, disableFormat bool, disableLint bool) error 
 		return err
 	}
 	if !disableFormat {
-		if err := r.format(true, false, false, meta); err != nil {
+		if err := r.format(true, false, false, updateFileOptions, meta); err != nil {
 			return err
 		}
 	}
@@ -678,10 +678,12 @@ func (r *runner) newLintRunner() lint.Runner {
 	)
 }
 
-func (r *runner) newTransformer() format.Transformer {
-	return format.NewTransformer(
-		format.TransformerWithLogger(r.logger),
-	)
+func (r *runner) newTransformer(updateFileOptions bool) format.Transformer {
+	transformerOptions := []format.TransformerOption{format.TransformerWithLogger(r.logger)}
+	if updateFileOptions {
+		transformerOptions = append(transformerOptions, format.TransformerWithUpdateFileOptions())
+	}
+	return format.NewTransformer(transformerOptions...)
 }
 
 func (r *runner) newGetter() extract.Getter {
