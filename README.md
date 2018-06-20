@@ -208,12 +208,12 @@ create:
     idl/baz: special
 ```
 
-- `prototool create idl/foo/bar/bar.proto` will have the package `uber.foo.bar`.
-- `prototool create idl/bar.proto` will have the package `uber`.
-- `prototool create idl/baz/baz.proto` will have the package `special`.
-- `prototool create idl/baz/bat/bat.proto` will have the package `special.bat`.
-- `prototool create another/dir/bar.proto` will have the package `another/dir`.
-- `prototool create bar.proto` will have the package `uber.prototool.generated`.
+- `prototool create repo/idl/foo/bar/bar.proto` will have the package `uber.foo.bar`.
+- `prototool create repo/idl/bar.proto` will have the package `uber`.
+- `prototool create repo/idl/baz/baz.proto` will have the package `special`.
+- `prototool create repo/idl/baz/bat/bat.proto` will have the package `special.bat`.
+- `prototool create repo/another/dir/bar.proto` will have the package `another/dir`.
+- `prototool create repo/bar.proto` will have the package `uber.prototool.generated`.
 
 This is meant to mimic what you generally want - a base package for your idl directory, followed
 by packages matching the directory structure.
