@@ -49,7 +49,6 @@ var (
 		fileOptionsEqualJavaPackageComPrefixLinter,
 		fileOptionsGoPackageSameInDirLinter,
 		fileOptionsJavaMultipleFilesSameInDirLinter,
-		fileOptionsJavaOuterClassnameSameInDirLinter,
 		fileOptionsJavaPackageSameInDirLinter,
 		fileOptionsRequireGoPackageLinter,
 		fileOptionsRequireJavaMultipleFilesLinter,

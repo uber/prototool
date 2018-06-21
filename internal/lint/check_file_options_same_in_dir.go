@@ -41,12 +41,6 @@ var fileOptionsJavaMultipleFilesSameInDirLinter = NewLinter(
 	newCheckFileOptionsSameInDir("java_multiple_files"),
 )
 
-var fileOptionsJavaOuterClassnameSameInDirLinter = NewLinter(
-	"FILE_OPTIONS_JAVA_OUTER_CLASSNAME_SAME_IN_DIR",
-	`Verifies that the file option "java_outer_classname" of all files in a directory are the same.`,
-	newCheckFileOptionsSameInDir("java_outer_classname"),
-)
-
 var fileOptionsJavaPackageSameInDirLinter = NewLinter(
 	"FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR",
 	`Verifies that the file option "java_package" of all files in a directory are the same.`,

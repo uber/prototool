@@ -93,6 +93,3 @@ enum Hoo {
 enum Hoo_one {
   HOO_ONE_INVALID = 0;
 }
-
-option java_multiple_files = false;
-option java_outer_classname = "";

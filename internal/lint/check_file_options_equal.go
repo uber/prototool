@@ -128,5 +128,6 @@ func packageBasename(pkg string) string {
 
 func fileBasenameUpperCamelCase(filename string) string {
 	filename = filepath.Base(filename)
-	return strs.ToUpperCamelCase(strings.TrimSuffix(filename, filepath.Ext(filename)))
+	filename = strings.TrimSuffix(filename, filepath.Ext(filename))
+	return strs.ToUpperCamelCase(filename)
 }
