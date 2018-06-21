@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Package extract is used to extract elements from FileDescriptorSets created
+// from internal/protoc, for use in json-to-binary and back conversion, and for
+// use for gRPC.
 package extract
 
 import (

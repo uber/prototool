@@ -27,7 +27,7 @@ import (
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
 	intdesc "github.com/uber/prototool/internal/desc"
-	"github.com/uber/prototool/internal/x/extract"
+	"github.com/uber/prototool/internal/extract"
 	"go.uber.org/zap"
 )
 
