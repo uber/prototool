@@ -25,25 +25,25 @@ import (
 )
 
 type flags struct {
-	cachePath         string
-	callTimeout       string
-	connectTimeout    string
-	debug             bool
-	diffMode          bool
-	dirMode           bool
-	disableFormat     bool
-	disableLint       bool
-	gen               bool
-	harbormaster      bool
-	headers           []string
-	keepaliveTime     string
-	lintMode          bool
-	overwrite         bool
-	pkg               string
-	printFields       string
-	protocURL         string
-	uncomment         bool
-	updateFileOptions bool
+	cachePath           string
+	callTimeout         string
+	connectTimeout      string
+	debug               bool
+	diffMode            bool
+	dirMode             bool
+	disableFormat       bool
+	disableLint         bool
+	gen                 bool
+	harbormaster        bool
+	headers             []string
+	keepaliveTime       string
+	lintMode            bool
+	overwrite           bool
+	pkg                 string
+	printFields         string
+	protocURL           string
+	uncomment           bool
+	noUpdateFileOptions bool
 }
 
 func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
@@ -118,6 +118,6 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
 }
 
-func (f *flags) bindUpdateFileOptions(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.updateFileOptions, "update-file-options", false, "Update the file options go_package and java_package to match the package per the guidelines of the style guide.")
+func (f *flags) bindNoUpdateFileOptions(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.noUpdateFileOptions, "no-update-file-options", false, "Do not update the file options go_package and java_package to match the package per the guidelines of the style guide.")
 }
