@@ -59,7 +59,8 @@ func (g *getter) GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, pa
 	}
 	var foundFieldDescriptorProto *descriptor.FieldDescriptorProto
 	for _, fieldDescriptorProto := range append(message.GetField(), message.GetExtension()...) {
-		if fieldDescriptorProto.GetName() == split[len(split)-1] {
+		wantName := split[len(split)-1]
+		if fieldDescriptorProto.GetName() == wantName {
 			if foundFieldDescriptorProto != nil {
 				return nil, fmt.Errorf("duplicate fields for path %s", path)
 			}
