@@ -24,7 +24,7 @@ import public "bar/bar_proto2.proto"; // inline comment2
 // comment11
 option java_multiple_files = true; //inline comment11
 // comment12
-option java_package = "com.foo.pb"; // inline comment23
+option java_package = "com.foo"; // inline comment23
 // comment4
 option go_package = "foopb"; // inline comment4
 // comment5
