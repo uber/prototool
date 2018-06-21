@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package grpc;
 
+option go_package = "grpcpb";
 option java_multiple_files = true;
 option java_outer_classname = "GrpcProto";
-option java_package = "com.grpc.pb";
-option go_package = "grpcpb";
+option java_package = "com.grpc";
 
 message ExclamationRequest {
   string value = 1;

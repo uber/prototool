@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package foo;
 
-option java_package = "com.foo.pb";
 option go_package = "foopb";
+option java_multiple_files = true;
+option java_outer_classname = "MessageNameNotCapitalizedProto";
+option java_package = "com.foo";
 
 // baz is a baz.
 message baz {

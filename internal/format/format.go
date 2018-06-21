@@ -33,7 +33,7 @@ type Transformer interface {
 	// Failures should never happen in the CLI tool as we run the files
 	// through protoc first, but this is done because we want to verify
 	// code correctness here and protect against the bad case.
-	Transform(config settings.Config, data []byte) ([]byte, []*text.Failure, error)
+	Transform(config settings.Config, filename string, data []byte) ([]byte, []*text.Failure, error)
 }
 
 // TransformerOption is an option for a new Transformer.

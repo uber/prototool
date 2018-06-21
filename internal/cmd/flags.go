@@ -118,6 +118,7 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
 }
 
+
 func (f *flags) bindNoUpdateFileOptions(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.noUpdateFileOptions, "no-update-file-options", false, "Do not update the file options go_package and java_package to match the package per the guidelines of the style guide.")
+	flagSet.BoolVar(&f.noUpdateFileOptions, "no-update-file-options", false, "Do not update the file options go_package, java_multiple_files, java_outer_classname, and java_package to match the package per the guidelines of the style guide.")
 }

@@ -135,13 +135,15 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
-		"9:1:MESSAGE_NAMES_CAPITALIZED",
+		"11:1:MESSAGE_NAMES_CAPITALIZED",
 		"testdata/lint/message_name_not_capitalized.proto",
 	)
 	assertDoLintFile(
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
 		"testdata/lint/file_options_required.proto",
 	)
@@ -149,6 +151,8 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		1:1:PACKAGE_IS_DECLARED`,
 		"testdata/lint/base_file.proto",
@@ -157,7 +161,9 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
-		6:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB`,
+		6:1:FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE
+		7:1:FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX
+		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX`,
 		"testdata/lint/file_options_incorrect.proto",
 	)
 	assertDoLintFiles(
@@ -188,6 +194,8 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		3:1:PACKAGE_LOWER_SNAKE_CASE
 		7:1:MESSAGE_NAMES_CAPITALIZED
@@ -221,8 +229,6 @@ func TestLint(t *testing.T) {
 		84:5:COMMENTS_NO_C_STYLE
 		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 		93:1:ENUM_NAMES_CAMEL_CASE
-		97:1:FILE_OPTIONS_UNSET_JAVA_MULTIPLE_FILES
-		98:1:FILE_OPTIONS_UNSET_JAVA_OUTER_CLASSNAME
 		`,
 		"testdata/lint/lots.proto",
 	)
@@ -231,6 +237,7 @@ func TestLint(t *testing.T) {
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		3:1:PACKAGE_LOWER_SNAKE_CASE
 		7:1:MESSAGES_HAVE_COMMENTS
@@ -319,6 +326,8 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
 		"testdata/lint/package_starts_with_keyword.proto",
 	)
@@ -353,7 +362,9 @@ func TestCreate(t *testing.T) {
 package foo.bar;
 
 option go_package = "barpb";
-option java_package = "com.foo.bar.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo.bar";`,
 	)
 	// create same file again but do not remove, should fail
 	assertDoCreateFile(
@@ -376,7 +387,9 @@ option java_package = "com.foo.bar.pb";`,
 package bat;
 
 option go_package = "batpb";
-option java_package = "com.bat.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.bat";`,
 	)
 	// package override but a shorter one "a"
 	assertDoCreateFile(
@@ -390,7 +403,9 @@ option java_package = "com.bat.pb";`,
 package foobar.c.bar;
 
 option go_package = "barpb";
-option java_package = "com.foobar.c.bar.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foobar.c.bar";`,
 	)
 	// no package override, do default b.c.bar
 	assertDoCreateFile(
@@ -404,7 +419,9 @@ option java_package = "com.foobar.c.bar.pb";`,
 package b.c.bar;
 
 option go_package = "barpb";
-option java_package = "com.b.c.bar.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.b.c.bar";`,
 	)
 	// in dir with prototool.yaml, use default package
 	assertDoCreateFile(
@@ -418,7 +435,9 @@ option java_package = "com.b.c.bar.pb";`,
 package uber.prototool.generated;
 
 option go_package = "generatedpb";
-option java_package = "com.uber.prototool.generated.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.uber.prototool.generated";`,
 	)
 	// in dir with prototool.yaml with override
 	assertDoCreateFile(
@@ -432,7 +451,9 @@ option java_package = "com.uber.prototool.generated.pb";`,
 package foo;
 
 option go_package = "foopb";
-option java_package = "com.foo.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo";`,
 	)
 }
 

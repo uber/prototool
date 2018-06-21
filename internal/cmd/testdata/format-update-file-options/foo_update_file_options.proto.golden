@@ -8,7 +8,11 @@ package foo; // inline comment3
 
 // comment4
 option go_package = "foopb"; // inline comment4
-option java_package = "com.foo.pb";
+// comment11
+option java_multiple_files = true; //inline comment11
+// comment5
+option java_outer_classname = "FooUpdateFileOptionsProto"; // inline comment5
+option java_package = "com.foo";
 
 // comment9
 import "google/protobuf/timestamp.proto"; // inline comment9

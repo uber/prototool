@@ -22,7 +22,7 @@ option java_multiple_files = true; //inline comment11
 // comment5
 option java_outer_classname = "FooProto"; // inline comment5
 // comment12
-option java_package = "com.foo.pb"; // inline comment23
+option java_package = "com.foo"; // inline comment23
 
 //comment10
 import "bar/bar.proto"; //inline comment10

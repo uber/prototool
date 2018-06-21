@@ -21,11 +21,13 @@
 package format
 
 import (
+	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/settings"
+	"github.com/uber/prototool/internal/strs"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -41,13 +43,16 @@ type firstPassVisitor struct {
 
 	haveHitNonComment bool
 
-	updateFileOptions bool
-	goPackageOption   *proto.Option
-	javaPackageOption *proto.Option
+	filename                 string
+	updateFileOptions        bool
+	goPackageOption          *proto.Option
+	javaMultipleFilesOption  *proto.Option
+	javaOuterClassnameOption *proto.Option
+	javaPackageOption        *proto.Option
 }
 
-func newFirstPassVisitor(config settings.Config, updateFileOptions bool) *firstPassVisitor {
-	return &firstPassVisitor{baseVisitor: newBaseVisitor(config.Format.Indent), updateFileOptions: updateFileOptions}
+func newFirstPassVisitor(config settings.Config, filename string, updateFileOptions bool) *firstPassVisitor {
+	return &firstPassVisitor{baseVisitor: newBaseVisitor(config.Format.Indent), filename: filename, updateFileOptions: updateFileOptions}
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {
@@ -70,6 +75,12 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		if v.goPackageOption == nil {
 			v.goPackageOption = &proto.Option{Name: "go_package"}
 		}
+		if v.javaMultipleFilesOption == nil {
+			v.javaMultipleFilesOption = &proto.Option{Name: "java_multiple_files"}
+		}
+		if v.javaOuterClassnameOption == nil {
+			v.javaOuterClassnameOption = &proto.Option{Name: "java_outer_classname"}
+		}
 		if v.javaPackageOption == nil {
 			v.javaPackageOption = &proto.Option{Name: "java_package"}
 		}
@@ -77,13 +88,22 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 			Source:   packageBasename(v.Package.Name) + "pb",
 			IsString: true,
 		}
+		v.javaMultipleFilesOption.Constant = proto.Literal{
+			Source: "true",
+		}
+		v.javaOuterClassnameOption.Constant = proto.Literal{
+			Source:   fileBasenameUpperCamelCase(v.filename) + "Proto",
+			IsString: true,
+		}
 		v.javaPackageOption.Constant = proto.Literal{
-			Source:   "com." + v.Package.Name + ".pb",
+			Source:   "com." + v.Package.Name,
 			IsString: true,
 		}
 		v.Options = append(
 			v.Options,
 			v.goPackageOption,
+			v.javaMultipleFilesOption,
+			v.javaOuterClassnameOption,
 			v.javaPackageOption,
 		)
 	}
@@ -133,11 +153,14 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 		case "go_package":
 			v.goPackageOption = element
 			return
+		case "java_multiple_files":
+			v.javaMultipleFilesOption = element
+			return
+		case "java_outer_classname":
+			v.javaOuterClassnameOption = element
+			return
 		case "java_package":
 			v.javaPackageOption = element
-			return
-		case "java_outer_classname", "java_multiple_files":
-			// ignore
 			return
 		}
 	}
@@ -220,4 +243,10 @@ func (v *firstPassVisitor) PImports(imports []*proto.Import) {
 func packageBasename(pkg string) string {
 	split := strings.Split(pkg, ".")
 	return split[len(split)-1]
+}
+
+func fileBasenameUpperCamelCase(filename string) string {
+	filename = filepath.Base(filename)
+	filename = strings.TrimSuffix(filename, filepath.Ext(filename))
+	return strs.ToUpperCamelCase(filename)
 }

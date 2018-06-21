@@ -28,6 +28,7 @@ package strs
 import (
 	"sort"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -87,6 +88,30 @@ func IsUpperSnakeCase(s string) bool {
 // ToUpperSnakeCase converts s to UPPER_SNAKE_CASE.
 func ToUpperSnakeCase(s string) string {
 	return strings.ToUpper(toSnake(s))
+}
+
+// ToUpperCamelCase converts s to UpperCamelCase.
+//
+// We use this for files, so any delimiter (_, -, or space) is
+// used to denote word boundaries, but we trim spaces from the
+// beginning and end of the string first.
+//
+// If a letter is uppercase, it will stay uppercase regardless,
+// this is for cases of abbreviations.
+func ToUpperCamelCase(s string) string {
+	output := ""
+	var previous rune
+	for i, c := range strings.TrimSpace(s) {
+		if !isDelimiter(c) {
+			if i == 0 || isDelimiter(previous) || isUpper(c) {
+				output += string(unicode.ToUpper(c))
+			} else {
+				output += string(unicode.ToLower(c))
+			}
+		}
+		previous = c
+	}
+	return output
 }
 
 // DedupeSort returns s with no duplicates and no empty strings, sorted.
@@ -186,4 +211,8 @@ func isUpper(r rune) bool {
 
 func isDigit(r rune) bool {
 	return '0' <= r && r <= '9'
+}
+
+func isDelimiter(r rune) bool {
+	return r == '-' || r == '_' || r == ' ' || r == '\t' || r == '\n' || r == '\r'
 }

@@ -5,8 +5,10 @@ package foo;
 import "google/protobuf/timestamp.proto";
 import "bar/dep.proto";
 
-option java_package = "com.foo.pb";
 option go_package = "foopb";
+option java_multiple_files = true;
+option java_outer_classname = "SuccessProto";
+option java_package = "com.foo";
 
 // Baz is a baz.
 message Baz {
