@@ -100,14 +100,14 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.All(args, flags.disableFormat, flags.disableLint, flags.updateFileOptions)
+				return runner.All(args, flags.disableFormat, flags.disableLint, !flags.noUpdateFileOptions)
 			})
 		},
 	}
 	flags.bindDirMode(allCmd.PersistentFlags())
 	flags.bindDisableFormat(allCmd.PersistentFlags())
 	flags.bindDisableLint(allCmd.PersistentFlags())
-	flags.bindUpdateFileOptions(allCmd.PersistentFlags())
+	flags.bindNoUpdateFileOptions(allCmd.PersistentFlags())
 
 	binaryToJSONCmd := &cobra.Command{
 		Use:   "binary-to-json dirOrProtoFiles... messagePath data",
@@ -191,14 +191,14 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Format a proto file and compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, flags.updateFileOptions)
+				return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, !flags.noUpdateFileOptions)
 			})
 		},
 	}
 	flags.bindDiffMode(formatCmd.PersistentFlags())
 	flags.bindLintMode(formatCmd.PersistentFlags())
 	flags.bindOverwrite(formatCmd.PersistentFlags())
-	flags.bindUpdateFileOptions(formatCmd.PersistentFlags())
+	flags.bindNoUpdateFileOptions(formatCmd.PersistentFlags())
 
 	genCmd := &cobra.Command{
 		Use:   "gen dirOrProtoFiles...",
