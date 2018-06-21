@@ -96,7 +96,7 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 			IsString: true,
 		}
 		v.javaPackageOption.Constant = proto.Literal{
-			Source:   "com." + v.Package.Name + ".pb",
+			Source:   "com." + v.Package.Name,
 			IsString: true,
 		}
 		v.Options = append(
