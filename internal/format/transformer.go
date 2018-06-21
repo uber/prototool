@@ -46,13 +46,14 @@ func newTransformer(options ...TransformerOption) *transformer {
 	return transformer
 }
 
-func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []*text.Failure, error) {
+func (t *transformer) Transform(config settings.Config, filename string, data []byte) ([]byte, []*text.Failure, error) {
 	descriptor, err := proto.NewParser(bytes.NewReader(data)).Parse()
 	if err != nil {
 		return nil, nil, err
 	}
+	descriptor.Filename = filename
 
-	firstPassVisitor := newFirstPassVisitor(config, t.updateFileOptions)
+	firstPassVisitor := newFirstPassVisitor(config, filename, t.updateFileOptions)
 	for _, element := range descriptor.Elements {
 		element.Accept(firstPassVisitor)
 	}

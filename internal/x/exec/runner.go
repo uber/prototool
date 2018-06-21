@@ -432,7 +432,7 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, update
 	if err != nil {
 		return err
 	}
-	data, failures, err := r.newTransformer(updateFileOptions).Transform(config, input)
+	data, failures, err := r.newTransformer(updateFileOptions).Transform(config, protoFile.Path, input)
 	if err != nil {
 		return err
 	}
