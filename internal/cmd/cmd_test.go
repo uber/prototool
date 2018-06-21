@@ -703,8 +703,8 @@ func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes st
 
 func assertGoldenFormat(t *testing.T, expectSuccess bool, updateFileOptions bool, filePath string) {
 	args := []string{"format"}
-	if updateFileOptions {
-		args = append(args, "--update-file-options")
+	if !updateFileOptions {
+		args = append(args, "--no-update-file-options")
 	}
 	args = append(args, filePath)
 	output, exitCode := testDo(t, args...)
