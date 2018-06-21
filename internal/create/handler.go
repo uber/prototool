@@ -204,7 +204,7 @@ func getJavaOuterclassname(filename string) string {
 }
 
 func getJavaPkg(pkg string) string {
-	return "com." + pkg + ".pb"
+	return "com." + pkg
 }
 
 func getData(tmplData *tmplData) ([]byte, error) {

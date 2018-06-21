@@ -364,7 +364,7 @@ package foo.bar;
 option go_package = "barpb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
-option java_package = "com.foo.bar.pb";`,
+option java_package = "com.foo.bar";`,
 	)
 	// create same file again but do not remove, should fail
 	assertDoCreateFile(
@@ -389,7 +389,7 @@ package bat;
 option go_package = "batpb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
-option java_package = "com.bat.pb";`,
+option java_package = "com.bat";`,
 	)
 	// package override but a shorter one "a"
 	assertDoCreateFile(
@@ -405,7 +405,7 @@ package foobar.c.bar;
 option go_package = "barpb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
-option java_package = "com.foobar.c.bar.pb";`,
+option java_package = "com.foobar.c.bar";`,
 	)
 	// no package override, do default b.c.bar
 	assertDoCreateFile(
@@ -421,7 +421,7 @@ package b.c.bar;
 option go_package = "barpb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
-option java_package = "com.b.c.bar.pb";`,
+option java_package = "com.b.c.bar";`,
 	)
 	// in dir with prototool.yaml, use default package
 	assertDoCreateFile(
@@ -437,7 +437,7 @@ package uber.prototool.generated;
 option go_package = "generatedpb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
-option java_package = "com.uber.prototool.generated.pb";`,
+option java_package = "com.uber.prototool.generated";`,
 	)
 	// in dir with prototool.yaml with override
 	assertDoCreateFile(
@@ -453,7 +453,7 @@ package foo;
 option go_package = "foopb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
-option java_package = "com.foo.pb";`,
+option java_package = "com.foo";`,
 	)
 }
 
