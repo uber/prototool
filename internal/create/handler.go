@@ -31,6 +31,7 @@ import (
 	"text/template"
 
 	"github.com/uber/prototool/internal/settings"
+	"github.com/uber/prototool/internal/strs"
 	"go.uber.org/zap"
 )
 
@@ -39,12 +40,15 @@ var tmpl = template.Must(template.New("tmpl").Parse(`syntax = "proto3";
 package {{.Pkg}};
 
 option go_package = "{{.GoPkg}}";
+option java_multiple_files = true;
+option java_outer_classname = "{{.JavaOuterClassname}}";
 option java_package = "{{.JavaPkg}}";`))
 
 type tmplData struct {
-	Pkg     string
-	GoPkg   string
-	JavaPkg string
+	Pkg                string
+	GoPkg              string
+	JavaOuterClassname string
+	JavaPkg            string
 }
 
 type handler struct {
@@ -106,9 +110,10 @@ func (h *handler) create(filePath string) error {
 	}
 	data, err := getData(
 		&tmplData{
-			Pkg:     pkg,
-			GoPkg:   getGoPkg(pkg),
-			JavaPkg: getJavaPkg(pkg),
+			Pkg:                pkg,
+			GoPkg:              getGoPkg(pkg),
+			JavaOuterClassname: getJavaOuterclassname(filePath),
+			JavaPkg:            getJavaPkg(pkg),
 		},
 	)
 	if err != nil {
@@ -190,6 +195,12 @@ func getPkgFromRel(rel string, basePkg string) string {
 func getGoPkg(pkg string) string {
 	split := strings.Split(pkg, ".")
 	return split[len(split)-1] + "pb"
+}
+
+func getJavaOuterclassname(filename string) string {
+	filename = filepath.Base(filename)
+	filename = strings.TrimSuffix(filename, filepath.Ext(filename))
+	return strs.ToUpperCamelCase(filename) + "Proto"
 }
 
 func getJavaPkg(pkg string) string {

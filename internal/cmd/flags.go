@@ -119,5 +119,5 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindUpdateFileOptions(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.updateFileOptions, "update-file-options", false, "Update the file options go_package and java_package to match the package per the guidelines of the style guide.")
+	flagSet.BoolVar(&f.updateFileOptions, "update-file-options", false, "Update the file options go_package, java_multiple_files, java_outer_classname, and java_package to match the package and filename per the guidelines of the style guide.")
 }

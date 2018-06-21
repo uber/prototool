@@ -362,6 +362,8 @@ func TestCreate(t *testing.T) {
 package foo.bar;
 
 option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
 option java_package = "com.foo.bar.pb";`,
 	)
 	// create same file again but do not remove, should fail
@@ -385,6 +387,8 @@ option java_package = "com.foo.bar.pb";`,
 package bat;
 
 option go_package = "batpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
 option java_package = "com.bat.pb";`,
 	)
 	// package override but a shorter one "a"
@@ -399,6 +403,8 @@ option java_package = "com.bat.pb";`,
 package foobar.c.bar;
 
 option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
 option java_package = "com.foobar.c.bar.pb";`,
 	)
 	// no package override, do default b.c.bar
@@ -413,6 +419,8 @@ option java_package = "com.foobar.c.bar.pb";`,
 package b.c.bar;
 
 option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
 option java_package = "com.b.c.bar.pb";`,
 	)
 	// in dir with prototool.yaml, use default package
@@ -427,6 +435,8 @@ option java_package = "com.b.c.bar.pb";`,
 package uber.prototool.generated;
 
 option go_package = "generatedpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
 option java_package = "com.uber.prototool.generated.pb";`,
 	)
 	// in dir with prototool.yaml with override
@@ -441,6 +451,8 @@ option java_package = "com.uber.prototool.generated.pb";`,
 package foo;
 
 option go_package = "foopb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
 option java_package = "com.foo.pb";`,
 	)
 }

@@ -176,7 +176,7 @@ Format a Protobuf file and print the formatted file to stdout. There are flags t
 
 ##### `prototool create`
 
-Create a Protobuf file from a template that passes lint. The file will look like the following:
+Create a Protobuf file from a template that passes lint. Assuming the filename `example_create_file.proto`, the file will look like the following:
 
 ```proto
 syntax = "proto3";
@@ -184,6 +184,8 @@ syntax = "proto3";
 package SOME.PKG;
 
 option go_package = "PKGpb";
+option java_multiple_files = true;
+option java_outer_classname = "ExampleCreateFileProto";
 option java_package = "com.SOME.PKG.pb";
 ```
 
@@ -315,7 +317,7 @@ $ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/Exclam
 Prototool is meant to help enforce a consistent development style for Protobuf, and as such you should follow some basic rules:
 
 - Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc_includes` to denote extra include directories, this is not recommended.
-- Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package` and `java_package`.
+- Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package`, `java_multiple_files`, `java_outer_classname`, and `java_package`.
 - Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool gen` do the best job.
 
 ## Vim Integration
