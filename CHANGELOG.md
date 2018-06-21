@@ -5,7 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- No changes yet.
+### Added
+- A new command `prototool create` to auto-generate Protobuf files from a
+  template. The generated files have the Protobuf package, go_package, and
+  java_package values set depending on the location of your file and config
+  settings. Make sure to update your Vim plugin setup as well if using the
+  Vim integration.
+
+
+## [0.3.0] - 2018-06-14
+### Added
+- Linters to verify that `java_multiple_files` and `java_outer_classname` are
+  unset.
+### Fixed
+- The formatting order now reflects
+  https://cloud.google.com/apis/design/file_structure by moving the location
+  of imports to be below syntax, package, and file options.
+- Temporary files used for `FileDescriptorSets` are now properly cleaned up.
+- Packages that begin with a keyword no longer produce an error when using
+  `prototool format` or `prototool lint`.
 
 
 ## [0.2.0] - 2018-05-29
@@ -30,5 +48,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/uber/prototool/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/uber/prototool/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/uber/prototool/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/uber/prototool/compare/v0.1.0...v0.2.0

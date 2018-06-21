@@ -26,12 +26,10 @@ import (
 	"go.uber.org/zap"
 )
 
-// TODO: single primitive options on same line
-
 // Transformer transforms an input file into an output file.
 type Transformer interface {
 	// Transform transforms the data.
-
+	//
 	// Failures should never happen in the CLI tool as we run the files
 	// through protoc first, but this is done because we want to verify
 	// code correctness here and protect against the bad case.
@@ -47,6 +45,14 @@ type TransformerOption func(*transformer)
 func TransformerWithLogger(logger *zap.Logger) TransformerOption {
 	return func(transformer *transformer) {
 		transformer.logger = logger
+	}
+}
+
+// TransformerWithUpdateFileOptions returns a TransformerOption that will update the file options
+// go_package, java_package to match the package per the guidelines of the style guide.
+func TransformerWithUpdateFileOptions() TransformerOption {
+	return func(transformer *transformer) {
+		transformer.updateFileOptions = true
 	}
 }
 

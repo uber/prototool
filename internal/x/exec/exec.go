@@ -40,6 +40,7 @@ func (e *ExitError) Error() string {
 // Runner runs commands.
 type Runner interface {
 	Init(args []string, uncomment bool) error
+	Create(args []string, pkg string) error
 	Version() error
 	Download() error
 	Clean() error
@@ -55,10 +56,10 @@ type Runner interface {
 	ListAllLinters() error
 	ListLintGroup(group string) error
 	ListAllLintGroups() error
-	Format(args []string, overwrite bool, diffMode bool, lintMode bool) error
+	Format(args []string, overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool) error
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error
-	All(args []string, disableFormat bool, disableLint bool) error
+	All(args []string, disableFormat bool, disableLint bool, updateFileOptions bool) error
 	GRPC(args []string, headers []string, callTimeout string, connectTimeout string, keepaliveTime string, jsonOutput bool) error
 }
 

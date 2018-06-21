@@ -18,30 +18,43 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package vars contains static variables used in Prototool.
+package create
+
+import "go.uber.org/zap"
+
+// DefaultPackage is the default package to use in lieu of one being able to be
+// derived.
+const DefaultPackage = "uber.prototool.generated"
+
+// Handler handles creation of Protobuf files from a template.
+type Handler interface {
+	// Create the files at the given filePaths.
+	Create(filePaths ...string) error
+}
+
+// HandlerOption is an option for a new Handler.
+type HandlerOption func(*handler)
+
+// HandlerWithLogger returns a HandlerOption that uses the given logger.
 //
-// Some variables are populated at build time using ldflags.
-package vars
+// The default is to use zap.NewNop().
+func HandlerWithLogger(logger *zap.Logger) HandlerOption {
+	return func(handler *handler) {
+		handler.logger = logger
+	}
+}
 
-const (
-	// Version is the current version.
-	Version = "0.4.0-dev"
+// HandlerWithPackage returns a HandlerOption that uses the given package for
+// new Protobuf files.
+//
+// The default is to derive this from the file path, or use DefaultPackage.
+func HandlerWithPackage(pkg string) HandlerOption {
+	return func(handler *handler) {
+		handler.pkg = pkg
+	}
+}
 
-	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
-	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.5.1"
-)
-
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
-)
+// NewHandler returns a new Handler.
+func NewHandler(options ...HandlerOption) Handler {
+	return newHandler(options...)
+}

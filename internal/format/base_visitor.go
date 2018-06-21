@@ -40,24 +40,6 @@ func newBaseVisitor(indent string) *baseVisitor {
 	return &baseVisitor{printer: newPrinter(indent)}
 }
 
-//func (v *baseVisitor) VisitMessage(element *proto.Message)         {}
-//func (v *baseVisitor) VisitService(element *proto.Service)         {}
-//func (v *baseVisitor) VisitSyntax(element *proto.Syntax)           {}
-//func (v *baseVisitor) VisitPackage(element *proto.Package)         {}
-//func (v *baseVisitor) VisitOption(element *proto.Option)           {}
-//func (v *baseVisitor) VisitImport(element *proto.Import)           {}
-//func (v *baseVisitor) VisitNormalField(element *proto.NormalField) {}
-//func (v *baseVisitor) VisitEnumField(element *proto.EnumField)     {}
-//func (v *baseVisitor) VisitEnum(element *proto.Enum)               {}
-//func (v *baseVisitor) VisitComment(element *proto.Comment)         {}
-//func (v *baseVisitor) VisitOneof(element *proto.Oneof)             {}
-//func (v *baseVisitor) VisitOneofField(element *proto.OneOfField)   {}
-//func (v *baseVisitor) VisitReserved(element *proto.Reserved)       {}
-//func (v *baseVisitor) VisitRPC(element *proto.RPC)                 {}
-//func (v *baseVisitor) VisitMapField(element *proto.MapField)       {}
-//func (v *baseVisitor) VisitGroup(element *proto.Group)             {}
-//func (v *baseVisitor) VisitExtensions(element *proto.Extensions)   {}
-
 func (v *baseVisitor) AddFailure(position scanner.Position, format string, args ...interface{}) {
 	v.Failures = append(v.Failures, &text.Failure{
 		Line:    position.Line,
@@ -72,23 +54,10 @@ func (v *baseVisitor) PWithInlineComment(inlineComment *proto.Comment, args ...i
 		return
 	}
 	// https://github.com/emicklei/proto/commit/5a91db7561a4dedab311f36304fcf0512343a9b1
-	//if inlineComment.Cstyle {
-	//args = append(args, inlineComment.Lines[0])
-	//v.P(args...)
-	//for _, line := range inlineComment.Lines[1:] {
-	//v.P(line)
-	//}
-	//return
-	//}
 	args = append(args, ` //`, cleanCommentLine(inlineComment.Lines[0]))
 	v.P(args...)
-	for i, line := range inlineComment.Lines[1:] {
-		line = cleanCommentLine(line)
-		if line == "" && i != len(inlineComment.Lines)-1 {
-			v.P(`//`)
-		} else {
-			v.P(`//`, line)
-		}
+	for _, line := range inlineComment.Lines[1:] {
+		v.P(`//`, cleanCommentLine(line))
 	}
 }
 
@@ -97,21 +66,10 @@ func (v *baseVisitor) PComment(comment *proto.Comment) {
 		return
 	}
 	// https://github.com/emicklei/proto/commit/5a91db7561a4dedab311f36304fcf0512343a9b1
-	//if comment.Cstyle {
-	//for _, line := range comment.Lines {
-	//v.P(line)
-	//}
-	//return
-	//}
 	// this is weird for now
 	// we always want non-c-style after formatting
-	for i, line := range comment.Lines {
-		line = cleanCommentLine(line)
-		if line == "" && !(i == 0 || i == len(comment.Lines)-1) {
-			v.P(`//`)
-		} else {
-			v.P(`//`, line)
-		}
+	for _, line := range comment.Lines {
+		v.P(`//`, cleanCommentLine(line))
 	}
 }
 
@@ -158,7 +116,7 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 	}
 }
 
-// should only be called by Poptions
+// should only be called by POptions
 func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal, suffix string) {
 	prefix := ""
 	if name != "" {

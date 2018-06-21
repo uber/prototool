@@ -1,0 +1,4 @@
+create:
+  dir_to_base_package:
+    a/b: foo
+    a: foobar
