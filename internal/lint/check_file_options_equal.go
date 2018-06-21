@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/strs"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -47,10 +48,9 @@ var fileOptionsEqualJavaMultipleFilesTrueLinter = NewLinter(
 
 var fileOptionsEqualJavaOuterClassnameProtoSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX",
-	`Verifies that the file option "java_outer_classname" is equal to $(capitalize $(basename FILE))Proto.`,
+	`Verifies that the file option "java_outer_classname" is equal to $(upperCamelCase $(basename FILE))Proto.`,
 	newCheckFileOptionsEqual("java_outer_classname", func(descriptor *proto.Proto, _ *proto.Package) string {
-		// TODO: make sure strings.Title does what you want
-		return strings.Title(filepath.Base(descriptor.Filename)) + "Proto"
+		return fileBasenameUpperCamelCase(descriptor.Filename) + "Proto"
 	}),
 )
 
@@ -124,4 +124,9 @@ func (v *fileOptionsEqualVisitor) Finally() error {
 func packageBasename(pkg string) string {
 	split := strings.Split(pkg, ".")
 	return split[len(split)-1]
+}
+
+func fileBasenameUpperCamelCase(filename string) string {
+	filename = filepath.Base(filename)
+	return strs.ToUpperCamelCase(strings.TrimSuffix(filename, filepath.Ext(filename)))
 }
