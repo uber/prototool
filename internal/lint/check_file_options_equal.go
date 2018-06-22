@@ -22,11 +22,9 @@ package lint
 
 import (
 	"fmt"
-	"path/filepath"
-	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/strs"
+	"github.com/uber/prototool/internal/protostrs"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -34,7 +32,7 @@ var fileOptionsEqualGoPackagePbSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX",
 	`Verifies that the file option "go_package" is equal to $(basename PACKAGE)pb.`,
 	newCheckFileOptionsEqual("go_package", func(_ *proto.Proto, pkg *proto.Package) string {
-		return packageBasename(pkg.Name) + "pb"
+		return protostrs.GoPackage(pkg.Name)
 	}),
 )
 
@@ -50,7 +48,7 @@ var fileOptionsEqualJavaOuterClassnameProtoSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX",
 	`Verifies that the file option "java_outer_classname" is equal to $(upperCamelCase $(basename FILE))Proto.`,
 	newCheckFileOptionsEqual("java_outer_classname", func(descriptor *proto.Proto, _ *proto.Package) string {
-		return fileBasenameUpperCamelCase(descriptor.Filename) + "Proto"
+		return protostrs.JavaOuterClassname(descriptor.Filename)
 	}),
 )
 
@@ -58,7 +56,7 @@ var fileOptionsEqualJavaPackageComPrefixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX",
 	`Verifies that the file option "java_package" is equal to com.PACKAGE.`,
 	newCheckFileOptionsEqual("java_package", func(_ *proto.Proto, pkg *proto.Package) string {
-		return "com." + pkg.Name
+		return protostrs.JavaPackage(pkg.Name)
 	}),
 )
 
@@ -119,15 +117,4 @@ func (v *fileOptionsEqualVisitor) Finally() error {
 		v.AddFailuref(v.option.Position, "Expected %q for option %q but was %q.", expectedValue, v.option.Name, value)
 	}
 	return nil
-}
-
-func packageBasename(pkg string) string {
-	split := strings.Split(pkg, ".")
-	return split[len(split)-1]
-}
-
-func fileBasenameUpperCamelCase(filename string) string {
-	filename = filepath.Base(filename)
-	filename = strings.TrimSuffix(filename, filepath.Ext(filename))
-	return strs.ToUpperCamelCase(filename)
 }
