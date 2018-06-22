@@ -1,9 +1,16 @@
 function! PrototoolFormatEnable() abort
     silent! let g:prototool_format_enable = 1
+    silent! let g:prototool_format_no_rewrite_flag = ''
 endfunction
 
 function! PrototoolFormatDisable() abort
     silent! unlet g:prototool_format_enable
+    silent! let g:prototool_format_no_rewrite_flag = ''
+endfunction
+
+function! PrototoolFormatNoRewriteEnable() abort
+    silent! let g:prototool_format_enable = 1
+    silent! let g:prototool_format_no_rewrite_flag = '--no-rewrite '
 endfunction
 
 function! PrototoolFormatToggle() abort
@@ -16,9 +23,19 @@ function! PrototoolFormatToggle() abort
     endif
 endfunction
 
+function! PrototoolFormatNoRewriteToggle() abort
+    if exists('g:prototool_format_enable')
+        call PrototoolFormatDisable()
+        execute 'echo "prototool format DISABLED"'
+    else
+        call PrototoolFormatNoRewriteEnable()
+        execute 'echo "prototool format --no-rewrite ENABLED"'
+    endif
+endfunction
+
 function! PrototoolFormat() abort
     if exists('g:prototool_format_enable')
-        silent! execute '!prototool format -w %'
+        silent! execute '!prototool format ' . g:prototool_format_no_rewrite_flag . '-w %'
         silent! edit
     endif
 endfunction
