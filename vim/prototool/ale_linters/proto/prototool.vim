@@ -1,4 +1,3 @@
-" Author: Peter Edge <pedge@uber.com>
 " Description: run the prototool linter
 
 call ale#Set('proto_prototool_command', 'all')
