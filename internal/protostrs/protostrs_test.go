@@ -28,10 +28,20 @@ import (
 
 func TestGoPackage(t *testing.T) {
 	assert.Equal(t, "", GoPackage(""))
+	assert.Equal(t, "foo", GoPackage("foopb"))
+	assert.Equal(t, "foo.bar", GoPackage("barpb"))
 }
 
 func TestJavaOuterClassname(t *testing.T) {
 	assert.Equal(t, "", JavaOuterClassname(""))
+	assert.Equal(t, "FileProto", JavaOuterClassname("file.proto"))
+	assert.Equal(t, "FileProto", JavaOuterClassname("file.txt"))
+	assert.Equal(t, "FileProto", JavaOuterClassname("a/file.proto"))
+	assert.Equal(t, "FileProto", JavaOuterClassname("a/b/file.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file_one.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file-one.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file one.proto"))
+	assert.Equal(t, "FileOneTwoProto", JavaOuterClassname("a/b/fiLe_One_two.proto"))
 }
 
 func TestJavaPackage(t *testing.T) {
