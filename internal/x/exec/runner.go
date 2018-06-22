@@ -415,7 +415,7 @@ func (r *runner) format(overwrite bool, diffMode bool, lintMode bool, rewrite bo
 	for _, protoSet := range meta.ProtoSets {
 		for _, protoFiles := range protoSet.DirPathToFiles {
 			for _, protoFile := range protoFiles {
-				if err := r.formatFile(overwrite, diffMode, lintMode, rewrite, meta, protoSet.Config, protoFile); err != nil {
+				if err := r.formatFile(overwrite, diffMode, lintMode, rewrite, meta, protoFile); err != nil {
 					if _, ok := err.(*ExitError); !ok {
 						return err
 					}
@@ -427,12 +427,12 @@ func (r *runner) format(overwrite bool, diffMode bool, lintMode bool, rewrite bo
 	return retErr
 }
 
-func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrite bool, meta *meta, config settings.Config, protoFile *file.ProtoFile) error {
+func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrite bool, meta *meta, protoFile *file.ProtoFile) error {
 	input, err := ioutil.ReadFile(protoFile.Path)
 	if err != nil {
 		return err
 	}
-	data, failures, err := r.newTransformer(rewrite).Transform(config, protoFile.Path, input)
+	data, failures, err := r.newTransformer(rewrite).Transform(protoFile.Path, input)
 	if err != nil {
 		return err
 	}

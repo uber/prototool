@@ -36,8 +36,8 @@ type baseVisitor struct {
 	Failures []*text.Failure
 }
 
-func newBaseVisitor(indent string) *baseVisitor {
-	return &baseVisitor{printer: newPrinter(indent)}
+func newBaseVisitor() *baseVisitor {
+	return &baseVisitor{printer: newPrinter()}
 }
 
 func (v *baseVisitor) AddFailure(position scanner.Position, format string, args ...interface{}) {

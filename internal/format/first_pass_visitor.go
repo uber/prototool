@@ -25,7 +25,6 @@ import (
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/protostrs"
-	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -49,8 +48,8 @@ type firstPassVisitor struct {
 	javaPackageOption        *proto.Option
 }
 
-func newFirstPassVisitor(config settings.Config, filename string, rewrite bool) *firstPassVisitor {
-	return &firstPassVisitor{baseVisitor: newBaseVisitor(config.Format.Indent), filename: filename, rewrite: rewrite}
+func newFirstPassVisitor(filename string, rewrite bool) *firstPassVisitor {
+	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, rewrite: rewrite}
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {

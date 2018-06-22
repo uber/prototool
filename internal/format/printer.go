@@ -26,21 +26,17 @@ import (
 	"strings"
 )
 
-const defaultIndentString = "  "
+const indentString = "  "
 
 // printer is a convenience struct that helps when printing proto files.
 // The concept was taken from the golang/protobuf plugin.
 type printer struct {
-	buffer       *bytes.Buffer
-	indentString string
-	indentCount  int
+	buffer      *bytes.Buffer
+	indentCount int
 }
 
-func newPrinter(indentString string) *printer {
-	if indentString == "" {
-		indentString = defaultIndentString
-	}
-	return &printer{bytes.NewBuffer(nil), indentString, 0}
+func newPrinter() *printer {
+	return &printer{bytes.NewBuffer(nil), 0}
 }
 
 // P prints the args concatenated on the same line after printing the current indent and then prints a newline.
@@ -49,7 +45,7 @@ func newPrinter(indentString string) *printer {
 func (p *printer) P(args ...interface{}) {
 	lineBuffer := bytes.NewBuffer(nil)
 	if p.indentCount > 0 {
-		_, _ = fmt.Fprint(lineBuffer, strings.Repeat(p.indentString, p.indentCount))
+		_, _ = fmt.Fprint(lineBuffer, strings.Repeat(indentString, p.indentCount))
 	}
 	for _, arg := range args {
 		_, _ = fmt.Fprint(lineBuffer, arg)
