@@ -30,8 +30,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/uber/prototool/internal/protostrs"
 	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/strs"
 	"go.uber.org/zap"
 )
 
@@ -111,9 +111,9 @@ func (h *handler) create(filePath string) error {
 	data, err := getData(
 		&tmplData{
 			Pkg:                pkg,
-			GoPkg:              getGoPkg(pkg),
-			JavaOuterClassname: getJavaOuterclassname(filePath),
-			JavaPkg:            getJavaPkg(pkg),
+			GoPkg:              protostrs.GoPackage(pkg),
+			JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
+			JavaPkg:            protostrs.JavaPackage(pkg),
 		},
 	)
 	if err != nil {
@@ -190,21 +190,6 @@ func getPkgFromRel(rel string, basePkg string) string {
 		return relPkg
 	}
 	return basePkg + "." + relPkg
-}
-
-func getGoPkg(pkg string) string {
-	split := strings.Split(pkg, ".")
-	return split[len(split)-1] + "pb"
-}
-
-func getJavaOuterclassname(filename string) string {
-	filename = filepath.Base(filename)
-	filename = strings.TrimSuffix(filename, filepath.Ext(filename))
-	return strs.ToUpperCamelCase(filename) + "Proto"
-}
-
-func getJavaPkg(pkg string) string {
-	return "com." + pkg
 }
 
 func getData(tmplData *tmplData) ([]byte, error) {

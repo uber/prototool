@@ -21,13 +21,11 @@
 package format
 
 import (
-	"path/filepath"
 	"sort"
-	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/protostrs"
 	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/strs"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -85,18 +83,18 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 			v.javaPackageOption = &proto.Option{Name: "java_package"}
 		}
 		v.goPackageOption.Constant = proto.Literal{
-			Source:   packageBasename(v.Package.Name) + "pb",
+			Source:   protostrs.GoPackage(v.Package.Name),
 			IsString: true,
 		}
 		v.javaMultipleFilesOption.Constant = proto.Literal{
 			Source: "true",
 		}
 		v.javaOuterClassnameOption.Constant = proto.Literal{
-			Source:   fileBasenameUpperCamelCase(v.filename) + "Proto",
+			Source:   protostrs.JavaOuterClassname(v.filename),
 			IsString: true,
 		}
 		v.javaPackageOption.Constant = proto.Literal{
-			Source:   "com." + v.Package.Name,
+			Source:   protostrs.JavaPackage(v.Package.Name),
 			IsString: true,
 		}
 		v.Options = append(
@@ -238,15 +236,4 @@ func (v *firstPassVisitor) PImports(imports []*proto.Import) {
 		}
 		v.PWithInlineComment(i.InlineComment, `import `, kind, `"`, i.Filename, `";`)
 	}
-}
-
-func packageBasename(pkg string) string {
-	split := strings.Split(pkg, ".")
-	return split[len(split)-1]
-}
-
-func fileBasenameUpperCamelCase(filename string) string {
-	filename = filepath.Base(filename)
-	filename = strings.TrimSuffix(filename, filepath.Ext(filename))
-	return strs.ToUpperCamelCase(filename)
 }

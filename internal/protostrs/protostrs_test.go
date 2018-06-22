@@ -28,8 +28,8 @@ import (
 
 func TestGoPackage(t *testing.T) {
 	assert.Equal(t, "", GoPackage(""))
-	assert.Equal(t, "foo", GoPackage("foopb"))
-	assert.Equal(t, "foo.bar", GoPackage("barpb"))
+	assert.Equal(t, "foopb", GoPackage("foo"))
+	assert.Equal(t, "barpb", GoPackage("foo.bar"))
 }
 
 func TestJavaOuterClassname(t *testing.T) {
@@ -41,9 +41,12 @@ func TestJavaOuterClassname(t *testing.T) {
 	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file_one.proto"))
 	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file-one.proto"))
 	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file one.proto"))
-	assert.Equal(t, "FileOneTwoProto", JavaOuterClassname("a/b/fiLe_One_two.proto"))
+	assert.Equal(t, "FiLeOneTwoProto", JavaOuterClassname("a/b/fiLe_One_two.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file one.txt"))
 }
 
 func TestJavaPackage(t *testing.T) {
 	assert.Equal(t, "", JavaPackage(""))
+	assert.Equal(t, "com.foo", JavaPackage("foo"))
+	assert.Equal(t, "com.foo.bar", JavaPackage("foo.bar"))
 }
