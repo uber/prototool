@@ -65,6 +65,6 @@ enum Something {
 
 // Daylight is the daylight service.
 service Daylight {
-  rpc Hello(Bat) returns (Empty) {} // inline comment23
-  rpc Foo(Empty) returns (Bat) {} // inline comment24
+  rpc Hello(Bat) returns (Empty); // inline comment23
+  rpc Foo(Empty) returns (Bat); // inline comment24
 }

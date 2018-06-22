@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -35,13 +34,12 @@ type mainVisitor struct {
 	*baseVisitor
 
 	isProto2          bool
-	rpcUseSemicolons  bool
 	haveHitNonComment bool
 	parent            proto.Visitee
 }
 
-func newMainVisitor(config settings.Config, isProto2 bool) *mainVisitor {
-	return &mainVisitor{isProto2: isProto2, rpcUseSemicolons: config.Format.RPCUseSemicolons, baseVisitor: newBaseVisitor(config.Format.Indent)}
+func newMainVisitor(isProto2 bool) *mainVisitor {
+	return &mainVisitor{isProto2: isProto2, baseVisitor: newBaseVisitor()}
 }
 
 func (v *mainVisitor) Do() []*text.Failure {
@@ -254,11 +252,7 @@ func (v *mainVisitor) VisitRPC(element *proto.RPC) {
 		responseStream = "stream "
 	}
 	if len(element.Options) == 0 {
-		suffix := ") {}"
-		if v.rpcUseSemicolons {
-			suffix = ");"
-		}
-		v.PWithInlineComment(element.InlineComment, "rpc ", element.Name, "(", requestStream, element.RequestType, ") returns (", responseStream, element.ReturnsType, suffix)
+		v.PWithInlineComment(element.InlineComment, "rpc ", element.Name, "(", requestStream, element.RequestType, ") returns (", responseStream, element.ReturnsType, ");")
 		return
 	}
 	v.P("rpc ", element.Name, "(", requestStream, element.RequestType, ") returns (", responseStream, element.ReturnsType, ") {")

@@ -139,8 +139,6 @@ type Config struct {
 	// or Group/IncludeIDs/ExcludeIDs can be set, but not both. There can be no overlap
 	// between IncludeIDs and ExcludeIDs.
 	Lint LintConfig
-	// The format config.
-	Format FormatConfig
 	// The gen config.
 	Gen GenConfig
 }
@@ -197,20 +195,6 @@ type LintConfig struct {
 	// IDs expected to be all upper-case.
 	// File paths expected to be absolute paths.
 	IgnoreIDToFilePaths map[string][]string
-}
-
-// FormatConfig is the format config.
-type FormatConfig struct {
-	// The indent to use. This is the actual Golang string to use as the indent,
-	// where the external repesentation will be Xt or Xs, where X >= 1 and "t"
-	// represents tabs, "s" represents spaces.
-	// If empty, use two spaces.
-	Indent string
-	// Use semicolons to finish RPC definitions when possible, ie when the associated
-	// RPC hs no options. Otherwise always use {}.
-	RPCUseSemicolons bool
-	// Trim the newline from the end of the file. Otherwise ends the file with a newline.
-	TrimNewline bool
 }
 
 // GenConfig is the gen config.
@@ -290,11 +274,6 @@ type ExternalConfig struct {
 		ExcludeIDs      []string            `json:"exclude_ids,omitempty" yaml:"exclude_ids,omitempty"`
 		IgnoreIDToFiles map[string][]string `json:"ignore_id_to_files,omitempty" yaml:"ignore_id_to_files,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
-	Format struct {
-		Indent           string `json:"indent,omitempty" yaml:"indent,omitempty"`
-		RPCUseSemicolons bool   `json:"rpc_use_semicolons,omitempty" yaml:"rpc_use_semicolons,omitempty"`
-		TrimNewline      bool   `json:"trim_newline,omitempty" yaml:"trim_newline,omitempty"`
-	} ` json:"format,omitempty" yaml:"format,omitempty"`
 	Gen struct {
 		GoOptions struct {
 			ImportPath         string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
