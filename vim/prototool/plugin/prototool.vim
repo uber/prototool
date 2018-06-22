@@ -40,8 +40,6 @@ function! PrototoolFormat() abort
     endif
 endfunction
 
-autocmd BufEnter,BufWritePost *.proto :call PrototoolFormat()
-
 function! PrototoolCreateEnable() abort
     silent! let g:prototool_create_enable = 1
 endfunction
@@ -49,8 +47,6 @@ endfunction
 function! PrototoolCreateDisable() abort
     silent! unlet g:prototool_create_enable
 endfunction
-
-call PrototoolCreateEnable()
 
 function! PrototoolCreateToggle() abort
     if exists('g:prototool_create_enable')
@@ -69,4 +65,10 @@ function! PrototoolCreate() abort
     endif
 endfunction
 
+" default functionality below
+
+call PrototoolFormatDisable()
+call PrototoolCreateEnable()
+
+autocmd BufEnter,BufWritePost *.proto :call PrototoolFormat()
 autocmd BufNewFile *.proto :call PrototoolCreate()
