@@ -11,7 +11,7 @@ option go_package = "foopb"; // inline comment4
 // comment11
 option java_multiple_files = true; //inline comment11
 // comment5
-option java_outer_classname = "FooUpdateFileOptionsProto"; // inline comment5
+option java_outer_classname = "FooProto"; // inline comment5
 option java_package = "com.foo";
 
 // comment9
