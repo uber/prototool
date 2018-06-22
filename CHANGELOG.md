@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   what is expected in the default Style Guide. This functionality can be
   suppressed with the flag `--no-rewrite`. See the documentation for
   `prototool format` in the README.md for more details.
+- Formatting configuration options are removed. We think there should be
+  only one way to format, so we went with defaults of two spaces for indents,
+  semicolons at the end of RPCs if there are no RPC options, and always
+  having a newline at the end of a file.
 
 
 ## [0.3.0] - 2018-06-14
