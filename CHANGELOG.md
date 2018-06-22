@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `java_multiple_files`, `java_outer_classname`, and `java_package` values set
   depending on the location of your file and config settings. Make sure to
   update your Vim plugin setup as well if using the Vim integration. See the
-  documentation for `prototool format` in the README.md for more details.
+  documentation for `prototool create` in the README.md for more details.
 ### Changed
 - The values for `java_multiple_files`, `java_outer_classname`, and
   `java_package` that pass lint by default now reflect what is expected
@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `java_multiple_files`, `java_outer_classname`, and `java_package` to match
   what is expected in the default Style Guide. This functionality can be
   suppressed with the flag `--no-rewrite`. See the documentation for
-  `prototool create` in the README.md for more details.
+  `prototool format` in the README.md for more details.
 
 
 ## [0.3.0] - 2018-06-14
