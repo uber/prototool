@@ -60,7 +60,7 @@ func (v enumsNoAllowAliasVisitor) VisitOption(element *proto.Option) {
 	switch element.Parent.(type) {
 	case (*proto.Enum):
 		if element.Name == "allow_alias" {
-			v.AddFailuref(element.Position, "Enum aliases is not allowed.")
+			v.AddFailuref(element.Position, "Enum aliases are not allowed.")
 		}
 	}
 }
