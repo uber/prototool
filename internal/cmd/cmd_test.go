@@ -229,6 +229,8 @@ func TestLint(t *testing.T) {
 		84:5:COMMENTS_NO_C_STYLE
 		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 		93:1:ENUM_NAMES_CAMEL_CASE
+		98:3:ENUMS_NO_ALLOW_ALIAS
+		108:5:ENUMS_NO_ALLOW_ALIAS
 		`,
 		"testdata/lint/lots.proto",
 	)
