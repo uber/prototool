@@ -227,6 +227,11 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	if output != "" {
 		c.logger.Debug("protoc output", zap.String("output", output))
 	}
+	// We want to treat any output from protoc as a failure, even if
+	// protoc exited with 0 status. This is because there are outputs
+	// from protoc that we consider errors that protoc considers warnings,
+	// and plugins in general do not produce output unless there is an error.
+	// See https://github.com/uber/prototool/issues/128 for a full discussion.
 	failures := c.parseProtocOutput(cmdMeta, output)
 	// we had a run error but for whatever reason did not get any parsed
 	// output lines, we still want to fail in this case
