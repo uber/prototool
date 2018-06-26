@@ -23,6 +23,7 @@ package grpc
 import (
 	"io"
 
+	"github.com/fullstorydev/grpcurl"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
@@ -32,6 +33,8 @@ import (
 )
 
 var jsonpbMarshaler = &jsonpb.Marshaler{Indent: "  "}
+
+var _ grpcurl.InvocationEventHandler = &invocationEventHandler{}
 
 type invocationEventHandler struct {
 	output io.Writer
@@ -58,10 +61,7 @@ func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
 
 func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, _ metadata.MD) {
 	if err := s.Err(); err != nil {
-		// TODO(pedge): not great for streaming
 		i.err = err
-		// printed by returning the error in handler
-		//i.println(err.Error())
 	}
 }
 
