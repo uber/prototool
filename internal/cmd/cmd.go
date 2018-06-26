@@ -37,7 +37,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
-	"github.com/uber/prototool/internal/x/exec"
+	"github.com/uber/prototool/internal/exec"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
