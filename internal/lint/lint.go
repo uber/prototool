@@ -43,6 +43,7 @@ var (
 		enumNamesCapitalizedLinter,
 		enumZeroValuesInvalidLinter,
 		enumsHaveCommentsLinter,
+		enumsNoAllowAliasLinter,
 		fileOptionsEqualGoPackagePbSuffixLinter,
 		fileOptionsEqualJavaMultipleFilesTrueLinter,
 		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,

@@ -93,3 +93,23 @@ enum Hoo {
 enum Hoo_one {
   HOO_ONE_INVALID = 0;
 }
+
+enum SomeAlias {
+  option allow_alias = true;
+  SOME_ALIAS_INVALID = 0;
+  SOME_ALIAS_UNSET = 1;
+  SOME_ALIAS_TREE = 2;
+  SOME_ALIAS_BALLOON = 3;
+  SOME_ALIAS_LAMP_POST = 3;
+}
+
+message NestedEnumWithAlias {
+  enum SomeOtherAlias {
+    option allow_alias = true;
+    NESTED_ENUM_WITH_ALIAS_SOME_OTHER_ALIAS_INVALID = 0;
+    NESTED_ENUM_WITH_ALIAS_SOME_OTHER_ALIAS_UNSET = 1;
+    NESTED_ENUM_WITH_ALIAS_SOME_OTHER_ALIAS_TREE = 2;
+    NESTED_ENUM_WITH_ALIAS_SOME_OTHER_ALIAS_BALLOON = 3;
+    NESTED_ENUM_WITH_ALIAS_SOME_OTHER_ALIAS_LAMP_POST = 3;
+  }
+}
