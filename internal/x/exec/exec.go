@@ -56,10 +56,10 @@ type Runner interface {
 	ListAllLinters() error
 	ListLintGroup(group string) error
 	ListAllLintGroups() error
-	Format(args []string, overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool) error
+	Format(args []string, overwrite bool, diffMode bool, lintMode bool, rewrite bool) error
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error
-	All(args []string, disableFormat bool, disableLint bool, updateFileOptions bool) error
+	All(args []string, disableFormat bool, disableLint bool, rewrite bool) error
 	GRPC(args []string, headers []string, callTimeout string, connectTimeout string, keepaliveTime string) error
 }
 

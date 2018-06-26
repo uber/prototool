@@ -19,7 +19,7 @@ option java_multiple_files = true; //inline comment11
 // comment4
 option go_package = "issssoopb"; // inline comment4
 // comment5
-option java_outer_classname = "FooProto"; // inline comment5
+option java_outer_classname = "FdsddooProto"; // inline comment5
 
 // Baz is a baz.
 message Baz {

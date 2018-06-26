@@ -5,12 +5,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- No changes yet.
+
+
+## [0.4.0] - 2018-06-22
 ### Added
 - A new command `prototool create` to auto-generate Protobuf files from a
-  template. The generated files have the Protobuf package, go_package,
-  java_multiple_files, java_outer_classname, and java_package values set
+  template. The generated files have the Protobuf package, `go_package`,
+  `java_multiple_files`, `java_outer_classname`, and `java_package` values set
   depending on the location of your file and config settings. Make sure to
-  update your Vim plugin setup as well if using the Vim integration.
+  update your Vim plugin setup as well if using the Vim integration. See the
+  documentation for `prototool create` in the README.md for more details.
+### Changed
+- The values for `java_multiple_files`, `java_outer_classname`, and
+  `java_package` that pass lint by default now reflect what is expected
+  by the Google Cloud APIs file structure. See
+  https://cloud.google.com/apis/design/file_structure for more details.
+- `protobuf format` will now automatically update the value of `go_package`,
+  `java_multiple_files`, `java_outer_classname`, and `java_package` to match
+  what is expected in the default Style Guide. This functionality can be
+  suppressed with the flag `--no-rewrite`. See the documentation for
+  `prototool format` in the README.md for more details.
+- Formatting configuration options are removed. We think there should be
+  only one way to format, so we went with defaults of two spaces for indents,
+  semicolons at the end of RPCs if there are no RPC options, and always
+  having a newline at the end of a file.
 
 
 ## [0.3.0] - 2018-06-14
@@ -48,6 +67,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/uber/prototool/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/uber/prototool/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/uber/prototool/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/uber/prototool/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/uber/prototool/compare/v0.1.0...v0.2.0

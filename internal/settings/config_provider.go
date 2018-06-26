@@ -26,7 +26,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/uber/prototool/internal/strs"
@@ -153,13 +152,6 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			ignoreIDToFilePaths[id] = append(ignoreIDToFilePaths[id], protoFilePath)
 		}
 	}
-	var indent string
-	if len(e.Format.Indent) > 0 {
-		indent, err = getIndent(e.Format.Indent)
-		if err != nil {
-			return Config{}, err
-		}
-	}
 
 	genPlugins := make([]GenPlugin, len(e.Gen.Plugins))
 	for i, plugin := range e.Gen.Plugins {
@@ -222,11 +214,6 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			IncludeIDs:          strs.DedupeSort(e.Lint.IncludeIDs, strings.ToUpper),
 			ExcludeIDs:          strs.DedupeSort(e.Lint.ExcludeIDs, strings.ToUpper),
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
-		},
-		Format: FormatConfig{
-			Indent:           indent,
-			RPCUseSemicolons: e.Format.RPCUseSemicolons,
-			TrimNewline:      e.Format.TrimNewline,
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
@@ -307,31 +294,4 @@ func getExcludePrefixes(excludes []string, noDefaultExcludes bool, dirPath strin
 		excludePrefixes = append(excludePrefixes, excludePrefix)
 	}
 	return excludePrefixes, nil
-}
-
-func getIndent(spec string) (string, error) {
-	if len(spec) < 2 {
-		return "", invalidIndentSpecErrorf(spec)
-	}
-	base := ""
-	switch spec[len(spec)-1] {
-	case 't':
-		base = "\t"
-	case 's':
-		base = " "
-	default:
-		return "", invalidIndentSpecErrorf(spec)
-	}
-	count, err := strconv.Atoi(spec[0 : len(spec)-1])
-	if err != nil {
-		return "", invalidIndentSpecErrorf(spec)
-	}
-	if count < 1 {
-		return "", invalidIndentSpecErrorf(spec)
-	}
-	return strings.Repeat(base, count), nil
-}
-
-func invalidIndentSpecErrorf(spec string) error {
-	return fmt.Errorf("invalid indent spec, must be Ns or Nt where N >= 1: %s", spec)
 }

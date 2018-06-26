@@ -102,20 +102,6 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}  exclude_ids:
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 
-# Format directives.
-{{.V}}format:
-  # The indent to use. This should be Xt or Xs, where X >= 1 and "t"
-  # represents tabs, "s" represents spaces.
-  # If empty, format will use two spaces.
-{{.V}}  indent: 1t
-
-  # Use semicolons to finish RPC definitions when possible, ie when the associated
-  # RPC hs no options. Otherwise format will always use {}.
-{{.V}}  rpc_use_semicolons: true
-
-  # Trim the newline from the end of the file. Otherwise ends the file with a newline.
-{{.V}}  trim_newline: true
-
 # Code generation directives.
 {{.V}}gen:
   # Options that will apply to all plugins of type go, gogo, gogrpc, gogogrpc.

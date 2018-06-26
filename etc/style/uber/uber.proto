@@ -272,19 +272,20 @@ message StreamQuasarsResponse {
 }
 
 // Services should end in Service.
-// Note {} instead of ; to terminate the method definition.
+// Use ; to terminate the method definition if there are no RPC options,
+// {} if there are RPC options.
 
 // HelloService is the hello service.
 service HelloService {
   // Requests and Responses should always match the rpc name.
-  // rpc NAME(NAMERequest) returns (NAMEResponse) {}
+  // rpc NAME(NAMERequest) returns (NAMEResponse);
 
   // SendFoo sends a foo.
-  rpc SendFoo(SendFooRequest) returns (SendFooResponse) {}
+  rpc SendFoo(SendFooRequest) returns (SendFooResponse);
   // GetPlanet gets a planet.
-  rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse) {}
+  rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse);
   // StreamGalaxies streams galaxies.
-  rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse) {}
+  rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse);
   // StreamQuasars streams quasars.
-  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse) {}
+  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse);
 }

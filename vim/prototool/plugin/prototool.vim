@@ -1,9 +1,16 @@
 function! PrototoolFormatEnable() abort
     silent! let g:prototool_format_enable = 1
+    silent! let g:prototool_format_no_rewrite_flag = ''
 endfunction
 
 function! PrototoolFormatDisable() abort
     silent! unlet g:prototool_format_enable
+    silent! let g:prototool_format_no_rewrite_flag = ''
+endfunction
+
+function! PrototoolFormatNoRewriteEnable() abort
+    silent! let g:prototool_format_enable = 1
+    silent! let g:prototool_format_no_rewrite_flag = '--no-rewrite '
 endfunction
 
 function! PrototoolFormatToggle() abort
@@ -16,14 +23,22 @@ function! PrototoolFormatToggle() abort
     endif
 endfunction
 
-function! PrototoolFormat() abort
+function! PrototoolFormatNoRewriteToggle() abort
     if exists('g:prototool_format_enable')
-        silent! execute '!prototool format -w %'
-        silent! edit
+        call PrototoolFormatDisable()
+        execute 'echo "prototool format DISABLED"'
+    else
+        call PrototoolFormatNoRewriteEnable()
+        execute 'echo "prototool format --no-rewrite ENABLED"'
     endif
 endfunction
 
-autocmd BufEnter,BufWritePost *.proto :call PrototoolFormat()
+function! PrototoolFormat() abort
+    if exists('g:prototool_format_enable')
+        silent! execute '!prototool format ' . g:prototool_format_no_rewrite_flag . '-w %'
+        silent! edit
+    endif
+endfunction
 
 function! PrototoolCreateEnable() abort
     silent! let g:prototool_create_enable = 1
@@ -32,8 +47,6 @@ endfunction
 function! PrototoolCreateDisable() abort
     silent! unlet g:prototool_create_enable
 endfunction
-
-call PrototoolCreateEnable()
 
 function! PrototoolCreateToggle() abort
     if exists('g:prototool_create_enable')
@@ -52,4 +65,10 @@ function! PrototoolCreate() abort
     endif
 endfunction
 
+" default functionality below
+
+call PrototoolFormatDisable()
+call PrototoolCreateEnable()
+
+autocmd BufEnter,BufWritePost *.proto :call PrototoolFormat()
 autocmd BufNewFile *.proto :call PrototoolCreate()

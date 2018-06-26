@@ -25,25 +25,25 @@ import (
 )
 
 type flags struct {
-	cachePath           string
-	callTimeout         string
-	connectTimeout      string
-	debug               bool
-	diffMode            bool
-	dirMode             bool
-	disableFormat       bool
-	disableLint         bool
-	gen                 bool
-	harbormaster        bool
-	headers             []string
-	keepaliveTime       string
-	lintMode            bool
-	overwrite           bool
-	pkg                 string
-	printFields         string
-	protocURL           string
-	uncomment           bool
-	noUpdateFileOptions bool
+	cachePath      string
+	callTimeout    string
+	connectTimeout string
+	debug          bool
+	diffMode       bool
+	dirMode        bool
+	disableFormat  bool
+	disableLint    bool
+	gen            bool
+	harbormaster   bool
+	headers        []string
+	keepaliveTime  string
+	lintMode       bool
+	overwrite      bool
+	pkg            string
+	printFields    string
+	protocURL      string
+	uncomment      bool
+	noRewrite      bool
 }
 
 func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
@@ -118,7 +118,6 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
 }
 
-
-func (f *flags) bindNoUpdateFileOptions(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.noUpdateFileOptions, "no-update-file-options", false, "Do not update the file options go_package, java_multiple_files, java_outer_classname, and java_package to match the package per the guidelines of the style guide.")
+func (f *flags) bindNoRewrite(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.noRewrite, "no-rewrite", false, "Do not rewrite the file options go_package, java_multiple_files, java_outer_classname, and java_package to match the package per the guidelines of the style guide.")
 }

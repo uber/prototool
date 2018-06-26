@@ -8,8 +8,8 @@ package foo; // inline comment3
 
 // comment16
 option (bar.file_dep_option) = {
-	hello: 1
-	bar: 2
+  hello: 1
+  bar: 2
 }; // inline comment16
 // comment6
 option (bar.file_option) = true; // inline comment6
@@ -38,123 +38,123 @@ import "google/protobuf/timestamp.proto"; // inline comment9
 
 // Baz is a baz.
 message Baz {
-	// comment14
-	// still comment14
-	option (bar.message_option) = true; // inline comment14
-	//
-	//  comment c-style
-	//  
-	option (bar.message_option_proto2) = true;
-	// comment15
-	option (bar.message_dep_option) = {
-		hello: 1
-	}; // inline comment15
-	int64 hello = 1;
-	// unassociated comment
+  // comment14
+  // still comment14
+  option (bar.message_option) = true; // inline comment14
+  //
+  //  comment c-style
+  //  
+  option (bar.message_option_proto2) = true;
+  // comment15
+  option (bar.message_dep_option) = {
+    hello: 1
+  }; // inline comment15
+  int64 hello = 1;
+  // unassociated comment
 
-	// another unassociated comment
+  // another unassociated comment
 
-	// dep comment
-	bar.Dep dep = 2;
-	google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
-	int64 woot = 5 [
-		(bar.field_option) = true
-	];
-	// comment17
-	int64 woot2 = 6 [
-		(bar.field_dep_option) = {
-			hello: 1
-		},
-		(bar.field_option) = true
-	]; // inline comment17
-	map<string, int64> m = 11;
-	map<string, int64> m2 = 12 [
-		(bar.field_dep_option) = {
-			hello: 1
-		},
-		(bar.field_option) = true
-	];
-	oneof test_oneof {
-		// TODO: readd when oneof options handled
-		option (bar.oneof_option) = true; // inline comment18
-		option (bar.oneof_dep_option) = {
-			hello: 1
-		}; // inline comment19
-		int64 foo1 = 8;
-		string foo2 = 9;
-		// comment18
-		int64 woot3 = 10 [
-			(bar.field_dep_option) = {
-				hello: 1
-			},
-			(bar.field_option) = true
-		]; // inline comment18
-		// comment21
-		bar.Dep dep2 = 14; // inline comment21
-	}
-	int64 test_repeated_field_option = 15 [
-		(bar.repeated_field_option) = 1,
-		(bar.repeated_field_option) = 2
-	];
-	int64 test_repeated_dep_option = 16 [
-		(bar.field_dep_option) = {
-			hello: 1
-			repeated_bar: [
-				1,
-				2
-			]
-		},
-		(bar.repeated_field_dep_option) = {
-			hello: 1
-			recursive: {
-				hello: 2
-				repeated_bar: [
-					3,
-					4
-				]
-			}
-		},
-		(bar.repeated_field_dep_option) = {
-			hello: 5
-			recursive: {
-				hello: 6
-				repeated_bar: [
-					7,
-					8
-				]
-			}
-		},
-		(bar.repeated_field_dep_option) = {
-			hello: 1
-			repeated_dep: [
-				{
-					hello: 1
-					repeated_bar: [
-						1,
-						2
-					]
-				},
-				{
-					hello: 3
-					repeated_bar: [
-						3,
-						4
-					]
-				}
-			]
-		}
-	];
+  // dep comment
+  bar.Dep dep = 2;
+  google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
+  int64 woot = 5 [
+    (bar.field_option) = true
+  ];
+  // comment17
+  int64 woot2 = 6 [
+    (bar.field_dep_option) = {
+      hello: 1
+    },
+    (bar.field_option) = true
+  ]; // inline comment17
+  map<string, int64> m = 11;
+  map<string, int64> m2 = 12 [
+    (bar.field_dep_option) = {
+      hello: 1
+    },
+    (bar.field_option) = true
+  ];
+  oneof test_oneof {
+    // TODO: readd when oneof options handled
+    option (bar.oneof_option) = true; // inline comment18
+    option (bar.oneof_dep_option) = {
+      hello: 1
+    }; // inline comment19
+    int64 foo1 = 8;
+    string foo2 = 9;
+    // comment18
+    int64 woot3 = 10 [
+      (bar.field_dep_option) = {
+        hello: 1
+      },
+      (bar.field_option) = true
+    ]; // inline comment18
+    // comment21
+    bar.Dep dep2 = 14; // inline comment21
+  }
+  int64 test_repeated_field_option = 15 [
+    (bar.repeated_field_option) = 1,
+    (bar.repeated_field_option) = 2
+  ];
+  int64 test_repeated_dep_option = 16 [
+    (bar.field_dep_option) = {
+      hello: 1
+      repeated_bar: [
+        1,
+        2
+      ]
+    },
+    (bar.repeated_field_dep_option) = {
+      hello: 1
+      recursive: {
+        hello: 2
+        repeated_bar: [
+          3,
+          4
+        ]
+      }
+    },
+    (bar.repeated_field_dep_option) = {
+      hello: 5
+      recursive: {
+        hello: 6
+        repeated_bar: [
+          7,
+          8
+        ]
+      }
+    },
+    (bar.repeated_field_dep_option) = {
+      hello: 1
+      repeated_dep: [
+        {
+          hello: 1
+          repeated_bar: [
+            1,
+            2
+          ]
+        },
+        {
+          hello: 3
+          repeated_bar: [
+            3,
+            4
+          ]
+        }
+      ]
+    }
+  ];
 }
 
 // Bat is a bat.
 message Bat {
-	reserved 2 to 10, 1000 to 1100;
-	reserved "foo";
-	reserved "bar", "baz";
-	// NestedBat is a nested bat.
-	message NestedBat {
-		int64 hello = 1;
-	}
+  reserved 2 to 10, 1000 to 1100;
+  reserved "foo";
+  reserved "bar", "baz";
+  // NestedBat is a nested bat.
+  message NestedBat {
+    int64 hello = 1;
+  }
 }
 
 // Empty is an empty message.
@@ -162,34 +162,34 @@ message Empty {}
 
 // Something is something.
 enum Something {
-	option (bar.enum_option) = true;
-	// comment25
-	 SOMETHING_INVALID = 0 [
-		(bar.enum_value_option) = true
-	]; // inline comment25
-	// comment27
-	SOMETHING_UNSET = 1; // inline comment27
-	// comment28
-	SOMETHING_FOO = 2; // inline comment28
+  option (bar.enum_option) = true;
+  // comment25
+   SOMETHING_INVALID = 0 [
+    (bar.enum_value_option) = true
+  ]; // inline comment25
+  // comment27
+  SOMETHING_UNSET = 1; // inline comment27
+  // comment28
+  SOMETHING_FOO = 2; // inline comment28
 }
 
 // Daylight is the daylight service.
 service Daylight {
-	option (bar.service_option) = true; // inline comment29
-	option (bar.service_dep_option) = {
-		hello: 1
-	}; // inline comment30
-	rpc Hello(Bat) returns (Empty) {
-		option (bar.method_dep_option) = {
-			hello: 1
-			bar: 2
-			recursive: {
-				hello: 3
-				recursive: {
-					bar: 2
-				}
-			}
-		}; // inline comment22
-	} // inline comment23
-	rpc Foo(Empty) returns (Bat); // inline comment24
+  option (bar.service_option) = true; // inline comment29
+  option (bar.service_dep_option) = {
+    hello: 1
+  }; // inline comment30
+  rpc Hello(Bat) returns (Empty) {
+    option (bar.method_dep_option) = {
+      hello: 1
+      bar: 2
+      recursive: {
+        hello: 3
+        recursive: {
+          bar: 2
+        }
+      }
+    }; // inline comment22
+  } // inline comment23
+  rpc Foo(Empty) returns (Bat); // inline comment24
 }

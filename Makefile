@@ -37,12 +37,12 @@ golden: install
 		rm -f $${file}; \
 	done
 	for file in $(shell find internal/cmd/testdata/format -name '*.proto'); do \
-		prototool format --no-update-file-options $${file} > $${file}.golden || true; \
+		prototool format --no-rewrite $${file} > $${file}.golden || true; \
 	done
-	for file in $(shell find internal/cmd/testdata/format-update-file-options -name '*.proto.golden'); do \
+	for file in $(shell find internal/cmd/testdata/format-rewrite -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
-	for file in $(shell find internal/cmd/testdata/format-update-file-options -name '*.proto'); do \
+	for file in $(shell find internal/cmd/testdata/format-rewrite -name '*.proto'); do \
 		prototool format $${file} > $${file}.golden || true; \
 	done
 
