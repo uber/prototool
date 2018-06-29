@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Package exec brings all the functionality of Prototool together in a format
+// easily consumable by CLI libraries. It is effectively the glue between
+// internal/cmd and all other packages.
 package exec
 
 import (
@@ -38,6 +41,9 @@ func (e *ExitError) Error() string {
 }
 
 // Runner runs commands.
+//
+// The args given are the args from the command line.
+// Each additional parameter generally refers to a command-specific flag.
 type Runner interface {
 	Init(args []string, uncomment bool) error
 	Create(args []string, pkg string) error
@@ -117,6 +123,9 @@ func RunnerWithHarbormaster() RunnerOption {
 }
 
 // NewRunner returns a new Runner.
+//
+// workDirPath should generally be the current directory.
+// input and output generally refer to stdin and stdout.
 func NewRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) Runner {
 	return newRunner(workDirPath, input, output, options...)
 }

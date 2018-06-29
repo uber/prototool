@@ -394,7 +394,7 @@ Before submitting a PR, make sure to:
 - Run `make generate` to make sure there is no diff.
 - Run `make` to make sure all tests pass. This is functionally equivalent to the tests run on CI.
 
-A note on package layout: all Golang code except for `cmd/prototool/main.go` is purposefully under the `internal` package to not expose any API for the time being. Within the internal package, anything under `internal/x` has not been reviewed, and is especially unstable. Any package in `internal` not in `internal/x` has been fully reviewed and is more stable.
+All Golang code except for `cmd/prototool/main.go` is purposefully under the `internal` package to not expose any API for the time being.
 
 ## Special Thanks
 
