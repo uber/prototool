@@ -173,7 +173,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			absPath = filepath.Clean(plugin.Output)
 			relPath, err = filepath.Rel(dirPath, absPath)
 			if err != nil {
-				return Config{}, fmt.Errorf("failed to resolve relative path to the output directory of %s: %s", plugin.Name, err)
+				return Config{}, fmt.Errorf("failed to resolve plugin %q output absolute path %q to a relative path with base %q: %v", plugin.Name, absPath, dirPath, err)
 			}
 		} else {
 			relPath = plugin.Output
