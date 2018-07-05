@@ -162,14 +162,22 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		if plugin.Output == "" {
 			return Config{}, fmt.Errorf("output path required for plugin %s", plugin.Name)
 		}
-		if filepath.IsAbs(plugin.Output) {
-			return Config{}, fmt.Errorf("output path must be a relative path for plugin %s", plugin.Name)
-		}
 		path := ""
 		if len(e.Gen.PluginOverrides) > 0 {
 			if override, ok := e.Gen.PluginOverrides[plugin.Name]; ok && override != "" {
 				path = override
 			}
+		}
+		var relPath, absPath string
+		if filepath.IsAbs(plugin.Output) {
+			absPath = filepath.Clean(plugin.Output)
+			relPath, err = filepath.Rel(dirPath, absPath)
+			if err != nil {
+				return Config{}, fmt.Errorf("failed to resolve plugin %q output absolute path %q to a relative path with base %q: %v", plugin.Name, absPath, dirPath, err)
+			}
+		} else {
+			relPath = plugin.Output
+			absPath = filepath.Clean(filepath.Join(dirPath, relPath))
 		}
 		genPlugins[i] = GenPlugin{
 			Name:  plugin.Name,
@@ -177,8 +185,8 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			Type:  genPluginType,
 			Flags: plugin.Flags,
 			OutputPath: OutputPath{
-				RelPath: plugin.Output,
-				AbsPath: filepath.Clean(filepath.Join(dirPath, plugin.Output)),
+				RelPath: relPath,
+				AbsPath: absPath,
 			},
 		}
 	}
