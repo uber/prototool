@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - A linter to verify that no enum uses the option `allow_alias.`
-
+### Changed
+- The protoc-commands command is now accessible via the `dry-run`
+  flag for compile, format, gen, and lint.
 
 ## [0.4.0] - 2018-06-22
 ### Added

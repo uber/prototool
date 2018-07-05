@@ -183,23 +183,23 @@ func (r *runner) Files(args []string) error {
 	return nil
 }
 
-func (r *runner) Compile(args []string) error {
+func (r *runner) Compile(args []string, dryRun bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	_, err = r.compile(false, false, meta)
+	_, err = r.compile(false, false, dryRun, meta)
 	return err
 }
 
-func (r *runner) Gen(args []string) error {
+func (r *runner) Gen(args []string, dryRun bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	_, err = r.compile(true, false, meta)
+	_, err = r.compile(true, false, dryRun, meta)
 	return err
 }
 
@@ -215,7 +215,7 @@ func (r *runner) DescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -245,7 +245,7 @@ func (r *runner) FieldDescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -275,7 +275,7 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -293,7 +293,10 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 	return r.println(data)
 }
 
-func (r *runner) compile(doGen bool, doFileDescriptorSet bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
+func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
+	if dryRun {
+		return nil, r.printCommands(doGen, meta.ProtoSets...)
+	}
 	compileResult, err := r.newCompiler(doGen, doFileDescriptorSet).Compile(meta.ProtoSets...)
 	if err != nil {
 		return nil, err
@@ -308,13 +311,8 @@ func (r *runner) compile(doGen bool, doFileDescriptorSet bool, meta *meta) ([]*d
 	return compileResult.FileDescriptorSets, nil
 }
 
-func (r *runner) ProtocCommands(args []string, genCommands bool) error {
-	meta, err := r.getMeta(args)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	commands, err := r.newCompiler(genCommands, false).ProtocCommands(meta.ProtoSets...)
+func (r *runner) printCommands(doGen bool, protoSets ...*file.ProtoSet) error {
+	commands, err := r.newCompiler(doGen, false).ProtocCommands(protoSets...)
 	if err != nil {
 		return err
 	}
@@ -326,13 +324,13 @@ func (r *runner) ProtocCommands(args []string, genCommands bool) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string) error {
+func (r *runner) Lint(args []string, dryRun bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, meta); err != nil {
+	if _, err := r.compile(false, false, dryRun, meta); err != nil {
 		return err
 	}
 	return r.lint(meta)
@@ -391,7 +389,7 @@ func (r *runner) ListAllLintGroups() error {
 	return nil
 }
 
-func (r *runner) Format(args []string, overwrite bool, diffMode bool, lintMode bool, rewrite bool) error {
+func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite, dryRun bool) error {
 	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
@@ -400,13 +398,16 @@ func (r *runner) Format(args []string, overwrite bool, diffMode bool, lintMode b
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, meta); err != nil {
+	if _, err := r.compile(false, false, dryRun, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, rewrite, meta)
+	return r.format(overwrite, diffMode, lintMode, rewrite, dryRun, meta)
 }
 
-func (r *runner) format(overwrite bool, diffMode bool, lintMode bool, rewrite bool, meta *meta) error {
+func (r *runner) format(overwrite, diffMode, lintMode, rewrite, dryRun bool, meta *meta) error {
+	if dryRun {
+		return nil
+	}
 	success := true
 	for _, protoSet := range meta.ProtoSets {
 		for _, protoFiles := range protoSet.DirPathToFiles {
@@ -494,7 +495,7 @@ func (r *runner) BinaryToJSON(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -525,7 +526,7 @@ func (r *runner) JSONToBinary(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -540,30 +541,30 @@ func (r *runner) JSONToBinary(args []string) error {
 	return err
 }
 
-func (r *runner) All(args []string, disableFormat bool, disableLint bool, rewrite bool) error {
+func (r *runner) All(args []string, disableFormat, disableLint, rewrite, dryRun bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, meta); err != nil {
+	if _, err := r.compile(false, false, dryRun, meta); err != nil {
 		return err
 	}
-	if !disableFormat {
-		if err := r.format(true, false, false, rewrite, meta); err != nil {
+	if !disableFormat && !dryRun {
+		if err := r.format(true, false, false, rewrite, dryRun, meta); err != nil {
 			return err
 		}
 	}
-	if _, err := r.compile(true, false, meta); err != nil {
+	if _, err := r.compile(true, false, dryRun, meta); err != nil {
 		return err
 	}
-	if !disableLint {
+	if !disableLint && !dryRun {
 		return r.lint(meta)
 	}
 	return nil
 }
 
-func (r *runner) GRPC(args []string, headers []string, callTimeout string, connectTimeout string, keepaliveTime string) error {
+func (r *runner) GRPC(args, headers []string, callTimeout, connectTimeout, keepaliveTime string) error {
 	if len(args) < 3 {
 		return nil
 	}
@@ -608,7 +609,7 @@ func (r *runner) GRPC(args []string, headers []string, callTimeout string, conne
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}

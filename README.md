@@ -29,7 +29,6 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
     * [prototool format](#prototool-format)
     * [prototool create](#prototool-create)
     * [prototool files](#prototool-files)
-    * [prototool protoc-commands](#prototool-protoc-commands)
     * [prototool grpc](#prototool-grpc)
   * [gRPC Example](#grpc-example)
   * [Tips and Tricks](#tips-and-tricks)
@@ -65,8 +64,6 @@ prototool files idl/uber # list the files that will be used after applying exclu
 prototool list-linters # list all current lint rules being used
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
 prototool gen idl/uber # generate stubs, see the generation directives in the config file example
-prototool protoc-commands idl/uber # print out the protoc commands that would be invoked with prototool compile idl/uber
-prototool protoc-commands --gen idl/uber # print out the protoc commands that would be invoked with prototool gen idl/uber
 prototool grpc idl/uber 0.0.0.0:8080 foo.ExcitedService/Exclamation '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
 cd $(prototool download) # download prints out the cached protoc dir, so this changes to the cache directory
 ```
@@ -243,10 +240,6 @@ If [Vim integration](#vim-integration) is set up, files will be generated when y
 ##### `prototool files`
 
 Print the list of all files that will be used given the input `dirOrProtoFiles...`. Useful for debugging.
-
-##### `prototool protoc-commands`
-
-Print all `protoc` commands that would be run on `prototool compile`. Add the `--gen` flag to print all commands that would be run on `prototool gen`.
 
 ##### `prototool grpc`
 
