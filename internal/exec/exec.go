@@ -56,15 +56,15 @@ type Runner interface {
 	DescriptorProto(args []string) error
 	FieldDescriptorProto(args []string) error
 	ServiceDescriptorProto(args []string) error
-	Lint(args []string, dryRun bool) error
+	Lint(args []string) error
 	ListLinters() error
 	ListAllLinters() error
 	ListLintGroup(group string) error
 	ListAllLintGroups() error
-	Format(args []string, overwrite, diffMode, lintMode, rewrite, dryRun bool) error
+	Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error
-	All(args []string, disableFormat, disableLint, rewrite, dryRun bool) error
+	All(args []string, disableFormat, disableLint, rewrite bool) error
 	GRPC(args, headers []string, callTimeout, connectTimeout, keepaliveTime string) error
 }
 

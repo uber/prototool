@@ -100,7 +100,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.All(args, flags.disableFormat, flags.disableLint, !flags.noRewrite, flags.dryRun)
+				return runner.All(args, flags.disableFormat, flags.disableLint, !flags.noRewrite)
 			})
 		},
 	}
@@ -191,7 +191,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Format a proto file and compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, !flags.noRewrite, flags.dryRun)
+				return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, !flags.noRewrite)
 			})
 		},
 	}
@@ -248,7 +248,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Use:   "lint dirOrProtoFiles...",
 		Short: "Lint proto files and compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args, flags.dryRun) })
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args) })
 		},
 	}
 	flags.bindDirMode(lintCmd.PersistentFlags())

@@ -324,13 +324,13 @@ func (r *runner) printCommands(doGen bool, protoSets ...*file.ProtoSet) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string, dryRun bool) error {
+func (r *runner) Lint(args []string) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, dryRun, meta); err != nil {
+	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
 	return r.lint(meta)
@@ -389,7 +389,7 @@ func (r *runner) ListAllLintGroups() error {
 	return nil
 }
 
-func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite, dryRun bool) error {
+func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error {
 	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
@@ -398,16 +398,13 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite, d
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, dryRun, meta); err != nil {
+	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, rewrite, dryRun, meta)
+	return r.format(overwrite, diffMode, lintMode, rewrite, meta)
 }
 
-func (r *runner) format(overwrite, diffMode, lintMode, rewrite, dryRun bool, meta *meta) error {
-	if dryRun {
-		return nil
-	}
+func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta) error {
 	success := true
 	for _, protoSet := range meta.ProtoSets {
 		for _, protoFiles := range protoSet.DirPathToFiles {
@@ -541,24 +538,24 @@ func (r *runner) JSONToBinary(args []string) error {
 	return err
 }
 
-func (r *runner) All(args []string, disableFormat, disableLint, rewrite, dryRun bool) error {
+func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, dryRun, meta); err != nil {
+	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
-	if !disableFormat && !dryRun {
-		if err := r.format(true, false, false, rewrite, dryRun, meta); err != nil {
+	if !disableFormat {
+		if err := r.format(true, false, false, rewrite, meta); err != nil {
 			return err
 		}
 	}
-	if _, err := r.compile(true, false, dryRun, meta); err != nil {
+	if _, err := r.compile(true, false, false, meta); err != nil {
 		return err
 	}
-	if !disableLint && !dryRun {
+	if !disableLint {
 		return r.lint(meta)
 	}
 	return nil
