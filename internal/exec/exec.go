@@ -56,11 +56,7 @@ type Runner interface {
 	DescriptorProto(args []string) error
 	FieldDescriptorProto(args []string) error
 	ServiceDescriptorProto(args []string) error
-	Lint(args []string) error
-	ListLinters() error
-	ListAllLinters() error
-	ListLintGroup(group string) error
-	ListAllLintGroups() error
+	Lint(args []string, listGroup string, listAll, listConfigured, listGroups bool) error
 	Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error

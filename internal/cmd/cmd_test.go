@@ -532,7 +532,7 @@ func TestVersion(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, 0, "all\ndefault", "list-all-lint-groups")
+	assertExact(t, 0, "all\ndefault", "lint", "--list-groups")
 }
 
 func TestDescriptorProto(t *testing.T) {
@@ -637,11 +637,11 @@ func TestServiceDescriptorProto(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	assertLinters(t, lint.DefaultLinters, "list-linters")
+	assertLinters(t, lint.DefaultLinters, "lint", "--list-configured")
 }
 
 func TestListAllLinters(t *testing.T) {
-	assertLinters(t, lint.AllLinters, "list-all-linters")
+	assertLinters(t, lint.AllLinters, "lint", "--list-all")
 }
 
 func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
