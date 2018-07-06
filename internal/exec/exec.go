@@ -51,22 +51,21 @@ type Runner interface {
 	Download() error
 	Clean() error
 	Files(args []string) error
-	Compile(args []string) error
-	Gen(args []string) error
+	Compile(args []string, dryRun bool) error
+	Gen(args []string, dryRun bool) error
 	DescriptorProto(args []string) error
 	FieldDescriptorProto(args []string) error
 	ServiceDescriptorProto(args []string) error
-	ProtocCommands(args []string, genCommands bool) error
 	Lint(args []string) error
 	ListLinters() error
 	ListAllLinters() error
 	ListLintGroup(group string) error
 	ListAllLintGroups() error
-	Format(args []string, overwrite bool, diffMode bool, lintMode bool, rewrite bool) error
+	Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error
-	All(args []string, disableFormat bool, disableLint bool, rewrite bool) error
-	GRPC(args []string, headers []string, callTimeout string, connectTimeout string, keepaliveTime string) error
+	All(args []string, disableFormat, disableLint, rewrite bool) error
+	GRPC(args, headers []string, callTimeout, connectTimeout, keepaliveTime string) error
 }
 
 // RunnerOption is an option for a new Runner.

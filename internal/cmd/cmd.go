@@ -132,7 +132,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Use:   "compile dirOrProtoFiles...",
 		Short: "Compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Compile(args) })
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Compile(args, flags.dryRun) })
 		},
 	}
 	flags.bindDirMode(compileCmd.PersistentFlags())
@@ -204,7 +204,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Use:   "gen dirOrProtoFiles...",
 		Short: "Generate with protoc.",
 		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Gen(args) })
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Gen(args, flags.dryRun) })
 		},
 	}
 	flags.bindDirMode(genCmd.PersistentFlags())
@@ -289,16 +289,6 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		},
 	}
 
-	protocCommandsCmd := &cobra.Command{
-		Use:   "protoc-commands dirOrProtoFiles...",
-		Short: "Print the commands that would be run on compile or gen.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.ProtocCommands(args, flags.gen) })
-		},
-	}
-	flags.bindDirMode(protocCommandsCmd.PersistentFlags())
-	flags.bindGen(protocCommandsCmd.PersistentFlags())
-
 	serviceDescriptorProtoCmd := &cobra.Command{
 		Use:   "service-descriptor-proto dirOrProtoFiles... servicePath",
 		Short: "Get the service descriptor proto for the service path.",
@@ -338,13 +328,13 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	rootCmd.AddCommand(listAllLintGroupsCmd)
 	rootCmd.AddCommand(listLintersCmd)
 	rootCmd.AddCommand(listLintGroupCmd)
-	rootCmd.AddCommand(protocCommandsCmd)
 	rootCmd.AddCommand(serviceDescriptorProtoCmd)
 	rootCmd.AddCommand(versionCmd)
 
 	// flags bound to rootCmd are global flags
 	flags.bindCachePath(rootCmd.PersistentFlags())
 	flags.bindDebug(rootCmd.PersistentFlags())
+	flags.bindDryRun(rootCmd.PersistentFlags())
 	flags.bindHarbormaster(rootCmd.PersistentFlags())
 	flags.bindPrintFields(rootCmd.PersistentFlags())
 	flags.bindProtocURL(rootCmd.PersistentFlags())

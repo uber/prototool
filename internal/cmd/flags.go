@@ -33,7 +33,7 @@ type flags struct {
 	dirMode        bool
 	disableFormat  bool
 	disableLint    bool
-	gen            bool
+	dryRun         bool
 	harbormaster   bool
 	headers        []string
 	keepaliveTime  string
@@ -78,8 +78,8 @@ func (f *flags) bindDisableLint(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.disableLint, "disable-lint", false, "Do not run linting.")
 }
 
-func (f *flags) bindGen(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.gen, "gen", false, "Print the commands that would be run on gen instead of compile.")
+func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.dryRun, "dry-run", false, "Print the protoc commands that would have been run without actually running them.")
 }
 
 func (f *flags) bindHarbormaster(flagSet *pflag.FlagSet) {
