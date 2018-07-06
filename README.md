@@ -200,7 +200,7 @@ This matches what the linter expects. `SOME.PKG` will be computed as follows:
 - If `--package` is specified, `SOME.PKG` will be the value passed to `--package`.
 - Otherwise, if there is no `prototool.yaml` that would apply to the new file, use `uber.prototool.generated`.
 - Otherwise, if there is a `prototool.yaml` file, check if it has a `dir_to_base_package` setting under the
-  `create` section (see [etc/config/example/prototool.yaml](etc/config/example.prototool.yaml) for an example).
+  `create` section (see [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for an example).
   If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml`
   will be used.
 - Otherwise, if there is no `dir_to_base_package` directive, just use the relative path from the directory
