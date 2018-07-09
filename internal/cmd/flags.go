@@ -38,6 +38,10 @@ type flags struct {
 	headers        []string
 	keepaliveTime  string
 	lintMode       bool
+	listAll        bool
+	listConfigured bool
+	listGroups     bool
+	listGroup      string
 	overwrite      bool
 	pkg            string
 	printFields    string
@@ -96,6 +100,22 @@ func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.lintMode, "lint", "l", false, "Write a lint error saying that the file is not formatted instead of writing the formatted file to stdout.")
+}
+
+func (f *flags) bindListAll(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listAll, "list-all", false, "List all of the available linters.")
+}
+
+func (f *flags) bindListConfigured(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listConfigured, "list-configured", false, "List all of the configured linters.")
+}
+
+func (f *flags) bindListGroups(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listGroups, "list-groups", false, "List all of the available linter groups.")
+}
+
+func (f *flags) bindListGroup(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.listGroup, "list-group", "", "List all of the linters configured in the given group.")
 }
 
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {

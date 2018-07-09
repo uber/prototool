@@ -248,46 +248,16 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Use:   "lint dirOrProtoFiles...",
 		Short: "Lint proto files and compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args) })
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
+				return runner.Lint(args, flags.listGroup, flags.listAll, flags.listConfigured, flags.listGroups)
+			})
 		},
 	}
 	flags.bindDirMode(lintCmd.PersistentFlags())
-
-	listAllLintersCmd := &cobra.Command{
-		Use:   "list-all-linters",
-		Short: "List all available linters.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListAllLinters)
-		},
-	}
-
-	listAllLintGroupsCmd := &cobra.Command{
-		Use:   "list-all-lint-groups",
-		Short: "List all the available lint groups.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListAllLintGroups)
-		},
-	}
-
-	listLintersCmd := &cobra.Command{
-		Use:   "list-linters",
-		Short: "List the configurerd linters.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListLinters)
-		},
-	}
-
-	listLintGroupCmd := &cobra.Command{
-		Use:   "list-lint-group group",
-		Short: "List the linters in the given lint group.",
-		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.ListLintGroup(args[0]) })
-		},
-	}
+	flags.bindListAll(lintCmd.PersistentFlags())
+	flags.bindListConfigured(lintCmd.PersistentFlags())
+	flags.bindListGroups(lintCmd.PersistentFlags())
+	flags.bindListGroup(lintCmd.PersistentFlags())
 
 	serviceDescriptorProtoCmd := &cobra.Command{
 		Use:   "service-descriptor-proto dirOrProtoFiles... servicePath",
@@ -324,10 +294,6 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(jsonToBinaryCmd)
 	rootCmd.AddCommand(lintCmd)
-	rootCmd.AddCommand(listAllLintersCmd)
-	rootCmd.AddCommand(listAllLintGroupsCmd)
-	rootCmd.AddCommand(listLintersCmd)
-	rootCmd.AddCommand(listLintGroupCmd)
 	rootCmd.AddCommand(serviceDescriptorProtoCmd)
 	rootCmd.AddCommand(versionCmd)
 

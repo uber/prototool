@@ -324,7 +324,23 @@ func (r *runner) printCommands(doGen bool, protoSets ...*file.ProtoSet) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string) error {
+func (r *runner) Lint(args []string, listGroup string, listAll, listConfigured, listGroups bool) error {
+	if err := checkFlags(listAll, listConfigured, listGroups, listGroup != ""); err != nil {
+		return newExitErrorf(255, "%v: can only set one of list-all, list-configured, list-groups, list-group", err)
+	}
+	if listAll {
+		return r.printLinters(lint.AllLinters)
+	}
+	if listConfigured {
+		return r.listConfiguredLinters()
+	}
+	if listGroups {
+		return r.listLintGroups()
+	}
+	if listGroup != "" {
+		return r.listLintGroup(listGroup)
+	}
+
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
@@ -351,7 +367,7 @@ func (r *runner) lint(meta *meta) error {
 	return nil
 }
 
-func (r *runner) ListLinters() error {
+func (r *runner) listConfiguredLinters() error {
 	config, err := r.getConfig(r.workDirPath)
 	if err != nil {
 		return err
@@ -363,19 +379,7 @@ func (r *runner) ListLinters() error {
 	return r.printLinters(linters)
 }
 
-func (r *runner) ListAllLinters() error {
-	return r.printLinters(lint.AllLinters)
-}
-
-func (r *runner) ListLintGroup(group string) error {
-	linters, ok := lint.GroupToLinters[strings.ToLower(group)]
-	if !ok {
-		return newExitErrorf(255, "unknown lint group: %s", strings.ToLower(group))
-	}
-	return r.printLinters(linters)
-}
-
-func (r *runner) ListAllLintGroups() error {
+func (r *runner) listLintGroups() error {
 	groups := make([]string, 0, len(lint.GroupToLinters))
 	for group := range lint.GroupToLinters {
 		groups = append(groups, group)
@@ -389,9 +393,17 @@ func (r *runner) ListAllLintGroups() error {
 	return nil
 }
 
+func (r *runner) listLintGroup(group string) error {
+	linters, ok := lint.GroupToLinters[strings.ToLower(group)]
+	if !ok {
+		return newExitErrorf(255, "unknown lint group: %s", strings.ToLower(group))
+	}
+	return r.printLinters(linters)
+}
+
 func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error {
-	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
-		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
+	if err := checkFlags(overwrite, diffMode, lintMode); err != nil {
+		return newExitErrorf(255, "%v: can only set one of overwrite, diff, lint", err)
 	}
 	meta, err := r.getMeta(args)
 	if err != nil {
@@ -921,4 +933,17 @@ func absClean(path string) (string, error) {
 
 func newTabWriter(writer io.Writer) *tabwriter.Writer {
 	return tabwriter.NewWriter(writer, 0, 0, 2, ' ', 0)
+}
+
+// checkFlags verifies that only one of the given
+// flags (represented as bools), is set.
+func checkFlags(flags ...bool) error {
+	var set bool
+	for _, b := range flags {
+		if set && b {
+			return fmt.Errorf("multiple flags were provided")
+		}
+		set = b
+	}
+	return nil
 }
