@@ -25,9 +25,11 @@ import (
 )
 
 type flags struct {
+	address        string
 	cachePath      string
 	callTimeout    string
 	connectTimeout string
+	data           string
 	debug          bool
 	diffMode       bool
 	dirMode        bool
@@ -38,12 +40,18 @@ type flags struct {
 	headers        []string
 	keepaliveTime  string
 	lintMode       bool
+	method         string
 	overwrite      bool
 	pkg            string
 	printFields    string
 	protocURL      string
+	stdin          bool
 	uncomment      bool
 	noRewrite      bool
+}
+
+func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.address, "address", "", "The GRPC endpoint to connect to. This is required.")
 }
 
 func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
@@ -56,6 +64,10 @@ func (f *flags) bindCallTimeout(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindConnectTimeout(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.connectTimeout, "connect-timeout", "10s", "The maximum time to wait for the connection to be established.")
+}
+
+func (f *flags) bindData(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.data, "data", "", "The GRPC request data in JSON format. Either this or --stdin is required.")
 }
 
 func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
@@ -98,6 +110,10 @@ func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.lintMode, "lint", "l", false, "Write a lint error saying that the file is not formatted instead of writing the formatted file to stdout.")
 }
 
+func (f *flags) bindMethod(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.method, "method", "", "The GRPC method to call in the form package.Service/Method. This is required.")
+}
+
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.overwrite, "overwrite", "w", false, "Overwrite the existing file instead of writing the formatted file to stdout.")
 }
@@ -112,6 +128,10 @@ func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.protocURL, "protoc-url", "", "The url to use to download the protoc zip file, otherwise uses GitHub Releases. Setting this option will ignore the config protoc_version setting.")
+}
+
+func (f *flags) bindStdin(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.stdin, "stdin", false, "Read the GRPC request data from stdin in JSON format. Either this or --data is required.")
 }
 
 func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {

@@ -210,19 +210,23 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 	flags.bindDirMode(genCmd.PersistentFlags())
 
 	grpcCmd := &cobra.Command{
-		Use:   "grpc dirOrProtoFiles... serverAddress package.service/Method requestData",
-		Short: "Call a gRPC endpoint.",
+		Use:   "grpc dirOrProtoFiles...",
+		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.GRPC(args, flags.headers, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime)
+				return runner.GRPC(args, flags.address, flags.method, flags.data, flags.stdin, flags.headers, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime)
 			})
 		},
 	}
+	flags.bindAddress(grpcCmd.PersistentFlags())
 	flags.bindCallTimeout(grpcCmd.PersistentFlags())
 	flags.bindConnectTimeout(grpcCmd.PersistentFlags())
+	flags.bindData(grpcCmd.PersistentFlags())
 	flags.bindDirMode(grpcCmd.PersistentFlags())
 	flags.bindHeaders(grpcCmd.PersistentFlags())
 	flags.bindKeepaliveTime(grpcCmd.PersistentFlags())
+	flags.bindMethod(grpcCmd.PersistentFlags())
+	flags.bindStdin(grpcCmd.PersistentFlags())
 
 	initCmd := &cobra.Command{
 		Use:   "init [dirPath]",

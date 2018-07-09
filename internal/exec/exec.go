@@ -65,7 +65,7 @@ type Runner interface {
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error
 	All(args []string, disableFormat, disableLint, rewrite bool) error
-	GRPC(args, headers []string, callTimeout, connectTimeout, keepaliveTime string) error
+	GRPC(args []string, address string, method string, data string, stdin bool, headers []string, callTimeout, connectTimeout, keepaliveTime string) error
 }
 
 // RunnerOption is an option for a new Runner.

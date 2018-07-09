@@ -731,7 +731,7 @@ func assertJSONToBinaryToJSON(t *testing.T, filePath string, messagePath string,
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string) {
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), expectedExitCode, expectedLinePrefixes, "grpc", filePath, excitedTestCase.Address(), method, "-")
+	assertDoStdin(t, strings.NewReader(jsonData), expectedExitCode, expectedLinePrefixes, "grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin")
 }
 
 func assertRegexp(t *testing.T, expectedExitCode int, expectedRegexp string, args ...string) {
