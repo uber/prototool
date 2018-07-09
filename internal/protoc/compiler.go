@@ -81,21 +81,17 @@ func newCompiler(options ...CompilerOption) *compiler {
 	return compiler
 }
 
-func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) {
-	var allCmdMetas []*cmdMeta
-	for _, protoSet := range protoSets {
-		cmdMetas, err := c.getCmdMetas(protoSet)
-		if err != nil {
-			cleanCmdMetas(allCmdMetas)
-			return nil, err
-		}
-		allCmdMetas = append(allCmdMetas, cmdMetas...)
+func (c *compiler) Compile(protoSet *file.ProtoSet) (*CompileResult, error) {
+	cmdMetas, err := c.getCmdMetas(protoSet)
+	if err != nil {
+		cleanCmdMetas(cmdMetas)
+		return nil, err
 	}
 
 	// we potentially create temporary files if doFileDescriptorSet is true
 	// if so, we try to remove them when we return no matter what
 	// by putting this defer here, we get this catch early
-	defer cleanCmdMetas(allCmdMetas)
+	defer cleanCmdMetas(cmdMetas)
 
 	if c.doGen {
 		// the directories for the output files have to exist
@@ -104,7 +100,7 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 		// generated files potentially
 		// we know the directories from the output option in the
 		// config files
-		if err := c.makeGenDirs(protoSets...); err != nil {
+		if err := c.makeGenDirs(protoSet); err != nil {
 			return nil, err
 		}
 	}
@@ -112,7 +108,7 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 	var errs []error
 	var lock sync.Mutex
 	var wg sync.WaitGroup
-	for _, cmdMeta := range allCmdMetas {
+	for _, cmdMeta := range cmdMetas {
 		cmdMeta := cmdMeta
 		wg.Add(1)
 		go func() {
@@ -151,8 +147,8 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 		}, nil
 	}
 
-	fileDescriptorSets := make([]*descriptor.FileDescriptorSet, 0, len(allCmdMetas))
-	for _, cmdMeta := range allCmdMetas {
+	fileDescriptorSets := make([]*descriptor.FileDescriptorSet, 0, len(cmdMetas))
+	for _, cmdMeta := range cmdMetas {
 		// if doFileDescriptorSet is not set, we won't get a fileDescriptorSet anyways,
 		// so the end result will be an empty CompileResult at this point
 		fileDescriptorSet, err := getFileDescriptorSet(cmdMeta)
@@ -168,31 +164,27 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 	}, nil
 }
 
-func (c *compiler) ProtocCommands(protoSets ...*file.ProtoSet) ([]string, error) {
-	var cmdMetaStrings []string
-	for _, protoSet := range protoSets {
-		// we end up calling the logic that creates temporary files for file descriptor sets
-		// anyways, so we need to clean them up with cleanCmdMetas
-		// this logic could be simplified to have a "dry run" option, but ProtocCommands
-		// is more for debugging anyways
-		cmdMetas, err := c.getCmdMetas(protoSet)
-		if err != nil {
-			return nil, err
-		}
-		for _, cmdMeta := range cmdMetas {
-			cmdMetaStrings = append(cmdMetaStrings, cmdMeta.String())
-		}
-		cleanCmdMetas(cmdMetas)
+func (c *compiler) ProtocCommands(protoSet *file.ProtoSet) ([]string, error) {
+	// we end up calling the logic that creates temporary files for file descriptor sets
+	// anyways, so we need to clean them up with cleanCmdMetas
+	// this logic could be simplified to have a "dry run" option, but ProtocCommands
+	// is more for debugging anyways
+	cmdMetas, err := c.getCmdMetas(protoSet)
+	if err != nil {
+		return nil, err
 	}
+	cmdMetaStrings := make([]string, 0, len(cmdMetas))
+	for _, cmdMeta := range cmdMetas {
+		cmdMetaStrings = append(cmdMetaStrings, cmdMeta.String())
+	}
+	cleanCmdMetas(cmdMetas)
 	return cmdMetaStrings, nil
 }
 
-func (c *compiler) makeGenDirs(protoSets ...*file.ProtoSet) error {
+func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 	genDirs := make(map[string]struct{})
-	for _, protoSet := range protoSets {
-		for _, genPlugin := range protoSet.Config.Gen.Plugins {
-			genDirs[genPlugin.OutputPath.AbsPath] = struct{}{}
-		}
+	for _, genPlugin := range protoSet.Config.Gen.Plugins {
+		genDirs[genPlugin.OutputPath.AbsPath] = struct{}{}
 	}
 	for genDir := range genDirs {
 		// we could choose a different permission set, but this seems reasonable
