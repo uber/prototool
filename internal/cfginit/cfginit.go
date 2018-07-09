@@ -65,9 +65,9 @@ protoc_version: {{.ProtocVersion}}
   {{.V}}dir_to_base_package:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
-    {{.V}}.:bar
+    {{.V}}.: bar
     # This means that a file created "idl/code.uber/a/b/c.proto" will have package "uber.a.b".
-    {{.V}}idl/code.uber:uber
+    {{.V}}idl/code.uber: uber
 
 # Lint directives.
 {{.V}}lint:
