@@ -40,22 +40,14 @@ func newRunner(options ...RunnerOption) *runner {
 	return runner
 }
 
-func (r *runner) Run(protoSets ...*file.ProtoSet) ([]*text.Failure, error) {
-	var failures []*text.Failure
-	for _, protoSet := range protoSets {
-		linters, err := GetLinters(protoSet.Config.Lint)
-		if err != nil {
-			return nil, err
-		}
-		dirPathToDescriptors, err := GetDirPathToDescriptors(protoSet)
-		if err != nil {
-			return nil, err
-		}
-		iFailures, err := CheckMultiple(linters, dirPathToDescriptors, protoSet.Config.Lint.IgnoreIDToFilePaths)
-		if err != nil {
-			return nil, err
-		}
-		failures = append(failures, iFailures...)
+func (r *runner) Run(protoSet *file.ProtoSet) ([]*text.Failure, error) {
+	linters, err := GetLinters(protoSet.Config.Lint)
+	if err != nil {
+		return nil, err
 	}
-	return failures, nil
+	dirPathToDescriptors, err := GetDirPathToDescriptors(protoSet)
+	if err != nil {
+		return nil, err
+	}
+	return CheckMultiple(linters, dirPathToDescriptors, protoSet.Config.Lint.IgnoreIDToFilePaths)
 }
