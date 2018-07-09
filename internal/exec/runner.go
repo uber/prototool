@@ -171,12 +171,10 @@ func (r *runner) Files(args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, protoSet := range meta.ProtoSets {
-		for _, files := range protoSet.DirPathToFiles {
-			for _, file := range files {
-				if err := r.println(file.DisplayPath); err != nil {
-					return err
-				}
+	for _, files := range meta.ProtoSet.DirPathToFiles {
+		for _, file := range files {
+			if err := r.println(file.DisplayPath); err != nil {
+				return err
 			}
 		}
 	}
@@ -295,9 +293,9 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 
 func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
 	if dryRun {
-		return nil, r.printCommands(doGen, meta.ProtoSets...)
+		return nil, r.printCommands(doGen, meta.ProtoSet)
 	}
-	compileResult, err := r.newCompiler(doGen, doFileDescriptorSet).Compile(meta.ProtoSets...)
+	compileResult, err := r.newCompiler(doGen, doFileDescriptorSet).Compile(meta.ProtoSet)
 	if err != nil {
 		return nil, err
 	}
@@ -311,8 +309,8 @@ func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([
 	return compileResult.FileDescriptorSets, nil
 }
 
-func (r *runner) printCommands(doGen bool, protoSets ...*file.ProtoSet) error {
-	commands, err := r.newCompiler(doGen, false).ProtocCommands(protoSets...)
+func (r *runner) printCommands(doGen bool, protoSet *file.ProtoSet) error {
+	commands, err := r.newCompiler(doGen, false).ProtocCommands(protoSet)
 	if err != nil {
 		return err
 	}
@@ -338,7 +336,7 @@ func (r *runner) Lint(args []string) error {
 
 func (r *runner) lint(meta *meta) error {
 	r.logger.Debug("calling LintRunner")
-	failures, err := r.newLintRunner().Run(meta.ProtoSets...)
+	failures, err := r.newLintRunner().Run(meta.ProtoSet)
 	if err != nil {
 		return err
 	}
@@ -406,16 +404,14 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bo
 
 func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta) error {
 	success := true
-	for _, protoSet := range meta.ProtoSets {
-		for _, protoFiles := range protoSet.DirPathToFiles {
-			for _, protoFile := range protoFiles {
-				fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, rewrite, meta, protoFile)
-				if err != nil {
-					return err
-				}
-				if !fileSuccess {
-					success = false
-				}
+	for _, protoFiles := range meta.ProtoSet.DirPathToFiles {
+		for _, protoFile := range protoFiles {
+			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, rewrite, meta, protoFile)
+			if err != nil {
+				return err
+			}
+			if !fileSuccess {
+				success = false
 			}
 		}
 	}
@@ -734,7 +730,7 @@ func (r *runner) getConfig(dirPath string) (settings.Config, error) {
 }
 
 type meta struct {
-	ProtoSets []*file.ProtoSet
+	ProtoSet *file.ProtoSet
 	// this will be empty if not in dir mode
 	// if in dir mode, this will be the single filename that we want to return errors for
 	InDirModeSingleFilename string
@@ -752,32 +748,32 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 			return nil, err
 		}
 		if fileInfo.Mode().IsDir() {
-			protoSets, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
+			protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
 			if err != nil {
 				return nil, err
 			}
 			return &meta{
-				ProtoSets: protoSets,
+				ProtoSet: protoSet,
 			}, nil
 		}
 		// TODO: allow symlinks?
 		if fileInfo.Mode().IsRegular() {
 			if r.dirMode {
-				protoSets, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
+				protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
 				if err != nil {
 					return nil, err
 				}
 				return &meta{
-					ProtoSets:               protoSets,
+					ProtoSet:                protoSet,
 					InDirModeSingleFilename: fileOrDir,
 				}, nil
 			}
-			protoSets, err := r.protoSetProvider.GetForFiles(r.workDirPath, fileOrDir)
+			protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, fileOrDir)
 			if err != nil {
 				return nil, err
 			}
 			return &meta{
-				ProtoSets: protoSets,
+				ProtoSet: protoSet,
 			}, nil
 		}
 		return nil, fmt.Errorf("%s is not a directory or a regular file", fileOrDir)
@@ -792,12 +788,12 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 			return nil, fmt.Errorf("multiple arguments only allowed if all arguments are regular files, %q is not a regular file", arg)
 		}
 	}
-	protoSets, err := r.protoSetProvider.GetForFiles(r.workDirPath, args...)
+	protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, args...)
 	if err != nil {
 		return nil, err
 	}
 	return &meta{
-		ProtoSets: protoSets,
+		ProtoSet: protoSet,
 	}, nil
 }
 
@@ -870,11 +866,9 @@ func (r *runner) printLinters(linters []lint.Linter) error {
 }
 
 func (r *runner) printAffectedFiles(meta *meta) {
-	for _, protoSet := range meta.ProtoSets {
-		for _, files := range protoSet.DirPathToFiles {
-			for _, file := range files {
-				r.logger.Debug("using file", zap.String("file", file.DisplayPath))
-			}
+	for _, files := range meta.ProtoSet.DirPathToFiles {
+		for _, file := range files {
+			r.logger.Debug("using file", zap.String("file", file.DisplayPath))
 		}
 	}
 }
