@@ -88,35 +88,7 @@ The command `prototool init` will generate a config file in the current director
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
-While almost all projects should not have multiple `prototool.yaml` files (and this [may be enforced before v1.0](https://github.com/uber/prototool/issues/10)), as of now, multiple `prototool.yaml` files corresponding to multiple found directories with Protobuf files may be used. For example, if you have the following layout:
-
-```
-.
-├── a
-│   ├── d
-│   │   ├── file.proto
-│   │   ├── file2.proto
-│   │   ├── file3.proto
-│   │   └── prototool.yaml
-│   ├── e
-│   │   └── file.proto
-│   ├── f
-│   │   └── file.proto
-│   └── file.proto
-├── b
-│   ├── file.proto
-│   ├── g
-│   │   └── h
-│   │       └── file.proto
-│   └── prototool.yaml
-├── c
-│   ├── file.proto
-│   └── i
-│       └── file.proto
-└── prototool.yaml
-```
-
-Everything under `a/d` will use `a/d/prototool.yaml`, everything under `b`, `b/g/h` will use `b/prototool.yaml`, and everything under `a`, `a/e`, `a/f`, `c`, `c/i` will use `prototool.yaml`. See [internal/file/testdata](internal/file/testdata) for the most current example.
+If multiple `prototool.yaml` files are found that match the input directory or files, an error will be returned. We have an ongoing discussion about whether to allow multiple `prototool.yaml` files, see [this issue](https://github.com/uber/prototool/issues/10) for more details.
 
 ## File Discovery
 
