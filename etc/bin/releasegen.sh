@@ -41,7 +41,7 @@ for os in Darwin Linux; do
       -installsuffix cgo \
       -ldflags "-X 'github.com/uber/prototool/internal/x/vars.GitCommit=$(git rev-list -1 HEAD)' -X 'github.com/uber/prototool/internal/x/vars.BuiltTimestamp=$(date -u)'" \
       -o "${dir}/bin/prototool" \
-      cmd/prototool/main.go
+      internal/cmd/prototool/main.go
     tar -C "${tar_context_dir}" -cvzf "${BASE_DIR}/prototool-${os}-${arch}.tar.gz" "${tar_dir}"
     cp "${dir}/bin/prototool" "${BASE_DIR}/prototool-${os}-${arch}"
   done

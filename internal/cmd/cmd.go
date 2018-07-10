@@ -20,7 +20,7 @@
 
 // Package cmd contains the logic to setup Prototool with github.com/spf13/cobra.
 //
-// The packages cmd/prototool, internal/gen/gen-prototool-bash-completion,
+// The packages internal/cmd/prototool, internal/gen/gen-prototool-bash-completion,
 // internal/gen/gen-prototool-manpages and internal/gen/gen-prototool-zsh-completion
 // are main packages that call into this package, and this package calls into
 // internal/exec to execute the logic.

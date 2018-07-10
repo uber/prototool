@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   as opposed to parsing these from variable-length command args.
 - If more than one `prototool.yaml` is found for the input directory or files,
   an error is returned.
+- The `prototool` binary package is move under `internal` so that users can not
+  `go get` the binary for installation, to prevent errors.
 
 
 ## [0.4.0] - 2018-06-22
