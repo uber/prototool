@@ -39,6 +39,8 @@ type flags struct {
 	harbormaster   bool
 	headers        []string
 	keepaliveTime  string
+	listAllLinters bool
+	listLinters    bool
 	lintMode       bool
 	method         string
 	overwrite      bool
@@ -108,6 +110,14 @@ func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.lintMode, "lint", "l", false, "Write a lint error saying that the file is not formatted instead of writing the formatted file to stdout.")
+}
+
+func (f *flags) bindListAllLinters(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listAllLinters, "list-all-linters", false, "List all available linters instead of running lint.")
+}
+
+func (f *flags) bindListLinters(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listLinters, "list-linters", false, "List the configured linters instead of running lint.")
 }
 
 func (f *flags) bindMethod(flagSet *pflag.FlagSet) {

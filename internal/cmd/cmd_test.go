@@ -637,11 +637,11 @@ func TestServiceDescriptorProto(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	assertLinters(t, lint.DefaultLinters, "list-linters")
+	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters")
 }
 
 func TestListAllLinters(t *testing.T) {
-	assertLinters(t, lint.AllLinters, "list-all-linters")
+	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters")
 }
 
 func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {

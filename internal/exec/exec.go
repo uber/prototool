@@ -56,9 +56,7 @@ type Runner interface {
 	DescriptorProto(args []string) error
 	FieldDescriptorProto(args []string) error
 	ServiceDescriptorProto(args []string) error
-	Lint(args []string) error
-	ListLinters() error
-	ListAllLinters() error
+	Lint(args []string, listAllLinters bool, listLinters bool) error
 	ListLintGroup(group string) error
 	ListAllLintGroups() error
 	Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error

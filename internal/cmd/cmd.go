@@ -260,19 +260,12 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 		Use:   "lint dirOrProtoFiles...",
 		Short: "Lint proto files and compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args) })
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args, flags.listAllLinters, flags.listLinters) })
 		},
 	}
 	flags.bindDirMode(lintCmd.PersistentFlags())
-
-	listAllLintersCmd := &cobra.Command{
-		Use:   "list-all-linters",
-		Short: "List all available linters.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListAllLinters)
-		},
-	}
+	flags.bindListAllLinters(lintCmd.PersistentFlags())
+	flags.bindListLinters(lintCmd.PersistentFlags())
 
 	listAllLintGroupsCmd := &cobra.Command{
 		Use:   "list-all-lint-groups",
@@ -280,15 +273,6 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListAllLintGroups)
-		},
-	}
-
-	listLintersCmd := &cobra.Command{
-		Use:   "list-linters",
-		Short: "List the configurerd linters.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListLinters)
 		},
 	}
 
@@ -344,9 +328,7 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 		rootCmd.AddCommand(downloadCmd)
 		rootCmd.AddCommand(fieldDescriptorProtoCmd)
 		rootCmd.AddCommand(jsonToBinaryCmd)
-		rootCmd.AddCommand(listAllLintersCmd)
 		rootCmd.AddCommand(listAllLintGroupsCmd)
-		rootCmd.AddCommand(listLintersCmd)
 		rootCmd.AddCommand(listLintGroupCmd)
 		rootCmd.AddCommand(serviceDescriptorProtoCmd)
 
