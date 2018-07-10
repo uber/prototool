@@ -8,8 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - A linter to verify that no enum uses the option `allow_alias.`
 ### Changed
-- The protoc-commands command is now accessible via the `dry-run`
-  flag for compile, format, gen, and lint.
+- The commands binary-to-json, clean, descriptor-proto, download,
+  field-descriptor-proto, json-to-binary, list-all-linters,
+  list-all-lint-groups, list-linters, list-lint-group,
+  service-descriptor-proto are deleted to reduce the surface area
+  for the v1.0 release.
+- The commands list-all-linters and list-linters are now flags
+  on lint.
+- The flags --cache-path and --print-fields are deleted to reduce the
+  surface area for the v1.0 release.
+- The protoc-commands command is now accessible via the --dry-run
+  flag for compile and gen.
 - The grpc command now takes flags for address, method, and data or stdin
   as opposed to parsing these from variable-length command args.
 - If more than one `prototool.yaml` is found for the input directory or files,

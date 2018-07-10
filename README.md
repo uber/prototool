@@ -61,11 +61,10 @@ prototool lint idl/uber # directory mode, search for all .proto files recursivel
 prototool lint # same as "prototool lint .", by default the current directory is used in directory mode
 prototool create foo.proto # create the file foo.proto from a template that passes lint
 prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml files
-prototool list-linters # list all current lint rules being used
+prototool lint --list-linters # list all current lint rules being used
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
 prototool gen idl/uber # generate stubs, see the generation directives in the config file example
-prototool grpc idl/uber 0.0.0.0:8080 foo.ExcitedService/Exclamation '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
-cd $(prototool download) # download prints out the cached protoc dir, so this changes to the cache directory
+prototool grpc idl/uber --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --data '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
 ```
 
 ## Full Example
