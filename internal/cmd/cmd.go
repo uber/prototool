@@ -214,7 +214,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.GRPC(args, flags.address, flags.method, flags.data, flags.stdin, flags.headers, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime)
+				return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
 			})
 		},
 	}

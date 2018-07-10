@@ -561,7 +561,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) er
 	return nil
 }
 
-func (r *runner) GRPC(args []string, address string, method string, data string, stdin bool, headers []string, callTimeout, connectTimeout, keepaliveTime string) error {
+func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool) error {
 	if address == "" {
 		return newExitErrorf(255, "must set address")
 	}
