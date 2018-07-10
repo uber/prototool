@@ -52,7 +52,7 @@ curl -sSL https://github.com/uber/prototool/releases/download/v0.4.0/prototool-$
 
 Prototool is purposefully all put under internal in an attempt to emphasize that you should not install `prototool` with `go get`.
 Although you can technically `go get` from `internal`, we do not check in the vendor directory, so `go get` will not respect the
-versions in `glide.yaml`. We have specific version requirements, so not using these can and probably will result in errors building
+versions in `glide.yaml`. We have specific version requirements, so not using these can and probably will result in errors when building
 `prototool` and/or result in unexpected runtime errors.
 
 ## Quick Start
