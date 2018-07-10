@@ -894,7 +894,8 @@ func testDoInternal(stdin io.Reader, args ...string) (string, int) {
 		stdin = os.Stdin
 	}
 	buffer := bytes.NewBuffer(nil)
-	exitCode := Do(args, stdin, buffer, os.Stderr)
+	// develMode is on, so we have access to all commands
+	exitCode := do(true, args, stdin, buffer, os.Stderr)
 	return strings.TrimSpace(buffer.String()), exitCode
 }
 

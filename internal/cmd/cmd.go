@@ -50,22 +50,26 @@ var genManTime = time.Date(2018, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 // Do runs the command logic.
 func Do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(args, stdin, stdout, stderr, (*cobra.Command).Execute)
+	return do(false, args, stdin, stdout, stderr)
+}
+
+func do(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
+	return runRootCommand(develMode, args, stdin, stdout, stderr, (*cobra.Command).Execute)
 }
 
 // GenBashCompletion generates a bash completion file to the writer.
 func GenBashCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
+	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
 }
 
 // GenZshCompletion generates a zsh completion file to the writer.
 func GenZshCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
+	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
 }
 
 // GenManpages generates the manpages to the given directory.
 func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
+	return runRootCommand(false, args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
 		if len(args) != 1 {
 			return fmt.Errorf("usage: %s dirPath", os.Args[0])
 		}
@@ -78,11 +82,13 @@ func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Wri
 	})
 }
 
-func runRootCommandOutput(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
-	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
+// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
+func runRootCommandOutput(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
+	return runRootCommand(develMode, args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
 }
 
-func runRootCommand(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
+// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
+func runRootCommand(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
 	if err := checkOS(); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
