@@ -67,7 +67,7 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*Proto
 		for _, protoSet := range protoSets {
 			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
 		}
-		return nil, fmt.Errorf("multiple configuration files found in directories %v for proto files found for dirPath %q but expected exactly one configuration file", configDirPaths, dirPath)
+		return nil, fmt.Errorf("expected exactly one configuration file for dirPath %q, but found multiple in directories: %v", dirPath, configDirPaths)
 	}
 }
 
@@ -86,7 +86,7 @@ func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) 
 		for _, protoSet := range protoSets {
 			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
 		}
-		return nil, fmt.Errorf("multiple configuration files found in directories %v for proto files found for filePaths %v but expected exactly one configuration file", configDirPaths, filePaths)
+		return nil, fmt.Errorf("expected exactly one configuration file for filePaths %v, but found multiple in directories: %v", filePaths, configDirPaths)
 	}
 }
 
