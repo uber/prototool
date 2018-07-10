@@ -50,6 +50,11 @@ curl -sSL https://github.com/uber/prototool/releases/download/v0.4.0/prototool-$
   chmod +x /usr/local/bin/prototool
 ```
 
+Prototool is purposefully all put under internal in an attempt to emphasize that you should not install `prototool` with `go get`.
+Although you can technically `go get` from `internal`, we do not check in the vendor directory, so `go get` will not respect the
+versions in `glide.yaml`. We have specific version requirements, so not using these can and probably will result in errors when building
+`prototool` and/or result in unexpected runtime errors.
+
 ## Quick Start
 
 We'll start with a general overview of the commands. There are more commands, and we will get into usage below, but this shows the basic functionality.
@@ -358,7 +363,7 @@ Before submitting a PR, make sure to:
 - Run `make generate` to make sure there is no diff.
 - Run `make` to make sure all tests pass. This is functionally equivalent to the tests run on CI.
 
-All Golang code except for `cmd/prototool/main.go` is purposefully under the `internal` package to not expose any API for the time being.
+All Golang code is purposefully under the `internal` package to not expose any API for the time being.
 
 ## Special Thanks
 

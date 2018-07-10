@@ -1,6 +1,6 @@
 SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/)
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
-BINS := github.com/uber/prototool/cmd/prototool
+BINS := github.com/uber/prototool/internal/cmd/prototool
 
 .PHONY: all
 all: lint cover
