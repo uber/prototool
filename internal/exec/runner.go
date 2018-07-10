@@ -561,14 +561,20 @@ func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) er
 	return nil
 }
 
-func (r *runner) GRPC(args, headers []string, callTimeout, connectTimeout, keepaliveTime string) error {
-	if len(args) < 3 {
-		return nil
+func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool) error {
+	if address == "" {
+		return newExitErrorf(255, "must set address")
 	}
-	address := args[len(args)-3]
-	method := args[len(args)-2]
-	reader := r.getInputReader(args[len(args)-1])
-	args = args[:len(args)-3]
+	if method == "" {
+		return newExitErrorf(255, "must set method")
+	}
+	if data == "" && !stdin {
+		return newExitErrorf(255, "must set one of data or stdin")
+	}
+	if data != "" && stdin {
+		return newExitErrorf(255, "must set only one of data or stdin")
+	}
+	reader := r.getInputReader(data, stdin)
 
 	parsedHeaders := make(map[string]string)
 	for _, header := range headers {
@@ -894,11 +900,11 @@ func (r *runner) getInputData(arg string) ([]byte, error) {
 	return []byte(arg), nil
 }
 
-func (r *runner) getInputReader(arg string) io.Reader {
-	if arg == "-" {
+func (r *runner) getInputReader(data string, stdin bool) io.Reader {
+	if stdin {
 		return r.input
 	}
-	return bytes.NewReader([]byte(arg))
+	return bytes.NewReader([]byte(data))
 }
 
 func newExitErrorf(code int, format string, args ...interface{}) *ExitError {
