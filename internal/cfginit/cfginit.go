@@ -80,7 +80,7 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}      - path/to/foo.proto
 
   # When specifying linters, you can only specify ids, or any combination of
-  # group,include_ids,exclude_ids, but not ids and any of those three.
+  # include_ids,exclude_ids, but not ids and any of those two.
   # Run prototool list-all-linters to see all available linters.
   # All are specified just for this example.
   # By default, the default group of linters is used.
@@ -89,10 +89,6 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}  ids:
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 {{.V}}    - ENUM_NAMES_CAPITALIZED
-
-  # The lint group to use.
-  # The only valid value as of now is default, which is also the default value.
-{{.V}}  group: default
 
   # Linters to include that are not in the lint group.
 {{.V}}  include_ids:

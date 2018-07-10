@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   on lint.
 - The flags --cache-path and --print-fields are deleted to reduce the
   surface area for the v1.0 release.
+- The option lint.group in the prototool.yaml configuration is deleted
+  to reduce the surface area for the v1.0 release.
 - The protoc-commands command is now accessible via the --dry-run
   flag for compile and gen.
 - The grpc command now takes flags for address, method, and data or stdin
