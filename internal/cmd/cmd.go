@@ -92,13 +92,13 @@ func runRootCommand(develMode bool, args []string, stdin io.Reader, stdout io.Wr
 	if err := checkOS(); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
-	if err := f(getRootCommand(&exitCode, args, stdin, stdout, stderr)); err != nil {
+	if err := f(getRootCommand(&exitCode, develMode, args, stdin, stdout, stderr)); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
 	return exitCode
 }
 
-func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
+func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
 	flags := &flags{}
 
 	allCmd := &cobra.Command{
@@ -142,6 +142,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		},
 	}
 	flags.bindDirMode(compileCmd.PersistentFlags())
+	flags.bindDryRun(compileCmd.PersistentFlags())
 
 	createCmd := &cobra.Command{
 		Use:   "create files...",
@@ -214,6 +215,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		},
 	}
 	flags.bindDirMode(genCmd.PersistentFlags())
+	flags.bindDryRun(genCmd.PersistentFlags())
 
 	grpcCmd := &cobra.Command{
 		Use:   "grpc dirOrProtoFiles...",
@@ -320,34 +322,39 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 
 	rootCmd := &cobra.Command{Use: "prototool"}
 	rootCmd.AddCommand(allCmd)
-	rootCmd.AddCommand(binaryToJSONCmd)
-	rootCmd.AddCommand(cleanCmd)
 	rootCmd.AddCommand(compileCmd)
 	rootCmd.AddCommand(createCmd)
-	rootCmd.AddCommand(descriptorProtoCmd)
-	rootCmd.AddCommand(downloadCmd)
-	rootCmd.AddCommand(fieldDescriptorProtoCmd)
 	rootCmd.AddCommand(filesCmd)
 	rootCmd.AddCommand(formatCmd)
 	rootCmd.AddCommand(genCmd)
 	rootCmd.AddCommand(grpcCmd)
 	rootCmd.AddCommand(initCmd)
-	rootCmd.AddCommand(jsonToBinaryCmd)
 	rootCmd.AddCommand(lintCmd)
-	rootCmd.AddCommand(listAllLintersCmd)
-	rootCmd.AddCommand(listAllLintGroupsCmd)
-	rootCmd.AddCommand(listLintersCmd)
-	rootCmd.AddCommand(listLintGroupCmd)
-	rootCmd.AddCommand(serviceDescriptorProtoCmd)
 	rootCmd.AddCommand(versionCmd)
 
 	// flags bound to rootCmd are global flags
-	flags.bindCachePath(rootCmd.PersistentFlags())
 	flags.bindDebug(rootCmd.PersistentFlags())
-	flags.bindDryRun(rootCmd.PersistentFlags())
 	flags.bindHarbormaster(rootCmd.PersistentFlags())
-	flags.bindPrintFields(rootCmd.PersistentFlags())
 	flags.bindProtocURL(rootCmd.PersistentFlags())
+
+	if develMode {
+		rootCmd.AddCommand(binaryToJSONCmd)
+		rootCmd.AddCommand(cleanCmd)
+		rootCmd.AddCommand(descriptorProtoCmd)
+		rootCmd.AddCommand(downloadCmd)
+		rootCmd.AddCommand(fieldDescriptorProtoCmd)
+		rootCmd.AddCommand(jsonToBinaryCmd)
+		rootCmd.AddCommand(listAllLintersCmd)
+		rootCmd.AddCommand(listAllLintGroupsCmd)
+		rootCmd.AddCommand(listLintersCmd)
+		rootCmd.AddCommand(listLintGroupCmd)
+		rootCmd.AddCommand(serviceDescriptorProtoCmd)
+
+		// we may or may not want to expose these to users
+		// but will not build them into the binary for v1.0
+		flags.bindCachePath(rootCmd.PersistentFlags())
+		flags.bindPrintFields(rootCmd.PersistentFlags())
+	}
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetOutput(stdout)
