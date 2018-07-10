@@ -322,7 +322,16 @@ func (r *runner) printCommands(doGen bool, protoSet *file.ProtoSet) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string) error {
+func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool) error {
+	if listAllLinters && listLinters {
+		return newExitErrorf(255, "can only set one of list-all-linters, list-linters")
+	}
+	if listAllLinters {
+		return r.listAllLinters()
+	}
+	if listLinters {
+		return r.listLinters()
+	}
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
@@ -349,7 +358,7 @@ func (r *runner) lint(meta *meta) error {
 	return nil
 }
 
-func (r *runner) ListLinters() error {
+func (r *runner) listLinters() error {
 	config, err := r.getConfig(r.workDirPath)
 	if err != nil {
 		return err
@@ -361,7 +370,7 @@ func (r *runner) ListLinters() error {
 	return r.printLinters(linters)
 }
 
-func (r *runner) ListAllLinters() error {
+func (r *runner) listAllLinters() error {
 	return r.printLinters(lint.AllLinters)
 }
 

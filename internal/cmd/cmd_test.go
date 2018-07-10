@@ -637,11 +637,11 @@ func TestServiceDescriptorProto(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	assertLinters(t, lint.DefaultLinters, "list-linters")
+	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters")
 }
 
 func TestListAllLinters(t *testing.T) {
-	assertLinters(t, lint.AllLinters, "list-all-linters")
+	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters")
 }
 
 func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
@@ -894,7 +894,8 @@ func testDoInternal(stdin io.Reader, args ...string) (string, int) {
 		stdin = os.Stdin
 	}
 	buffer := bytes.NewBuffer(nil)
-	exitCode := Do(args, stdin, buffer, os.Stderr)
+	// develMode is on, so we have access to all commands
+	exitCode := do(true, args, stdin, buffer, os.Stderr)
 	return strings.TrimSpace(buffer.String()), exitCode
 }
 

@@ -50,22 +50,26 @@ var genManTime = time.Date(2018, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 // Do runs the command logic.
 func Do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(args, stdin, stdout, stderr, (*cobra.Command).Execute)
+	return do(false, args, stdin, stdout, stderr)
+}
+
+func do(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
+	return runRootCommand(develMode, args, stdin, stdout, stderr, (*cobra.Command).Execute)
 }
 
 // GenBashCompletion generates a bash completion file to the writer.
 func GenBashCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
+	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
 }
 
 // GenZshCompletion generates a zsh completion file to the writer.
 func GenZshCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
+	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
 }
 
 // GenManpages generates the manpages to the given directory.
 func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
+	return runRootCommand(false, args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
 		if len(args) != 1 {
 			return fmt.Errorf("usage: %s dirPath", os.Args[0])
 		}
@@ -78,21 +82,23 @@ func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Wri
 	})
 }
 
-func runRootCommandOutput(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
-	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
+// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
+func runRootCommandOutput(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
+	return runRootCommand(develMode, args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
 }
 
-func runRootCommand(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
+// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
+func runRootCommand(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
 	if err := checkOS(); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
-	if err := f(getRootCommand(&exitCode, args, stdin, stdout, stderr)); err != nil {
+	if err := f(getRootCommand(&exitCode, develMode, args, stdin, stdout, stderr)); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
 	return exitCode
 }
 
-func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
+func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
 	flags := &flags{}
 
 	allCmd := &cobra.Command{
@@ -136,6 +142,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		},
 	}
 	flags.bindDirMode(compileCmd.PersistentFlags())
+	flags.bindDryRun(compileCmd.PersistentFlags())
 
 	createCmd := &cobra.Command{
 		Use:   "create files...",
@@ -208,6 +215,7 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		},
 	}
 	flags.bindDirMode(genCmd.PersistentFlags())
+	flags.bindDryRun(genCmd.PersistentFlags())
 
 	grpcCmd := &cobra.Command{
 		Use:   "grpc dirOrProtoFiles...",
@@ -252,19 +260,12 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Use:   "lint dirOrProtoFiles...",
 		Short: "Lint proto files and compile with protoc to check for failures.",
 		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args) })
+			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args, flags.listAllLinters, flags.listLinters) })
 		},
 	}
 	flags.bindDirMode(lintCmd.PersistentFlags())
-
-	listAllLintersCmd := &cobra.Command{
-		Use:   "list-all-linters",
-		Short: "List all available linters.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListAllLinters)
-		},
-	}
+	flags.bindListAllLinters(lintCmd.PersistentFlags())
+	flags.bindListLinters(lintCmd.PersistentFlags())
 
 	listAllLintGroupsCmd := &cobra.Command{
 		Use:   "list-all-lint-groups",
@@ -272,15 +273,6 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListAllLintGroups)
-		},
-	}
-
-	listLintersCmd := &cobra.Command{
-		Use:   "list-linters",
-		Short: "List the configurerd linters.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListLinters)
 		},
 	}
 
@@ -314,34 +306,37 @@ func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io
 
 	rootCmd := &cobra.Command{Use: "prototool"}
 	rootCmd.AddCommand(allCmd)
-	rootCmd.AddCommand(binaryToJSONCmd)
-	rootCmd.AddCommand(cleanCmd)
 	rootCmd.AddCommand(compileCmd)
 	rootCmd.AddCommand(createCmd)
-	rootCmd.AddCommand(descriptorProtoCmd)
-	rootCmd.AddCommand(downloadCmd)
-	rootCmd.AddCommand(fieldDescriptorProtoCmd)
 	rootCmd.AddCommand(filesCmd)
 	rootCmd.AddCommand(formatCmd)
 	rootCmd.AddCommand(genCmd)
 	rootCmd.AddCommand(grpcCmd)
 	rootCmd.AddCommand(initCmd)
-	rootCmd.AddCommand(jsonToBinaryCmd)
 	rootCmd.AddCommand(lintCmd)
-	rootCmd.AddCommand(listAllLintersCmd)
-	rootCmd.AddCommand(listAllLintGroupsCmd)
-	rootCmd.AddCommand(listLintersCmd)
-	rootCmd.AddCommand(listLintGroupCmd)
-	rootCmd.AddCommand(serviceDescriptorProtoCmd)
 	rootCmd.AddCommand(versionCmd)
 
 	// flags bound to rootCmd are global flags
-	flags.bindCachePath(rootCmd.PersistentFlags())
 	flags.bindDebug(rootCmd.PersistentFlags())
-	flags.bindDryRun(rootCmd.PersistentFlags())
 	flags.bindHarbormaster(rootCmd.PersistentFlags())
-	flags.bindPrintFields(rootCmd.PersistentFlags())
 	flags.bindProtocURL(rootCmd.PersistentFlags())
+
+	if develMode {
+		rootCmd.AddCommand(binaryToJSONCmd)
+		rootCmd.AddCommand(cleanCmd)
+		rootCmd.AddCommand(descriptorProtoCmd)
+		rootCmd.AddCommand(downloadCmd)
+		rootCmd.AddCommand(fieldDescriptorProtoCmd)
+		rootCmd.AddCommand(jsonToBinaryCmd)
+		rootCmd.AddCommand(listAllLintGroupsCmd)
+		rootCmd.AddCommand(listLintGroupCmd)
+		rootCmd.AddCommand(serviceDescriptorProtoCmd)
+
+		// we may or may not want to expose these to users
+		// but will not build them into the binary for v1.0
+		flags.bindCachePath(rootCmd.PersistentFlags())
+		flags.bindPrintFields(rootCmd.PersistentFlags())
+	}
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetOutput(stdout)
