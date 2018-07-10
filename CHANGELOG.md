@@ -10,8 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - The protoc-commands command is now accessible via the `dry-run`
   flag for compile, format, gen, and lint.
+- The grpc command now takes flags for address, method, and data or stdin
+  as opposed to parsing these from variable-length command args.
 - If more than one `prototool.yaml` is found for the input directory or files,
   an error is returned.
+
 
 ## [0.4.0] - 2018-06-22
 ### Added

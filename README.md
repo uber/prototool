@@ -230,9 +230,9 @@ There is a full example for gRPC in the [example](example) directory. Run `make 
 
 Start the example server in a separate terminal by doing `go run example/cmd/excited/main.go`.
 
-`prototool grpc dirOrProtoFiles... serverAddress package.service/Method requestData`
+`prototool grpc dirOrProtoFiles... --address serverAddress --method package.service/Method --data 'requestData'`
 
-`requestData` can either be the JSON data to input, or `-` which will result in the input being read from stdin.
+Either use `--data 'requestData'` as the the JSON data to input, or `--stdin` which will result in the input being read from stdin as JSON.
 
 ```
 $ make init example # make sure everything is built just in case
@@ -240,12 +240,12 @@ $ make init example # make sure everything is built just in case
 $ cat input.json
 {"value":"hello"}
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/Exclamation -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --stdin
 {
   "value": "hello!"
 }
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/ExclamationServerStream -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationServerStream --stdin
 {
   "value": "h"
 }
@@ -269,12 +269,12 @@ $ cat input.json
 {"value":"hello"}
 {"value":"salutations"}
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/ExclamationClientStream -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationClientStream --stdin
 {
   "value": "hellosalutations!"
 }
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/ExclamationBidiStream -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationBidiStream --stdin
 {
   "value": "hello!"
 }
