@@ -52,7 +52,45 @@ func newProtoSetProvider(options ...ProtoSetProviderOption) *protoSetProvider {
 	return protoSetProvider
 }
 
-func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
+func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*ProtoSet, error) {
+	protoSets, err := c.GetMultipleForDir(workDirPath, dirPath)
+	if err != nil {
+		return nil, err
+	}
+	switch len(protoSets) {
+	case 0:
+		return nil, fmt.Errorf("no proto files found for dirPath %q", dirPath)
+	case 1:
+		return protoSets[0], nil
+	default:
+		configDirPaths := make([]string, 0, len(protoSets))
+		for _, protoSet := range protoSets {
+			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
+		}
+		return nil, fmt.Errorf("expected exactly one configuration file for dirPath %q, but found multiple in directories: %v", dirPath, configDirPaths)
+	}
+}
+
+func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error) {
+	protoSets, err := c.GetMultipleForFiles(workDirPath, filePaths...)
+	if err != nil {
+		return nil, err
+	}
+	switch len(protoSets) {
+	case 0:
+		return nil, fmt.Errorf("no proto files found for filePaths %v", filePaths)
+	case 1:
+		return protoSets[0], nil
+	default:
+		configDirPaths := make([]string, 0, len(protoSets))
+		for _, protoSet := range protoSets {
+			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
+		}
+		return nil, fmt.Errorf("expected exactly one configuration file for filePaths %v, but found multiple in directories: %v", filePaths, configDirPaths)
+	}
+}
+
+func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
 	workDirPath, err := absClean(workDirPath)
 	if err != nil {
 		return nil, err
@@ -90,7 +128,7 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) ([]*Pro
 	return protoSets, nil
 }
 
-func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
+func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
 	workDirPath, err := absClean(workDirPath)
 	if err != nil {
 		return nil, err

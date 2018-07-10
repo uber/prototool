@@ -120,12 +120,12 @@ type Compiler interface {
 	// and there will be no error. The caller can determine if this is
 	// an error case. If there is any other type of error, or some output
 	// from protoc cannot be interpreted, an error will be returned.
-	Compile(...*file.ProtoSet) (*CompileResult, error)
+	Compile(*file.ProtoSet) (*CompileResult, error)
 
 	// Return the protoc commands that would be run on Compile.
 	//
 	// This will ignore the CompilerWithFileDescriptorSet option.
-	ProtocCommands(...*file.ProtoSet) ([]string, error)
+	ProtocCommands(*file.ProtoSet) ([]string, error)
 }
 
 // CompilerOption is an option for a new Compiler.

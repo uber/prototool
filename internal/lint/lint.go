@@ -122,7 +122,7 @@ func init() {
 
 // Runner runs a lint job.
 type Runner interface {
-	Run(...*file.ProtoSet) ([]*text.Failure, error)
+	Run(*file.ProtoSet) ([]*text.Failure, error)
 }
 
 // RunnerOption is an option for a new Runner.

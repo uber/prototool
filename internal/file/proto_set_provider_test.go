@@ -29,11 +29,11 @@ import (
 	"go.uber.org/zap"
 )
 
-func TestProtoSetProviderGetForFilesAll(t *testing.T) {
+func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetForFiles(
+	protoSets, err := protoSetProvider.GetMultipleForFiles(
 		cwd,
 		"testdata/a/file.proto",
 		"testdata/b/file.proto",
@@ -186,11 +186,11 @@ func TestProtoSetProviderGetForFilesAll(t *testing.T) {
 	)
 }
 
-func TestProtoSetProviderGetForFilesSomeMissing(t *testing.T) {
+func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetForFiles(
+	protoSets, err := protoSetProvider.GetMultipleForFiles(
 		cwd,
 		"testdata/a/file.proto",
 		"testdata/c/file.proto",
@@ -298,11 +298,11 @@ func TestProtoSetProviderGetForFilesSomeMissing(t *testing.T) {
 	)
 }
 
-func TestProtoSetProviderGetForDirCwdRel(t *testing.T) {
+func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetForDir(cwd, ".")
+	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, ".")
 	require.NoError(t, err)
 	require.Equal(
 		t,
@@ -434,11 +434,11 @@ func TestProtoSetProviderGetForDirCwdRel(t *testing.T) {
 	)
 }
 
-func TestProtoSetProviderGetForDirCwdAbs(t *testing.T) {
+func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetForDir(cwd, cwd)
+	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, cwd)
 	require.NoError(t, err)
 	require.Equal(
 		t,
@@ -570,11 +570,11 @@ func TestProtoSetProviderGetForDirCwdAbs(t *testing.T) {
 	)
 }
 
-func TestProtoSetProviderGetForDirCwdSubRel(t *testing.T) {
+func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetForDir(cwd, "testdata/d/g")
+	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, "testdata/d/g")
 	require.NoError(t, err)
 	require.Equal(
 		t,
