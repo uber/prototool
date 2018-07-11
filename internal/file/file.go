@@ -21,6 +21,8 @@
 package file
 
 import (
+	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/uber/prototool/internal/settings"
@@ -131,4 +133,24 @@ func ProtoSetProviderWithWalkTimeout(walkTimeout time.Duration) ProtoSetProvider
 // NewProtoSetProvider returns a new ProtoSetProvider.
 func NewProtoSetProvider(options ...ProtoSetProviderOption) ProtoSetProvider {
 	return newProtoSetProvider(options...)
+}
+
+// AbsClean returns the cleaned absolute path of the given path.
+func AbsClean(path string) (string, error) {
+	if path == "" {
+		return path, nil
+	}
+	if !filepath.IsAbs(path) {
+		return filepath.Abs(path)
+	}
+	return filepath.Clean(path), nil
+}
+
+// CheckAbs is a convenience functions for determining
+// whether a path is an absolute path.
+func CheckAbs(path string) error {
+	if !filepath.IsAbs(path) {
+		return fmt.Errorf("expected absolute path but was %s", path)
+	}
+	return nil
 }

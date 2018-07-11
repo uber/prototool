@@ -91,11 +91,11 @@ func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) 
 }
 
 func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
-	workDirPath, err := absClean(workDirPath)
+	workDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
 	}
-	absDirPath, err := absClean(dirPath)
+	absDirPath, err := AbsClean(dirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 }
 
 func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
-	workDirPath, err := absClean(workDirPath)
+	workDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -187,11 +187,11 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 
 func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath string) ([]*ProtoFile, error) {
 	var protoFiles []*ProtoFile
-	absWorkDirPath, err := absClean(workDirPath)
+	absWorkDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
 	}
-	absDirPath, err := absClean(dirPath)
+	absDirPath, err := AbsClean(dirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 						"timed out after %v and having seen %d files, are you sure you are operating "+
 						"in the right context?", c.walkTimeout, numWalkedFiles)
 				}
-				absFilePath, err := absClean(filePath)
+				absFilePath, err := AbsClean(filePath)
 				if err != nil {
 					return err
 				}
@@ -287,7 +287,7 @@ func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
 func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
 	protoFiles := make([]*ProtoFile, 0, len(filePaths))
 	for _, filePath := range filePaths {
-		absFilePath, err := absClean(filePath)
+		absFilePath, err := AbsClean(filePath)
 		if err != nil {
 			return nil, err
 		}
@@ -297,14 +297,4 @@ func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
 		})
 	}
 	return protoFiles, nil
-}
-
-func absClean(path string) (string, error) {
-	if path == "" {
-		return path, nil
-	}
-	if !filepath.IsAbs(path) {
-		return filepath.Abs(path)
-	}
-	return filepath.Clean(path), nil
 }

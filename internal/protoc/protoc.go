@@ -21,9 +21,6 @@
 package protoc
 
 import (
-	"fmt"
-	"path/filepath"
-
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/settings"
@@ -175,21 +172,4 @@ func CompilerWithFileDescriptorSet() CompilerOption {
 // NewCompiler returns a new Compiler.
 func NewCompiler(options ...CompilerOption) Compiler {
 	return newCompiler(options...)
-}
-
-func checkAbs(path string) error {
-	if !filepath.IsAbs(path) {
-		return fmt.Errorf("expected absolute path but was %s", path)
-	}
-	return nil
-}
-
-func absClean(path string) (string, error) {
-	if path == "" {
-		return path, nil
-	}
-	if !filepath.IsAbs(path) {
-		return filepath.Abs(path)
-	}
-	return filepath.Clean(path), nil
 }
