@@ -38,8 +38,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 	"github.com/uber/prototool/internal/exec"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 // when generating man pages, the current date is used
@@ -101,220 +99,17 @@ func runRootCommand(develMode bool, args []string, stdin io.Reader, stdout io.Wr
 func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
 	flags := &flags{}
 
-	allCmd := &cobra.Command{
-		Use:   "all dirOrProtoFiles...",
-		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.All(args, flags.disableFormat, flags.disableLint, !flags.noRewrite)
-			})
-		},
-	}
-	flags.bindDirMode(allCmd.PersistentFlags())
-	flags.bindDisableFormat(allCmd.PersistentFlags())
-	flags.bindDisableLint(allCmd.PersistentFlags())
-	flags.bindNoRewrite(allCmd.PersistentFlags())
-
-	binaryToJSONCmd := &cobra.Command{
-		Use:   "binary-to-json dirOrProtoFiles... messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.MinimumNArgs(3),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.BinaryToJSON(args) })
-		},
-	}
-	flags.bindDirMode(binaryToJSONCmd.PersistentFlags())
-
-	cleanCmd := &cobra.Command{
-		Use:   "clean",
-		Short: "Delete the cache.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.Clean)
-		},
-	}
-
-	compileCmd := &cobra.Command{
-		Use:   "compile dirOrProtoFiles...",
-		Short: "Compile with protoc to check for failures.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Compile(args, flags.dryRun) })
-		},
-	}
-	flags.bindDirMode(compileCmd.PersistentFlags())
-	flags.bindDryRun(compileCmd.PersistentFlags())
-
-	createCmd := &cobra.Command{
-		Use:   "create files...",
-		Short: "Create the given Protobuf files according to a template that passes default prototool lint.",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.Create(args, flags.pkg)
-			})
-		},
-	}
-	flags.bindPackage(createCmd.PersistentFlags())
-
-	descriptorProtoCmd := &cobra.Command{
-		Use:   "descriptor-proto dirOrProtoFiles... messagePath",
-		Short: "Get the descriptor proto for the message path.",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.DescriptorProto(args) })
-		},
-	}
-	flags.bindDirMode(descriptorProtoCmd.PersistentFlags())
-
-	downloadCmd := &cobra.Command{
-		Use:   "download",
-		Short: "Download the protobuf artifacts to a cache.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.Download)
-		},
-	}
-
-	fieldDescriptorProtoCmd := &cobra.Command{
-		Use:   "field-descriptor-proto dirOrProtoFiles... fieldPath",
-		Short: "Get the field descriptor proto for the field path.",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.FieldDescriptorProto(args) })
-		},
-	}
-	flags.bindDirMode(fieldDescriptorProtoCmd.PersistentFlags())
-
-	filesCmd := &cobra.Command{
-		Use:   "files dirOrProtoFiles...",
-		Short: "Print all files that match the input arguments.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Files(args) })
-		},
-	}
-
-	formatCmd := &cobra.Command{
-		Use:   "format dirOrProtoFiles...",
-		Short: "Format a proto file and compile with protoc to check for failures.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, !flags.noRewrite)
-			})
-		},
-	}
-	flags.bindDiffMode(formatCmd.PersistentFlags())
-	flags.bindLintMode(formatCmd.PersistentFlags())
-	flags.bindOverwrite(formatCmd.PersistentFlags())
-	flags.bindNoRewrite(formatCmd.PersistentFlags())
-
-	genCmd := &cobra.Command{
-		Use:   "gen dirOrProtoFiles...",
-		Short: "Generate with protoc.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Gen(args, flags.dryRun) })
-		},
-	}
-	flags.bindDirMode(genCmd.PersistentFlags())
-	flags.bindDryRun(genCmd.PersistentFlags())
-
-	grpcCmd := &cobra.Command{
-		Use:   "grpc dirOrProtoFiles...",
-		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error {
-				return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
-			})
-		},
-	}
-	flags.bindAddress(grpcCmd.PersistentFlags())
-	flags.bindCallTimeout(grpcCmd.PersistentFlags())
-	flags.bindConnectTimeout(grpcCmd.PersistentFlags())
-	flags.bindData(grpcCmd.PersistentFlags())
-	flags.bindDirMode(grpcCmd.PersistentFlags())
-	flags.bindHeaders(grpcCmd.PersistentFlags())
-	flags.bindKeepaliveTime(grpcCmd.PersistentFlags())
-	flags.bindMethod(grpcCmd.PersistentFlags())
-	flags.bindStdin(grpcCmd.PersistentFlags())
-
-	initCmd := &cobra.Command{
-		Use:   "init [dirPath]",
-		Short: "Generate an initial config file in the current or given directory.",
-		Args:  cobra.MaximumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Init(args, flags.uncomment) })
-		},
-	}
-	flags.bindUncomment(initCmd.PersistentFlags())
-
-	jsonToBinaryCmd := &cobra.Command{
-		Use:   "json-to-binary dirOrProtoFiles... messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.MinimumNArgs(2),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.JSONToBinary(args) })
-		},
-	}
-	flags.bindDirMode(jsonToBinaryCmd.PersistentFlags())
-
-	lintCmd := &cobra.Command{
-		Use:   "lint dirOrProtoFiles...",
-		Short: "Lint proto files and compile with protoc to check for failures.",
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.Lint(args, flags.listAllLinters, flags.listLinters) })
-		},
-	}
-	flags.bindDirMode(lintCmd.PersistentFlags())
-	flags.bindListAllLinters(lintCmd.PersistentFlags())
-	flags.bindListLinters(lintCmd.PersistentFlags())
-
-	listAllLintGroupsCmd := &cobra.Command{
-		Use:   "list-all-lint-groups",
-		Short: "List all the available lint groups.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.ListAllLintGroups)
-		},
-	}
-
-	listLintGroupCmd := &cobra.Command{
-		Use:   "list-lint-group group",
-		Short: "List the linters in the given lint group.",
-		Args:  cobra.ExactArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.ListLintGroup(args[0]) })
-		},
-	}
-
-	serviceDescriptorProtoCmd := &cobra.Command{
-		Use:   "service-descriptor-proto dirOrProtoFiles... servicePath",
-		Short: "Get the service descriptor proto for the service path.",
-		Args:  cobra.MinimumNArgs(1),
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, func(runner exec.Runner) error { return runner.ServiceDescriptorProto(args) })
-		},
-	}
-	flags.bindDirMode(serviceDescriptorProtoCmd.PersistentFlags())
-
-	versionCmd := &cobra.Command{
-		Use:   "version",
-		Short: "Print the version.",
-		Args:  cobra.NoArgs,
-		Run: func(cmd *cobra.Command, args []string) {
-			checkCmd(exitCodeAddr, stdin, stdout, stderr, flags, exec.Runner.Version)
-		},
-	}
-
 	rootCmd := &cobra.Command{Use: "prototool"}
-	rootCmd.AddCommand(allCmd)
-	rootCmd.AddCommand(compileCmd)
-	rootCmd.AddCommand(createCmd)
-	rootCmd.AddCommand(filesCmd)
-	rootCmd.AddCommand(formatCmd)
-	rootCmd.AddCommand(genCmd)
-	rootCmd.AddCommand(grpcCmd)
-	rootCmd.AddCommand(initCmd)
-	rootCmd.AddCommand(lintCmd)
-	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(allCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(compileCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(createCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(filesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(formatCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(genCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(grpcCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(initCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(lintCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(versionCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())
@@ -322,15 +117,15 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	flags.bindProtocURL(rootCmd.PersistentFlags())
 
 	if develMode {
-		rootCmd.AddCommand(binaryToJSONCmd)
-		rootCmd.AddCommand(cleanCmd)
-		rootCmd.AddCommand(descriptorProtoCmd)
-		rootCmd.AddCommand(downloadCmd)
-		rootCmd.AddCommand(fieldDescriptorProtoCmd)
-		rootCmd.AddCommand(jsonToBinaryCmd)
-		rootCmd.AddCommand(listAllLintGroupsCmd)
-		rootCmd.AddCommand(listLintGroupCmd)
-		rootCmd.AddCommand(serviceDescriptorProtoCmd)
+		rootCmd.AddCommand(binaryToJSONCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(cleanCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(descriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(downloadCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(fieldDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(jsonToBinaryCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(listAllLintGroupsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(listLintGroupCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+		rootCmd.AddCommand(serviceDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 
 		// we may or may not want to expose these to users
 		// but will not build them into the binary for v1.0
@@ -349,80 +144,8 @@ func checkOS() error {
 	case "darwin", "linux":
 		return nil
 	default:
-		return fmt.Errorf("%s is not a supported operating system, if you want to go through the code and change all the strings.HasPrefix and \"/\" stuff to os.PathSeparator and filepath calls, you're more than welcome to", runtime.GOOS)
+		return fmt.Errorf("%s is not a supported operating system", runtime.GOOS)
 	}
-}
-
-func checkCmd(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags, f func(exec.Runner) error) {
-	runner, err := getRunner(stdin, stdout, stderr, flags)
-	if err != nil {
-		*exitCodeAddr = printAndGetErrorExitCode(err, stdout)
-		return
-	}
-	if err := f(runner); err != nil {
-		*exitCodeAddr = printAndGetErrorExitCode(err, stdout)
-	}
-}
-
-func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) (exec.Runner, error) {
-	logger, err := getLogger(stderr, flags.debug)
-	if err != nil {
-		return nil, err
-	}
-	runnerOptions := []exec.RunnerOption{
-		exec.RunnerWithLogger(logger),
-	}
-	if flags.cachePath != "" {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithCachePath(flags.cachePath),
-		)
-	}
-	if flags.dirMode {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithDirMode(),
-		)
-	}
-	if flags.harbormaster {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithHarbormaster(),
-		)
-	}
-	if flags.printFields != "" {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithPrintFields(flags.printFields),
-		)
-	}
-	if flags.protocURL != "" {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithProtocURL(flags.protocURL),
-		)
-	}
-	workDirPath, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-	return exec.NewRunner(workDirPath, stdin, stdout, runnerOptions...), nil
-}
-
-func getLogger(stderr io.Writer, debug bool) (*zap.Logger, error) {
-	level := zapcore.InfoLevel
-	if debug {
-		level = zapcore.DebugLevel
-	}
-	return zap.New(
-		zapcore.NewCore(
-			zapcore.NewConsoleEncoder(
-				zap.NewDevelopmentEncoderConfig(),
-			),
-			zapcore.Lock(zapcore.AddSync(stderr)),
-			zap.NewAtomicLevelAt(level),
-		),
-	), nil
 }
 
 func printAndGetErrorExitCode(err error, stdout io.Writer) int {
