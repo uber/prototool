@@ -27,12 +27,14 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -203,14 +205,39 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	c.logger.Debug("running protoc", zap.String("command", cmdMeta.String()))
 	buffer := bytes.NewBuffer(nil)
 	cmdMeta.execCmd.Stderr = buffer
-	// we only need stderr to parse errors
+	// We only need stderr to parse errors
 	// you have to explicitly set to ioutil.Discard, otherwise if there
-	// is a stdout, it will be printed to os.Stdout
+	// is a stdout, it will be printed to os.Stdout.
 	cmdMeta.execCmd.Stdout = ioutil.Discard
-	runErr := cmdMeta.execCmd.Run()
-	if runErr != nil {
-		// exit errors are ok, we can probably parse them into text.Failures
-		// if not an exec.ExitError, short circuit
+
+	// Prepare a signal buffer so that we can kill the protoc
+	// process when Prototool receives a SIGINT, SIGTERM,
+	// SIGQUIT or SIGHUP.
+	sig := make(chan os.Signal, 1)
+	done := make(chan error, 1)
+	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
+	go func() {
+		done <- cmdMeta.execCmd.Run()
+	}()
+
+	var runErr error
+	select {
+	case s := <-sig:
+		// Kill the process, and terminate early.
+		c.logger.Debug(
+			"terminating protoc",
+			zap.String("command", cmdMeta.String()),
+			zap.String("signal", s.String()),
+		)
+		return nil, cmdMeta.execCmd.Process.Kill()
+	case runErr = <-done:
+		// The command succeeded.
+		if runErr == nil {
+			break
+		}
+		// Exit errors are ok, we can probably parse them into text.Failures
+		// if not an exec.ExitError, short circuit.
 		if _, ok := runErr.(*exec.ExitError); !ok {
 			return nil, runErr
 		}
@@ -225,11 +252,11 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	// and plugins in general do not produce output unless there is an error.
 	// See https://github.com/uber/prototool/issues/128 for a full discussion.
 	failures := c.parseProtocOutput(cmdMeta, output)
-	// we had a run error but for whatever reason did not get any parsed
+	// We had a run error but for whatever reason did not get any parsed
 	// output lines, we still want to fail in this case
 	// this generally should not happen, especially as plugins that fail
 	// will result in a pluginFailedRegexp matching line but this
-	// is just to make sure
+	// is just to make sure.
 	if len(failures) == 0 && runErr != nil {
 		return nil, runErr
 	}
