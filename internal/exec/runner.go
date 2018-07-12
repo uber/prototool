@@ -836,11 +836,11 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 			shouldPrint = true
 		} else if meta.InDirModeSingleFilename != "" {
 			// TODO: the compiler may not return the rel path due to logic in bestFilePath
-			absSingleFilename, err := absClean(meta.InDirModeSingleFilename)
+			absSingleFilename, err := file.AbsClean(meta.InDirModeSingleFilename)
 			if err != nil {
 				return err
 			}
-			absFailureFilename, err := absClean(failure.Filename)
+			absFailureFilename, err := file.AbsClean(failure.Filename)
 			if err != nil {
 				return err
 			}
@@ -915,17 +915,6 @@ func newExitErrorf(code int, format string, args ...interface{}) *ExitError {
 		Code:    code,
 		Message: fmt.Sprintf(format, args...),
 	}
-}
-
-// TODO: this is copied in three places
-func absClean(path string) (string, error) {
-	if path == "" {
-		return path, nil
-	}
-	if !filepath.IsAbs(path) {
-		return filepath.Abs(path)
-	}
-	return filepath.Clean(path), nil
 }
 
 func newTabWriter(writer io.Writer) *tabwriter.Writer {

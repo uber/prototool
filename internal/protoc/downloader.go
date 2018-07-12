@@ -35,6 +35,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
 	"go.uber.org/multierr"
@@ -258,12 +259,12 @@ func (d *downloader) getBasePathNoVersion() (string, error) {
 			return "", err
 		}
 	} else {
-		basePath, err = absClean(basePath)
+		basePath, err = file.AbsClean(basePath)
 		if err != nil {
 			return "", err
 		}
 	}
-	if err := checkAbs(basePath); err != nil {
+	if err := file.CheckAbs(basePath); err != nil {
 		return "", err
 	}
 	return filepath.Join(basePath, "protobuf"), nil
