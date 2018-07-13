@@ -215,7 +215,7 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	// SIGQUIT or SIGHUP.
 	sig := make(chan os.Signal, 1)
 	done := make(chan error, 1)
-	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		done <- cmdMeta.execCmd.Run()
@@ -232,13 +232,9 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 		)
 		return nil, cmdMeta.execCmd.Process.Kill()
 	case runErr = <-done:
-		// The command succeeded.
-		if runErr == nil {
-			break
-		}
 		// Exit errors are ok, we can probably parse them into text.Failures
 		// if not an exec.ExitError, short circuit.
-		if _, ok := runErr.(*exec.ExitError); !ok {
+		if _, ok := runErr.(*exec.ExitError); !ok && runErr != nil {
 			return nil, runErr
 		}
 	}
