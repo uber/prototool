@@ -211,8 +211,7 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	cmdMeta.execCmd.Stdout = ioutil.Discard
 
 	// Prepare a signal buffer so that we can kill the protoc
-	// process when Prototool receives a SIGINT, SIGTERM,
-	// SIGQUIT or SIGHUP.
+	// process when Prototool receives a SIGINT or SIGTERM.
 	sig := make(chan os.Signal, 1)
 	done := make(chan error, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
