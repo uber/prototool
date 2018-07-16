@@ -34,9 +34,9 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var (
-	wordWrapLength uint = 80
+const wordWrapLength uint = 80
 
+var (
 	allCmdTemplate = &cmdTemplate{
 		Use:   "all dirOrProtoFiles...",
 		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
