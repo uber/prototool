@@ -35,6 +35,8 @@ import (
 )
 
 var (
+	wordWrapLength uint = 80
+
 	allCmdTemplate = &cmdTemplate{
 		Use:   "all dirOrProtoFiles...",
 		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
@@ -88,14 +90,14 @@ var (
 		Short: "Create the given Protobuf files according to a template that passes default prototool lint.",
 		Long: `Assuming the filename "example_create_file.proto", the file will look like the following:
 
-syntax = "proto3";
+  syntax = "proto3";
 
-package SOME.PKG;
+  package SOME.PKG;
 
-option go_package = "PKGpb";
-option java_multiple_files = true;
-option java_outer_classname = "ExampleCreateFileProto";
-option java_package = "com.SOME.PKG.pb";
+  option go_package = "PKGpb";
+  option java_multiple_files = true;
+  option java_outer_classname = "ExampleCreateFileProto";
+  option java_package = "com.SOME.PKG.pb";
 
 This matches what the linter expects. "SOME.PKG" will be computed as follows:
 
@@ -320,7 +322,7 @@ $ cat input.json | prototool grpc example \
 	initCmdTemplate = &cmdTemplate{
 		Use:   "init [dirPath]",
 		Short: "Generate an initial config file in the current or given directory.",
-		Long:  `All available options will be generated, but all options except "protoc_version" :will be commented out unless the --uncomment flag is specified.`,
+		Long:  `All available options will be generated and commented out except for "protoc_version". Pass the "--uncomment" flag to uncomment all options.`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Init(args, flags.uncomment)
@@ -438,7 +440,7 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	command.Use = c.Use
 	command.Short = strings.TrimSpace(c.Short)
 	if c.Long != "" {
-		command.Long = wordwrap.WrapString(fmt.Sprintf("%s\n\n%s", strings.TrimSpace(c.Short), strings.TrimSpace(c.Long)), 80)
+		command.Long = wordwrap.WrapString(fmt.Sprintf("%s\n\n%s", strings.TrimSpace(c.Short), strings.TrimSpace(c.Long)), wordWrapLength)
 	}
 	command.Args = c.Args
 	command.Run = func(_ *cobra.Command, args []string) {
