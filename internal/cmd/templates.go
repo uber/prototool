@@ -26,6 +26,7 @@ import (
 	"os"
 	"strings"
 
+	wordwrap "github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/uber/prototool/internal/exec"
@@ -301,7 +302,7 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	command.Use = c.Use
 	command.Short = strings.TrimSpace(c.Short)
 	if c.Long != "" {
-		command.Long = fmt.Sprintf("%s\n\n%s", strings.TrimSpace(c.Short), strings.TrimSpace(c.Long))
+		command.Long = wordwrap.WrapString(fmt.Sprintf("%s\n\n%s", strings.TrimSpace(c.Short), strings.TrimSpace(c.Long)), 80)
 	}
 	command.Args = c.Args
 	command.Run = func(_ *cobra.Command, args []string) {
