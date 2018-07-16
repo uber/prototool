@@ -86,6 +86,62 @@ var (
 	createCmdTemplate = &cmdTemplate{
 		Use:   "create files...",
 		Short: "Create the given Protobuf files according to a template that passes default prototool lint.",
+		Long: `Assuming the filename "example_create_file.proto", the file will look like the following:
+
+syntax = "proto3";
+
+package SOME.PKG;
+
+option go_package = "PKGpb";
+option java_multiple_files = true;
+option java_outer_classname = "ExampleCreateFileProto";
+option java_package = "com.SOME.PKG.pb";
+
+This matches what the linter expects. "SOME.PKG" will be computed as follows:
+
+- If "--package" is specified, "SOME.PKG" will be the value passed to
+  "--package".
+- Otherwise, if there is no "prototool.yaml" that would apply to the new file,
+  use "uber.prototool.generated".
+- Otherwise, if there is a "prototool.yaml" file, check if it has a
+  "dir_to_base_package" setting under the "create" section. If it does, this
+  package, concatenated with the relative path from the directory with the
+ "prototool.yaml" will be used.
+- Otherwise, if there is no "dir_to_base_package" directive, just use the
+  relative path from the directory with the "prototool.yaml" file. If the file
+  is in the same directory as the "prototoo.yaml" file, use
+  "uber.prototool.generated".
+
+For example, assume you have the following file at "repo/prototool.yaml":
+
+create:
+  dir_to_base_package:
+    idl: uber
+    idl/baz: special
+
+- "prototool create repo/idl/foo/bar/bar.proto" will have the package
+  "uber.foo.bar".
+- "prototool create repo/idl/bar.proto" will have the package "uber".
+- "prototool create repo/idl/baz/baz.proto" will have the package "special".
+- "prototool create repo/idl/baz/bat/bat.proto" will have the package
+  "special.bat".
+- "prototool create repo/another/dir/bar.proto" will have the package
+  "another.dir".
+- "prototool create repo/bar.proto" will have the package
+  "uber.prototool.generated".
+
+This is meant to mimic what you generally want - a base package for your idl directory, followed by packages matching the directory structure.
+
+Note you can override the directory that the "prototool.yaml" file is in as well. If we update our file at "repo/prototool.yaml" to this:
+
+create:
+  dir_to_base_package:
+    .: foo.bar
+
+Then "prototool create repo/bar.proto" will have the package "foo.bar", and "prototool create repo/another/dir/bar.proto" will have the package "foo.bar.another.dir".
+
+If Vim integration is set up, files will be generated when you open a new Protobuf file.`,
+
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Create(args, flags.pkg)
 		},
