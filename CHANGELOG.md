@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - A linter to verify that no enum uses the option `allow_alias.`
 ### Changed
+- The formatter now prints primitive field options on the same line
+  as the field.
 - The commands binary-to-json, clean, descriptor-proto, download,
   field-descriptor-proto, json-to-binary, list-all-linters,
   list-all-lint-groups, list-linters, list-lint-group,
