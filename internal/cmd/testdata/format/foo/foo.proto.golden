@@ -57,9 +57,7 @@ message Baz {
   // dep comment
   bar.Dep dep = 2;
   google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
-  int64 woot = 5 [
-    (bar.field_option) = true
-  ];
+  int64 woot = 5 [(bar.field_option) = true];
   // comment17
   int64 woot2 = 6 [
     (bar.field_dep_option) = {
@@ -173,9 +171,7 @@ message Empty {}
 enum Something {
   option (bar.enum_option) = true;
   // comment25
-   SOMETHING_INVALID = 0 [
-    (bar.enum_value_option) = true
-  ]; // inline comment25
+  SOMETHING_INVALID = 0 [(bar.enum_value_option) = true]; // inline comment25
   // comment27
   SOMETHING_UNSET = 1; // inline comment27
   // comment28

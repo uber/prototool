@@ -105,7 +105,7 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		)
 	}
 	if len(v.Options) > 0 {
-		v.POptions(false, v.Options...)
+		v.POptions(v.Options...)
 		v.P()
 	}
 	if len(v.Imports) > 0 {
