@@ -351,12 +351,6 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 			exec.RunnerWithPrintFields(flags.printFields),
 		)
 	}
-	if flags.protocURL != "" {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithProtocURL(flags.protocURL),
-		)
-	}
 	workDirPath, err := os.Getwd()
 	if err != nil {
 		return nil, err

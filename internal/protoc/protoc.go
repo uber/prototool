@@ -146,15 +146,6 @@ func CompilerWithCachePath(cachePath string) CompilerOption {
 	}
 }
 
-// CompilerWithProtocURL returns a CompilerOption that uses the given protoc zip file URL.
-//
-// The default is https://github.com/google/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
-func CompilerWithProtocURL(protocURL string) CompilerOption {
-	return func(compiler *compiler) {
-		compiler.protocURL = protocURL
-	}
-}
-
 // CompilerWithGen says to also generate the code.
 func CompilerWithGen() CompilerOption {
 	return func(compiler *compiler) {

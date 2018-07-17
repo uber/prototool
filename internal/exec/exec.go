@@ -85,13 +85,6 @@ func RunnerWithCachePath(cachePath string) RunnerOption {
 	}
 }
 
-// RunnerWithProtocURL returns a RunnerOption that uses the given protoc zip file URL.
-func RunnerWithProtocURL(protocURL string) RunnerOption {
-	return func(runner *runner) {
-		runner.protocURL = protocURL
-	}
-}
-
 // RunnerWithPrintFields returns a RunnerOption that uses the given colon-separated
 // print fields. The default is filename:line:column:message.
 func RunnerWithPrintFields(printFields string) RunnerOption {
