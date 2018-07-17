@@ -8,21 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - A linter to verify that no enum uses the option `allow_alias.`
 ### Changed
-- The commands binary-to-json, clean, descriptor-proto, download,
-  field-descriptor-proto, json-to-binary, list-all-linters,
-  list-all-lint-groups, list-linters, list-lint-group,
-  service-descriptor-proto are deleted to reduce the surface area
+- The commands `binary-to-json`, `clean`, `descriptor-proto`, `download`,
+  `field-descriptor-proto`, `json-to-binary`, `list-all-linters`,
+  `list-all-lint-groups`, `list-linters`, `list-lint-group`, and
+  `service-descriptor-proto` are deleted to reduce the surface area
   for the v1.0 release.
-- The commands list-all-linters and list-linters are now flags
-  on lint.
-- The flags --cache-path and --print-fields are deleted to reduce the
+- The commands `list-all-linters` and `list-linters` are now flags
+  on the `lint` command.
+- The flags `--cache-path` and `--print-fields` are deleted to reduce the
   surface area for the v1.0 release.
-- The option lint.group in the prototool.yaml configuration is deleted
+- The option `lint.group` in the `prototool.yaml` configuration is deleted
   to reduce the surface area for the v1.0 release.
-- The protoc-commands command is now accessible via the --dry-run
-  flag for compile and gen.
-- The grpc command now takes flags for address, method, and data or stdin
-  as opposed to parsing these from variable-length command args.
+- The command `protoc-commands` is now accessible via the `--dry-run`
+  flag on the commands `compile` and `gen`.
+- The `grpc` command now takes the flags `--address`, `--method`, and `--data`
+  or `--stdin` as opposed to parsing these from variable-length command args.
 - If more than one `prototool.yaml` is found for the input directory or files,
   an error is returned.
 - The `prototool` binary package is moved under `internal`.
