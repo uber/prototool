@@ -223,16 +223,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 	grpcCmdTemplate = &cmdTemplate{
 		Use:   "grpc dirOrProtoFiles...",
 		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
-		Long: `What this does behind the scenes:
-
-- Compiles your Protobuf files with "protoc", generating a "FileDescriptorSet".
-- Uses the "FileDescriptorSet" to figure out the request and response type for
-  the endpoint, and to convert the JSON input to binary.
-- Calls the gRPC endpoint.
-- Uses the "FileDescriptorSet" to convert the resulting binary back to JSON,
-  and prints it out for you.
-
-All these steps take on the order of milliseconds, for example the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
+		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC. 
 
 There is a full example for gRPC in the example directory of Prototool. Run "make init example" to make sure everything is installed and generated.
 
