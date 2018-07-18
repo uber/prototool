@@ -89,7 +89,7 @@ func (v *baseVisitor) pMessageOrEnumField(prefix string, fieldName string, field
 	}
 	if len(options) == 1 {
 		o := options[0]
-		if len(o.Constant.Array) == 0 && len(o.Constant.OrderedMap) == 0 {
+		if isSingleValueLiteral(o.Constant) {
 			if source := o.Constant.SourceRepresentation(); source != "" {
 				v.PWithInlineComment(inlineComment, prefix, fieldType, fieldName, " = ", fieldTag, " [", o.Name, ` = `, source, "];")
 				return
@@ -122,8 +122,7 @@ func (v *baseVisitor) pOptions(isFieldOption bool, options ...*proto.Option) {
 			}
 		}
 		v.PComment(o.Comment)
-		// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
-		if len(o.Constant.Array) == 0 && len(o.Constant.OrderedMap) == 0 {
+		if isSingleValueLiteral(o.Constant) {
 			// SourceRepresentation() returns an empty string if the literal is empty
 			// if empty, we do not want to print the key or empty value
 			if source := o.Constant.SourceRepresentation(); source != "" {
@@ -152,8 +151,7 @@ func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal, suffix s
 	if name != "" {
 		prefix = name + ": "
 	}
-	// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
-	if len(literal.Array) == 0 && len(literal.OrderedMap) == 0 {
+	if isSingleValueLiteral(literal) {
 		// SourceRepresentation() returns an empty string if the literal is empty
 		// if empty, we do not want to print the key or empty value
 		if source := literal.SourceRepresentation(); source != "" {
@@ -184,6 +182,11 @@ func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal, suffix s
 
 func (v *baseVisitor) PField(prefix string, fieldType string, field *proto.Field) {
 	v.pMessageOrEnumField(prefix, field.Name, fieldType, field.Sequence, field.Comment, field.InlineComment, field.Options...)
+}
+
+func isSingleValueLiteral(literal proto.Literal) bool {
+	// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
+	return len(literal.Array) == 0 && len(literal.OrderedMap) == 0
 }
 
 func (v *baseVisitor) PEnumField(element *proto.EnumField) {
