@@ -112,13 +112,13 @@ func (v *mainVisitor) VisitOption(element *proto.Option) {
 	}
 	switch v.parent.(type) {
 	case (*proto.Enum):
-		v.POptions(false, element)
+		v.POptions(element)
 	case (*proto.Message):
-		v.POptions(false, element)
+		v.POptions(element)
 	case (*proto.Oneof):
-		v.POptions(false, element)
+		v.POptions(element)
 	case (*proto.Service):
-		v.POptions(false, element)
+		v.POptions(element)
 	default:
 		v.AddFailure(element.Position, "unhandled child option")
 	}
@@ -149,16 +149,7 @@ func (v *mainVisitor) VisitNormalField(element *proto.NormalField) {
 
 func (v *mainVisitor) VisitEnumField(element *proto.EnumField) {
 	v.haveHitNonComment = true
-	v.PComment(element.Comment)
-	if element.ValueOption == nil {
-		v.PWithInlineComment(element.InlineComment, element.Name, " = ", element.Integer, ";")
-		return
-	}
-	v.P(" ", element.Name, " = ", element.Integer, " [")
-	v.In()
-	v.POptions(true, element.ValueOption)
-	v.Out()
-	v.PWithInlineComment(element.InlineComment, "];")
+	v.PEnumField(element)
 }
 
 func (v *mainVisitor) VisitEnum(element *proto.Enum) {
@@ -257,7 +248,7 @@ func (v *mainVisitor) VisitRPC(element *proto.RPC) {
 	}
 	v.P("rpc ", element.Name, "(", requestStream, element.RequestType, ") returns (", responseStream, element.ReturnsType, ") {")
 	v.In()
-	v.POptions(false, element.Options...)
+	v.POptions(element.Options...)
 	v.Out()
 	v.PWithInlineComment(element.InlineComment, "}")
 }
