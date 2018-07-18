@@ -68,7 +68,6 @@ type runner struct {
 
 	logger       *zap.Logger
 	cachePath    string
-	protocURL    string
 	printFields  string
 	dirMode      bool
 	harbormaster bool
@@ -642,12 +641,6 @@ func (r *runner) newDownloader(config settings.Config) protoc.Downloader {
 			protoc.DownloaderWithCachePath(r.cachePath),
 		)
 	}
-	if r.protocURL != "" {
-		downloaderOptions = append(
-			downloaderOptions,
-			protoc.DownloaderWithProtocURL(r.protocURL),
-		)
-	}
 	return protoc.NewDownloader(config, downloaderOptions...)
 }
 
@@ -659,12 +652,6 @@ func (r *runner) newCompiler(doGen bool, doFileDescriptorSet bool) protoc.Compil
 		compilerOptions = append(
 			compilerOptions,
 			protoc.CompilerWithCachePath(r.cachePath),
-		)
-	}
-	if r.protocURL != "" {
-		compilerOptions = append(
-			compilerOptions,
-			protoc.CompilerWithProtocURL(r.protocURL),
 		)
 	}
 	if doGen {

@@ -46,7 +46,6 @@ type flags struct {
 	overwrite      bool
 	pkg            string
 	printFields    string
-	protocURL      string
 	stdin          bool
 	uncomment      bool
 	noRewrite      bool
@@ -134,10 +133,6 @@ func (f *flags) bindPackage(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.printFields, "print-fields", "filename:line:column:message", "The colon-separated fields to print out on error.")
-}
-
-func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.protocURL, "protoc-url", "", "The url to use to download the protoc zip file, otherwise uses GitHub Releases. Setting this option will ignore the config protoc_version setting.")
 }
 
 func (f *flags) bindStdin(flagSet *pflag.FlagSet) {
