@@ -38,7 +38,7 @@ const (
 
 // Handler handles gRPC calls.
 type Handler interface {
-	Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, address string, method string, inputReader io.Reader, outputWriter io.Writer) error
+	Invoke(fileDescriptorSet *descriptor.FileDescriptorSet, address string, method string, inputReader io.Reader, outputWriter io.Writer) error
 }
 
 // HandlerOption is an option for a new Handler.
