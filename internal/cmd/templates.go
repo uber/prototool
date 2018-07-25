@@ -24,13 +24,17 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
+	wordwrap "github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/uber/prototool/internal/exec"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+const wordWrapLength uint = 80
 
 var (
 	allCmdTemplate = &cmdTemplate{
@@ -71,6 +75,7 @@ var (
 	compileCmdTemplate = &cmdTemplate{
 		Use:   "compile dirOrProtoFiles...",
 		Short: "Compile with protoc to check for failures.",
+		Long:  `Stubs will not be generated. To generate stubs, use the "gen" command. Calling "compile" has the effect of calling protoc with "-o /dev/null".`,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Compile(args, flags.dryRun)
 		},
@@ -83,6 +88,62 @@ var (
 	createCmdTemplate = &cmdTemplate{
 		Use:   "create files...",
 		Short: "Create the given Protobuf files according to a template that passes default prototool lint.",
+		Long: `Assuming the filename "example_create_file.proto", the file will look like the following:
+
+  syntax = "proto3";
+
+  package SOME.PKG;
+
+  option go_package = "PKGpb";
+  option java_multiple_files = true;
+  option java_outer_classname = "ExampleCreateFileProto";
+  option java_package = "com.SOME.PKG.pb";
+
+This matches what the linter expects. "SOME.PKG" will be computed as follows:
+
+- If "--package" is specified, "SOME.PKG" will be the value passed to
+  "--package".
+- Otherwise, if there is no "prototool.yaml" that would apply to the new file,
+  use "uber.prototool.generated".
+- Otherwise, if there is a "prototool.yaml" file, check if it has a
+  "dir_to_base_package" setting under the "create" section. If it does, this
+  package, concatenated with the relative path from the directory with the
+ "prototool.yaml" will be used.
+- Otherwise, if there is no "dir_to_base_package" directive, just use the
+  relative path from the directory with the "prototool.yaml" file. If the file
+  is in the same directory as the "prototoo.yaml" file, use
+  "uber.prototool.generated".
+
+For example, assume you have the following file at "repo/prototool.yaml":
+
+create:
+  dir_to_base_package:
+    idl: uber
+    idl/baz: special
+
+- "prototool create repo/idl/foo/bar/bar.proto" will have the package
+  "uber.foo.bar".
+- "prototool create repo/idl/bar.proto" will have the package "uber".
+- "prototool create repo/idl/baz/baz.proto" will have the package "special".
+- "prototool create repo/idl/baz/bat/bat.proto" will have the package
+  "special.bat".
+- "prototool create repo/another/dir/bar.proto" will have the package
+  "another.dir".
+- "prototool create repo/bar.proto" will have the package
+  "uber.prototool.generated".
+
+This is meant to mimic what you generally want - a base package for your idl directory, followed by packages matching the directory structure.
+
+Note you can override the directory that the "prototool.yaml" file is in as well. If we update our file at "repo/prototool.yaml" to this:
+
+create:
+  dir_to_base_package:
+    .: foo.bar
+
+Then "prototool create repo/bar.proto" will have the package "foo.bar", and "prototool create repo/another/dir/bar.proto" will have the package "foo.bar.another.dir".
+
+If Vim integration is set up, files will be generated when you open a new Protobuf file.`,
+
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Create(args, flags.pkg)
 		},
@@ -135,6 +196,7 @@ var (
 	formatCmdTemplate = &cmdTemplate{
 		Use:   "format dirOrProtoFiles...",
 		Short: "Format a proto file and compile with protoc to check for failures.",
+		Long:  `By default, the values for "java_multiple_files", "java_outer_classname", and "java_package" are updated to reflect what is expected by the Google Cloud APIs file structure at https://cloud.google.com/apis/design/file_structure, and the value of "go_package" is updated to reflect what we expect for the default Style Guide. By formatting, the linting for these values will pass by default. See the documentation for "create" for an example. This functionality can be suppressed by passing the flag "--no-rewrite".`,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, !flags.noRewrite)
 		},
@@ -161,6 +223,77 @@ var (
 	grpcCmdTemplate = &cmdTemplate{
 		Use:   "grpc dirOrProtoFiles...",
 		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
+		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC. 
+
+There is a full example for gRPC in the example directory of Prototool. Run "make init example" to make sure everything is installed and generated.
+
+Start the example server in a separate terminal by doing "go run example/cmd/excited/main.go".
+
+prototool grpc dirOrProtoFiles... \
+  --address serverAddress \
+  --method package.service/Method \
+  --data 'requestData'
+
+Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" which will result in the input being read from stdin as JSON.
+
+$ make init example # make sure everything is built just in case
+
+$ cat input.json
+{"value":"hello"}
+
+$ cat input.json | prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/Exclamation \
+  --stdin
+{
+  "value": "hello!"
+}
+
+$ cat input.json | prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/ExclamationServerStream \
+  --stdin
+{
+  "value": "h"
+}
+{
+  "value": "e"
+}
+{
+  "value": "l"
+}
+{
+  "value": "l"
+}
+{
+  "value": "o"
+}
+{
+  "value": "!"
+}
+
+$ cat input.json
+{"value":"hello"}
+{"value":"salutations"}
+
+$ cat input.json | prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/ExclamationClientStream \
+  --stdin
+{
+  "value": "hellosalutations!"
+}
+
+$ cat input.json | prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/ExclamationBidiStream \
+  --stdin
+{
+  "value": "hello!"
+}
+{
+  "value": "salutations!"
+}`,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
 		},
@@ -180,6 +313,7 @@ var (
 	initCmdTemplate = &cmdTemplate{
 		Use:   "init [dirPath]",
 		Short: "Generate an initial config file in the current or given directory.",
+		Long:  `All available options will be generated and commented out except for "protoc_version". Pass the "--uncomment" flag to uncomment all options.`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Init(args, flags.uncomment)
@@ -204,6 +338,7 @@ var (
 	lintCmdTemplate = &cmdTemplate{
 		Use:   "lint dirOrProtoFiles...",
 		Short: "Lint proto files and compile with protoc to check for failures.",
+		Long:  `The default rule set follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. You can add or exclude lint rules in your "prototool.yaml" file. The default rule set is very strict and is meant to enforce consistent development patterns.`,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Lint(args, flags.listAllLinters, flags.listLinters)
 		},
@@ -294,9 +429,9 @@ type cmdTemplate struct {
 func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) *cobra.Command {
 	command := &cobra.Command{}
 	command.Use = c.Use
-	command.Short = c.Short
+	command.Short = strings.TrimSpace(c.Short)
 	if c.Long != "" {
-		command.Long = fmt.Sprintf("%s\n%s", c.Short, c.Long)
+		command.Long = wordwrap.WrapString(fmt.Sprintf("%s\n\n%s", strings.TrimSpace(c.Short), strings.TrimSpace(c.Long)), wordWrapLength)
 	}
 	command.Args = c.Args
 	command.Run = func(_ *cobra.Command, args []string) {

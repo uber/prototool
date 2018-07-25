@@ -1,5 +1,5 @@
-hash: 7ba018ca22cd50a2e909cb7b3e091aa378b2ae048e69d0d999af81cb0583c2a3
-updated: 2018-06-14T13:49:16.756220234-04:00
+hash: e103ef81d6b447b46f5afb30e2d4bcf841a26eb52a11b8743f9dc8f35d16e855
+updated: 2018-07-16T10:45:39.277224709+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 3a771d992973f24aa725d07868b467d1ddfceafb
@@ -58,6 +58,8 @@ imports:
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
+- name: github.com/mitchellh/go-wordwrap
+  version: ad45545899c7b13c020ea92b2072220eefad42b8
 - name: github.com/opentracing/opentracing-go
   version: 1949ddbfd147afd4d964a9f00b24eb291e0e7c38
   subpackages:
@@ -99,7 +101,7 @@ imports:
 - name: github.com/uber-go/tally
   version: 79f2a33b0e55b1255ffbbaf824dcafb09ff34dda
 - name: github.com/uber/tchannel-go
-  version: cc0c40929b0dbdb755b727a8c253de2b5d4af46b
+  version: 7f5c12c66261f3ac3c5dde959d65eed59e3b63af
   subpackages:
   - internal/argreader
   - relay
@@ -110,7 +112,7 @@ imports:
 - name: go.uber.org/atomic
   version: 1ea20fb1cbb1cc08cbd0d913a96dead89aa18289
 - name: go.uber.org/dig
-  version: 45540ff1846c207f109bbb7de2f2748f7198ca21
+  version: d100de9c8cc8358591507951141bc107713ba671
   subpackages:
   - internal/digreflect
 - name: go.uber.org/fx
@@ -128,7 +130,7 @@ imports:
   - push
   - tallypush
 - name: go.uber.org/thriftrw
-  version: 43dfafd7bb1c99f0460d645a1959b73f6dfa536f
+  version: fb439a9a7f5a388d8606aae1c1ff6654b8b67fbe
   subpackages:
   - version
 - name: go.uber.org/yarpc
@@ -162,7 +164,7 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/net
-  version: db08ff08e8622530d9ed3a0e8ac279f6d4c02196
+  version: afe8f62b1d6bbd81f31868121a50b06d8188e1f9
   subpackages:
   - bpf
   - context
@@ -193,13 +195,12 @@ imports:
   - protobuf/ptype
   - protobuf/source_context
 - name: google.golang.org/grpc
-  version: 24f3cca1ffddeab04708c325f8088c76c2d74972
+  version: ba63e52faf1676ef8bb26b6e0ba5acf78ff3b8e8
   repo: https://github.com/grpc/grpc-go
   subpackages:
   - balancer
   - balancer/base
   - balancer/roundrobin
-  - channelz
   - codes
   - connectivity
   - credentials
@@ -208,6 +209,7 @@ imports:
   - grpclog
   - internal
   - internal/backoff
+  - internal/channelz
   - internal/grpcrand
   - keepalive
   - metadata
