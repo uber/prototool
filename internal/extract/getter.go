@@ -42,7 +42,7 @@ func newGetter(options ...GetterOption) *getter {
 	return getter
 }
 
-func (g *getter) GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error) {
+func (g *getter) GetField(fileDescriptorSet *descriptor.FileDescriptorSet, path string) (*Field, error) {
 	if len(path) == 0 {
 		return nil, fmt.Errorf("empty path")
 	}
@@ -53,7 +53,7 @@ func (g *getter) GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, pa
 	if len(split) < 2 {
 		return nil, fmt.Errorf("no field for path %s", path)
 	}
-	message, err := g.GetMessage(fileDescriptorSets, strings.Join(split[0:len(split)-1], "."))
+	message, err := g.GetMessage(fileDescriptorSet, strings.Join(split[0:len(split)-1], "."))
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (g *getter) GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, pa
 	}, nil
 }
 
-func (g *getter) GetMessage(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Message, error) {
+func (g *getter) GetMessage(fileDescriptorSet *descriptor.FileDescriptorSet, path string) (*Message, error) {
 	if len(path) == 0 {
 		return nil, fmt.Errorf("empty path")
 	}
@@ -88,26 +88,17 @@ func (g *getter) GetMessage(fileDescriptorSets []*descriptor.FileDescriptorSet, 
 	}
 	var descriptorProto *descriptor.DescriptorProto
 	var fileDescriptorProto *descriptor.FileDescriptorProto
-	var fileDescriptorSet *descriptor.FileDescriptorSet
-	for _, iFileDescriptorSet := range fileDescriptorSets {
-		for _, iFileDescriptorProto := range iFileDescriptorSet.File {
-			iDescriptorProto, err := findDescriptorProto(path, iFileDescriptorProto)
-			if err != nil {
-				return nil, err
-			}
-			if iDescriptorProto != nil {
-				if descriptorProto != nil {
-					return nil, fmt.Errorf("duplicate messages for path %s", path)
-				}
-				descriptorProto = iDescriptorProto
-				fileDescriptorProto = iFileDescriptorProto
-			}
+	for _, iFileDescriptorProto := range fileDescriptorSet.File {
+		iDescriptorProto, err := findDescriptorProto(path, iFileDescriptorProto)
+		if err != nil {
+			return nil, err
 		}
-		// return first fileDescriptorSet that matches
-		// as opposed to duplicate check within fileDescriptorSet, we easily could
-		// have multiple fileDescriptorSets that match
-		if descriptorProto != nil {
-			fileDescriptorSet = iFileDescriptorSet
+		if iDescriptorProto != nil {
+			if descriptorProto != nil {
+				return nil, fmt.Errorf("duplicate messages for path %s", path)
+			}
+			descriptorProto = iDescriptorProto
+			fileDescriptorProto = iFileDescriptorProto
 			break
 		}
 	}
@@ -122,7 +113,7 @@ func (g *getter) GetMessage(fileDescriptorSets []*descriptor.FileDescriptorSet, 
 	}, nil
 }
 
-func (g *getter) GetService(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Service, error) {
+func (g *getter) GetService(fileDescriptorSet *descriptor.FileDescriptorSet, path string) (*Service, error) {
 	if len(path) == 0 {
 		return nil, fmt.Errorf("empty path")
 	}
@@ -131,26 +122,17 @@ func (g *getter) GetService(fileDescriptorSets []*descriptor.FileDescriptorSet, 
 	}
 	var serviceDescriptorProto *descriptor.ServiceDescriptorProto
 	var fileDescriptorProto *descriptor.FileDescriptorProto
-	var fileDescriptorSet *descriptor.FileDescriptorSet
-	for _, iFileDescriptorSet := range fileDescriptorSets {
-		for _, iFileDescriptorProto := range iFileDescriptorSet.File {
-			iServiceDescriptorProto, err := findServiceDescriptorProto(path, iFileDescriptorProto)
-			if err != nil {
-				return nil, err
-			}
-			if iServiceDescriptorProto != nil {
-				if serviceDescriptorProto != nil {
-					return nil, fmt.Errorf("duplicate services for path %s", path)
-				}
-				serviceDescriptorProto = iServiceDescriptorProto
-				fileDescriptorProto = iFileDescriptorProto
-			}
+	for _, iFileDescriptorProto := range fileDescriptorSet.File {
+		iServiceDescriptorProto, err := findServiceDescriptorProto(path, iFileDescriptorProto)
+		if err != nil {
+			return nil, err
 		}
-		// return first fileDescriptorSet that matches
-		// as opposed to duplicate check within fileDescriptorSet, we easily could
-		// have multiple fileDescriptorSets that match
-		if serviceDescriptorProto != nil {
-			fileDescriptorSet = iFileDescriptorSet
+		if iServiceDescriptorProto != nil {
+			if serviceDescriptorProto != nil {
+				return nil, fmt.Errorf("duplicate services for path %s", path)
+			}
+			serviceDescriptorProto = iServiceDescriptorProto
+			fileDescriptorProto = iFileDescriptorProto
 			break
 		}
 	}

@@ -161,8 +161,40 @@ func (c *compiler) Compile(protoSet *file.ProtoSet) (*CompileResult, error) {
 			fileDescriptorSets = append(fileDescriptorSets, fileDescriptorSet)
 		}
 	}
+	// Given that we only allow one build configuration, we can merge all of
+	// file descriptor sets into a single set.
+	fds, err := mergeFileDescriptorSets(fileDescriptorSets)
+	if err != nil {
+		return nil, fmt.Errorf("failed to merge file descriptors: %v", err)
+	}
 	return &CompileResult{
-		FileDescriptorSets: fileDescriptorSets,
+		FileDescriptorSet: fds,
+	}, nil
+}
+
+// Merge the file descriptor sets into a single set. All of the import paths should
+// refer to the same proto files, so we verify by comparing the raw bytes
+// between the files that are referenced more than once.
+func mergeFileDescriptorSets(sets []*descriptor.FileDescriptorSet) (*descriptor.FileDescriptorSet, error) {
+	// Used to determine whether or not a *descriptor.FileDescriptorProto
+	// has already been added to the merged set. We use the file descriptor's
+	// Name attribute to uniquely represent every file descriptor.
+	files := map[string]*descriptor.FileDescriptorProto{}
+	for _, s := range sets {
+		for _, f := range s.File {
+			name := f.GetName()
+			if fdp, ok := files[name]; ok && fdp.String() != f.String() {
+				return nil, fmt.Errorf("multiple files imported for %s were found", name)
+			}
+			files[name] = f
+		}
+	}
+	descriptors := make([]*descriptor.FileDescriptorProto, 0, len(files))
+	for _, f := range files {
+		descriptors = append(descriptors, f)
+	}
+	return &descriptor.FileDescriptorSet{
+		File: descriptors,
 	}, nil
 }
 

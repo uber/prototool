@@ -213,14 +213,14 @@ func (r *runner) DescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	fileDescriptorSet, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
+	if len(fileDescriptorSet.File) == 0 {
+		return fmt.Errorf("no FileDescriptors returned")
 	}
-	message, err := r.newGetter().GetMessage(fileDescriptorSets, path)
+	message, err := r.newGetter().GetMessage(fileDescriptorSet, path)
 	if err != nil {
 		return err
 	}
@@ -243,14 +243,14 @@ func (r *runner) FieldDescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	fileDescriptorSet, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
+	if len(fileDescriptorSet.File) == 0 {
+		return fmt.Errorf("no FileDescriptors returned")
 	}
-	field, err := r.newGetter().GetField(fileDescriptorSets, path)
+	field, err := r.newGetter().GetField(fileDescriptorSet, path)
 	if err != nil {
 		return err
 	}
@@ -273,14 +273,14 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	fileDescriptorSet, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
+	if len(fileDescriptorSet.File) == 0 {
+		return fmt.Errorf("no FileDescriptors returned")
 	}
-	service, err := r.newGetter().GetService(fileDescriptorSets, path)
+	service, err := r.newGetter().GetService(fileDescriptorSet, path)
 	if err != nil {
 		return err
 	}
@@ -291,7 +291,7 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 	return r.println(data)
 }
 
-func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
+func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) (*descriptor.FileDescriptorSet, error) {
 	if dryRun {
 		return nil, r.printCommands(doGen, meta.ProtoSet)
 	}
@@ -306,7 +306,7 @@ func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([
 		return nil, newExitErrorf(255, "")
 	}
 	r.logger.Debug("protoc command exited without errors")
-	return compileResult.FileDescriptorSets, nil
+	return compileResult.FileDescriptorSet, nil
 }
 
 func (r *runner) printCommands(doGen bool, protoSet *file.ProtoSet) error {
@@ -497,14 +497,14 @@ func (r *runner) BinaryToJSON(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	fileDescriptorSet, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
+	if len(fileDescriptorSet.File) == 0 {
+		return fmt.Errorf("no FileDescriptors returned")
 	}
-	out, err := r.newReflectHandler().BinaryToJSON(fileDescriptorSets, path, data)
+	out, err := r.newReflectHandler().BinaryToJSON(fileDescriptorSet, path, data)
 	if err != nil {
 		return err
 	}
@@ -528,14 +528,14 @@ func (r *runner) JSONToBinary(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	fileDescriptorSet, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
+	if len(fileDescriptorSet.File) == 0 {
+		return fmt.Errorf("no FileDescriptors returned")
 	}
-	out, err := r.newReflectHandler().JSONToBinary(fileDescriptorSets, path, data)
+	out, err := r.newReflectHandler().JSONToBinary(fileDescriptorSet, path, data)
 	if err != nil {
 		return err
 	}
@@ -617,19 +617,19 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	fileDescriptorSet, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
+	if len(fileDescriptorSet.File) == 0 {
+		return fmt.Errorf("no FileDescriptors returned")
 	}
 	return r.newGRPCHandler(
 		parsedHeaders,
 		parsedCallTimeout,
 		parsedConnectTimeout,
 		parsedKeepaliveTime,
-	).Invoke(fileDescriptorSets, address, method, reader, r.output)
+	).Invoke(fileDescriptorSet, address, method, reader, r.output)
 }
 
 func (r *runner) newDownloader(config settings.Config) protoc.Downloader {
@@ -762,7 +762,8 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 		if err != nil {
 			return nil, err
 		}
-		if fileInfo.Mode().IsDir() {
+		mode := fileInfo.Mode()
+		if mode.IsDir() {
 			protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
 			if err != nil {
 				return nil, err
@@ -771,8 +772,7 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 				ProtoSet: protoSet,
 			}, nil
 		}
-		// TODO: allow symlinks?
-		if fileInfo.Mode().IsRegular() {
+		if mode.IsRegular() {
 			if r.dirMode {
 				protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
 				if err != nil {
@@ -792,16 +792,6 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 			}, nil
 		}
 		return nil, fmt.Errorf("%s is not a directory or a regular file", fileOrDir)
-	}
-	for _, arg := range args {
-		fileInfo, err := os.Stat(arg)
-		if err != nil {
-			return nil, err
-		}
-		// TODO: allow symlinks?
-		if !fileInfo.Mode().IsRegular() {
-			return nil, fmt.Errorf("multiple arguments only allowed if all arguments are regular files, %q is not a regular file", arg)
-		}
 	}
 	protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, args...)
 	if err != nil {

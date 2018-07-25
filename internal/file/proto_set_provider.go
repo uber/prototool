@@ -72,6 +72,16 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*Proto
 }
 
 func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error) {
+	for _, f := range filePaths {
+		fileInfo, err := os.Stat(f)
+		if err != nil {
+			return nil, err
+		}
+		// TODO: allow symlinks?
+		if !fileInfo.Mode().IsRegular() {
+			return nil, fmt.Errorf("failed to read from multiple files: %q is not a regular file", f)
+		}
+	}
 	protoSets, err := c.GetMultipleForFiles(workDirPath, filePaths...)
 	if err != nil {
 		return nil, err

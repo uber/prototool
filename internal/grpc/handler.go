@@ -67,8 +67,8 @@ func newHandler(options ...HandlerOption) *handler {
 	return handler
 }
 
-func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, address string, method string, inputReader io.Reader, outputWriter io.Writer) error {
-	descriptorSource, err := h.getDescriptorSourceForMethod(fileDescriptorSets, method)
+func (h *handler) Invoke(fileDescriptorSet *descriptor.FileDescriptorSet, address string, method string, inputReader io.Reader, outputWriter io.Writer) error {
+	descriptorSource, err := h.getDescriptorSourceForMethod(fileDescriptorSet, method)
 	if err != nil {
 		return err
 	}
@@ -116,16 +116,16 @@ func (h *handler) getDialOptions() []grpc.DialOption {
 	return dialOptions
 }
 
-func (h *handler) getDescriptorSourceForMethod(fileDescriptorSets []*descriptor.FileDescriptorSet, method string) (grpcurl.DescriptorSource, error) {
+func (h *handler) getDescriptorSourceForMethod(fileDescriptorSet *descriptor.FileDescriptorSet, method string) (grpcurl.DescriptorSource, error) {
 	servicePath, err := getServiceForMethod(method)
 	if err != nil {
 		return nil, err
 	}
-	service, err := h.getter.GetService(fileDescriptorSets, servicePath)
+	service, err := h.getter.GetService(fileDescriptorSet, servicePath)
 	if err != nil {
 		return nil, err
 	}
-	fileDescriptorSet, err := desc.SortFileDescriptorSet(service.FileDescriptorSet, service.FileDescriptorProto)
+	fileDescriptorSet, err = desc.SortFileDescriptorSet(service.FileDescriptorSet, service.FileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}

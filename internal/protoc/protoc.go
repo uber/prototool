@@ -106,7 +106,7 @@ type CompileResult struct {
 	//
 	// Will only be set if the CompilerWithFileDescriptorSet
 	// option is used.
-	FileDescriptorSets []*descriptor.FileDescriptorSet
+	FileDescriptorSet *descriptor.FileDescriptorSet
 }
 
 // Compiler compiles protobuf files.

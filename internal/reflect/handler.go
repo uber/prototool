@@ -51,8 +51,8 @@ func newHandler(options ...HandlerOption) *handler {
 	return handler
 }
 
-func (h *handler) BinaryToJSON(fileDescriptorSets []*descriptor.FileDescriptorSet, messagePath string, binaryData []byte) ([]byte, error) {
-	dynamicMessage, err := h.getDynamicMessage(fileDescriptorSets, messagePath)
+func (h *handler) BinaryToJSON(fileDescriptorSet *descriptor.FileDescriptorSet, messagePath string, binaryData []byte) ([]byte, error) {
+	dynamicMessage, err := h.getDynamicMessage(fileDescriptorSet, messagePath)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +62,8 @@ func (h *handler) BinaryToJSON(fileDescriptorSets []*descriptor.FileDescriptorSe
 	return dynamicMessage.MarshalJSON()
 }
 
-func (h *handler) JSONToBinary(fileDescriptorSets []*descriptor.FileDescriptorSet, messagePath string, jsonData []byte) ([]byte, error) {
-	dynamicMessage, err := h.getDynamicMessage(fileDescriptorSets, messagePath)
+func (h *handler) JSONToBinary(fileDescriptorSet *descriptor.FileDescriptorSet, messagePath string, jsonData []byte) ([]byte, error) {
+	dynamicMessage, err := h.getDynamicMessage(fileDescriptorSet, messagePath)
 	if err != nil {
 		return nil, err
 	}
@@ -73,12 +73,12 @@ func (h *handler) JSONToBinary(fileDescriptorSets []*descriptor.FileDescriptorSe
 	return dynamicMessage.Marshal()
 }
 
-func (h *handler) getDynamicMessage(fileDescriptorSets []*descriptor.FileDescriptorSet, messagePath string) (*dynamic.Message, error) {
-	message, err := h.getter.GetMessage(fileDescriptorSets, messagePath)
+func (h *handler) getDynamicMessage(fileDescriptorSet *descriptor.FileDescriptorSet, messagePath string) (*dynamic.Message, error) {
+	message, err := h.getter.GetMessage(fileDescriptorSet, messagePath)
 	if err != nil {
 		return nil, err
 	}
-	fileDescriptorSet, err := intdesc.SortFileDescriptorSet(message.FileDescriptorSet, message.FileDescriptorProto)
+	fileDescriptorSet, err = intdesc.SortFileDescriptorSet(message.FileDescriptorSet, message.FileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}

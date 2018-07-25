@@ -27,8 +27,8 @@ import (
 
 // Handler handles reflection.
 type Handler interface {
-	BinaryToJSON(fileDescriptorSets []*descriptor.FileDescriptorSet, messagePath string, binaryData []byte) ([]byte, error)
-	JSONToBinary(fileDescriptorSets []*descriptor.FileDescriptorSet, messagePath string, jsonData []byte) ([]byte, error)
+	BinaryToJSON(fileDescriptorSet *descriptor.FileDescriptorSet, messagePath string, binaryData []byte) ([]byte, error)
+	JSONToBinary(fileDescriptorSet *descriptor.FileDescriptorSet, messagePath string, jsonData []byte) ([]byte, error)
 }
 
 // HandlerOption is an option for a new Handler.
