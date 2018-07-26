@@ -1,7 +1,7 @@
 # The Protobuf version to use from https://github.com/google/protobuf/releases.
-# By default use 3.5.1.
+# By default use 3.6.0.
 # You probably want to set this to make your builds completely reproducible.
-protoc_version: 3.5.1
+protoc_version: 3.6.0
 
 # Paths to exclude when using directory mode.
 # These are prefixes, not regexes, so path/to/a will ignore anything beginning with

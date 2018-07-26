@@ -6,10 +6,9 @@ package foopb
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import _ "google.golang.org/genproto/googleapis/api/annotations"
-import google_protobuf1 "github.com/gogo/protobuf/types"
-import google_protobuf2 "github.com/gogo/protobuf/types"
+import types "github.com/gogo/protobuf/types"
 import sub "github.com/uber/prototool/example/gen/proto/go/sub"
+import _ "google.golang.org/genproto/googleapis/api/annotations"
 
 import strconv "strconv"
 
@@ -17,10 +16,8 @@ import strings "strings"
 import reflect "reflect"
 import github_com_gogo_protobuf_sortkeys "github.com/gogo/protobuf/sortkeys"
 
-import (
-	context "golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
-)
+import context "golang.org/x/net/context"
+import grpc "google.golang.org/grpc"
 
 import io "io"
 
@@ -28,6 +25,12 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Hello is a hello.
 type Hello int32
@@ -52,7 +55,9 @@ var Hello_value = map[string]int32{
 	"HELLO_BALLOON": 3,
 }
 
-func (Hello) EnumDescriptor() ([]byte, []int) { return fileDescriptorFoo, []int{0} }
+func (Hello) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{0}
+}
 
 // Bar is a bar.
 type Bar int32
@@ -68,7 +73,9 @@ var Bar_value = map[string]int32{
 	"BAR_INVALID": 0,
 }
 
-func (Bar) EnumDescriptor() ([]byte, []int) { return fileDescriptorFoo, []int{1} }
+func (Bar) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{1}
+}
 
 // Baz is a baz.
 type Foo_Bar_Baz int32
@@ -84,7 +91,9 @@ var Foo_Bar_Baz_value = map[string]int32{
 	"FOO_BAR_BAZ_INVALID": 0,
 }
 
-func (Foo_Bar_Baz) EnumDescriptor() ([]byte, []int) { return fileDescriptorFoo, []int{0, 0, 0} }
+func (Foo_Bar_Baz) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{0, 0, 0}
+}
 
 // Bat is a bat.
 type Foo_Bar_Bat int32
@@ -100,16 +109,48 @@ var Foo_Bar_Bat_value = map[string]int32{
 	"FOO_BAR_BAT_INVALID": 0,
 }
 
-func (Foo_Bar_Bat) EnumDescriptor() ([]byte, []int) { return fileDescriptorFoo, []int{0, 0, 1} }
+func (Foo_Bar_Bat) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{0, 0, 1}
+}
 
 // Foo is a foo.
 type Foo struct {
-	Bar *Foo_Bar `protobuf:"bytes,1,opt,name=bar" json:"bar,omitempty"`
+	Bar                  *Foo_Bar `protobuf:"bytes,1,opt,name=bar" json:"bar,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Foo) Reset()                    { *m = Foo{} }
-func (*Foo) ProtoMessage()               {}
-func (*Foo) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{0} }
+func (m *Foo) Reset()      { *m = Foo{} }
+func (*Foo) ProtoMessage() {}
+func (*Foo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{0}
+}
+func (m *Foo) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Foo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Foo.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *Foo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Foo.Merge(dst, src)
+}
+func (m *Foo) XXX_Size() int {
+	return m.Size()
+}
+func (m *Foo) XXX_DiscardUnknown() {
+	xxx_messageInfo_Foo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Foo proto.InternalMessageInfo
 
 func (m *Foo) GetBar() *Foo_Bar {
 	if m != nil {
@@ -120,13 +161,43 @@ func (m *Foo) GetBar() *Foo_Bar {
 
 // Bar is a bar.
 type Foo_Bar struct {
-	Baz Foo_Bar_Baz `protobuf:"varint,1,opt,name=baz,proto3,enum=foo.Foo_Bar_Baz" json:"baz,omitempty"`
-	Bat Foo_Bar_Bat `protobuf:"varint,2,opt,name=bat,proto3,enum=foo.Foo_Bar_Bat" json:"bat,omitempty"`
+	Baz                  Foo_Bar_Baz `protobuf:"varint,1,opt,name=baz,proto3,enum=foo.Foo_Bar_Baz" json:"baz,omitempty"`
+	Bat                  Foo_Bar_Bat `protobuf:"varint,2,opt,name=bat,proto3,enum=foo.Foo_Bar_Bat" json:"bat,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
-func (m *Foo_Bar) Reset()                    { *m = Foo_Bar{} }
-func (*Foo_Bar) ProtoMessage()               {}
-func (*Foo_Bar) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{0, 0} }
+func (m *Foo_Bar) Reset()      { *m = Foo_Bar{} }
+func (*Foo_Bar) ProtoMessage() {}
+func (*Foo_Bar) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{0, 0}
+}
+func (m *Foo_Bar) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Foo_Bar) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Foo_Bar.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *Foo_Bar) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Foo_Bar.Merge(dst, src)
+}
+func (m *Foo_Bar) XXX_Size() int {
+	return m.Size()
+}
+func (m *Foo_Bar) XXX_DiscardUnknown() {
+	xxx_messageInfo_Foo_Bar.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Foo_Bar proto.InternalMessageInfo
 
 func (m *Foo_Bar) GetBaz() Foo_Bar_Baz {
 	if m != nil {
@@ -144,14 +215,44 @@ func (m *Foo_Bar) GetBat() Foo_Bar_Bat {
 
 // Barr is a barr.
 type Barr struct {
-	Hello     int64                       `protobuf:"varint,1,opt,name=hello,proto3" json:"hello,omitempty"`
-	Dep       *Dep                        `protobuf:"bytes,2,opt,name=dep" json:"dep,omitempty"`
-	Timestamp *google_protobuf2.Timestamp `protobuf:"bytes,3,opt,name=timestamp" json:"timestamp,omitempty"`
+	Hello                int64            `protobuf:"varint,1,opt,name=hello,proto3" json:"hello,omitempty"`
+	Dep                  *Dep             `protobuf:"bytes,2,opt,name=dep" json:"dep,omitempty"`
+	Timestamp            *types.Timestamp `protobuf:"bytes,3,opt,name=timestamp" json:"timestamp,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
-func (m *Barr) Reset()                    { *m = Barr{} }
-func (*Barr) ProtoMessage()               {}
-func (*Barr) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{1} }
+func (m *Barr) Reset()      { *m = Barr{} }
+func (*Barr) ProtoMessage() {}
+func (*Barr) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{1}
+}
+func (m *Barr) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Barr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Barr.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *Barr) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Barr.Merge(dst, src)
+}
+func (m *Barr) XXX_Size() int {
+	return m.Size()
+}
+func (m *Barr) XXX_DiscardUnknown() {
+	xxx_messageInfo_Barr.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Barr proto.InternalMessageInfo
 
 func (m *Barr) GetHello() int64 {
 	if m != nil {
@@ -167,7 +268,7 @@ func (m *Barr) GetDep() *Dep {
 	return nil
 }
 
-func (m *Barr) GetTimestamp() *google_protobuf2.Timestamp {
+func (m *Barr) GetTimestamp() *types.Timestamp {
 	if m != nil {
 		return m.Timestamp
 	}
@@ -185,14 +286,44 @@ type Another struct {
 	// Types that are valid to be assigned to OneofOneof:
 	//	*Another_Seven
 	//	*Another_Eight
-	OneofOneof isAnother_OneofOneof       `protobuf_oneof:"oneof_oneof"`
-	Nine       []*Another                 `protobuf:"bytes,9,rep,name=nine" json:"nine,omitempty"`
-	Duration   *google_protobuf1.Duration `protobuf:"bytes,10,opt,name=duration" json:"duration,omitempty"`
+	OneofOneof           isAnother_OneofOneof `protobuf_oneof:"oneof_oneof"`
+	Nine                 []*Another           `protobuf:"bytes,9,rep,name=nine" json:"nine,omitempty"`
+	Duration             *types.Duration      `protobuf:"bytes,10,opt,name=duration" json:"duration,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
-func (m *Another) Reset()                    { *m = Another{} }
-func (*Another) ProtoMessage()               {}
-func (*Another) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{2} }
+func (m *Another) Reset()      { *m = Another{} }
+func (*Another) ProtoMessage() {}
+func (*Another) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{2}
+}
+func (m *Another) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Another) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Another.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *Another) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Another.Merge(dst, src)
+}
+func (m *Another) XXX_Size() int {
+	return m.Size()
+}
+func (m *Another) XXX_DiscardUnknown() {
+	xxx_messageInfo_Another.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Another proto.InternalMessageInfo
 
 type isAnother_OneofOneof interface {
 	isAnother_OneofOneof()
@@ -281,7 +412,7 @@ func (m *Another) GetNine() []*Another {
 	return nil
 }
 
-func (m *Another) GetDuration() *google_protobuf1.Duration {
+func (m *Another) GetDuration() *types.Duration {
 	if m != nil {
 		return m.Duration
 	}
@@ -340,10 +471,10 @@ func _Another_OneofSizer(msg proto.Message) (n int) {
 	// oneof_oneof
 	switch x := m.OneofOneof.(type) {
 	case *Another_Seven:
-		n += proto.SizeVarint(7<<3 | proto.WireVarint)
+		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(x.Seven))
 	case *Another_Eight:
-		n += proto.SizeVarint(8<<3 | proto.WireBytes)
+		n += 1 // tag and wire
 		n += proto.SizeVarint(uint64(len(x.Eight)))
 		n += len(x.Eight)
 	case nil:
@@ -355,14 +486,44 @@ func _Another_OneofSizer(msg proto.Message) (n int) {
 
 // HasWKT has Well-Known Types.
 type HasWKT struct {
-	Duration *google_protobuf1.Duration `protobuf:"bytes,1,opt,name=duration" json:"duration,omitempty"`
+	Duration             *types.Duration `protobuf:"bytes,1,opt,name=duration" json:"duration,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
+	XXX_sizecache        int32           `json:"-"`
 }
 
-func (m *HasWKT) Reset()                    { *m = HasWKT{} }
-func (*HasWKT) ProtoMessage()               {}
-func (*HasWKT) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{3} }
+func (m *HasWKT) Reset()      { *m = HasWKT{} }
+func (*HasWKT) ProtoMessage() {}
+func (*HasWKT) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{3}
+}
+func (m *HasWKT) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *HasWKT) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_HasWKT.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *HasWKT) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HasWKT.Merge(dst, src)
+}
+func (m *HasWKT) XXX_Size() int {
+	return m.Size()
+}
+func (m *HasWKT) XXX_DiscardUnknown() {
+	xxx_messageInfo_HasWKT.DiscardUnknown(m)
+}
 
-func (m *HasWKT) GetDuration() *google_protobuf1.Duration {
+var xxx_messageInfo_HasWKT proto.InternalMessageInfo
+
+func (m *HasWKT) GetDuration() *types.Duration {
 	if m != nil {
 		return m.Duration
 	}
@@ -371,20 +532,80 @@ func (m *HasWKT) GetDuration() *google_protobuf1.Duration {
 
 // Bazz is a bazzzz.
 type Bazz struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Bazz) Reset()                    { *m = Bazz{} }
-func (*Bazz) ProtoMessage()               {}
-func (*Bazz) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{4} }
+func (m *Bazz) Reset()      { *m = Bazz{} }
+func (*Bazz) ProtoMessage() {}
+func (*Bazz) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{4}
+}
+func (m *Bazz) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Bazz) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Bazz.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *Bazz) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Bazz.Merge(dst, src)
+}
+func (m *Bazz) XXX_Size() int {
+	return m.Size()
+}
+func (m *Bazz) XXX_DiscardUnknown() {
+	xxx_messageInfo_Bazz.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Bazz proto.InternalMessageInfo
 
 // BarRequest is a bar request.
 type BarRequest struct {
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *BarRequest) Reset()                    { *m = BarRequest{} }
-func (*BarRequest) ProtoMessage()               {}
-func (*BarRequest) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{5} }
+func (m *BarRequest) Reset()      { *m = BarRequest{} }
+func (*BarRequest) ProtoMessage() {}
+func (*BarRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{5}
+}
+func (m *BarRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *BarRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_BarRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *BarRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BarRequest.Merge(dst, src)
+}
+func (m *BarRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *BarRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BarRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BarRequest proto.InternalMessageInfo
 
 func (m *BarRequest) GetId() int64 {
 	if m != nil {
@@ -395,12 +616,42 @@ func (m *BarRequest) GetId() int64 {
 
 // FooResponse is an foo response.
 type FooResponse struct {
-	Dep *Dep `protobuf:"bytes,1,opt,name=dep" json:"dep,omitempty"`
+	Dep                  *Dep     `protobuf:"bytes,1,opt,name=dep" json:"dep,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *FooResponse) Reset()                    { *m = FooResponse{} }
-func (*FooResponse) ProtoMessage()               {}
-func (*FooResponse) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{6} }
+func (m *FooResponse) Reset()      { *m = FooResponse{} }
+func (*FooResponse) ProtoMessage() {}
+func (*FooResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{6}
+}
+func (m *FooResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *FooResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_FooResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *FooResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FooResponse.Merge(dst, src)
+}
+func (m *FooResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *FooResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_FooResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FooResponse proto.InternalMessageInfo
 
 func (m *FooResponse) GetDep() *Dep {
 	if m != nil {
@@ -410,12 +661,42 @@ func (m *FooResponse) GetDep() *Dep {
 }
 
 type ExclamationRequest struct {
-	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ExclamationRequest) Reset()                    { *m = ExclamationRequest{} }
-func (*ExclamationRequest) ProtoMessage()               {}
-func (*ExclamationRequest) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{7} }
+func (m *ExclamationRequest) Reset()      { *m = ExclamationRequest{} }
+func (*ExclamationRequest) ProtoMessage() {}
+func (*ExclamationRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{7}
+}
+func (m *ExclamationRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ExclamationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ExclamationRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ExclamationRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExclamationRequest.Merge(dst, src)
+}
+func (m *ExclamationRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *ExclamationRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExclamationRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExclamationRequest proto.InternalMessageInfo
 
 func (m *ExclamationRequest) GetValue() string {
 	if m != nil {
@@ -425,12 +706,42 @@ func (m *ExclamationRequest) GetValue() string {
 }
 
 type ExclamationResponse struct {
-	Value string `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *ExclamationResponse) Reset()                    { *m = ExclamationResponse{} }
-func (*ExclamationResponse) ProtoMessage()               {}
-func (*ExclamationResponse) Descriptor() ([]byte, []int) { return fileDescriptorFoo, []int{8} }
+func (m *ExclamationResponse) Reset()      { *m = ExclamationResponse{} }
+func (*ExclamationResponse) ProtoMessage() {}
+func (*ExclamationResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_foo_985cfaf62b75c4c1, []int{8}
+}
+func (m *ExclamationResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ExclamationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ExclamationResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalTo(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (dst *ExclamationResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExclamationResponse.Merge(dst, src)
+}
+func (m *ExclamationResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *ExclamationResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExclamationResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExclamationResponse proto.InternalMessageInfo
 
 func (m *ExclamationResponse) GetValue() string {
 	if m != nil {
@@ -444,6 +755,7 @@ func init() {
 	proto.RegisterType((*Foo_Bar)(nil), "foo.Foo.Bar")
 	proto.RegisterType((*Barr)(nil), "foo.Barr")
 	proto.RegisterType((*Another)(nil), "foo.Another")
+	proto.RegisterMapType((map[string]int64)(nil), "foo.Another.MEntry")
 	proto.RegisterType((*HasWKT)(nil), "foo.HasWKT")
 	proto.RegisterType((*Bazz)(nil), "foo.Bazz")
 	proto.RegisterType((*BarRequest)(nil), "foo.BarRequest")
@@ -485,10 +797,7 @@ func (x Foo_Bar_Bat) String() string {
 }
 func (this *Foo) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Foo)
@@ -501,10 +810,7 @@ func (this *Foo) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -515,10 +821,7 @@ func (this *Foo) Equal(that interface{}) bool {
 }
 func (this *Foo_Bar) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Foo_Bar)
@@ -531,10 +834,7 @@ func (this *Foo_Bar) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -548,10 +848,7 @@ func (this *Foo_Bar) Equal(that interface{}) bool {
 }
 func (this *Barr) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Barr)
@@ -564,10 +861,7 @@ func (this *Barr) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -584,10 +878,7 @@ func (this *Barr) Equal(that interface{}) bool {
 }
 func (this *Another) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Another)
@@ -600,10 +891,7 @@ func (this *Another) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -659,10 +947,7 @@ func (this *Another) Equal(that interface{}) bool {
 }
 func (this *Another_Seven) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Another_Seven)
@@ -675,10 +960,7 @@ func (this *Another_Seven) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -689,10 +971,7 @@ func (this *Another_Seven) Equal(that interface{}) bool {
 }
 func (this *Another_Eight) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Another_Eight)
@@ -705,10 +984,7 @@ func (this *Another_Eight) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -719,10 +995,7 @@ func (this *Another_Eight) Equal(that interface{}) bool {
 }
 func (this *HasWKT) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*HasWKT)
@@ -735,10 +1008,7 @@ func (this *HasWKT) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -749,10 +1019,7 @@ func (this *HasWKT) Equal(that interface{}) bool {
 }
 func (this *Bazz) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*Bazz)
@@ -765,10 +1032,7 @@ func (this *Bazz) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -776,10 +1040,7 @@ func (this *Bazz) Equal(that interface{}) bool {
 }
 func (this *BarRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*BarRequest)
@@ -792,10 +1053,7 @@ func (this *BarRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -806,10 +1064,7 @@ func (this *BarRequest) Equal(that interface{}) bool {
 }
 func (this *FooResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*FooResponse)
@@ -822,10 +1077,7 @@ func (this *FooResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -836,10 +1088,7 @@ func (this *FooResponse) Equal(that interface{}) bool {
 }
 func (this *ExclamationRequest) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ExclamationRequest)
@@ -852,10 +1101,7 @@ func (this *ExclamationRequest) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -866,10 +1112,7 @@ func (this *ExclamationRequest) Equal(that interface{}) bool {
 }
 func (this *ExclamationResponse) Equal(that interface{}) bool {
 	if that == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	}
 
 	that1, ok := that.(*ExclamationResponse)
@@ -882,10 +1125,7 @@ func (this *ExclamationResponse) Equal(that interface{}) bool {
 		}
 	}
 	if that1 == nil {
-		if this == nil {
-			return true
-		}
-		return false
+		return this == nil
 	} else if this == nil {
 		return false
 	}
@@ -1086,7 +1326,7 @@ func NewHelloServiceClient(cc *grpc.ClientConn) HelloServiceClient {
 
 func (c *helloServiceClient) Foo(ctx context.Context, in *sub.Dep, opts ...grpc.CallOption) (*FooResponse, error) {
 	out := new(FooResponse)
-	err := grpc.Invoke(ctx, "/foo.HelloService/Foo", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/foo.HelloService/Foo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1095,7 +1335,7 @@ func (c *helloServiceClient) Foo(ctx context.Context, in *sub.Dep, opts ...grpc.
 
 func (c *helloServiceClient) Bar(ctx context.Context, in *BarRequest, opts ...grpc.CallOption) (*Dep, error) {
 	out := new(Dep)
-	err := grpc.Invoke(ctx, "/foo.HelloService/Bar", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/foo.HelloService/Bar", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1192,7 +1432,7 @@ func NewExcitedServiceClient(cc *grpc.ClientConn) ExcitedServiceClient {
 
 func (c *excitedServiceClient) Exclamation(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (*ExclamationResponse, error) {
 	out := new(ExclamationResponse)
-	err := grpc.Invoke(ctx, "/foo.ExcitedService/Exclamation", in, out, c.cc, opts...)
+	err := c.cc.Invoke(ctx, "/foo.ExcitedService/Exclamation", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1200,7 +1440,7 @@ func (c *excitedServiceClient) Exclamation(ctx context.Context, in *ExclamationR
 }
 
 func (c *excitedServiceClient) ExclamationClientStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedService_ExclamationClientStreamClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_ExcitedService_serviceDesc.Streams[0], c.cc, "/foo.ExcitedService/ExclamationClientStream", opts...)
+	stream, err := c.cc.NewStream(ctx, &_ExcitedService_serviceDesc.Streams[0], "/foo.ExcitedService/ExclamationClientStream", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1234,7 +1474,7 @@ func (x *excitedServiceExclamationClientStreamClient) CloseAndRecv() (*Exclamati
 }
 
 func (c *excitedServiceClient) ExclamationServerStream(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (ExcitedService_ExclamationServerStreamClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_ExcitedService_serviceDesc.Streams[1], c.cc, "/foo.ExcitedService/ExclamationServerStream", opts...)
+	stream, err := c.cc.NewStream(ctx, &_ExcitedService_serviceDesc.Streams[1], "/foo.ExcitedService/ExclamationServerStream", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1266,7 +1506,7 @@ func (x *excitedServiceExclamationServerStreamClient) Recv() (*ExclamationRespon
 }
 
 func (c *excitedServiceClient) ExclamationBidiStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedService_ExclamationBidiStreamClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_ExcitedService_serviceDesc.Streams[2], c.cc, "/foo.ExcitedService/ExclamationBidiStream", opts...)
+	stream, err := c.cc.NewStream(ctx, &_ExcitedService_serviceDesc.Streams[2], "/foo.ExcitedService/ExclamationBidiStream", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2002,7 +2242,7 @@ func (this *Barr) String() string {
 	s := strings.Join([]string{`&Barr{`,
 		`Hello:` + fmt.Sprintf("%v", this.Hello) + `,`,
 		`Dep:` + strings.Replace(fmt.Sprintf("%v", this.Dep), "Dep", "Dep", 1) + `,`,
-		`Timestamp:` + strings.Replace(fmt.Sprintf("%v", this.Timestamp), "Timestamp", "google_protobuf2.Timestamp", 1) + `,`,
+		`Timestamp:` + strings.Replace(fmt.Sprintf("%v", this.Timestamp), "Timestamp", "types.Timestamp", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2030,7 +2270,7 @@ func (this *Another) String() string {
 		`M:` + mapStringForM + `,`,
 		`OneofOneof:` + fmt.Sprintf("%v", this.OneofOneof) + `,`,
 		`Nine:` + strings.Replace(fmt.Sprintf("%v", this.Nine), "Another", "Another", 1) + `,`,
-		`Duration:` + strings.Replace(fmt.Sprintf("%v", this.Duration), "Duration", "google_protobuf1.Duration", 1) + `,`,
+		`Duration:` + strings.Replace(fmt.Sprintf("%v", this.Duration), "Duration", "types.Duration", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2060,7 +2300,7 @@ func (this *HasWKT) String() string {
 		return "nil"
 	}
 	s := strings.Join([]string{`&HasWKT{`,
-		`Duration:` + strings.Replace(fmt.Sprintf("%v", this.Duration), "Duration", "google_protobuf1.Duration", 1) + `,`,
+		`Duration:` + strings.Replace(fmt.Sprintf("%v", this.Duration), "Duration", "types.Duration", 1) + `,`,
 		`}`,
 	}, "")
 	return s
@@ -2401,7 +2641,7 @@ func (m *Barr) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Timestamp == nil {
-				m.Timestamp = &google_protobuf2.Timestamp{}
+				m.Timestamp = &types.Timestamp{}
 			}
 			if err := m.Timestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2800,7 +3040,7 @@ func (m *Another) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Duration == nil {
-				m.Duration = &google_protobuf1.Duration{}
+				m.Duration = &types.Duration{}
 			}
 			if err := m.Duration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -2883,7 +3123,7 @@ func (m *HasWKT) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if m.Duration == nil {
-				m.Duration = &google_protobuf1.Duration{}
+				m.Duration = &types.Duration{}
 			}
 			if err := m.Duration.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
@@ -3375,9 +3615,9 @@ var (
 	ErrIntOverflowFoo   = fmt.Errorf("proto: integer overflow")
 )
 
-func init() { proto.RegisterFile("foo/foo.proto", fileDescriptorFoo) }
+func init() { proto.RegisterFile("foo/foo.proto", fileDescriptor_foo_985cfaf62b75c4c1) }
 
-var fileDescriptorFoo = []byte{
+var fileDescriptor_foo_985cfaf62b75c4c1 = []byte{
 	// 838 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x54, 0x4f, 0x8f, 0xdb, 0x44,
 	0x1c, 0xcd, 0xd8, 0x9b, 0x6c, 0xf2, 0x73, 0x77, 0x9b, 0xce, 0x42, 0xd7, 0x58, 0x95, 0x49, 0x7d,
