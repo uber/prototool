@@ -152,31 +152,10 @@ func (d *downloader) download(basePath string) (retErr error) {
 }
 
 func (d *downloader) downloadInternal(basePath string, goos string, goarch string) (retErr error) {
-	url, err := d.getProtocURL(goos, goarch)
+	data, err := d.getDownloadData(goos, goarch)
 	if err != nil {
 		return err
 	}
-	response, err := http.Get(url)
-	if err != nil || response.StatusCode != http.StatusOK {
-		// if there is not given protocURL, we tried to
-		// download this from GitHub Releases, so add
-		// extra context to the error message
-		if d.protocURL == "" {
-			return fmt.Errorf("error downloading %s: %v\nMake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/google/protobuf/releases/v%s\nNote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
-		}
-		return err
-	}
-	d.logger.Debug("downloaded protobuf zip file", zap.String("url", url))
-	defer func() {
-		if response.Body != nil {
-			retErr = multierr.Append(retErr, response.Body.Close())
-		}
-	}()
-	data, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
-
 	// this is a working but hacky unzip
 	// there must be a library for this
 	// we don't properly copy directories, modification times, etc
@@ -219,6 +198,43 @@ func (d *downloader) downloadInternal(basePath string, goos string, goarch strin
 		d.logger.Debug("wrote protobuf file", zap.String("path", writeFilePath))
 	}
 	return nil
+}
+
+func (d *downloader) getDownloadData(goos string, goarch string) (_ []byte, retErr error) {
+	url, err := d.getProtocURL(goos, goarch)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if retErr == nil {
+			d.logger.Debug("downloaded protobuf zip file", zap.String("url", url))
+		}
+	}()
+
+	switch {
+	case strings.HasPrefix(url, "file://"):
+		return ioutil.ReadFile(strings.TrimPrefix(url, "file://"))
+	case strings.HasPrefix(url, "http://"), strings.HasPrefix(url, "https://"):
+		response, err := http.Get(url)
+		if err != nil || response.StatusCode != http.StatusOK {
+			// if there is not given protocURL, we tried to
+			// download this from GitHub Releases, so add
+			// extra context to the error message
+			if d.protocURL == "" {
+				return nil, fmt.Errorf("error downloading %s: %v\nMake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/google/protobuf/releases/v%s\nNote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
+			}
+			return nil, err
+		}
+		defer func() {
+			if response.Body != nil {
+				retErr = multierr.Append(retErr, response.Body.Close())
+			}
+		}()
+		return ioutil.ReadAll(response.Body)
+	default:
+		return nil, fmt.Errorf("unknown url, can only handle http, https, file: %s", url)
+	}
+
 }
 
 func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {

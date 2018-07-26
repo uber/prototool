@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - A linter to verify that no enum uses the option `allow_alias.`
+- The `--protoc-url` flag can now handle references to local protoc zip files
+  as well as normal http references by handling urls of the form
+  `file:///path/to/protoc.zip`.
 ### Changed
 - The formatter now prints primitive field options on the same line
   as the field.
