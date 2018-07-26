@@ -107,8 +107,8 @@ This document outlines how to create a release of prototool.
      [1.21.0]: https://github.com/uber/prototool/compare/v1.20.1...v1.21.0
     ```
 
-13. Update the version number in internal/vars/vars.go and the Installation
-    section of the README.md to the same version.
+13. Update the version number in internal/vars/vars.go to a new minor version
+    suffixed with `"-dev"`.
 
     ```diff
     -const Version = "1.21.0"
@@ -118,7 +118,7 @@ This document outlines how to create a release of prototool.
 14. Commit and push your changes.
 
     ```
-    git add CHANGELOG.md README.md internal/vars/vars.go
+    git add CHANGELOG.md internal/vars/vars.go
     git commit -m 'Back to development'
     git push origin $BRANCH
     ```
