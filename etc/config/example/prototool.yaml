@@ -52,11 +52,11 @@ lint:
     - ENUM_NAMES_CAMEL_CASE
     - ENUM_NAMES_CAPITALIZED
 
-  # Linters to include that are not in the lint group.
+  # Linters to include that are not in the default lint group.
   include_ids:
     - REQUEST_RESPONSE_NAMES_MATCH_RPC
 
-  # Linters to exclude from the lint group.
+  # Linters to exclude from the default lint group.
   exclude_ids:
     - ENUM_NAMES_CAMEL_CASE
 

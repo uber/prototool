@@ -82,11 +82,11 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 {{.V}}    - ENUM_NAMES_CAPITALIZED
 
-  # Linters to include that are not in the lint group.
+  # Linters to include that are not in the default lint group.
 {{.V}}  include_ids:
 {{.V}}    - REQUEST_RESPONSE_NAMES_MATCH_RPC
 
-  # Linters to exclude from the lint group.
+  # Linters to exclude from the default lint group.
 {{.V}}  exclude_ids:
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 

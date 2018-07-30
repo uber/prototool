@@ -37,4 +37,9 @@ func TestExternalConfigValidate(t *testing.T) {
 		e.Gen.GoOptions.NoDefaultModifiers = true
 		assert.EqualError(t, e.Validate(), "gen.go_options.no_default_modifiers is not a configurable setting")
 	})
+	t.Run("lint.group", func(t *testing.T) {
+		e := ExternalConfig{}
+		e.Lint.Group = "oh no"
+		assert.EqualError(t, e.Validate(), "lint.group is not a configurable setting: have oh no")
+	})
 }
