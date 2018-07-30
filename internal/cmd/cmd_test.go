@@ -335,8 +335,8 @@ func TestLint(t *testing.T) {
 
 func TestGoldenFormat(t *testing.T) {
 	t.Parallel()
-	assertGoldenFormat(t, false, false, "testdata/format/proto3/bar/bar.proto")
-	assertGoldenFormat(t, false, false, "testdata/format/proto2/bar/bar_proto2.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/bar/bar.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/bar/bar_proto2.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/foo.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/foo_proto2.proto")
 	assertGoldenFormat(t, false, true, "testdata/format-rewrite/foo.proto")

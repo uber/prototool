@@ -449,7 +449,17 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrit
 			}
 			return false, nil
 		}
-		//!overwrite && !lintMode && !diffMode
+		//below is !overwrite && !lintMode && !diffMode
+
+		absSingleFilename, err := file.AbsClean(meta.SingleFilename)
+		if err != nil {
+			return false, err
+		}
+		// there was a diff, but we are not concerned with the current file
+		if meta.SingleFilename != "" && protoFile.Path != absSingleFilename {
+			return true, nil
+		}
+		// there was a diff, and we either have specified a directory,  or we are concerned with the current file
 		if _, err := io.Copy(r.output, bytes.NewReader(data)); err != nil {
 			return false, err
 		}
