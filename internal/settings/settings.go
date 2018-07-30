@@ -290,6 +290,28 @@ type ExternalConfig struct {
 	} `json:"gen,omitempty" yaml:"gen,omitempty"`
 }
 
+// Validate returns an error if any of the restricted, yet previously supported,
+// ExternalConfig attributes are set. This includes:
+//   - NoDefaultExcludes
+//   - ProtocIncludeWKT
+//   - Lint.Group
+//   - Gen.GoOptions.NoDefaultModifiers
+func (e ExternalConfig) Validate() error {
+	if e.NoDefaultExcludes {
+		return fmt.Errorf("no_default_excludes is not a configurable setting")
+	}
+	//if e.ProtocIncludeWKT {
+	//return fmt.Errorf("protoc_include_wkt is not a configurable setting")
+	//}
+	//if e.Lint.Group != "" {
+	//return fmt.Errorf("lint.group is not a configurable setting: have %v", e.Lint.Group)
+	//}
+	//if e.Gen.GoOptions.NoDefaultModifiers {
+	//return fmt.Errorf("gen.go_options.no_default_modifiers is not a configurable setting")
+	//}
+	return nil
+}
+
 // ConfigProvider provides Configs.
 type ConfigProvider interface {
 	// GetForDir tries to find a file named DefaultConfigFilename starting in the

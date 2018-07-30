@@ -40,10 +40,6 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
 
-# Do not use the default exclude paths.
-# The only default exclude path is "vendor".
-{{.V}}no_default_excludes: true
-
 # Additional paths to include with -I to protoc.
 # By default, the directory of the config file is included,
 # or the current directory if there is no config file.

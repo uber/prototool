@@ -164,6 +164,7 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 					DirPath: cwd + "/testdata/b",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/b/g/h",
+						cwd + "/testdata/b/vendor",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion: "3.3.0",
@@ -412,6 +413,7 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 					DirPath: cwd + "/testdata/b",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/b/g/h",
+						cwd + "/testdata/b/vendor",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion: "3.3.0",
@@ -548,6 +550,7 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 					DirPath: cwd + "/testdata/b",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/b/g/h",
+						cwd + "/testdata/b/vendor",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion: "3.3.0",

@@ -117,6 +117,9 @@ func get(filePath string) (Config, error) {
 	if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
 		return Config{}, err
 	}
+	if err := externalConfig.Validate(); err != nil {
+		return Config{}, fmt.Errorf("invalid external configuration: %v", err)
+	}
 	return externalConfigToConfig(externalConfig, filepath.Dir(filePath))
 }
 
@@ -134,9 +137,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
 		includePath = filepath.Clean(includePath)
-		//if includePath != dirPath {
 		includePaths = append(includePaths, includePath)
-		//}
 	}
 	ignoreIDToFilePaths := make(map[string][]string)
 	for id, protoFilePaths := range e.Lint.IgnoreIDToFiles {
