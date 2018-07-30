@@ -70,7 +70,6 @@ type runner struct {
 	cachePath    string
 	protocURL    string
 	printFields  string
-	dirMode      bool
 	harbormaster bool
 }
 
@@ -167,7 +166,7 @@ func (r *runner) Clean() error {
 }
 
 func (r *runner) Files(args []string) error {
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -182,7 +181,7 @@ func (r *runner) Files(args []string) error {
 }
 
 func (r *runner) Compile(args []string, dryRun bool) error {
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -192,7 +191,7 @@ func (r *runner) Compile(args []string, dryRun bool) error {
 }
 
 func (r *runner) Gen(args []string, dryRun bool) error {
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -202,13 +201,8 @@ func (r *runner) Gen(args []string, dryRun bool) error {
 }
 
 func (r *runner) DescriptorProto(args []string) error {
-	if len(args) < 1 {
-		return nil
-	}
 	path := args[len(args)-1]
-	args = args[:len(args)-1]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 2)
 	if err != nil {
 		return err
 	}
@@ -232,13 +226,8 @@ func (r *runner) DescriptorProto(args []string) error {
 }
 
 func (r *runner) FieldDescriptorProto(args []string) error {
-	if len(args) < 1 {
-		return nil
-	}
 	path := args[len(args)-1]
-	args = args[:len(args)-1]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 2)
 	if err != nil {
 		return err
 	}
@@ -262,13 +251,8 @@ func (r *runner) FieldDescriptorProto(args []string) error {
 }
 
 func (r *runner) ServiceDescriptorProto(args []string) error {
-	if len(args) < 1 {
-		return nil
-	}
 	path := args[len(args)-1]
-	args = args[:len(args)-1]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 2)
 	if err != nil {
 		return err
 	}
@@ -332,7 +316,7 @@ func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool) erro
 	if listLinters {
 		return r.listLinters()
 	}
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -400,7 +384,7 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bo
 	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -482,17 +466,12 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrit
 }
 
 func (r *runner) BinaryToJSON(args []string) error {
-	if len(args) < 2 {
-		return nil
-	}
 	path := args[len(args)-2]
 	data, err := r.getInputData(args[len(args)-1])
 	if err != nil {
 		return err
 	}
-	args = args[:len(args)-2]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 3)
 	if err != nil {
 		return err
 	}
@@ -513,17 +492,12 @@ func (r *runner) BinaryToJSON(args []string) error {
 }
 
 func (r *runner) JSONToBinary(args []string) error {
-	if len(args) < 2 {
-		return nil
-	}
 	path := args[len(args)-2]
 	data, err := r.getInputData(args[len(args)-1])
 	if err != nil {
 		return err
 	}
-	args = args[:len(args)-2]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 3)
 	if err != nil {
 		return err
 	}
@@ -544,7 +518,7 @@ func (r *runner) JSONToBinary(args []string) error {
 }
 
 func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) error {
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -612,7 +586,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		}
 	}
 
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -748,68 +722,40 @@ type meta struct {
 	ProtoSet *file.ProtoSet
 	// this will be empty if not in dir mode
 	// if in dir mode, this will be the single filename that we want to return errors for
-	InDirModeSingleFilename string
+	SingleFilename string
 }
 
-func (r *runner) getMeta(args []string) (*meta, error) {
-	if len(args) == 0 {
-		// TODO: does not fit in with workDirPath paradigm
-		args = []string{"."}
+func (r *runner) getMeta(args []string, lenOfArgsIfSpecified int) (*meta, error) {
+	// TODO: does not fit in with workDirPath paradigm
+	fileOrDir := "."
+	if len(args) == lenOfArgsIfSpecified {
+		fileOrDir = args[0]
 	}
-	if len(args) == 1 {
-		fileOrDir := args[0]
-		fileInfo, err := os.Stat(fileOrDir)
-		if err != nil {
-			return nil, err
-		}
-		if fileInfo.Mode().IsDir() {
-			protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
-			if err != nil {
-				return nil, err
-			}
-			return &meta{
-				ProtoSet: protoSet,
-			}, nil
-		}
-		// TODO: allow symlinks?
-		if fileInfo.Mode().IsRegular() {
-			if r.dirMode {
-				protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
-				if err != nil {
-					return nil, err
-				}
-				return &meta{
-					ProtoSet:                protoSet,
-					InDirModeSingleFilename: fileOrDir,
-				}, nil
-			}
-			protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, fileOrDir)
-			if err != nil {
-				return nil, err
-			}
-			return &meta{
-				ProtoSet: protoSet,
-			}, nil
-		}
-		return nil, fmt.Errorf("%s is not a directory or a regular file", fileOrDir)
-	}
-	for _, arg := range args {
-		fileInfo, err := os.Stat(arg)
-		if err != nil {
-			return nil, err
-		}
-		// TODO: allow symlinks?
-		if !fileInfo.Mode().IsRegular() {
-			return nil, fmt.Errorf("multiple arguments only allowed if all arguments are regular files, %q is not a regular file", arg)
-		}
-	}
-	protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, args...)
+	fileInfo, err := os.Stat(fileOrDir)
 	if err != nil {
 		return nil, err
 	}
-	return &meta{
-		ProtoSet: protoSet,
-	}, nil
+	if fileInfo.Mode().IsDir() {
+		protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
+		if err != nil {
+			return nil, err
+		}
+		return &meta{
+			ProtoSet: protoSet,
+		}, nil
+	}
+	// TODO: allow symlinks?
+	if fileInfo.Mode().IsRegular() {
+		protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
+		if err != nil {
+			return nil, err
+		}
+		return &meta{
+			ProtoSet:       protoSet,
+			SingleFilename: fileOrDir,
+		}, nil
+	}
+	return nil, fmt.Errorf("%s is not a directory or a regular file", fileOrDir)
 }
 
 // TODO: we filter failures in dir mode in printFailures but above we count any failure
@@ -832,11 +778,11 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 	bufWriter := bufio.NewWriter(r.output)
 	for _, failure := range failures {
 		shouldPrint := false
-		if meta.InDirModeSingleFilename == "" || meta.InDirModeSingleFilename == failure.Filename {
+		if meta.SingleFilename == "" || meta.SingleFilename == failure.Filename {
 			shouldPrint = true
-		} else if meta.InDirModeSingleFilename != "" {
+		} else if meta.SingleFilename != "" {
 			// TODO: the compiler may not return the rel path due to logic in bestFilePath
-			absSingleFilename, err := file.AbsClean(meta.InDirModeSingleFilename)
+			absSingleFilename, err := file.AbsClean(meta.SingleFilename)
 			if err != nil {
 				return err
 			}
