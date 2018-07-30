@@ -98,13 +98,6 @@ protoc_version: {{.ProtocVersion}}
     # This is required if you have any go plugins.
 {{.V}}    import_path: uber/foo/bar.git/idl/uber
 
-    # Do not include default modifiers with Mfile=package.
-    # By default, modifiers are included for the Well-Known Types if
-    # protoc_include_wkt is set, and for all files in the compilation relative
-    # to the import path.
-    # ** Generally do not set this unless you know what you are doing. **
-    #no_default_modifiers: true
-
     # Extra modifiers to include with Mfile=package.
 {{.V}}    extra_modifiers:
 {{.V}}      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations

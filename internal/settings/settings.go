@@ -303,9 +303,9 @@ func (e ExternalConfig) Validate() error {
 	//if e.Lint.Group != "" {
 	//return fmt.Errorf("lint.group is not a configurable setting: have %v", e.Lint.Group)
 	//}
-	//if e.Gen.GoOptions.NoDefaultModifiers {
-	//return fmt.Errorf("gen.go_options.no_default_modifiers is not a configurable setting")
-	//}
+	if e.Gen.GoOptions.NoDefaultModifiers {
+		return fmt.Errorf("gen.go_options.no_default_modifiers is not a configurable setting")
+	}
 	return nil
 }
 
