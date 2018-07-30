@@ -418,6 +418,14 @@ func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta)
 // return false if we should exit with non-zero
 // if false and nil error, we will return an ExitError outside of this function
 func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrite bool, meta *meta, protoFile *file.ProtoFile) (bool, error) {
+	absSingleFilename, err := file.AbsClean(meta.SingleFilename)
+	if err != nil {
+		return false, err
+	}
+	// we are not concerned with the current file
+	if meta.SingleFilename != "" && protoFile.Path != absSingleFilename {
+		return true, nil
+	}
 	input, err := ioutil.ReadFile(protoFile.Path)
 	if err != nil {
 		return false, err
@@ -450,16 +458,6 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrit
 			return false, nil
 		}
 		//below is !overwrite && !lintMode && !diffMode
-
-		absSingleFilename, err := file.AbsClean(meta.SingleFilename)
-		if err != nil {
-			return false, err
-		}
-		// there was a diff, but we are not concerned with the current file
-		if meta.SingleFilename != "" && protoFile.Path != absSingleFilename {
-			return true, nil
-		}
-		// there was a diff, and we either have specified a directory,  or we are concerned with the current file
 		if _, err := io.Copy(r.output, bytes.NewReader(data)); err != nil {
 			return false, err
 		}
