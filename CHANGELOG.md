@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Delete the ability to explicitly specify multiple files, and have the effect
   of one file being specified be the same as the former `--dir-mode`. See
   [#16](https://github.com/uber/prototool/issues/16) for more details.
+- Remove protoc_include_wkt setting. This is always set to true.
+- Remove no_default_excludes setting.
+- Remove gen.go_options.no_default_modifiers setting.
+- Remove lint.group setting.
+- Rename create.dir_to_base_package -> create.dir_to_package.
 
 
 ## [0.5.0] - 2018-07-26

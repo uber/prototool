@@ -293,7 +293,6 @@ type ExternalConfig struct {
 // Validate returns an error if any of the restricted, yet previously supported,
 // ExternalConfig attributes are set. This includes:
 //   - NoDefaultExcludes
-//   - ProtocIncludeWKT
 //   - Lint.Group
 //   - Gen.GoOptions.NoDefaultModifiers
 func (e ExternalConfig) Validate() error {
