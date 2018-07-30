@@ -103,10 +103,10 @@ This matches what the linter expects. "SOME.PKG" will be computed as follows:
 - Otherwise, if there is no "prototool.yaml" that would apply to the new file,
   use "uber.prototool.generated".
 - Otherwise, if there is a "prototool.yaml" file, check if it has a
-  "dir_to_base_package" setting under the "create" section. If it does, this
+  "dir_to_package" setting under the "create" section. If it does, this
   package, concatenated with the relative path from the directory with the
  "prototool.yaml" will be used.
-- Otherwise, if there is no "dir_to_base_package" directive, just use the
+- Otherwise, if there is no "dir_to_package" directive, just use the
   relative path from the directory with the "prototool.yaml" file. If the file
   is in the same directory as the "prototoo.yaml" file, use
   "uber.prototool.generated".
@@ -114,7 +114,7 @@ This matches what the linter expects. "SOME.PKG" will be computed as follows:
 For example, assume you have the following file at "repo/prototool.yaml":
 
 create:
-  dir_to_base_package:
+  dir_to_package:
     idl: uber
     idl/baz: special
 
@@ -134,7 +134,7 @@ This is meant to mimic what you generally want - a base package for your idl dir
 Note you can override the directory that the "prototool.yaml" file is in as well. If we update our file at "repo/prototool.yaml" to this:
 
 create:
-  dir_to_base_package:
+  dir_to_package:
     .: foo.bar
 
 Then "prototool create repo/bar.proto" will have the package "foo.bar", and "prototool create repo/another/dir/bar.proto" will have the package "foo.bar.another.dir".

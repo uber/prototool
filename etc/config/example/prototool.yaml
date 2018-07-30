@@ -32,7 +32,7 @@ allow_unused_imports: true
 create:
   # Map from relative directory to base package.
   # This affects how packages are generated with create.
-  dir_to_base_package:
+  dir_to_package:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
     .: bar

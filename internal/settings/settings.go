@@ -265,7 +265,7 @@ type ExternalConfig struct {
 	ProtocIncludeWKT   bool     `json:"protoc_include_wkt,omitempty" yaml:"protoc_include_wkt,omitempty"`
 	AllowUnusedImports bool     `json:"allow_unused_imports,omitempty" yaml:"allow_unused_imports,omitempty"`
 	Create             struct {
-		DirToBasePackage map[string]string `json:"dir_to_base_package,omitempty" yaml:"dir_to_base_package,omitempty"`
+		DirToBasePackage map[string]string `json:"dir_to_package,omitempty" yaml:"dir_to_package,omitempty"`
 	} `json:"create,omitempty" yaml:"create,omitempty"`
 	Lint struct {
 		IDs             []string            `json:"ids,omitempty" yaml:"ids,omitempty"`
