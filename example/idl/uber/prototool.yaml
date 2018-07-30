@@ -2,7 +2,6 @@
 protoc_includes:
   # note vendor is .gitignored
   - ../../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
-protoc_include_wkt: true
 lint:
   # run "prototool list-linters" to see the currently configured linters
   # add "exclude_ids" to ignore specific linter IDs for all files

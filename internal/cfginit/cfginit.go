@@ -46,10 +46,6 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}protoc_includes:
 {{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
 
-# Include the Well-Known Types when compiling with protoc.
-# For example, this allows you to do import "google/protobuf/timestamp.proto" in your Protobuf files.
-{{.V}}protoc_include_wkt: true
-
 # If not set, compile will fail if there are unused imports.
 # Setting this will ignore unused imports.
 {{.V}}allow_unused_imports: true

@@ -1,2 +1,1 @@
-protoc_include_wkt: true
 allow_unused_imports: true

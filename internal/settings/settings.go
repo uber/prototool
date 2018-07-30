@@ -300,9 +300,6 @@ func (e ExternalConfig) Validate() error {
 	if e.NoDefaultExcludes {
 		return fmt.Errorf("no_default_excludes is not a configurable setting")
 	}
-	//if e.ProtocIncludeWKT {
-	//return fmt.Errorf("protoc_include_wkt is not a configurable setting")
-	//}
 	//if e.Lint.Group != "" {
 	//return fmt.Errorf("lint.group is not a configurable setting: have %v", e.Lint.Group)
 	//}

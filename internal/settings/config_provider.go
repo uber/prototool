@@ -211,7 +211,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		Compile: CompileConfig{
 			ProtobufVersion:       e.ProtocVersion,
 			IncludePaths:          includePaths,
-			IncludeWellKnownTypes: e.ProtocIncludeWKT,
+			IncludeWellKnownTypes: true, // Always include the well-known types.
 			AllowUnusedImports:    e.AllowUnusedImports,
 		},
 		Create: CreateConfig{
