@@ -196,7 +196,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	createDirPathToBasePackage := make(map[string]string)
 	for relDirPath, basePackage := range e.Create.DirToBasePackage {
 		if filepath.IsAbs(relDirPath) {
-			return Config{}, fmt.Errorf("directory for dir_to_base package must be relative: %s", relDirPath)
+			return Config{}, fmt.Errorf("directory for dir_to_package must be relative: %s", relDirPath)
 		}
 		createDirPathToBasePackage[filepath.Clean(filepath.Join(dirPath, relDirPath))] = basePackage
 	}
