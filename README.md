@@ -103,21 +103,16 @@ $ prototool help lint
 Lint proto files and compile with protoc to check for failures.
 
 Usage:
-  prototool lint dirOrProtoFiles... [flags]
-
-Flags:
-      --dir-mode   Run as if the directory the file was given, but only print the errors from the file. Useful for integration with editors.
+  prototool lint [dirOrFile] [flags]
 ```
 
-`dirOrProtoFiles...` can take multiple forms:
+`dirOrFile` can take two forms:
 
-- You can specify multiple files. If this is done, these files will be explicitly used for `protoc` calls.
 - You can specify exactly one directory. If this is done, Prototool goes up until it finds a `prototool.yaml` file (or uses the current directory if none is found), and then walks starting at this location for all `.proto` files, and these are used, except for files in the `excludes` lists in `prototool.yaml` files.
-- You can specify exactly one file, along with `--dir-mode`. This has the effect as if you specified the directory of this file (using the logic above), but errors are only printed for that file. This is useful for e.g. Vim integration.
+- You can specify exactly one file. This has the effect as if you specified the directory of this file (using the logic above), but errors are only printed for that file. This is useful for e.g. Vim integration.
+- You can specify nothing. This has the effect as if you specified the current directory as the directory.
 
 The idea with "directory builds" is that you often need more than just one file to do a `protoc` call, for example if you have types in other files in the same package that are not referenced by their fully-qualified name, and/or if you need to know what directories to specify with `-I` to `protoc` (by default, the directory of the `prototool.yaml` file is used).
-
-In general practice, directory builds are what you always want to do. File builds were just added for convenience, and [may be removed](https://github.com/uber/prototool/issues/16).
 
 ## Command Overview
 
@@ -215,7 +210,7 @@ If [Vim integration](#vim-integration) is set up, files will be generated when y
 
 ##### `prototool files`
 
-Print the list of all files that will be used given the input `dirOrProtoFiles...`. Useful for debugging.
+Print the list of all files that will be used given the input `dirOrFile`. Useful for debugging.
 
 ##### `prototool grpc`
 
@@ -234,7 +229,7 @@ There is a full example for gRPC in the [example](example) directory. Run `make 
 
 Start the example server in a separate terminal by doing `go run example/cmd/excited/main.go`.
 
-`prototool grpc dirOrProtoFiles... --address serverAddress --method package.service/Method --data 'requestData'`
+`prototool grpc [dirOrFile] --address serverAddress --method package.service/Method --data 'requestData'`
 
 Either use `--data 'requestData'` as the the JSON data to input, or `--stdin` which will result in the input being read from stdin as JSON.
 
