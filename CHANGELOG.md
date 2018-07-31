@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Delete `no_default_excludes` setting. This is always set to true.
 - Delete `gen.go_options.no_default_modifiers` setting.
 - Delete `lint.group` setting.
-- Delete `create.dir_to_base_package` -> `create.dir_to_package`.
+- Rename `create.dir_to_base_package` -> `create.dir_to_package`.
 
 
 ## [0.5.0] - 2018-07-26
