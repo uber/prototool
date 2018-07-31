@@ -733,6 +733,12 @@ type meta struct {
 	SingleFilename string
 }
 
+// lenOfArgsIfSpecified makes this function more convenient when calling above.
+// It says "if the length of args is equal to lenOfArgsIfSpecified, then args
+// contains the dirOrFile parameter as it's first argument." For example, for
+// "prototool compile [dirOrFile]", lenOfArgsIfSpecified is 1, saying that if
+// we have 1 argument, the first argument is dirOrFile, if we have zero arguments,
+// we do not and assume the current directory is the dirOrFile.
 func (r *runner) getMeta(args []string, lenOfArgsIfSpecified int) (*meta, error) {
 	// TODO: does not fit in with workDirPath paradigm
 	fileOrDir := "."
