@@ -265,7 +265,7 @@ type ExternalConfig struct {
 	ProtocIncludeWKT   bool     `json:"protoc_include_wkt,omitempty" yaml:"protoc_include_wkt,omitempty"`
 	AllowUnusedImports bool     `json:"allow_unused_imports,omitempty" yaml:"allow_unused_imports,omitempty"`
 	Create             struct {
-		DirToBasePackage map[string]string `json:"dir_to_base_package,omitempty" yaml:"dir_to_base_package,omitempty"`
+		DirToBasePackage map[string]string `json:"dir_to_package,omitempty" yaml:"dir_to_package,omitempty"`
 	} `json:"create,omitempty" yaml:"create,omitempty"`
 	Lint struct {
 		IDs             []string            `json:"ids,omitempty" yaml:"ids,omitempty"`
@@ -288,6 +288,20 @@ type ExternalConfig struct {
 			Output string `json:"output,omitempty" yaml:"output,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"gen,omitempty" yaml:"gen,omitempty"`
+}
+
+// Validate returns an error if any of the restricted, yet previously supported,
+// ExternalConfig attributes are set. This includes:
+//   - Lint.Group
+//   - Gen.GoOptions.NoDefaultModifiers
+func (e ExternalConfig) Validate() error {
+	if e.Lint.Group != "" {
+		return fmt.Errorf("lint.group is not a configurable setting: have %v", e.Lint.Group)
+	}
+	if e.Gen.GoOptions.NoDefaultModifiers {
+		return fmt.Errorf("gen.go_options.no_default_modifiers is not a configurable setting")
+	}
+	return nil
 }
 
 // ConfigProvider provides Configs.

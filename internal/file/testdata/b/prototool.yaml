@@ -1,4 +1,3 @@
 excludes:
   - g/h
-no_default_excludes: true
 protoc_version: 3.3.0

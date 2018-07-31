@@ -84,11 +84,11 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -125,11 +125,11 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -166,8 +166,9 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 						cwd + "/testdata/b/g/h",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -238,11 +239,11 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -275,11 +276,11 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -342,11 +343,11 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -379,11 +380,11 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -414,8 +415,9 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 						cwd + "/testdata/b/g/h",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -478,11 +480,11 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -515,11 +517,11 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -550,8 +552,9 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 						cwd + "/testdata/b/g/h",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},
@@ -597,13 +600,12 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/d",
-					ExcludePrefixes: []string{
-						cwd + "/testdata/d/vendor",
-					},
+					DirPath:         cwd + "/testdata/d",
+					ExcludePrefixes: []string{},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
 						IDs:                 []string{},

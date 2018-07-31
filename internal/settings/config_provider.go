@@ -117,6 +117,9 @@ func get(filePath string) (Config, error) {
 	if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
 		return Config{}, err
 	}
+	if err := externalConfig.Validate(); err != nil {
+		return Config{}, fmt.Errorf("invalid external configuration: %v", err)
+	}
 	return externalConfigToConfig(externalConfig, filepath.Dir(filePath))
 }
 
@@ -124,7 +127,7 @@ func get(filePath string) (Config, error) {
 //
 // This will return a valid Config, or an error.
 func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
-	excludePrefixes, err := getExcludePrefixes(e.Excludes, e.NoDefaultExcludes, dirPath)
+	excludePrefixes, err := getExcludePrefixes(e.Excludes, true /* Never include default excludes */, dirPath)
 	if err != nil {
 		return Config{}, err
 	}
@@ -134,9 +137,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
 		includePath = filepath.Clean(includePath)
-		//if includePath != dirPath {
 		includePaths = append(includePaths, includePath)
-		//}
 	}
 	ignoreIDToFilePaths := make(map[string][]string)
 	for id, protoFilePaths := range e.Lint.IgnoreIDToFiles {
@@ -195,7 +196,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	createDirPathToBasePackage := make(map[string]string)
 	for relDirPath, basePackage := range e.Create.DirToBasePackage {
 		if filepath.IsAbs(relDirPath) {
-			return Config{}, fmt.Errorf("directory for dir_to_base package must be relative: %s", relDirPath)
+			return Config{}, fmt.Errorf("directory for dir_to_package must be relative: %s", relDirPath)
 		}
 		createDirPathToBasePackage[filepath.Clean(filepath.Join(dirPath, relDirPath))] = basePackage
 	}
@@ -210,7 +211,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		Compile: CompileConfig{
 			ProtobufVersion:       e.ProtocVersion,
 			IncludePaths:          includePaths,
-			IncludeWellKnownTypes: e.ProtocIncludeWKT,
+			IncludeWellKnownTypes: true, // Always include the well-known types.
 			AllowUnusedImports:    e.AllowUnusedImports,
 		},
 		Create: CreateConfig{

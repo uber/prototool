@@ -1,4 +1,4 @@
 create:
-  dir_to_base_package:
+  dir_to_package:
     a/b: foo
     a: foobar

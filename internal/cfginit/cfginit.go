@@ -40,19 +40,11 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
 
-# Do not use the default exclude paths.
-# The only default exclude path is "vendor".
-{{.V}}no_default_excludes: true
-
 # Additional paths to include with -I to protoc.
 # By default, the directory of the config file is included,
 # or the current directory if there is no config file.
 {{.V}}protoc_includes:
 {{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
-
-# Include the Well-Known Types when compiling with protoc.
-# For example, this allows you to do import "google/protobuf/timestamp.proto" in your Protobuf files.
-{{.V}}protoc_include_wkt: true
 
 # If not set, compile will fail if there are unused imports.
 # Setting this will ignore unused imports.
@@ -62,7 +54,7 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}create:
   # Map from relative directory to base package.
   # This affects how packages are generated with create.
-  {{.V}}dir_to_base_package:
+  {{.V}}dir_to_package:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
     {{.V}}.: bar
@@ -90,11 +82,11 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 {{.V}}    - ENUM_NAMES_CAPITALIZED
 
-  # Linters to include that are not in the lint group.
+  # Linters to include that are not in the default lint group.
 {{.V}}  include_ids:
 {{.V}}    - REQUEST_RESPONSE_NAMES_MATCH_RPC
 
-  # Linters to exclude from the lint group.
+  # Linters to exclude from the default lint group.
 {{.V}}  exclude_ids:
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 
@@ -105,13 +97,6 @@ protoc_version: {{.ProtocVersion}}
     # The base import path. This should be the go path of the prototool.yaml file.
     # This is required if you have any go plugins.
 {{.V}}    import_path: uber/foo/bar.git/idl/uber
-
-    # Do not include default modifiers with Mfile=package.
-    # By default, modifiers are included for the Well-Known Types if
-    # protoc_include_wkt is set, and for all files in the compilation relative
-    # to the import path.
-    # ** Generally do not set this unless you know what you are doing. **
-    #no_default_modifiers: true
 
     # Extra modifiers to include with Mfile=package.
 {{.V}}    extra_modifiers:
