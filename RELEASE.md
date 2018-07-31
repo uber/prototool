@@ -44,17 +44,18 @@ This document outlines how to create a release of prototool.
     ```
 
 
-5.  Update the version number in internal/vars/vars.go and verify that it
-    matches what is in the changelog.
+5.  Update the version number in internal/vars/vars.go and the Installation
+    section of the README.md and verify that it matches what is in the changelog.
 
-    ```
-    sed -i '' -e "s/^const Version =.*/const Version = \"$VERSION\"/" internal/vars/vars.go
+    ```diff
+    -const Version = "1.21.0-dev"
+    +const Version = "1.21.0"
     ```
 
 6.  Create a commit for the release.
 
     ```
-    git add internal/vars/vars.go CHANGELOG.md
+    git add internal/vars/vars.go README.md CHANGELOG.md
     git commit -m "Preparing release v$VERSION"
     ```
 
@@ -82,7 +83,7 @@ This document outlines how to create a release of prototool.
 10. Go to <https://github.com/uber/prototool/tags> and edit the release notes
     of the new tag.  Copy the changelog entries for this release in the
     release notes and set the name of the release to the version number
-    (`v$VERSION`). Upload the release artifacts from the release directory
+    (`v$VERSION`). Upload the release artifacts from the release directory.
 
 11. Switch back to development.
 
@@ -106,7 +107,8 @@ This document outlines how to create a release of prototool.
      [1.21.0]: https://github.com/uber/prototool/compare/v1.20.1...v1.21.0
     ```
 
-13. Update the version number in internal/vars/vars.go to the same version.
+13. Update the version number in internal/vars/vars.go to a new minor version
+    suffixed with `"-dev"`.
 
     ```diff
     -const Version = "1.21.0"

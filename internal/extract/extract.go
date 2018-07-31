@@ -62,10 +62,13 @@ type Service struct {
 // The first FileDescriptorSet with a match will be returned.
 type Getter interface {
 	// Get the field that matches the path.
+	// Return non-nil value, or error otherwise including if nothing found.
 	GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error)
 	// Get the message that matches the path.
+	// Return non-nil value, or error otherwise including if nothing found.
 	GetMessage(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Message, error)
 	// Get the service that matches the path.
+	// Return non-nil value, or error otherwise including if nothing found.
 	GetService(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Service, error)
 }
 

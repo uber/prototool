@@ -30,6 +30,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/uber/prototool/internal/protostrs"
 	"github.com/uber/prototool/internal/settings"
 	"go.uber.org/zap"
 )
@@ -39,12 +40,15 @@ var tmpl = template.Must(template.New("tmpl").Parse(`syntax = "proto3";
 package {{.Pkg}};
 
 option go_package = "{{.GoPkg}}";
+option java_multiple_files = true;
+option java_outer_classname = "{{.JavaOuterClassname}}";
 option java_package = "{{.JavaPkg}}";`))
 
 type tmplData struct {
-	Pkg     string
-	GoPkg   string
-	JavaPkg string
+	Pkg                string
+	GoPkg              string
+	JavaOuterClassname string
+	JavaPkg            string
 }
 
 type handler struct {
@@ -106,9 +110,10 @@ func (h *handler) create(filePath string) error {
 	}
 	data, err := getData(
 		&tmplData{
-			Pkg:     pkg,
-			GoPkg:   getGoPkg(pkg),
-			JavaPkg: getJavaPkg(pkg),
+			Pkg:                pkg,
+			GoPkg:              protostrs.GoPackage(pkg),
+			JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
+			JavaPkg:            protostrs.JavaPackage(pkg),
 		},
 	)
 	if err != nil {
@@ -185,15 +190,6 @@ func getPkgFromRel(rel string, basePkg string) string {
 		return relPkg
 	}
 	return basePkg + "." + relPkg
-}
-
-func getGoPkg(pkg string) string {
-	split := strings.Split(pkg, ".")
-	return split[len(split)-1] + "pb"
-}
-
-func getJavaPkg(pkg string) string {
-	return "com." + pkg + ".pb"
 }
 
 func getData(tmplData *tmplData) ([]byte, error) {

@@ -25,26 +25,36 @@ import (
 )
 
 type flags struct {
-	cachePath         string
-	callTimeout       string
-	connectTimeout    string
-	debug             bool
-	diffMode          bool
-	dirMode           bool
-	disableFormat     bool
-	disableLint       bool
-	gen               bool
-	harbormaster      bool
-	headers           []string
-	jsonOutput        bool
-	keepaliveTime     string
-	lintMode          bool
-	overwrite         bool
-	pkg               string
-	printFields       string
-	protocURL         string
-	uncomment         bool
-	updateFileOptions bool
+	address        string
+	cachePath      string
+	callTimeout    string
+	connectTimeout string
+	data           string
+	debug          bool
+	diffMode       bool
+	dirMode        bool
+	disableFormat  bool
+	disableLint    bool
+	dryRun         bool
+	harbormaster   bool
+	headers        []string
+	jsonOutput     bool
+	keepaliveTime  string
+	listAllLinters bool
+	listLinters    bool
+	lintMode       bool
+	method         string
+	overwrite      bool
+	pkg            string
+	printFields    string
+	protocURL      string
+	stdin          bool
+	uncomment      bool
+	noRewrite      bool
+}
+
+func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.address, "address", "", "The GRPC endpoint to connect to. This is required.")
 }
 
 func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
@@ -57,6 +67,10 @@ func (f *flags) bindCallTimeout(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindConnectTimeout(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.connectTimeout, "connect-timeout", "10s", "The maximum time to wait for the connection to be established.")
+}
+
+func (f *flags) bindData(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.data, "data", "", "The GRPC request data in JSON format. Either this or --stdin is required.")
 }
 
 func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
@@ -79,8 +93,8 @@ func (f *flags) bindDisableLint(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.disableLint, "disable-lint", false, "Do not run linting.")
 }
 
-func (f *flags) bindGen(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.gen, "gen", false, "Print the commands that would be run on gen instead of compile.")
+func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.dryRun, "dry-run", false, "Print the protoc commands that would have been run without actually running them.")
 }
 
 func (f *flags) bindHarbormaster(flagSet *pflag.FlagSet) {
@@ -103,6 +117,18 @@ func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.lintMode, "lint", "l", false, "Write a lint error saying that the file is not formatted instead of writing the formatted file to stdout.")
 }
 
+func (f *flags) bindListAllLinters(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listAllLinters, "list-all-linters", false, "List all available linters instead of running lint.")
+}
+
+func (f *flags) bindListLinters(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listLinters, "list-linters", false, "List the configured linters instead of running lint.")
+}
+
+func (f *flags) bindMethod(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.method, "method", "", "The GRPC method to call in the form package.Service/Method. This is required.")
+}
+
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.overwrite, "overwrite", "w", false, "Overwrite the existing file instead of writing the formatted file to stdout.")
 }
@@ -119,10 +145,14 @@ func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.protocURL, "protoc-url", "", "The url to use to download the protoc zip file, otherwise uses GitHub Releases. Setting this option will ignore the config protoc_version setting.")
 }
 
+func (f *flags) bindStdin(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.stdin, "stdin", false, "Read the GRPC request data from stdin in JSON format. Either this or --data is required.")
+}
+
 func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
 }
 
-func (f *flags) bindUpdateFileOptions(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.updateFileOptions, "update-file-options", false, "Update the file options go_package and java_package to match the package per the guidelines of the style guide.")
+func (f *flags) bindNoRewrite(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.noRewrite, "no-rewrite", false, "Do not rewrite the file options go_package, java_multiple_files, java_outer_classname, and java_package to match the package per the guidelines of the style guide.")
 }

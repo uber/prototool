@@ -29,15 +29,19 @@ package style.uber;
 // Next are the package options.
 // There is one newline between the package declaration and package options.
 // Package options should be alphabetized.
-// The below java and golang options are always specified.
 
-// Do not specify either "java_multiple_files" or "java_outer_classname".
+// The below java and golang options are always specified.
+// The java options match https://cloud.google.com/apis/design/file_structure
 
 // The go package is always $(basename PACKAGE)pb.
 // Do not use the "long-form" package name with a directory path.
 option go_package = "uberpb";
-// The java package is always com.PACKAGE.pb.
-option java_package = "com.style.uber.pb";
+// java_multiple_files is always true.
+option java_multiple_files = true;
+// java_outer_classname is the CamelCased file name without the extension, followed by Proto.
+option java_outer_classname = "UberProto";
+// The java package is always com.PACKAGE.
+option java_package = "com.style.uber";
 
 // Imports come next.
 // There is one newline between the package/options and imports.
@@ -268,19 +272,20 @@ message StreamQuasarsResponse {
 }
 
 // Services should end in Service.
-// Note {} instead of ; to terminate the method definition.
+// Use ; to terminate the method definition if there are no RPC options,
+// {} if there are RPC options.
 
 // HelloService is the hello service.
 service HelloService {
   // Requests and Responses should always match the rpc name.
-  // rpc NAME(NAMERequest) returns (NAMEResponse) {}
+  // rpc NAME(NAMERequest) returns (NAMEResponse);
 
   // SendFoo sends a foo.
-  rpc SendFoo(SendFooRequest) returns (SendFooResponse) {}
+  rpc SendFoo(SendFooRequest) returns (SendFooResponse);
   // GetPlanet gets a planet.
-  rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse) {}
+  rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse);
   // StreamGalaxies streams galaxies.
-  rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse) {}
+  rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse);
   // StreamQuasars streams quasars.
-  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse) {}
+  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse);
 }

@@ -92,6 +92,29 @@ func TestToUpperSnakeCase(t *testing.T) {
 	assert.Equal(t, "ABBR_CAMEL", ToUpperSnakeCase("ABBRCamel"))
 }
 
+func TestToUpperCamelCase(t *testing.T) {
+	assert.Equal(t, "", ToUpperCamelCase(""))
+	assert.Equal(t, "", ToUpperCamelCase("  "))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("camel_case"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("  camel_case"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("  camel_case  "))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("camel_case  "))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("Camel_case"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("__Camel___case"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("__Camel___case__"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("Camel___case__"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("Camel-case"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("Camel case"))
+	assert.Equal(t, "CamelCase", ToUpperCamelCase("  Camel case"))
+	assert.Equal(t, "CAMELCase", ToUpperCamelCase("CAMEL_case"))
+	assert.Equal(t, "CAMELCase", ToUpperCamelCase("__CAMEL___case"))
+	assert.Equal(t, "CAMELCase", ToUpperCamelCase("__CAMEL___case__"))
+	assert.Equal(t, "CAMELCase", ToUpperCamelCase("CAMEL___case__"))
+	assert.Equal(t, "CAMELCase", ToUpperCamelCase("CAMEL-case"))
+	assert.Equal(t, "CAMELCase", ToUpperCamelCase("CAMEL case"))
+	assert.Equal(t, "CAMELCase", ToUpperCamelCase("  CAMEL case"))
+}
+
 func TestDedupeSort(t *testing.T) {
 	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c"}, strings.ToLower))
 	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a"}, strings.ToLower))

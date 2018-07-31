@@ -24,6 +24,7 @@ import (
 	"encoding/json"
 	"io"
 
+	"github.com/fullstorydev/grpcurl"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
@@ -34,6 +35,8 @@ import (
 
 var jsonpbMarshaler = &jsonpb.Marshaler{}
 var jsonpbPrettyMarshaler = &jsonpb.Marshaler{Indent: "  "}
+
+var _ grpcurl.InvocationEventHandler = &invocationEventHandler{}
 
 type invocationEventHandler struct {
 	output     io.Writer
@@ -77,7 +80,6 @@ func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
 
 func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, trailers metadata.MD) {
 	if err := s.Err(); err != nil {
-		// TODO(pedge): not great for streaming
 		i.err = err
 	}
 	if !i.jsonOutput {

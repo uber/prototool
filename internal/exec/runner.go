@@ -45,14 +45,14 @@ import (
 	"github.com/uber/prototool/internal/extract"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/format"
+	"github.com/uber/prototool/internal/grpc"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/phab"
 	"github.com/uber/prototool/internal/protoc"
+	"github.com/uber/prototool/internal/reflect"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
-	"github.com/uber/prototool/internal/x/grpc"
-	"github.com/uber/prototool/internal/x/reflect"
 	"go.uber.org/zap"
 )
 
@@ -61,15 +61,17 @@ var jsonMarshaler = &jsonpb.Marshaler{Indent: "  "}
 type runner struct {
 	configProvider   settings.ConfigProvider
 	protoSetProvider file.ProtoSetProvider
-	workDirPath      string
-	input            io.Reader
-	output           io.Writer
-	logger           *zap.Logger
-	cachePath        string
-	protocURL        string
-	printFields      string
-	dirMode          bool
-	harbormaster     bool
+
+	workDirPath string
+	input       io.Reader
+	output      io.Writer
+
+	logger       *zap.Logger
+	cachePath    string
+	protocURL    string
+	printFields  string
+	dirMode      bool
+	harbormaster bool
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -169,35 +171,33 @@ func (r *runner) Files(args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, protoSet := range meta.ProtoSets {
-		for _, files := range protoSet.DirPathToFiles {
-			for _, file := range files {
-				if err := r.println(file.DisplayPath); err != nil {
-					return err
-				}
+	for _, files := range meta.ProtoSet.DirPathToFiles {
+		for _, file := range files {
+			if err := r.println(file.DisplayPath); err != nil {
+				return err
 			}
 		}
 	}
 	return nil
 }
 
-func (r *runner) Compile(args []string) error {
+func (r *runner) Compile(args []string, dryRun bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	_, err = r.compile(false, false, meta)
+	_, err = r.compile(false, false, dryRun, meta)
 	return err
 }
 
-func (r *runner) Gen(args []string) error {
+func (r *runner) Gen(args []string, dryRun bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	_, err = r.compile(true, false, meta)
+	_, err = r.compile(true, false, dryRun, meta)
 	return err
 }
 
@@ -213,7 +213,7 @@ func (r *runner) DescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -223,9 +223,6 @@ func (r *runner) DescriptorProto(args []string) error {
 	message, err := r.newGetter().GetMessage(fileDescriptorSets, path)
 	if err != nil {
 		return err
-	}
-	if message == nil {
-		return fmt.Errorf("nil message")
 	}
 	data, err := jsonMarshaler.MarshalToString(message.DescriptorProto)
 	if err != nil {
@@ -246,7 +243,7 @@ func (r *runner) FieldDescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -256,9 +253,6 @@ func (r *runner) FieldDescriptorProto(args []string) error {
 	field, err := r.newGetter().GetField(fileDescriptorSets, path)
 	if err != nil {
 		return err
-	}
-	if field == nil {
-		return fmt.Errorf("nil field")
 	}
 	data, err := jsonMarshaler.MarshalToString(field.FieldDescriptorProto)
 	if err != nil {
@@ -279,7 +273,7 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -290,9 +284,6 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 	if err != nil {
 		return err
 	}
-	if service == nil {
-		return fmt.Errorf("nil service")
-	}
 	data, err := jsonMarshaler.MarshalToString(service.ServiceDescriptorProto)
 	if err != nil {
 		return err
@@ -300,8 +291,11 @@ func (r *runner) ServiceDescriptorProto(args []string) error {
 	return r.println(data)
 }
 
-func (r *runner) compile(doGen bool, doFileDescriptorSet bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
-	compileResult, err := r.newCompiler(doGen, doFileDescriptorSet).Compile(meta.ProtoSets...)
+func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
+	if dryRun {
+		return nil, r.printCommands(doGen, meta.ProtoSet)
+	}
+	compileResult, err := r.newCompiler(doGen, doFileDescriptorSet).Compile(meta.ProtoSet)
 	if err != nil {
 		return nil, err
 	}
@@ -315,13 +309,8 @@ func (r *runner) compile(doGen bool, doFileDescriptorSet bool, meta *meta) ([]*d
 	return compileResult.FileDescriptorSets, nil
 }
 
-func (r *runner) ProtocCommands(args []string, genCommands bool) error {
-	meta, err := r.getMeta(args)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	commands, err := r.newCompiler(genCommands, false).ProtocCommands(meta.ProtoSets...)
+func (r *runner) printCommands(doGen bool, protoSet *file.ProtoSet) error {
+	commands, err := r.newCompiler(doGen, false).ProtocCommands(protoSet)
 	if err != nil {
 		return err
 	}
@@ -333,13 +322,22 @@ func (r *runner) ProtocCommands(args []string, genCommands bool) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string) error {
+func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool) error {
+	if listAllLinters && listLinters {
+		return newExitErrorf(255, "can only set one of list-all-linters, list-linters")
+	}
+	if listAllLinters {
+		return r.listAllLinters()
+	}
+	if listLinters {
+		return r.listLinters()
+	}
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, meta); err != nil {
+	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
 	return r.lint(meta)
@@ -347,7 +345,7 @@ func (r *runner) Lint(args []string) error {
 
 func (r *runner) lint(meta *meta) error {
 	r.logger.Debug("calling LintRunner")
-	failures, err := r.newLintRunner().Run(meta.ProtoSets...)
+	failures, err := r.newLintRunner().Run(meta.ProtoSet)
 	if err != nil {
 		return err
 	}
@@ -360,7 +358,7 @@ func (r *runner) lint(meta *meta) error {
 	return nil
 }
 
-func (r *runner) ListLinters() error {
+func (r *runner) listLinters() error {
 	config, err := r.getConfig(r.workDirPath)
 	if err != nil {
 		return err
@@ -372,7 +370,7 @@ func (r *runner) ListLinters() error {
 	return r.printLinters(linters)
 }
 
-func (r *runner) ListAllLinters() error {
+func (r *runner) listAllLinters() error {
 	return r.printLinters(lint.AllLinters)
 }
 
@@ -398,83 +396,89 @@ func (r *runner) ListAllLintGroups() error {
 	return nil
 }
 
-func (r *runner) Format(args []string, overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool) error {
+func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error {
+	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
+		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
+	}
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, meta); err != nil {
+	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, updateFileOptions, meta)
+	return r.format(overwrite, diffMode, lintMode, rewrite, meta)
 }
 
-func (r *runner) format(overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool, meta *meta) error {
-	var retErr error
-	for _, protoSet := range meta.ProtoSets {
-		for _, protoFiles := range protoSet.DirPathToFiles {
-			for _, protoFile := range protoFiles {
-				if err := r.formatFile(overwrite, diffMode, lintMode, updateFileOptions, meta, protoSet.Config, protoFile); err != nil {
-					if _, ok := err.(*ExitError); !ok {
-						return err
-					}
-					retErr = err
-				}
+func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta) error {
+	success := true
+	for _, protoFiles := range meta.ProtoSet.DirPathToFiles {
+		for _, protoFile := range protoFiles {
+			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, rewrite, meta, protoFile)
+			if err != nil {
+				return err
+			}
+			if !fileSuccess {
+				success = false
 			}
 		}
 	}
-	return retErr
+	if !success {
+		return newExitErrorf(255, "")
+	}
+	return nil
 }
 
-func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, updateFileOptions bool, meta *meta, config settings.Config, protoFile *file.ProtoFile) error {
+// return true if there was no unexpected diff and we should exit with 0
+// return false if we should exit with non-zero
+// if false and nil error, we will return an ExitError outside of this function
+func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrite bool, meta *meta, protoFile *file.ProtoFile) (bool, error) {
 	input, err := ioutil.ReadFile(protoFile.Path)
 	if err != nil {
-		return err
+		return false, err
 	}
-	data, failures, err := r.newTransformer(updateFileOptions).Transform(config, input)
+	data, failures, err := r.newTransformer(rewrite).Transform(protoFile.Path, input)
 	if err != nil {
-		return err
+		return false, err
 	}
 	if len(failures) > 0 {
-		if err := r.printFailures(protoFile.DisplayPath, meta, failures...); err != nil {
-			return err
-		}
-		return newExitErrorf(255, "")
+		return false, r.printFailures(protoFile.DisplayPath, meta, failures...)
 	}
 	if !bytes.Equal(input, data) {
 		if overwrite {
-			return ioutil.WriteFile(protoFile.Path, data, os.ModePerm)
+			// 0 exit code in overwrite case
+			return true, ioutil.WriteFile(protoFile.Path, data, os.ModePerm)
 		}
 		if lintMode {
-			if err := r.printFailures("", meta, text.NewFailuref(scanner.Position{
+			return false, r.printFailures("", meta, text.NewFailuref(scanner.Position{
 				Filename: protoFile.DisplayPath,
-			}, "FORMAT_DIFF", "Format returned a diff.")); err != nil {
-				return err
-			}
+			}, "FORMAT_DIFF", "Format returned a diff."))
 		}
 		if diffMode {
 			d, err := diff.Do(input, data, protoFile.DisplayPath)
 			if err != nil {
-				return err
+				return false, err
 			}
 			if _, err := io.Copy(r.output, bytes.NewReader(d)); err != nil {
-				return err
+				return false, err
 			}
+			return false, nil
 		}
-		if !overwrite && !lintMode && !diffMode {
-			if _, err := io.Copy(r.output, bytes.NewReader(data)); err != nil {
-				return err
-			}
+		//!overwrite && !lintMode && !diffMode
+		if _, err := io.Copy(r.output, bytes.NewReader(data)); err != nil {
+			return false, err
 		}
-		return newExitErrorf(255, "")
+		// there was a diff, return non-zero exit code
+		return false, nil
 	}
+	// we still print the formatted file to stdout
 	if !overwrite && !lintMode && !diffMode {
 		if _, err := io.Copy(r.output, bytes.NewReader(data)); err != nil {
-			return err
+			return false, err
 		}
 	}
-	return nil
+	return true, nil
 }
 
 func (r *runner) BinaryToJSON(args []string) error {
@@ -493,7 +497,7 @@ func (r *runner) BinaryToJSON(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -524,7 +528,7 @@ func (r *runner) JSONToBinary(args []string) error {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -539,21 +543,21 @@ func (r *runner) JSONToBinary(args []string) error {
 	return err
 }
 
-func (r *runner) All(args []string, disableFormat bool, disableLint bool, updateFileOptions bool) error {
+func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	if _, err := r.compile(false, false, meta); err != nil {
+	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
 	if !disableFormat {
-		if err := r.format(true, false, false, updateFileOptions, meta); err != nil {
+		if err := r.format(true, false, false, rewrite, meta); err != nil {
 			return err
 		}
 	}
-	if _, err := r.compile(true, false, meta); err != nil {
+	if _, err := r.compile(true, false, false, meta); err != nil {
 		return err
 	}
 	if !disableLint {
@@ -562,14 +566,20 @@ func (r *runner) All(args []string, disableFormat bool, disableLint bool, update
 	return nil
 }
 
-func (r *runner) GRPC(args []string, headers []string, callTimeout string, connectTimeout string, keepaliveTime string, jsonOutput bool) error {
-	if len(args) < 3 {
-		return nil
+func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, jsonOutput bool) error {
+	if address == "" {
+		return newExitErrorf(255, "must set address")
 	}
-	address := args[len(args)-3]
-	method := args[len(args)-2]
-	reader := r.getInputReader(args[len(args)-1])
-	args = args[:len(args)-3]
+	if method == "" {
+		return newExitErrorf(255, "must set method")
+	}
+	if data == "" && !stdin {
+		return newExitErrorf(255, "must set one of data or stdin")
+	}
+	if data != "" && stdin {
+		return newExitErrorf(255, "must set only one of data or stdin")
+	}
+	reader := r.getInputReader(data, stdin)
 
 	parsedHeaders := make(map[string]string)
 	for _, header := range headers {
@@ -607,7 +617,7 @@ func (r *runner) GRPC(args []string, headers []string, callTimeout string, conne
 		return err
 	}
 	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
 		return err
 	}
@@ -679,10 +689,10 @@ func (r *runner) newLintRunner() lint.Runner {
 	)
 }
 
-func (r *runner) newTransformer(updateFileOptions bool) format.Transformer {
+func (r *runner) newTransformer(rewrite bool) format.Transformer {
 	transformerOptions := []format.TransformerOption{format.TransformerWithLogger(r.logger)}
-	if updateFileOptions {
-		transformerOptions = append(transformerOptions, format.TransformerWithUpdateFileOptions())
+	if rewrite {
+		transformerOptions = append(transformerOptions, format.TransformerWithRewrite())
 	}
 	return format.NewTransformer(transformerOptions...)
 }
@@ -740,7 +750,9 @@ func (r *runner) getConfig(dirPath string) (settings.Config, error) {
 }
 
 type meta struct {
-	ProtoSets               []*file.ProtoSet
+	ProtoSet *file.ProtoSet
+	// this will be empty if not in dir mode
+	// if in dir mode, this will be the single filename that we want to return errors for
 	InDirModeSingleFilename string
 }
 
@@ -750,40 +762,41 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 		args = []string{"."}
 	}
 	if len(args) == 1 {
-		fileInfo, err := os.Stat(args[0])
+		fileOrDir := args[0]
+		fileInfo, err := os.Stat(fileOrDir)
 		if err != nil {
 			return nil, err
 		}
 		if fileInfo.Mode().IsDir() {
-			protoSets, err := r.protoSetProvider.GetForDir(r.workDirPath, args[0])
+			protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
 			if err != nil {
 				return nil, err
 			}
 			return &meta{
-				ProtoSets: protoSets,
+				ProtoSet: protoSet,
 			}, nil
 		}
 		// TODO: allow symlinks?
 		if fileInfo.Mode().IsRegular() {
 			if r.dirMode {
-				protoSets, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(args[0]))
+				protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
 				if err != nil {
 					return nil, err
 				}
 				return &meta{
-					ProtoSets:               protoSets,
-					InDirModeSingleFilename: args[0],
+					ProtoSet:                protoSet,
+					InDirModeSingleFilename: fileOrDir,
 				}, nil
 			}
-			protoSets, err := r.protoSetProvider.GetForFiles(r.workDirPath, args[0])
+			protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, fileOrDir)
 			if err != nil {
 				return nil, err
 			}
 			return &meta{
-				ProtoSets: protoSets,
+				ProtoSet: protoSet,
 			}, nil
 		}
-		return nil, fmt.Errorf("%s is not a directory or a regular file", args[0])
+		return nil, fmt.Errorf("%s is not a directory or a regular file", fileOrDir)
 	}
 	for _, arg := range args {
 		fileInfo, err := os.Stat(arg)
@@ -792,15 +805,15 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 		}
 		// TODO: allow symlinks?
 		if !fileInfo.Mode().IsRegular() {
-			return nil, fmt.Errorf("multiple arguments only allowed if all arguments are regular files and %s is not a regular file", args[0])
+			return nil, fmt.Errorf("multiple arguments only allowed if all arguments are regular files, %q is not a regular file", arg)
 		}
 	}
-	protoSets, err := r.protoSetProvider.GetForFiles(r.workDirPath, args...)
+	protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, args...)
 	if err != nil {
 		return nil, err
 	}
 	return &meta{
-		ProtoSets: protoSets,
+		ProtoSet: protoSet,
 	}, nil
 }
 
@@ -828,11 +841,11 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 			shouldPrint = true
 		} else if meta.InDirModeSingleFilename != "" {
 			// TODO: the compiler may not return the rel path due to logic in bestFilePath
-			absSingleFilename, err := absClean(meta.InDirModeSingleFilename)
+			absSingleFilename, err := file.AbsClean(meta.InDirModeSingleFilename)
 			if err != nil {
 				return err
 			}
-			absFailureFilename, err := absClean(failure.Filename)
+			absFailureFilename, err := file.AbsClean(failure.Filename)
 			if err != nil {
 				return err
 			}
@@ -873,11 +886,9 @@ func (r *runner) printLinters(linters []lint.Linter) error {
 }
 
 func (r *runner) printAffectedFiles(meta *meta) {
-	for _, protoSet := range meta.ProtoSets {
-		for _, files := range protoSet.DirPathToFiles {
-			for _, file := range files {
-				r.logger.Debug("using file", zap.String("file", file.DisplayPath))
-			}
+	for _, files := range meta.ProtoSet.DirPathToFiles {
+		for _, file := range files {
+			r.logger.Debug("using file", zap.String("file", file.DisplayPath))
 		}
 	}
 }
@@ -897,11 +908,11 @@ func (r *runner) getInputData(arg string) ([]byte, error) {
 	return []byte(arg), nil
 }
 
-func (r *runner) getInputReader(arg string) io.Reader {
-	if arg == "-" {
+func (r *runner) getInputReader(data string, stdin bool) io.Reader {
+	if stdin {
 		return r.input
 	}
-	return bytes.NewReader([]byte(arg))
+	return bytes.NewReader([]byte(data))
 }
 
 func newExitErrorf(code int, format string, args ...interface{}) *ExitError {
@@ -909,17 +920,6 @@ func newExitErrorf(code int, format string, args ...interface{}) *ExitError {
 		Code:    code,
 		Message: fmt.Sprintf(format, args...),
 	}
-}
-
-// TODO: this is copied in three places
-func absClean(path string) (string, error) {
-	if path == "" {
-		return path, nil
-	}
-	if !filepath.IsAbs(path) {
-		return filepath.Abs(path)
-	}
-	return filepath.Clean(path), nil
 }
 
 func newTabWriter(writer io.Writer) *tabwriter.Writer {

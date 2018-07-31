@@ -35,6 +35,12 @@ var fileOptionsGoPackageSameInDirLinter = NewLinter(
 	newCheckFileOptionsSameInDir("go_package"),
 )
 
+var fileOptionsJavaMultipleFilesSameInDirLinter = NewLinter(
+	"FILE_OPTIONS_JAVA_MULTIPLE_FILES_SAME_IN_DIR",
+	`Verifies that the file option "java_multiple_files" of all files in a directory are the same.`,
+	newCheckFileOptionsSameInDir("java_multiple_files"),
+)
+
 var fileOptionsJavaPackageSameInDirLinter = NewLinter(
 	"FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR",
 	`Verifies that the file option "java_package" of all files in a directory are the same.`,

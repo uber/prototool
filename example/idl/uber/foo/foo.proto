@@ -3,7 +3,9 @@ syntax = "proto3";
 package foo;
 
 option go_package = "foopb";
-option java_package = "com.foo.pb";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo";
 
 import "foo/dep.proto";
 import "google/api/annotations.proto";
@@ -86,7 +88,7 @@ message FooResponse {
 // HelloService is a service.
 service HelloService {
   // Foo does a foo.
-  rpc Foo(sub.Dep) returns (FooResponse) {}
+  rpc Foo(sub.Dep) returns (FooResponse);
   // Bar does a bar.
   rpc Bar(BarRequest) returns (foo.Dep) {
     option (google.api.http) = {
@@ -106,12 +108,12 @@ message ExclamationResponse {
 // ExcitedService is a service with exciting transformations.
 service ExcitedService {
   // Exclamation adds an exclamation to the request value.
-  rpc Exclamation(ExclamationRequest) returns (ExclamationResponse) {}
+  rpc Exclamation(ExclamationRequest) returns (ExclamationResponse);
   // ExclamationClientStream adds an exclamation to the combined request values.
-  rpc ExclamationClientStream(stream ExclamationRequest) returns (ExclamationResponse) {}
+  rpc ExclamationClientStream(stream ExclamationRequest) returns (ExclamationResponse);
   // ExclamationServerStream adds an exclamation to the request value
   // and streams each character as a response.
-  rpc ExclamationServerStream(ExclamationRequest) returns (stream ExclamationResponse) {}
+  rpc ExclamationServerStream(ExclamationRequest) returns (stream ExclamationResponse);
   // ExclamationBidiStream adds an exclamation to the each request value.
-  rpc ExclamationBidiStream(stream ExclamationRequest) returns (stream ExclamationResponse) {}
+  rpc ExclamationBidiStream(stream ExclamationRequest) returns (stream ExclamationResponse);
 }

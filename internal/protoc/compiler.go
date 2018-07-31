@@ -27,12 +27,14 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -81,21 +83,17 @@ func newCompiler(options ...CompilerOption) *compiler {
 	return compiler
 }
 
-func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) {
-	var allCmdMetas []*cmdMeta
-	for _, protoSet := range protoSets {
-		cmdMetas, err := c.getCmdMetas(protoSet)
-		if err != nil {
-			cleanCmdMetas(allCmdMetas)
-			return nil, err
-		}
-		allCmdMetas = append(allCmdMetas, cmdMetas...)
+func (c *compiler) Compile(protoSet *file.ProtoSet) (*CompileResult, error) {
+	cmdMetas, err := c.getCmdMetas(protoSet)
+	if err != nil {
+		cleanCmdMetas(cmdMetas)
+		return nil, err
 	}
 
 	// we potentially create temporary files if doFileDescriptorSet is true
 	// if so, we try to remove them when we return no matter what
 	// by putting this defer here, we get this catch early
-	defer cleanCmdMetas(allCmdMetas)
+	defer cleanCmdMetas(cmdMetas)
 
 	if c.doGen {
 		// the directories for the output files have to exist
@@ -104,7 +102,7 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 		// generated files potentially
 		// we know the directories from the output option in the
 		// config files
-		if err := c.makeGenDirs(protoSets...); err != nil {
+		if err := c.makeGenDirs(protoSet); err != nil {
 			return nil, err
 		}
 	}
@@ -112,7 +110,7 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 	var errs []error
 	var lock sync.Mutex
 	var wg sync.WaitGroup
-	for _, cmdMeta := range allCmdMetas {
+	for _, cmdMeta := range cmdMetas {
 		cmdMeta := cmdMeta
 		wg.Add(1)
 		go func() {
@@ -151,8 +149,8 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 		}, nil
 	}
 
-	fileDescriptorSets := make([]*descriptor.FileDescriptorSet, 0, len(allCmdMetas))
-	for _, cmdMeta := range allCmdMetas {
+	fileDescriptorSets := make([]*descriptor.FileDescriptorSet, 0, len(cmdMetas))
+	for _, cmdMeta := range cmdMetas {
 		// if doFileDescriptorSet is not set, we won't get a fileDescriptorSet anyways,
 		// so the end result will be an empty CompileResult at this point
 		fileDescriptorSet, err := getFileDescriptorSet(cmdMeta)
@@ -168,31 +166,27 @@ func (c *compiler) Compile(protoSets ...*file.ProtoSet) (*CompileResult, error) 
 	}, nil
 }
 
-func (c *compiler) ProtocCommands(protoSets ...*file.ProtoSet) ([]string, error) {
-	var cmdMetaStrings []string
-	for _, protoSet := range protoSets {
-		// we end up calling the logic that creates temporary files for file descriptor sets
-		// anyways, so we need to clean them up with cleanCmdMetas
-		// this logic could be simplified to have a "dry run" option, but ProtocCommands
-		// is more for debugging anyways
-		cmdMetas, err := c.getCmdMetas(protoSet)
-		if err != nil {
-			return nil, err
-		}
-		for _, cmdMeta := range cmdMetas {
-			cmdMetaStrings = append(cmdMetaStrings, cmdMeta.String())
-		}
-		cleanCmdMetas(cmdMetas)
+func (c *compiler) ProtocCommands(protoSet *file.ProtoSet) ([]string, error) {
+	// we end up calling the logic that creates temporary files for file descriptor sets
+	// anyways, so we need to clean them up with cleanCmdMetas
+	// this logic could be simplified to have a "dry run" option, but ProtocCommands
+	// is more for debugging anyways
+	cmdMetas, err := c.getCmdMetas(protoSet)
+	if err != nil {
+		return nil, err
 	}
+	cmdMetaStrings := make([]string, 0, len(cmdMetas))
+	for _, cmdMeta := range cmdMetas {
+		cmdMetaStrings = append(cmdMetaStrings, cmdMeta.String())
+	}
+	cleanCmdMetas(cmdMetas)
 	return cmdMetaStrings, nil
 }
 
-func (c *compiler) makeGenDirs(protoSets ...*file.ProtoSet) error {
+func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 	genDirs := make(map[string]struct{})
-	for _, protoSet := range protoSets {
-		for _, genPlugin := range protoSet.Config.Gen.Plugins {
-			genDirs[genPlugin.OutputPath.AbsPath] = struct{}{}
-		}
+	for _, genPlugin := range protoSet.Config.Gen.Plugins {
+		genDirs[genPlugin.OutputPath.AbsPath] = struct{}{}
 	}
 	for genDir := range genDirs {
 		// we could choose a different permission set, but this seems reasonable
@@ -211,15 +205,35 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	c.logger.Debug("running protoc", zap.String("command", cmdMeta.String()))
 	buffer := bytes.NewBuffer(nil)
 	cmdMeta.execCmd.Stderr = buffer
-	// we only need stderr to parse errors
+	// We only need stderr to parse errors
 	// you have to explicitly set to ioutil.Discard, otherwise if there
-	// is a stdout, it will be printed to os.Stdout
+	// is a stdout, it will be printed to os.Stdout.
 	cmdMeta.execCmd.Stdout = ioutil.Discard
-	runErr := cmdMeta.execCmd.Run()
-	if runErr != nil {
-		// exit errors are ok, we can probably parse them into text.Failures
-		// if not an exec.ExitError, short circuit
-		if _, ok := runErr.(*exec.ExitError); !ok {
+
+	// Prepare a signal buffer so that we can kill the protoc
+	// process when Prototool receives a SIGINT or SIGTERM.
+	sig := make(chan os.Signal, 1)
+	done := make(chan error, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		done <- cmdMeta.execCmd.Run()
+	}()
+
+	var runErr error
+	select {
+	case s := <-sig:
+		// Kill the process, and terminate early.
+		c.logger.Debug(
+			"terminating protoc",
+			zap.String("command", cmdMeta.String()),
+			zap.String("signal", s.String()),
+		)
+		return nil, cmdMeta.execCmd.Process.Kill()
+	case runErr = <-done:
+		// Exit errors are ok, we can probably parse them into text.Failures
+		// if not an exec.ExitError, short circuit.
+		if _, ok := runErr.(*exec.ExitError); !ok && runErr != nil {
 			return nil, runErr
 		}
 	}
@@ -227,12 +241,17 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	if output != "" {
 		c.logger.Debug("protoc output", zap.String("output", output))
 	}
+	// We want to treat any output from protoc as a failure, even if
+	// protoc exited with 0 status. This is because there are outputs
+	// from protoc that we consider errors that protoc considers warnings,
+	// and plugins in general do not produce output unless there is an error.
+	// See https://github.com/uber/prototool/issues/128 for a full discussion.
 	failures := c.parseProtocOutput(cmdMeta, output)
-	// we had a run error but for whatever reason did not get any parsed
+	// We had a run error but for whatever reason did not get any parsed
 	// output lines, we still want to fail in this case
 	// this generally should not happen, especially as plugins that fail
 	// will result in a pluginFailedRegexp matching line but this
-	// is just to make sure
+	// is just to make sure.
 	if len(failures) == 0 && runErr != nil {
 		return nil, runErr
 	}

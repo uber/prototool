@@ -4,43 +4,39 @@
 
 syntax = "proto3"; // inline comment1
 
-// baz
-
 package foo; // inline comment3
 
-// bat
-// ban
+// comment4
+option go_package = "foopb"; // inline comment4
+// comment11
+option java_multiple_files = true; //inline comment11
+// comment5
+option java_outer_classname = "FooProto"; // inline comment5
+option java_package = "com.foo";
 
 // comment9
 import "google/protobuf/timestamp.proto"; // inline comment9
 
-// comment11
-option java_multiple_files = true; //inline comment11
-// comment4
-option go_package = "issssoopb"; // inline comment4
-// comment5
-option java_outer_classname = "FooProto"; // inline comment5
+// baz
+
+// bat
+// ban
 
 // Baz is a baz.
 message Baz {
-
   int64 hello = 1;
-
   // unassociated comment
 
   // another unassociated comment
 
-  google.protobuf.Timestamp timestamp = 3; /* inline c-style comment */
-
-
+  google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
   map<string, int64> m = 11;
-
   oneof test_oneof {
     int64 foo1 = 8;
     string foo2 = 9;
     // comment18
-  }
 
+  }
 }
 
 // Bat is a bat.
@@ -55,22 +51,20 @@ message Bat {
 }
 
 // Empty is an empty message.
-message Empty {
-}
+message Empty {}
 
 // Something is something.
 enum Something {
-// comment25
+  // comment25
   SOMETHING_INVALID = 0; // inline comment25
-// comment27
+  // comment27
   SOMETHING_UNSET = 1; // inline comment27
-// comment28
+  // comment28
   SOMETHING_FOO = 2; // inline comment28
 }
 
 // Daylight is the daylight service.
 service Daylight {
-  rpc Hello(Bat) returns (Empty) {
-  } // inline comment23
+  rpc Hello(Bat) returns (Empty); // inline comment23
   rpc Foo(Empty) returns (Bat); // inline comment24
 }

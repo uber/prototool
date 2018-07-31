@@ -36,8 +36,8 @@ type baseVisitor struct {
 	Failures []*text.Failure
 }
 
-func newBaseVisitor(indent string) *baseVisitor {
-	return &baseVisitor{printer: newPrinter(indent)}
+func newBaseVisitor() *baseVisitor {
+	return &baseVisitor{printer: newPrinter()}
 }
 
 func (v *baseVisitor) AddFailure(position scanner.Position, format string, args ...interface{}) {
@@ -73,7 +73,37 @@ func (v *baseVisitor) PComment(comment *proto.Comment) {
 	}
 }
 
-func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
+func (v *baseVisitor) POptions(options ...*proto.Option) {
+	v.pOptions(false, options...)
+}
+
+// fieldType can be "" in case of enum field
+func (v *baseVisitor) pMessageOrEnumField(prefix string, fieldName string, fieldType string, fieldTag int, comment *proto.Comment, inlineComment *proto.Comment, options ...*proto.Option) {
+	if fieldType != "" {
+		fieldType = fieldType + " "
+	}
+	v.PComment(comment)
+	if len(options) == 0 {
+		v.PWithInlineComment(inlineComment, prefix, fieldType, fieldName, " = ", fieldTag, ";")
+		return
+	}
+	if len(options) == 1 {
+		o := options[0]
+		if isSingleValueLiteral(o.Constant) {
+			if source := o.Constant.SourceRepresentation(); source != "" {
+				v.PWithInlineComment(inlineComment, prefix, fieldType, fieldName, " = ", fieldTag, " [", o.Name, ` = `, source, "];")
+				return
+			}
+		}
+	}
+	v.P(prefix, fieldType, fieldName, " = ", fieldTag, " [")
+	v.In()
+	v.pOptions(true, options...)
+	v.Out()
+	v.PWithInlineComment(inlineComment, "];")
+}
+
+func (v *baseVisitor) pOptions(isFieldOption bool, options ...*proto.Option) {
 	if len(options) == 0 {
 		return
 	}
@@ -92,8 +122,7 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 			}
 		}
 		v.PComment(o.Comment)
-		// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
-		if len(o.Constant.Array) == 0 && len(o.Constant.OrderedMap) == 0 {
+		if isSingleValueLiteral(o.Constant) {
 			// SourceRepresentation() returns an empty string if the literal is empty
 			// if empty, we do not want to print the key or empty value
 			if source := o.Constant.SourceRepresentation(); source != "" {
@@ -116,14 +145,13 @@ func (v *baseVisitor) POptions(isFieldOption bool, options ...*proto.Option) {
 	}
 }
 
-// should only be called by POptions
+// should only be called by pOptions
 func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal, suffix string) {
 	prefix := ""
 	if name != "" {
 		prefix = name + ": "
 	}
-	// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
-	if len(literal.Array) == 0 && len(literal.OrderedMap) == 0 {
+	if isSingleValueLiteral(literal) {
 		// SourceRepresentation() returns an empty string if the literal is empty
 		// if empty, we do not want to print the key or empty value
 		if source := literal.SourceRepresentation(); source != "" {
@@ -152,17 +180,21 @@ func (v *baseVisitor) pInnerLiteral(name string, literal proto.Literal, suffix s
 	}
 }
 
-func (v *baseVisitor) PField(prefix string, t string, field *proto.Field) {
-	v.PComment(field.Comment)
-	if len(field.Options) == 0 {
-		v.PWithInlineComment(field.InlineComment, prefix, t, " ", field.Name, " = ", field.Sequence, ";")
+func (v *baseVisitor) PField(prefix string, fieldType string, field *proto.Field) {
+	v.pMessageOrEnumField(prefix, field.Name, fieldType, field.Sequence, field.Comment, field.InlineComment, field.Options...)
+}
+
+func isSingleValueLiteral(literal proto.Literal) bool {
+	// TODO: this is a good example of the reasoning for https://github.com/uber/prototool/issues/1
+	return len(literal.Array) == 0 && len(literal.OrderedMap) == 0
+}
+
+func (v *baseVisitor) PEnumField(element *proto.EnumField) {
+	if element.ValueOption == nil {
+		v.pMessageOrEnumField("", element.Name, "", element.Integer, element.Comment, element.InlineComment)
 		return
 	}
-	v.P(prefix, t, " ", field.Name, " = ", field.Sequence, " [")
-	v.In()
-	v.POptions(true, field.Options...)
-	v.Out()
-	v.PWithInlineComment(field.InlineComment, "];")
+	v.pMessageOrEnumField("", element.Name, "", element.Integer, element.Comment, element.InlineComment, element.ValueOption)
 }
 
 func cleanCommentLine(line string) string {

@@ -29,7 +29,6 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
     * [prototool format](#prototool-format)
     * [prototool create](#prototool-create)
     * [prototool files](#prototool-files)
-    * [prototool protoc-commands](#prototool-protoc-commands)
     * [prototool grpc](#prototool-grpc)
   * [gRPC Example](#grpc-example)
   * [Tips and Tricks](#tips-and-tricks)
@@ -46,10 +45,15 @@ Prototool is stil in the early alpha stages, and should not be used in productio
 Install Prototool from GitHub Releases.
 
 ```
-curl -sSL https://github.com/uber/prototool/releases/download/v0.3.0/prototool-$(uname -s)-$(uname -m) \
+curl -sSL https://github.com/uber/prototool/releases/download/v0.5.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
   chmod +x /usr/local/bin/prototool
 ```
+
+Prototool is purposefully all put under internal in an attempt to emphasize that you should not install `prototool` with `go get`.
+Although you can technically `go get` from `internal`, we do not check in the vendor directory, so `go get` will not respect the
+versions in `glide.yaml`. We have specific version requirements, so not using these can and probably will result in errors when building
+`prototool` and/or result in unexpected runtime errors.
 
 ## Quick Start
 
@@ -62,13 +66,10 @@ prototool lint idl/uber # directory mode, search for all .proto files recursivel
 prototool lint # same as "prototool lint .", by default the current directory is used in directory mode
 prototool create foo.proto # create the file foo.proto from a template that passes lint
 prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml files
-prototool list-linters # list all current lint rules being used
+prototool lint --list-linters # list all current lint rules being used
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
 prototool gen idl/uber # generate stubs, see the generation directives in the config file example
-prototool protoc-commands idl/uber # print out the protoc commands that would be invoked with prototool compile idl/uber
-prototool protoc-commands --gen idl/uber # print out the protoc commands that would be invoked with prototool gen idl/uber
-prototool grpc idl/uber 0.0.0.0:8080 foo.ExcitedService/Exclamation '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
-cd $(prototool download) # download prints out the cached protoc dir, so this changes to the cache directory
+prototool grpc idl/uber --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --data '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
 ```
 
 ## Full Example
@@ -84,42 +85,14 @@ Prototool operates using a config file named `prototool.yaml`. For non-trivial u
 Recommended base config file:
 
 ```yaml
-protoc_version: 3.5.1
+protoc_version: 3.6.0
 ```
 
 The command `prototool init` will generate a config file in the current directory with all available configuration options commented out except `protoc_version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool init --uncomment` generates.
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
-While almost all projects should not have multiple `prototool.yaml` files (and this [may be enforced before v1.0](https://github.com/uber/prototool/issues/10)), as of now, multiple `prototool.yaml` files corresponding to multiple found directories with Protobuf files may be used. For example, if you have the following layout:
-
-```
-.
-├── a
-│   ├── d
-│   │   ├── file.proto
-│   │   ├── file2.proto
-│   │   ├── file3.proto
-│   │   └── prototool.yaml
-│   ├── e
-│   │   └── file.proto
-│   ├── f
-│   │   └── file.proto
-│   └── file.proto
-├── b
-│   ├── file.proto
-│   ├── g
-│   │   └── h
-│   │       └── file.proto
-│   └── prototool.yaml
-├── c
-│   ├── file.proto
-│   └── i
-│       └── file.proto
-└── prototool.yaml
-```
-
-Everything under `a/d` will use `a/d/prototool.yaml`, everything under `b`, `b/g/h` will use `b/prototool.yaml`, and everything under `a`, `a/e`, `a/f`, `c`, `c/i` will use `prototool.yaml`. See [internal/file/testdata](internal/file/testdata) for the most current example.
+If multiple `prototool.yaml` files are found that match the input directory or files, an error will be returned. We have an ongoing discussion about whether to allow multiple `prototool.yaml` files, see [this issue](https://github.com/uber/prototool/issues/10) for more details.
 
 ## File Discovery
 
@@ -174,9 +147,15 @@ Format a Protobuf file and print the formatted file to stdout. There are flags t
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
 
+By default, the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated
+to reflect what is expected by the [Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure),
+and the value of `go_package` is updated to reflect what we expect for the default Style Guide. By formatting, the linting for
+these values will pass by default. See the documentation below for [prototool create](#prototool-create) for an example. This functionality
+can be suppressed by passing the flag `--no-rewrite` to `prototool format`.
+
 ##### `prototool create`
 
-Create a Protobuf file from a template that passes lint. The file will look like the following:
+Create a Protobuf file from a template that passes lint. Assuming the filename `example_create_file.proto`, the file will look like the following:
 
 ```proto
 syntax = "proto3";
@@ -184,6 +163,8 @@ syntax = "proto3";
 package SOME.PKG;
 
 option go_package = "PKGpb";
+option java_multiple_files = true;
+option java_outer_classname = "ExampleCreateFileProto";
 option java_package = "com.SOME.PKG.pb";
 ```
 
@@ -192,7 +173,7 @@ This matches what the linter expects. `SOME.PKG` will be computed as follows:
 - If `--package` is specified, `SOME.PKG` will be the value passed to `--package`.
 - Otherwise, if there is no `prototool.yaml` that would apply to the new file, use `uber.prototool.generated`.
 - Otherwise, if there is a `prototool.yaml` file, check if it has a `dir_to_base_package` setting under the
-  `create` section (see [etc/config/example/prototool.yaml](etc/config/example.prototool.yaml) for an example).
+  `create` section (see [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for an example).
   If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml`
   will be used.
 - Otherwise, if there is no `dir_to_base_package` directive, just use the relative path from the directory
@@ -236,10 +217,6 @@ If [Vim integration](#vim-integration) is set up, files will be generated when y
 
 Print the list of all files that will be used given the input `dirOrProtoFiles...`. Useful for debugging.
 
-##### `prototool protoc-commands`
-
-Print all `protoc` commands that would be run on `prototool compile`. Add the `--gen` flag to print all commands that would be run on `prototool gen`.
-
 ##### `prototool grpc`
 
 Call a gRPC endpoint using a JSON input. What this does behind the scenes:
@@ -257,9 +234,9 @@ There is a full example for gRPC in the [example](example) directory. Run `make 
 
 Start the example server in a separate terminal by doing `go run example/cmd/excited/main.go`.
 
-`prototool grpc dirOrProtoFiles... serverAddress package.service/Method requestData`
+`prototool grpc dirOrProtoFiles... --address serverAddress --method package.service/Method --data 'requestData'`
 
-`requestData` can either be the JSON data to input, or `-` which will result in the input being read from stdin.
+Either use `--data 'requestData'` as the the JSON data to input, or `--stdin` which will result in the input being read from stdin as JSON.
 
 ```
 $ make init example # make sure everything is built just in case
@@ -267,12 +244,12 @@ $ make init example # make sure everything is built just in case
 $ cat input.json
 {"value":"hello"}
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/Exclamation -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --stdin
 {
   "value": "hello!"
 }
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/ExclamationServerStream -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationServerStream --stdin
 {
   "value": "h"
 }
@@ -296,12 +273,12 @@ $ cat input.json
 {"value":"hello"}
 {"value":"salutations"}
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/ExclamationClientStream -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationClientStream --stdin
 {
   "value": "hellosalutations!"
 }
 
-$ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/ExclamationBidiStream -
+$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationBidiStream --stdin
 {
   "value": "hello!"
 }
@@ -315,16 +292,57 @@ $ cat input.json | prototool grpc example 0.0.0.0:8080 foo.ExcitedService/Exclam
 Prototool is meant to help enforce a consistent development style for Protobuf, and as such you should follow some basic rules:
 
 - Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc_includes` to denote extra include directories, this is not recommended.
-- Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package` and `java_package`.
+- Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package`, `java_multiple_files`, `java_outer_classname`, and `java_package`.
 - Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool gen` do the best job.
 
 ## Vim Integration
 
 This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). It should be similarly easy to add support for Syntastic, Neomake, etc later.
 
-The Vim integration will currently provide lint errors, optionally regenerate all the stubs, and optionally format your files on save.
+The Vim integration will currently provide lint errors, optionally regenerate all the stubs, and optionally format your files on save. It
+will also optionally create new files from a template when opened.
 
-The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using Vundle, copy/paste [etc/vim/example/vimrc](etc/vim/example/vimrc) into your vimrc and you should be good to go.
+The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using Vundle, copy/paste the following into your vimrc and you should be good to go.
+
+```vim
+" Prototool must be installed as a binary for the Vim integration to work.
+
+" Add ale and prototool with your package manager.
+" Note that Vundle does not allow setting of a branch, and downloads
+" from dev by default. There may be minor changes to the Vim integration
+" on dev between releases, but this won't be common. To make sure you are
+" on the same branch as your Prototool install, go into your Vim bundle
+" directory and checkout the branch of the release you are on.
+Vundle 'w0rp/ale'
+Vundle 'uber/prototool' { 'rtp':'vim/prototool' }
+
+" I would recommend setting just this for Golang, as well as the necessary set for proto.
+let g:ale_linters = {
+\   'go': ['golint'],
+\   'proto': ['prototool'],
+\}
+" If you don't set this, it will get annoying.
+let g:ale_lint_on_text_changed = 'never'
+" Set to 'lint' to not do code generation.
+" Set to 'compile' to not do linting either and just compile without code generation.
+"let g:ale_proto_prototool_command = 'compile'
+
+" I have <leader> mapped to ",", uncomment this to set leader.
+"let mapleader=","
+
+" ,f will toggle formatting on and off.
+" Change to PrototoolFormatNoRewriteToggle to toggle with --no-rewrite instead.
+nnoremap <silent> <leader>f :call PrototoolFormatToggle()<CR>
+" ,c will toggle create on and off.
+nnoremap <silent> <leader>c :call PrototoolCreateToggle()<CR>
+
+" Uncomment this to enable formatting by default.
+"call PrototoolFormatEnable()
+" Uncomment this to enable formatting with --no-rewrite by default.
+"call PrototoolFormatNoRewriteEnable()
+" Uncomment this to disable creating Protobuf files from a template by default.
+"call PrototoolCreateDisable()
+```
 
 Editor integration is a key goal of Prototool. We've demonstrated support internally for Intellij, and hope that we have integration for more editors in the future.
 
@@ -345,7 +363,7 @@ Before submitting a PR, make sure to:
 - Run `make generate` to make sure there is no diff.
 - Run `make` to make sure all tests pass. This is functionally equivalent to the tests run on CI.
 
-A note on package layout: all Golang code except for `cmd/prototool/main.go` is purposefully under the `internal` package to not expose any API for the time being. Within the internal package, anything under `internal/x` has not been reviewed, and is especially unstable. Any package in `internal` not in `internal/x` has been fully reviewed and is more stable.
+All Golang code is purposefully under the `internal` package to not expose any API for the time being.
 
 ## Special Thanks
 

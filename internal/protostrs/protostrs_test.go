@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package settings
+package protostrs
 
 import (
 	"testing"
@@ -26,25 +26,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetIndent(t *testing.T) {
-	testGetIndent(t, "2s", "  ", false)
-	testGetIndent(t, "4s", "    ", false)
-	testGetIndent(t, "1t", "\t", false)
-	testGetIndent(t, "2t", "\t\t", false)
-	testGetIndent(t, "0s", "", true)
-	testGetIndent(t, "s", "", true)
-	testGetIndent(t, "0t", "", true)
-	testGetIndent(t, "t", "", true)
-	testGetIndent(t, "-1t", "", true)
-	testGetIndent(t, "2r", "", true)
+func TestGoPackage(t *testing.T) {
+	assert.Equal(t, "", GoPackage(""))
+	assert.Equal(t, "foopb", GoPackage("foo"))
+	assert.Equal(t, "barpb", GoPackage("foo.bar"))
 }
 
-func testGetIndent(t *testing.T, spec string, expected string, expectError bool) {
-	indent, err := getIndent(spec)
-	if expectError {
-		assert.Equal(t, invalidIndentSpecErrorf(spec), err)
-	} else {
-		assert.NoError(t, err)
-	}
-	assert.Equal(t, expected, indent)
+func TestJavaOuterClassname(t *testing.T) {
+	assert.Equal(t, "", JavaOuterClassname(""))
+	assert.Equal(t, "FileProto", JavaOuterClassname("file.proto"))
+	assert.Equal(t, "FileProto", JavaOuterClassname("file.txt"))
+	assert.Equal(t, "FileProto", JavaOuterClassname("a/file.proto"))
+	assert.Equal(t, "FileProto", JavaOuterClassname("a/b/file.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file_one.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file-one.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file one.proto"))
+	assert.Equal(t, "FiLeOneTwoProto", JavaOuterClassname("a/b/fiLe_One_two.proto"))
+	assert.Equal(t, "FileOneProto", JavaOuterClassname("a/b/file one.txt"))
+}
+
+func TestJavaPackage(t *testing.T) {
+	assert.Equal(t, "", JavaPackage(""))
+	assert.Equal(t, "com.foo", JavaPackage("foo"))
+	assert.Equal(t, "com.foo.bar", JavaPackage("foo.bar"))
 }

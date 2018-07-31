@@ -52,12 +52,50 @@ func newProtoSetProvider(options ...ProtoSetProviderOption) *protoSetProvider {
 	return protoSetProvider
 }
 
-func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
-	workDirPath, err := absClean(workDirPath)
+func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*ProtoSet, error) {
+	protoSets, err := c.GetMultipleForDir(workDirPath, dirPath)
 	if err != nil {
 		return nil, err
 	}
-	absDirPath, err := absClean(dirPath)
+	switch len(protoSets) {
+	case 0:
+		return nil, fmt.Errorf("no proto files found for dirPath %q", dirPath)
+	case 1:
+		return protoSets[0], nil
+	default:
+		configDirPaths := make([]string, 0, len(protoSets))
+		for _, protoSet := range protoSets {
+			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
+		}
+		return nil, fmt.Errorf("expected exactly one configuration file for dirPath %q, but found multiple in directories: %v", dirPath, configDirPaths)
+	}
+}
+
+func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error) {
+	protoSets, err := c.GetMultipleForFiles(workDirPath, filePaths...)
+	if err != nil {
+		return nil, err
+	}
+	switch len(protoSets) {
+	case 0:
+		return nil, fmt.Errorf("no proto files found for filePaths %v", filePaths)
+	case 1:
+		return protoSets[0], nil
+	default:
+		configDirPaths := make([]string, 0, len(protoSets))
+		for _, protoSet := range protoSets {
+			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
+		}
+		return nil, fmt.Errorf("expected exactly one configuration file for filePaths %v, but found multiple in directories: %v", filePaths, configDirPaths)
+	}
+}
+
+func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
+	workDirPath, err := AbsClean(workDirPath)
+	if err != nil {
+		return nil, err
+	}
+	absDirPath, err := AbsClean(dirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -90,8 +128,8 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) ([]*Pro
 	return protoSets, nil
 }
 
-func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
-	workDirPath, err := absClean(workDirPath)
+func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
+	workDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -149,11 +187,11 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 
 func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath string) ([]*ProtoFile, error) {
 	var protoFiles []*ProtoFile
-	absWorkDirPath, err := absClean(workDirPath)
+	absWorkDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
 	}
-	absDirPath, err := absClean(dirPath)
+	absDirPath, err := AbsClean(dirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +212,7 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 						"timed out after %v and having seen %d files, are you sure you are operating "+
 						"in the right context?", c.walkTimeout, numWalkedFiles)
 				}
-				absFilePath, err := absClean(filePath)
+				absFilePath, err := AbsClean(filePath)
 				if err != nil {
 					return err
 				}
@@ -249,7 +287,7 @@ func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
 func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
 	protoFiles := make([]*ProtoFile, 0, len(filePaths))
 	for _, filePath := range filePaths {
-		absFilePath, err := absClean(filePath)
+		absFilePath, err := AbsClean(filePath)
 		if err != nil {
 			return nil, err
 		}
@@ -259,14 +297,4 @@ func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
 		})
 	}
 	return protoFiles, nil
-}
-
-func absClean(path string) (string, error) {
-	if path == "" {
-		return path, nil
-	}
-	if !filepath.IsAbs(path) {
-		return filepath.Abs(path)
-	}
-	return filepath.Clean(path), nil
 }

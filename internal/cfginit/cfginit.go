@@ -65,9 +65,9 @@ protoc_version: {{.ProtocVersion}}
   {{.V}}dir_to_base_package:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
-    {{.V}}.:bar
+    {{.V}}.: bar
     # This means that a file created "idl/code.uber/a/b/c.proto" will have package "uber.a.b".
-    {{.V}}idl/code.uber:uber
+    {{.V}}idl/code.uber: uber
 
 # Lint directives.
 {{.V}}lint:
@@ -80,7 +80,7 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}      - path/to/foo.proto
 
   # When specifying linters, you can only specify ids, or any combination of
-  # group,include_ids,exclude_ids, but not ids and any of those three.
+  # include_ids,exclude_ids, but not ids and any of those two.
   # Run prototool list-all-linters to see all available linters.
   # All are specified just for this example.
   # By default, the default group of linters is used.
@@ -90,10 +90,6 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 {{.V}}    - ENUM_NAMES_CAPITALIZED
 
-  # The lint group to use.
-  # The only valid value as of now is default, which is also the default value.
-{{.V}}  group: default
-
   # Linters to include that are not in the lint group.
 {{.V}}  include_ids:
 {{.V}}    - REQUEST_RESPONSE_NAMES_MATCH_RPC
@@ -101,20 +97,6 @@ protoc_version: {{.ProtocVersion}}
   # Linters to exclude from the lint group.
 {{.V}}  exclude_ids:
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
-
-# Format directives.
-{{.V}}format:
-  # The indent to use. This should be Xt or Xs, where X >= 1 and "t"
-  # represents tabs, "s" represents spaces.
-  # If empty, format will use two spaces.
-{{.V}}  indent: 1t
-
-  # Use semicolons to finish RPC definitions when possible, ie when the associated
-  # RPC hs no options. Otherwise format will always use {}.
-{{.V}}  rpc_use_semicolons: true
-
-  # Trim the newline from the end of the file. Otherwise ends the file with a newline.
-{{.V}}  trim_newline: true
 
 # Code generation directives.
 {{.V}}gen:

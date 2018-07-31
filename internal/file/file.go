@@ -21,6 +21,8 @@
 package file
 
 import (
+	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/uber/prototool/internal/settings"
@@ -68,7 +70,7 @@ type ProtoFile struct {
 
 // ProtoSetProvider provides ProtoSets.
 type ProtoSetProvider interface {
-	// GetForDir gets the ProtoSets for the given dirPath.
+	// GetMultipleForDir gets the ProtoSets for the given dirPath.
 	// Each ProtoSet will have the config assocated with all files associated with
 	// the ProtoSet.
 	//
@@ -78,9 +80,9 @@ type ProtoSetProvider interface {
 	//
 	// Configs will be searched for starting at the directory of each .proto file
 	// and going up a directory until hitting root.
-	GetForDir(workDirPath string, dirPath string) ([]*ProtoSet, error)
+	GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error)
 
-	// GetForFiles gets the ProtoSets for the given filePaths.
+	// GetMultipleForFiles gets the ProtoSets for the given filePaths.
 	// Each ProtoSet will have the config assocated with all files associated with
 	// the ProtoSet.
 	//
@@ -88,7 +90,21 @@ type ProtoSetProvider interface {
 	// and going up a directory until hitting root.
 	//
 	// This ignores excludes, all files given will be included.
-	GetForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error)
+	GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error)
+
+	// GetForDir does the same logic as GetMultipleForDir, but returns an error if there
+	// is not exactly one ProtoSet. We keep the original logic and testing for multiple
+	// ProtoSets around as we are still discussing this pre-v1.0.
+	// https://github.com/uber/prototool/issues/10
+	// https://github.com/uber/prototool/issues/93
+	GetForDir(workDirPath string, dirPath string) (*ProtoSet, error)
+
+	// GetForFiles does the same logic as GetMultipleForFiles, but returns an error if there
+	// is not exactly one ProtoSet. We keep the original logic and testing for multiple
+	// ProtoSets around as we are still discussing this pre-v1.0.
+	// https://github.com/uber/prototool/issues/10
+	// https://github.com/uber/prototool/issues/93
+	GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error)
 }
 
 // ProtoSetProviderOption is an option for a new ProtoSetProvider.
@@ -117,4 +133,24 @@ func ProtoSetProviderWithWalkTimeout(walkTimeout time.Duration) ProtoSetProvider
 // NewProtoSetProvider returns a new ProtoSetProvider.
 func NewProtoSetProvider(options ...ProtoSetProviderOption) ProtoSetProvider {
 	return newProtoSetProvider(options...)
+}
+
+// AbsClean returns the cleaned absolute path of the given path.
+func AbsClean(path string) (string, error) {
+	if path == "" {
+		return path, nil
+	}
+	if !filepath.IsAbs(path) {
+		return filepath.Abs(path)
+	}
+	return filepath.Clean(path), nil
+}
+
+// CheckAbs is a convenience functions for determining
+// whether a path is an absolute path.
+func CheckAbs(path string) error {
+	if !filepath.IsAbs(path) {
+		return fmt.Errorf("expected absolute path but was %s", path)
+	}
+	return nil
 }

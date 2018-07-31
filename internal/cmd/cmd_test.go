@@ -135,13 +135,15 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
-		"9:1:MESSAGE_NAMES_CAPITALIZED",
+		"11:1:MESSAGE_NAMES_CAPITALIZED",
 		"testdata/lint/message_name_not_capitalized.proto",
 	)
 	assertDoLintFile(
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
 		"testdata/lint/file_options_required.proto",
 	)
@@ -149,6 +151,8 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		1:1:PACKAGE_IS_DECLARED`,
 		"testdata/lint/base_file.proto",
@@ -157,7 +161,9 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
-		6:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PB`,
+		6:1:FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE
+		7:1:FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX
+		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX`,
 		"testdata/lint/file_options_incorrect.proto",
 	)
 	assertDoLintFiles(
@@ -188,6 +194,8 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		3:1:PACKAGE_LOWER_SNAKE_CASE
 		7:1:MESSAGE_NAMES_CAPITALIZED
@@ -221,8 +229,8 @@ func TestLint(t *testing.T) {
 		84:5:COMMENTS_NO_C_STYLE
 		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 		93:1:ENUM_NAMES_CAMEL_CASE
-		97:1:FILE_OPTIONS_UNSET_JAVA_MULTIPLE_FILES
-		98:1:FILE_OPTIONS_UNSET_JAVA_OUTER_CLASSNAME
+		98:3:ENUMS_NO_ALLOW_ALIAS
+		108:5:ENUMS_NO_ALLOW_ALIAS
 		`,
 		"testdata/lint/lots.proto",
 	)
@@ -231,6 +239,7 @@ func TestLint(t *testing.T) {
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		3:1:PACKAGE_LOWER_SNAKE_CASE
 		7:1:MESSAGES_HAVE_COMMENTS
@@ -319,6 +328,8 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`1:1:FILE_OPTIONS_REQUIRE_GO_PACKAGE
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
 		"testdata/lint/package_starts_with_keyword.proto",
 	)
@@ -330,7 +341,7 @@ func TestGoldenFormat(t *testing.T) {
 	assertGoldenFormat(t, false, false, "testdata/format/bar/bar_proto2.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/foo/foo.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/foo/foo_proto2.proto")
-	assertGoldenFormat(t, false, true, "testdata/format-update-file-options/foo_update_file_options.proto")
+	assertGoldenFormat(t, false, true, "testdata/format-rewrite/foo.proto")
 }
 
 func TestJSONToBinaryToJSON(t *testing.T) {
@@ -353,7 +364,9 @@ func TestCreate(t *testing.T) {
 package foo.bar;
 
 option go_package = "barpb";
-option java_package = "com.foo.bar.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo.bar";`,
 	)
 	// create same file again but do not remove, should fail
 	assertDoCreateFile(
@@ -376,7 +389,9 @@ option java_package = "com.foo.bar.pb";`,
 package bat;
 
 option go_package = "batpb";
-option java_package = "com.bat.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.bat";`,
 	)
 	// package override but a shorter one "a"
 	assertDoCreateFile(
@@ -390,7 +405,9 @@ option java_package = "com.bat.pb";`,
 package foobar.c.bar;
 
 option go_package = "barpb";
-option java_package = "com.foobar.c.bar.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foobar.c.bar";`,
 	)
 	// no package override, do default b.c.bar
 	assertDoCreateFile(
@@ -404,7 +421,9 @@ option java_package = "com.foobar.c.bar.pb";`,
 package b.c.bar;
 
 option go_package = "barpb";
-option java_package = "com.b.c.bar.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.b.c.bar";`,
 	)
 	// in dir with prototool.yaml, use default package
 	assertDoCreateFile(
@@ -418,7 +437,9 @@ option java_package = "com.b.c.bar.pb";`,
 package uber.prototool.generated;
 
 option go_package = "generatedpb";
-option java_package = "com.uber.prototool.generated.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.uber.prototool.generated";`,
 	)
 	// in dir with prototool.yaml with override
 	assertDoCreateFile(
@@ -432,7 +453,9 @@ option java_package = "com.uber.prototool.generated.pb";`,
 package foo;
 
 option go_package = "foopb";
-option java_package = "com.foo.pb";`,
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo";`,
 	)
 }
 
@@ -614,11 +637,11 @@ func TestServiceDescriptorProto(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	assertLinters(t, lint.DefaultLinters, "list-linters")
+	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters")
 }
 
 func TestListAllLinters(t *testing.T) {
-	assertLinters(t, lint.AllLinters, "list-all-linters")
+	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters")
 }
 
 func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
@@ -680,10 +703,10 @@ func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes st
 	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint"}, filePaths...)...)
 }
 
-func assertGoldenFormat(t *testing.T, expectSuccess bool, updateFileOptions bool, filePath string) {
+func assertGoldenFormat(t *testing.T, expectSuccess bool, rewrite bool, filePath string) {
 	args := []string{"format"}
-	if updateFileOptions {
-		args = append(args, "--update-file-options")
+	if !rewrite {
+		args = append(args, "--no-rewrite")
 	}
 	args = append(args, filePath)
 	output, exitCode := testDo(t, args...)
@@ -708,7 +731,7 @@ func assertJSONToBinaryToJSON(t *testing.T, filePath string, messagePath string,
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string) {
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), expectedExitCode, expectedLinePrefixes, "grpc", filePath, excitedTestCase.Address(), method, "-")
+	assertDoStdin(t, strings.NewReader(jsonData), expectedExitCode, expectedLinePrefixes, "grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin")
 }
 
 func assertRegexp(t *testing.T, expectedExitCode int, expectedRegexp string, args ...string) {
@@ -871,7 +894,8 @@ func testDoInternal(stdin io.Reader, args ...string) (string, int) {
 		stdin = os.Stdin
 	}
 	buffer := bytes.NewBuffer(nil)
-	exitCode := Do(args, stdin, buffer, os.Stderr)
+	// develMode is on, so we have access to all commands
+	exitCode := do(true, args, stdin, buffer, os.Stderr)
 	return strings.TrimSpace(buffer.String()), exitCode
 }
 

@@ -26,14 +26,13 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"go.uber.org/zap"
 )
 
 type transformer struct {
-	logger            *zap.Logger
-	updateFileOptions bool
+	logger  *zap.Logger
+	rewrite bool
 }
 
 func newTransformer(options ...TransformerOption) *transformer {
@@ -46,13 +45,14 @@ func newTransformer(options ...TransformerOption) *transformer {
 	return transformer
 }
 
-func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []*text.Failure, error) {
+func (t *transformer) Transform(filename string, data []byte) ([]byte, []*text.Failure, error) {
 	descriptor, err := proto.NewParser(bytes.NewReader(data)).Parse()
 	if err != nil {
 		return nil, nil, err
 	}
+	descriptor.Filename = filename
 
-	firstPassVisitor := newFirstPassVisitor(config, t.updateFileOptions)
+	firstPassVisitor := newFirstPassVisitor(filename, t.rewrite)
 	for _, element := range descriptor.Elements {
 		element.Accept(firstPassVisitor)
 	}
@@ -72,7 +72,7 @@ func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []
 		}
 	}
 
-	mainVisitor := newMainVisitor(config, syntaxVersion == 2)
+	mainVisitor := newMainVisitor(syntaxVersion == 2)
 	for _, element := range descriptor.Elements {
 		element.Accept(mainVisitor)
 	}
@@ -84,9 +84,6 @@ func (t *transformer) Transform(config settings.Config, data []byte) ([]byte, []
 	// TODO: expensive
 	s := strings.TrimSpace(buffer.String())
 	if len(s) > 0 {
-		if config.Format.TrimNewline {
-			return []byte(s), failures, nil
-		}
 		return []byte(s + "\n"), failures, nil
 	}
 	return nil, failures, nil

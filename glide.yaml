@@ -6,6 +6,7 @@ import:
   - package: github.com/gogo/protobuf/protoc-gen-gogoslick
   - package: github.com/golang/protobuf/protoc-gen-go
   - package: github.com/jhump/protoreflect/dynamic
+  - package: github.com/mitchellh/go-wordwrap
   - package: github.com/spf13/cobra
   - package: github.com/spf13/pflag
   - package: go.uber.org/atomic

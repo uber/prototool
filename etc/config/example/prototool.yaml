@@ -1,7 +1,7 @@
 # The Protobuf version to use from https://github.com/google/protobuf/releases.
-# By default use 3.5.1.
+# By default use 3.6.0.
 # You probably want to set this to make your builds completely reproducible.
-protoc_version: 3.5.1
+protoc_version: 3.6.0
 
 # Paths to exclude when using directory mode.
 # These are prefixes, not regexes, so path/to/a will ignore anything beginning with
@@ -35,9 +35,9 @@ create:
   dir_to_base_package:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
-    .:bar
+    .: bar
     # This means that a file created "idl/code.uber/a/b/c.proto" will have package "uber.a.b".
-    idl/code.uber:uber
+    idl/code.uber: uber
 
 # Lint directives.
 lint:
@@ -50,7 +50,7 @@ lint:
       - path/to/foo.proto
 
   # When specifying linters, you can only specify ids, or any combination of
-  # group,include_ids,exclude_ids, but not ids and any of those three.
+  # include_ids,exclude_ids, but not ids and any of those two.
   # Run prototool list-all-linters to see all available linters.
   # All are specified just for this example.
   # By default, the default group of linters is used.
@@ -60,10 +60,6 @@ lint:
     - ENUM_NAMES_CAMEL_CASE
     - ENUM_NAMES_CAPITALIZED
 
-  # The lint group to use.
-  # The only valid value as of now is default, which is also the default value.
-  group: default
-
   # Linters to include that are not in the lint group.
   include_ids:
     - REQUEST_RESPONSE_NAMES_MATCH_RPC
@@ -71,20 +67,6 @@ lint:
   # Linters to exclude from the lint group.
   exclude_ids:
     - ENUM_NAMES_CAMEL_CASE
-
-# Format directives.
-format:
-  # The indent to use. This should be Xt or Xs, where X >= 1 and "t"
-  # represents tabs, "s" represents spaces.
-  # If empty, format will use two spaces.
-  indent: 1t
-
-  # Use semicolons to finish RPC definitions when possible, ie when the associated
-  # RPC hs no options. Otherwise format will always use {}.
-  rpc_use_semicolons: true
-
-  # Trim the newline from the end of the file. Otherwise ends the file with a newline.
-  trim_newline: true
 
 # Code generation directives.
 gen:

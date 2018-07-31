@@ -21,9 +21,6 @@
 package protoc
 
 import (
-	"fmt"
-	"path/filepath"
-
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/settings"
@@ -120,12 +117,12 @@ type Compiler interface {
 	// and there will be no error. The caller can determine if this is
 	// an error case. If there is any other type of error, or some output
 	// from protoc cannot be interpreted, an error will be returned.
-	Compile(...*file.ProtoSet) (*CompileResult, error)
+	Compile(*file.ProtoSet) (*CompileResult, error)
 
 	// Return the protoc commands that would be run on Compile.
 	//
 	// This will ignore the CompilerWithFileDescriptorSet option.
-	ProtocCommands(...*file.ProtoSet) ([]string, error)
+	ProtocCommands(*file.ProtoSet) ([]string, error)
 }
 
 // CompilerOption is an option for a new Compiler.
@@ -175,21 +172,4 @@ func CompilerWithFileDescriptorSet() CompilerOption {
 // NewCompiler returns a new Compiler.
 func NewCompiler(options ...CompilerOption) Compiler {
 	return newCompiler(options...)
-}
-
-func checkAbs(path string) error {
-	if !filepath.IsAbs(path) {
-		return fmt.Errorf("expected absolute path but was %s", path)
-	}
-	return nil
-}
-
-func absClean(path string) (string, error) {
-	if path == "" {
-		return path, nil
-	}
-	if !filepath.IsAbs(path) {
-		return filepath.Abs(path)
-	}
-	return filepath.Clean(path), nil
 }
