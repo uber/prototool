@@ -27,11 +27,6 @@ import (
 )
 
 func TestExternalConfigValidate(t *testing.T) {
-	t.Run("no_default_excludes", func(t *testing.T) {
-		e := ExternalConfig{}
-		e.NoDefaultExcludes = true
-		assert.EqualError(t, e.Validate(), "no_default_excludes is not a configurable setting")
-	})
 	t.Run("gen.go_options.no_default_modifiers", func(t *testing.T) {
 		e := ExternalConfig{}
 		e.Gen.GoOptions.NoDefaultModifiers = true

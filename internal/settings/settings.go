@@ -292,13 +292,9 @@ type ExternalConfig struct {
 
 // Validate returns an error if any of the restricted, yet previously supported,
 // ExternalConfig attributes are set. This includes:
-//   - NoDefaultExcludes
 //   - Lint.Group
 //   - Gen.GoOptions.NoDefaultModifiers
 func (e ExternalConfig) Validate() error {
-	if e.NoDefaultExcludes {
-		return fmt.Errorf("no_default_excludes is not a configurable setting")
-	}
 	if e.Lint.Group != "" {
 		return fmt.Errorf("lint.group is not a configurable setting: have %v", e.Lint.Group)
 	}

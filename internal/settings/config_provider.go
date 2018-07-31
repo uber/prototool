@@ -127,7 +127,7 @@ func get(filePath string) (Config, error) {
 //
 // This will return a valid Config, or an error.
 func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
-	excludePrefixes, err := getExcludePrefixes(e.Excludes, e.NoDefaultExcludes, dirPath)
+	excludePrefixes, err := getExcludePrefixes(e.Excludes, true /* Never include default excludes */, dirPath)
 	if err != nil {
 		return Config{}, err
 	}

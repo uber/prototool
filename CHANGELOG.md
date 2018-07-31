@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   of one file being specified be the same as the former `--dir-mode`. See
   [#16](https://github.com/uber/prototool/issues/16) for more details.
 - Delete `protoc_include_wkt` setting. This is always set to true.
-- Delete `no_default_excludes` setting.
+- Delete `no_default_excludes` setting. This is always set to true.
 - Delete `gen.go_options.no_default_modifiers` setting.
 - Delete `lint.group` setting.
 - Delete `create.dir_to_base_package` -> `create.dir_to_package`.
