@@ -54,53 +54,51 @@ func TestCompile(t *testing.T) {
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/dep_errors.proto:6:1:Expected ";".`,
-		"testdata/compile/dep_errors.proto",
+		`testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
+		"testdata/compile/errors_on_import/dep_errors.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`dep_errors.proto:6:1:Expected ";".
-		testdata/compile/errors_on_import.proto:10:3:"foo.DepError" is not defined.`,
-		"testdata/compile/errors_on_import.proto",
+		`testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
+		"testdata/compile/errors_on_import",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/extra_import.proto:1:1:Import "dep.proto" was not used.`,
-		"testdata/compile/extra_import.proto",
+		`testdata/compile/extra_import/extra_import.proto:1:1:Import "dep.proto" was not used.`,
+		"testdata/compile/extra_import/extra_import.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/json_camel_case_conflict.proto:1:1:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
-		"testdata/compile/json_camel_case_conflict.proto",
+		`testdata/compile/json/json_camel_case_conflict.proto:1:1:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
+		"testdata/compile/json/json_camel_case_conflict.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/missing_package_semicolon.proto:5:1:Expected ";".`,
-		"testdata/compile/missing_package_semicolon.proto",
+		`testdata/compile/semicolon/missing_package_semicolon.proto:5:1:Expected ";".`,
+		"testdata/compile/semicolon/missing_package_semicolon.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/missing_syntax.proto:1:1:No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.
-		testdata/compile/missing_syntax.proto:4:3:Expected "required", "optional", or "repeated".`,
-		"testdata/compile/missing_syntax.proto",
+		`testdata/compile/syntax/missing_syntax.proto:1:1:No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.
+		testdata/compile/syntax/missing_syntax.proto:4:3:Expected "required", "optional", or "repeated".`,
+		"testdata/compile/syntax/missing_syntax.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		true,
 		``,
-		"testdata/compile/syntax_proto2.proto",
+		"testdata/compile/proto2/syntax_proto2.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
-		`testdata/compile/not_imported.proto:11:3:"foo.Dep" seems to be defined in "dep.proto", which is not imported by "not_imported.proto".  To use it here, please add the necessary import.`,
-		"testdata/compile/dep.proto",
-		"testdata/compile/not_imported.proto",
+		`testdata/compile/notimported/not_imported.proto:11:3:"foo.Dep" seems to be defined in "dep.proto", which is not imported by "not_imported.proto".  To use it here, please add the necessary import.`,
+		"testdata/compile/notimported/not_imported.proto",
 	)
 }
 
@@ -130,13 +128,13 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		"1:1:SYNTAX_PROTO3",
-		"testdata/lint/syntax_proto2.proto",
+		"testdata/lint/syntaxproto2/syntax_proto2.proto",
 	)
 	assertDoLintFile(
 		t,
 		false,
 		"11:1:MESSAGE_NAMES_CAPITALIZED",
-		"testdata/lint/message_name_not_capitalized.proto",
+		"testdata/lint/capitalized/message_name_not_capitalized.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -145,7 +143,7 @@ func TestLint(t *testing.T) {
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
-		"testdata/lint/file_options_required.proto",
+		"testdata/lint/required/file_options_required.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -155,7 +153,7 @@ func TestLint(t *testing.T) {
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		1:1:PACKAGE_IS_DECLARED`,
-		"testdata/lint/base_file.proto",
+		"testdata/lint/base/base_file.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -164,7 +162,7 @@ func TestLint(t *testing.T) {
 		6:1:FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE
 		7:1:FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX
 		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX`,
-		"testdata/lint/file_options_incorrect.proto",
+		"testdata/lint/fileoptions/file_options_incorrect.proto",
 	)
 	assertDoLintFiles(
 		t,
@@ -232,7 +230,7 @@ func TestLint(t *testing.T) {
 		98:3:ENUMS_NO_ALLOW_ALIAS
 		108:5:ENUMS_NO_ALLOW_ALIAS
 		`,
-		"testdata/lint/lots.proto",
+		"testdata/lint/lots/lots.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -331,16 +329,16 @@ func TestLint(t *testing.T) {
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
-		"testdata/lint/package_starts_with_keyword.proto",
+		"testdata/lint/keyword/package_starts_with_keyword.proto",
 	)
 }
 
 func TestGoldenFormat(t *testing.T) {
 	t.Parallel()
-	assertGoldenFormat(t, false, false, "testdata/format/bar/bar.proto")
-	assertGoldenFormat(t, false, false, "testdata/format/bar/bar_proto2.proto")
-	assertGoldenFormat(t, false, false, "testdata/format/foo/foo.proto")
-	assertGoldenFormat(t, false, false, "testdata/format/foo/foo_proto2.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/bar/bar.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/bar/bar_proto2.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/foo.proto")
+	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/foo_proto2.proto")
 	assertGoldenFormat(t, false, true, "testdata/format-rewrite/foo.proto")
 }
 
@@ -867,9 +865,9 @@ func (s *excitedServer) ExclamationBidiStream(streamServer grpcpb.ExcitedService
 
 func assertDoInternal(t *testing.T, stdin io.Reader, expectedExitCode int, expectedLinePrefixes string, args ...string) {
 	stdout, exitCode := testDoStdin(t, stdin, args...)
-	assert.Equal(t, expectedExitCode, exitCode)
-	expectedLinePrefixesSplit := getCleanLines(expectedLinePrefixes)
 	outputSplit := getCleanLines(stdout)
+	assert.Equal(t, expectedExitCode, exitCode, strings.Join(outputSplit, "\n"))
+	expectedLinePrefixesSplit := getCleanLines(expectedLinePrefixes)
 	require.Equal(t, len(expectedLinePrefixesSplit), len(outputSplit), strings.Join(outputSplit, "\n"))
 	for i, expectedLinePrefix := range expectedLinePrefixesSplit {
 		assert.True(t, strings.HasPrefix(outputSplit[i], expectedLinePrefix), "%s %d %s", expectedLinePrefix, i, strings.Join(outputSplit, "\n"))
@@ -895,7 +893,7 @@ func testDoInternal(stdin io.Reader, args ...string) (string, int) {
 	}
 	buffer := bytes.NewBuffer(nil)
 	// develMode is on, so we have access to all commands
-	exitCode := do(true, args, stdin, buffer, os.Stderr)
+	exitCode := do(true, args, stdin, buffer, buffer)
 	return strings.TrimSpace(buffer.String()), exitCode
 }
 

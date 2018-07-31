@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- No changes yet.
+### Changed
+- Delete the ability to explicitly specify multiple files, and have the effect
+  of one file being specified be the same as the former `--dir-mode`. See
+  [#16](https://github.com/uber/prototool/issues/16) for more details.
 
 
 ## [0.5.0] - 2018-07-26

@@ -32,7 +32,6 @@ type flags struct {
 	data           string
 	debug          bool
 	diffMode       bool
-	dirMode        bool
 	disableFormat  bool
 	disableLint    bool
 	dryRun         bool
@@ -78,10 +77,6 @@ func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDiffMode(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.diffMode, "diff", "d", false, "Write a diff instead of writing the formatted file to stdout.")
-}
-
-func (f *flags) bindDirMode(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.dirMode, "dir-mode", false, "Run as if the directory the file was given, but only print the errors from the file. Useful for integration with editors.")
 }
 
 func (f *flags) bindDisableFormat(flagSet *pflag.FlagSet) {

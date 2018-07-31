@@ -100,15 +100,6 @@ func RunnerWithPrintFields(printFields string) RunnerOption {
 	}
 }
 
-// RunnerWithDirMode returns a RunnerOption that will act as if the file
-// given is the directory of the file, but only print the failures
-// from that file.
-func RunnerWithDirMode() RunnerOption {
-	return func(runner *runner) {
-		runner.dirMode = true
-	}
-}
-
 // RunnerWithHarbormaster returns a RunnerOption that will print
 // failures as Harbormaster compatible JSON.
 //
