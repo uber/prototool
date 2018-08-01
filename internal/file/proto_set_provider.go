@@ -188,15 +188,7 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 // found, whereas workDirPath represents absolute path at which prototool was invoked.
 // workDirPath is only used to determine the ProtoFile.DisplayPath, also known as
 // the relative path from where prototool was invoked.
-func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath string) ([]*ProtoFile, error) {
-	absWorkDirPath, err := AbsClean(workDirPath)
-	if err != nil {
-		return nil, err
-	}
-	absDirPath, err := AbsClean(dirPath)
-	if err != nil {
-		return nil, err
-	}
+func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDirPath string) ([]*ProtoFile, error) {
 	var (
 		protoFiles     []*ProtoFile
 		numWalkedFiles int
