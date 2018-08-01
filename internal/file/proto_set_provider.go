@@ -185,19 +185,18 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 	return protoSets, nil
 }
 
-func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath string) ([]*ProtoFile, error) {
-	var protoFiles []*ProtoFile
-	absWorkDirPath, err := AbsClean(workDirPath)
-	if err != nil {
-		return nil, err
-	}
-	absDirPath, err := AbsClean(dirPath)
-	if err != nil {
-		return nil, err
-	}
+// walkAndGetAllProtoFiles collects the .proto files nested under the given absDirPath.
+// absDirPath represents the absolute path at which the prototool.yaml configuration is
+// found, whereas workDirPath represents absolute path at which prototool was invoked.
+// workDirPath is only used to determine the ProtoFile.DisplayPath, also known as
+// the relative path from where prototool was invoked.
+func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDirPath string) ([]*ProtoFile, error) {
+	var (
+		protoFiles     []*ProtoFile
+		numWalkedFiles int
+		timedOut       bool
+	)
 	allExcludePrefixes := make(map[string]struct{})
-	numWalkedFiles := 0
-	timedOut := false
 	walkErrC := make(chan error)
 	go func() {
 		walkErrC <- filepath.Walk(
@@ -212,12 +211,8 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 						"timed out after %v and having seen %d files, are you sure you are operating "+
 						"in the right context?", c.walkTimeout, numWalkedFiles)
 				}
-				absFilePath, err := AbsClean(filePath)
-				if err != nil {
-					return err
-				}
 				if fileInfo.IsDir() {
-					excludePrefixes, err := c.configProvider.GetExcludePrefixesForDir(absFilePath)
+					excludePrefixes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
 					if err != nil {
 						return err
 					}
@@ -225,7 +220,7 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 						allExcludePrefixes[excludePrefix] = struct{}{}
 					}
 					for excludePrefix := range allExcludePrefixes {
-						if strings.HasPrefix(absFilePath, excludePrefix) {
+						if strings.HasPrefix(filePath, excludePrefix) {
 							return filepath.SkipDir
 						}
 					}
@@ -235,18 +230,17 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 					return nil
 				}
 				for excludePrefix := range allExcludePrefixes {
-					if strings.HasPrefix(absFilePath, excludePrefix) {
+					if strings.HasPrefix(filePath, excludePrefix) {
 						return nil
 					}
 				}
 				displayPath, err := filepath.Rel(absWorkDirPath, filePath)
 				if err != nil {
-					//return err
 					displayPath = filePath
 				}
 				displayPath = filepath.Clean(displayPath)
 				protoFiles = append(protoFiles, &ProtoFile{
-					Path:        absFilePath,
+					Path:        filePath,
 					DisplayPath: displayPath,
 				})
 				return nil
@@ -270,8 +264,7 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath s
 		if walkErr := <-walkErrC; walkErr != nil {
 			return nil, walkErr
 		}
-		// TODO(pedge): nice job with your code, I should learn how to code
-		return nil, fmt.Errorf("should never get here")
+		return nil, fmt.Errorf("internal prototool error")
 	}
 }
 
