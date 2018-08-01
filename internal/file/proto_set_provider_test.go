@@ -22,8 +22,10 @@ package file
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/settings"
 	"go.uber.org/zap"
@@ -622,6 +624,57 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 		},
 		protoSets,
 	)
+}
+
+func TestIsExcluded(t *testing.T) {
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+
+	tests := []struct {
+		desc     string
+		filePath string
+		stopPath string
+		excludes map[string]struct{}
+		excluded bool
+	}{
+		{
+			desc:     "Nothing excluded",
+			filePath: cwd,
+			excluded: false,
+		},
+		{
+			desc:     "String prefix of excluded dir is not excluded",
+			filePath: filepath.Join(cwd, "foo"),
+			stopPath: cwd,
+			excludes: map[string]struct{}{filepath.Join(cwd, "fooo"): struct{}{}},
+			excluded: false,
+		},
+		{
+			desc:     "Not excluded, terminates without stopPath",
+			filePath: filepath.Join(cwd, "foo"),
+			excludes: map[string]struct{}{filepath.Join(cwd, "bar"): struct{}{}},
+			excluded: false,
+		},
+		{
+			desc:     "Directory is exluded",
+			filePath: filepath.Join(cwd, "foo/bar"),
+			stopPath: cwd,
+			excludes: map[string]struct{}{filepath.Join(cwd, "foo"): struct{}{}},
+			excluded: true,
+		},
+		{
+			desc:     "File is exluded",
+			filePath: filepath.Join(cwd, "foo.proto"),
+			stopPath: cwd,
+			excludes: map[string]struct{}{filepath.Join(cwd, "foo.proto"): struct{}{}},
+			excluded: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			assert.Equal(t, tt.excluded, isExcluded(tt.filePath, tt.stopPath, tt.excludes))
+		})
+	}
 }
 
 func newTestProtoSetProvider(t *testing.T) ProtoSetProvider {
