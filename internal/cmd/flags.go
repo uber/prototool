@@ -35,7 +35,6 @@ type flags struct {
 	disableFormat  bool
 	disableLint    bool
 	dryRun         bool
-	harbormaster   bool
 	headers        []string
 	keepaliveTime  string
 	listAllLinters bool
@@ -89,10 +88,6 @@ func (f *flags) bindDisableLint(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.dryRun, "dry-run", false, "Print the protoc commands that would have been run without actually running them.")
-}
-
-func (f *flags) bindHarbormaster(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.harbormaster, "harbormaster", false, "Print failures in JSON compatible with the Harbormaster API.")
 }
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {

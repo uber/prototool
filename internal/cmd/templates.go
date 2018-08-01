@@ -455,12 +455,6 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 			exec.RunnerWithCachePath(flags.cachePath),
 		)
 	}
-	if flags.harbormaster {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithHarbormaster(),
-		)
-	}
 	if flags.printFields != "" {
 		runnerOptions = append(
 			runnerOptions,
