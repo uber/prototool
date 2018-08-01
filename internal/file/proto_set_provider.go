@@ -25,7 +25,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/uber/prototool/internal/settings"
@@ -110,7 +109,6 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 	if configFilePath != "" {
 		configDirPath = filepath.Dir(configFilePath)
 	}
-
 	protoFiles, err := c.walkAndGetAllProtoFiles(workDirPath, configDirPath)
 	if err != nil {
 		return nil, err
@@ -190,13 +188,21 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 // found, whereas workDirPath represents absolute path at which prototool was invoked.
 // workDirPath is only used to determine the ProtoFile.DisplayPath, also known as
 // the relative path from where prototool was invoked.
-func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDirPath string) ([]*ProtoFile, error) {
+func (c *protoSetProvider) walkAndGetAllProtoFiles(workDirPath string, dirPath string) ([]*ProtoFile, error) {
+	absWorkDirPath, err := AbsClean(workDirPath)
+	if err != nil {
+		return nil, err
+	}
+	absDirPath, err := AbsClean(dirPath)
+	if err != nil {
+		return nil, err
+	}
 	var (
 		protoFiles     []*ProtoFile
 		numWalkedFiles int
 		timedOut       bool
 	)
-	allExcludePrefixes := make(map[string]struct{})
+	allExcludes := make(map[string]struct{})
 	walkErrC := make(chan error)
 	go func() {
 		walkErrC <- filepath.Walk(
@@ -211,29 +217,29 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 						"timed out after %v and having seen %d files, are you sure you are operating "+
 						"in the right context?", c.walkTimeout, numWalkedFiles)
 				}
+				// Verify if we should skip this directory/file.
 				if fileInfo.IsDir() {
-					excludePrefixes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
+					// Add the excluded files with respect to the current file path.
+					excludes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
 					if err != nil {
 						return err
 					}
-					for _, excludePrefix := range excludePrefixes {
-						allExcludePrefixes[excludePrefix] = struct{}{}
+					for _, exclude := range excludes {
+						allExcludes[exclude] = struct{}{}
 					}
-					for excludePrefix := range allExcludePrefixes {
-						if strings.HasPrefix(filePath, excludePrefix) {
-							return filepath.SkipDir
-						}
+					if isExcluded(filePath, absDirPath, allExcludes) {
+						return filepath.SkipDir
 					}
 					return nil
 				}
 				if filepath.Ext(filePath) != ".proto" {
 					return nil
 				}
-				for excludePrefix := range allExcludePrefixes {
-					if strings.HasPrefix(filePath, excludePrefix) {
-						return nil
-					}
+				if isExcluded(filePath, absDirPath, allExcludes) {
+					return nil
 				}
+
+				// Visit this file.
 				displayPath, err := filepath.Rel(absWorkDirPath, filePath)
 				if err != nil {
 					displayPath = filePath
@@ -290,4 +296,30 @@ func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
 		})
 	}
 	return protoFiles, nil
+}
+
+// isExcluded determines whether the given filePath should be excluded.
+// Note that all excludes are assumed to be cleaned absolute paths at
+// this point.
+// stopPath represnts the absolute path to the prototool configuration.
+// This is used to determine when we should stop checking for excludes.
+func isExcluded(filePath, stopPath string, excludes map[string]struct{}) bool {
+	isNested := func(curr, exclude string) bool {
+		for {
+			if curr == stopPath {
+				return false
+			}
+			if curr == exclude {
+				return true
+			}
+			curr = filepath.Dir(curr)
+		}
+	}
+	for exclude := range excludes {
+		if isNested(filePath, exclude) {
+			return true
+		}
+	}
+	return false
+
 }
