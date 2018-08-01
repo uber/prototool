@@ -185,8 +185,8 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 
 // walkAndGetAllProtoFiles collects the .proto files nested under the given absDirPath.
 // absDirPath represents the absolute path at which the prototool.yaml configuration is
-// found, whereas workDirPath represents absolute path at which prototool was invoked.
-// workDirPath is only used to determine the ProtoFile.DisplayPath, also known as
+// found, whereas absWorkDirPath represents absolute path at which prototool was invoked.
+// absWorkDirPath is only used to determine the ProtoFile.DisplayPath, also known as
 // the relative path from where prototool was invoked.
 func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDirPath string) ([]*ProtoFile, error) {
 	var (
@@ -296,9 +296,12 @@ func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
 // stopPath represnts the absolute path to the prototool configuration.
 // This is used to determine when we should stop checking for excludes.
 func isExcluded(filePath, stopPath string, excludes map[string]struct{}) bool {
+	// Use the root as a fallback so that we don't loop forever.
+	root := filepath.Dir(string(filepath.Separator))
+
 	isNested := func(curr, exclude string) bool {
 		for {
-			if curr == stopPath {
+			if curr == stopPath || curr == root {
 				return false
 			}
 			if curr == exclude {
