@@ -65,7 +65,7 @@ example: install
 internalgen: install
 	prototool gen internal/cmd/testdata/grpc
 	rm -f etc/config/example/prototool.yaml
-	prototool init etc/config/example --uncomment
+	prototool config init etc/config/example --uncomment
 
 .PHONY: generate
 generate: license golden example internalgen
