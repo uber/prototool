@@ -167,11 +167,11 @@ This matches what the linter expects. `SOME.PKG` will be computed as follows:
 
 - If `--package` is specified, `SOME.PKG` will be the value passed to `--package`.
 - Otherwise, if there is no `prototool.yaml` that would apply to the new file, use `uber.prototool.generated`.
-- Otherwise, if there is a `prototool.yaml` file, check if it has a `dir_to_package` setting under the
+- Otherwise, if there is a `prototool.yaml` file, check if it has a `packages` setting under the
   `create` section (see [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for an example).
   If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml`
   will be used.
-- Otherwise, if there is no `dir_to_package` directive, just use the relative path from the directory
+- Otherwise, if there is no `packages` directive, just use the relative path from the directory
   with the `prototool.yaml` file. If the file is in the same directory as the `prototoo.yaml` file,
   use `uber.prototool.generated`
 
@@ -179,9 +179,11 @@ For example, assume you have the following file at `repo/prototool.yaml`:
 
 ```yaml
 create:
-  dir_to_package:
-    idl: uber
-    idl/baz: special
+  packages:
+    - directory: idl
+      name: uber
+    - directory: idl/baz
+      name: special
 ```
 
 - `prototool create repo/idl/foo/bar/bar.proto` will have the package `uber.foo.bar`.
@@ -199,8 +201,9 @@ file at `repo/prototool.yaml` to this:
 
 ```yaml
 create:
-  dir_to_package:
-    .: foo.bar
+  packages:
+    - directory: .
+      name: foo.bar
 ```
 
 Then `prototool create repo/bar.proto` will have the package `foo.bar`, and `prototool create repo/another/dir/bar.proto`

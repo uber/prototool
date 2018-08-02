@@ -1,3 +1,4 @@
 create:
-  dir_to_package:
-    .: foo
+  packages:
+    - directory: .
+      name: foo

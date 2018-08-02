@@ -194,9 +194,17 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	sort.Slice(genPlugins, func(i int, j int) bool { return genPlugins[i].Name < genPlugins[j].Name })
 
 	createDirPathToBasePackage := make(map[string]string)
-	for relDirPath, basePackage := range e.Create.DirToBasePackage {
+	for _, pkg := range e.Create.Packages {
+		relDirPath := pkg.Directory
+		basePackage := pkg.Name
+		if relDirPath == "" {
+			return Config{}, fmt.Errorf("directory for create package is empty")
+		}
+		if basePackage == "" {
+			return Config{}, fmt.Errorf("name for create package is empty")
+		}
 		if filepath.IsAbs(relDirPath) {
-			return Config{}, fmt.Errorf("directory for dir_to_package must be relative: %s", relDirPath)
+			return Config{}, fmt.Errorf("directory for create package must be relative: %s", relDirPath)
 		}
 		createDirPathToBasePackage[filepath.Clean(filepath.Join(dirPath, relDirPath))] = basePackage
 	}

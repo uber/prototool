@@ -1,4 +1,6 @@
 create:
-  dir_to_package:
-    a/b: foo
-    a: foobar
+  packages:
+    - directory: a/b
+      name: foo
+    - directory: a
+      name: foobar
