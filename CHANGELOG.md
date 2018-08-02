@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Delete `lint.group` setting.
 - Delete `harbormaster` global flag.
 - Rename `create.dir_to_base_package` -> `create.dir_to_package`.
+- Move `gen.plugin_overrides` to `gen.plugins.path`.
 ### Fixed
 - Fix `excludes` setting to correctly match file path prefixes.
 

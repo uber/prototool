@@ -163,12 +163,6 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		if plugin.Output == "" {
 			return Config{}, fmt.Errorf("output path required for plugin %s", plugin.Name)
 		}
-		path := ""
-		if len(e.Gen.PluginOverrides) > 0 {
-			if override, ok := e.Gen.PluginOverrides[plugin.Name]; ok && override != "" {
-				path = override
-			}
-		}
 		var relPath, absPath string
 		if filepath.IsAbs(plugin.Output) {
 			absPath = filepath.Clean(plugin.Output)
@@ -182,7 +176,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		}
 		genPlugins[i] = GenPlugin{
 			Name:  plugin.Name,
-			Path:  path,
+			Path:  plugin.Path,
 			Type:  genPluginType,
 			Flags: plugin.Flags,
 			OutputPath: OutputPath{

@@ -101,12 +101,7 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
 {{.V}}      google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
 
-  # Plugin overrides. For example, if you set "grpc-gpp: /usr/local/bin/grpc_cpp_plugin",
-  # This will mean that a plugin named "grpc-gpp" in the plugins list will be looked for
-  # at "/usr/local/bin/grpc_cpp_plugin" by setting the
-  # "--plugin=protoc-gen-grpc-gpp=/usr/local/bin/grpc_cpp_plugin" flag on protoc.
 {{.V}}  plugin_overrides:
-{{.V}}    grpc-gpp: /usr/local/bin/grpc_cpp_plugin
 
   # The list of plugins.
 {{.V}}  plugins:
@@ -132,6 +127,11 @@ protoc_version: {{.ProtocVersion}}
       # If the directory does not exist, it will be created when running generation.
       # This needs to be a relative path.
 {{.V}}      output: ../../.gen/proto/go
+
+      # Optional override for the plugin path. For example, if you set set path to
+      # /usr/local/bin/gogo_plugin", prototool will add the
+      # "--plugin=protoc-gen-gogo=/usr/local/bin/gogo_plugin" flag to protoc calls.
+{{.V}}      path: /usr/local/bin/gogo
 
 {{.V}}    - name: yarpc-go
 {{.V}}      type: gogo
