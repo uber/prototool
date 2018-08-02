@@ -293,7 +293,7 @@ func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
 // isExcluded determines whether the given filePath should be excluded.
 // Note that all excludes are assumed to be cleaned absolute paths at
 // this point.
-// stopPath represnts the absolute path to the prototool configuration.
+// stopPath represents the absolute path to the prototool configuration.
 // This is used to determine when we should stop checking for excludes.
 func isExcluded(filePath, stopPath string, excludes map[string]struct{}) bool {
 	// Use the root as a fallback so that we don't loop forever.
