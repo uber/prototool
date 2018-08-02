@@ -23,7 +23,6 @@ package exec
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -47,7 +46,6 @@ import (
 	"github.com/uber/prototool/internal/format"
 	"github.com/uber/prototool/internal/grpc"
 	"github.com/uber/prototool/internal/lint"
-	"github.com/uber/prototool/internal/phab"
 	"github.com/uber/prototool/internal/protoc"
 	"github.com/uber/prototool/internal/reflect"
 	"github.com/uber/prototool/internal/settings"
@@ -66,11 +64,10 @@ type runner struct {
 	input       io.Reader
 	output      io.Writer
 
-	logger       *zap.Logger
-	cachePath    string
-	protocURL    string
-	printFields  string
-	harbormaster bool
+	logger      *zap.Logger
+	cachePath   string
+	protocURL   string
+	printFields string
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -809,19 +806,7 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 			}
 		}
 		if shouldPrint {
-			if r.harbormaster {
-				harbormasterLintResult, err := phab.TextFailureToHarbormasterLintResult(failure)
-				if err != nil {
-					return err
-				}
-				data, err := json.Marshal(harbormasterLintResult)
-				if err != nil {
-					return err
-				}
-				if _, err := fmt.Fprintln(bufWriter, string(data)); err != nil {
-					return err
-				}
-			} else if err := failure.Fprintln(bufWriter, failureFields...); err != nil {
+			if err := failure.Fprintln(bufWriter, failureFields...); err != nil {
 				return err
 			}
 		}
