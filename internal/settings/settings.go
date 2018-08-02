@@ -45,11 +45,6 @@ const (
 )
 
 var (
-	// DefaultExcludePrefixes are the default prefixes to exclude.
-	DefaultExcludePrefixes = []string{
-		"vendor",
-	}
-
 	_genPluginTypeToString = map[GenPluginType]string{
 		GenPluginTypeNone: "",
 		GenPluginTypeGo:   "go",
