@@ -274,12 +274,12 @@ type ExternalConfig struct {
 			NoDefaultModifiers bool              `json:"no_default_modifiers,omitempty" yaml:"no_default_modifiers,omitempty"`
 			ExtraModifiers     map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`
 		} `json:"go_options,omitempty" yaml:"go_options,omitempty"`
-		PluginOverrides map[string]string `json:"plugin_overrides,omitempty" yaml:"plugin_overrides,omitempty"`
-		Plugins         []struct {
+		Plugins []struct {
 			Name   string `json:"name,omitempty" yaml:"name,omitempty"`
 			Type   string `json:"type,omitempty" yaml:"type,omitempty"`
 			Flags  string `json:"flags,omitempty" yaml:"flags,omitempty"`
 			Output string `json:"output,omitempty" yaml:"output,omitempty"`
+			Path   string `json:"path,omitempty" yaml:"path,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"gen,omitempty" yaml:"gen,omitempty"`
 }
