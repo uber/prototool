@@ -33,9 +33,7 @@ var tmpl = template.Must(template.New("tmpl").Parse(`# The Protobuf version to u
 # You probably want to set this to make your builds completely reproducible.
 protoc_version: {{.ProtocVersion}}
 
-# Paths to exclude when using directory mode.
-# These are prefixes, not regexes, so path/to/a will ignore anything beginning with
-# $(dirname some/dir/prototool.yaml)/path/to/a including for example $(dirname some/dir/prototool.yaml)/path/to/ab.
+# Paths to exclude from protoc.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto

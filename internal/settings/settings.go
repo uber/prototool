@@ -45,11 +45,6 @@ const (
 )
 
 var (
-	// DefaultExcludePrefixes are the default prefixes to exclude.
-	DefaultExcludePrefixes = []string{
-		"vendor",
-	}
-
 	_genPluginTypeToString = map[GenPluginType]string{
 		GenPluginTypeNone: "",
 		GenPluginTypeGo:   "go",
@@ -259,7 +254,6 @@ type OutputPath struct {
 // It is meant to be set by a YAML or JSON config file, or flags.
 type ExternalConfig struct {
 	Excludes           []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
-	NoDefaultExcludes  bool     `json:"no_default_excludes,omitempty" yaml:"no_default_excludes,omitempty"`
 	ProtocVersion      string   `json:"protoc_version,omitempty" yaml:"protoc_version,omitempty"`
 	ProtocIncludes     []string `json:"protoc_includes,omitempty" yaml:"protoc_includes,omitempty"`
 	ProtocIncludeWKT   bool     `json:"protoc_include_wkt,omitempty" yaml:"protoc_include_wkt,omitempty"`
