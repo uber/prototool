@@ -92,7 +92,7 @@ The command `prototool config init` will generate a config file in the current d
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
-If multiple `prototool.yaml` files are found that match the input directory or files, an error will be returned. We have an ongoing discussion about whether to allow multiple `prototool.yaml` files, see [this issue](https://github.com/uber/prototool/issues/10) for more details.
+If multiple `prototool.yaml` files are found that match the input directory or files, an error will be returned.
 
 ## File Discovery
 
@@ -359,7 +359,7 @@ Editor integration is a key goal of Prototool. We've demonstrated support intern
 Prototool is under active development, if you want to help, here's some places to start:
 
 - Try out `prototool` and file issues, including points that are unclear in the documentation.
-- Put up PRs with any changes you'd like to see made. We can't guarantee that many PRs will get merged for now, but we appreciate any input!
+- Put up PRs with any changes you'd like to see made. We appreciate any input!
 
 Note that development of Prototool will only work with Golang 1.10 or newer. On initially cloning the repository, run `make init` if you have not already to download dependencies to `vendor`.
 
