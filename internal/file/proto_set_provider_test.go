@@ -93,7 +93,6 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -134,7 +133,6 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -173,7 +171,6 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -248,7 +245,6 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -285,7 +281,6 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -352,7 +347,6 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -389,7 +383,6 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -422,7 +415,6 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -489,7 +481,6 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -526,7 +517,6 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -559,7 +549,6 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -610,7 +599,6 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
