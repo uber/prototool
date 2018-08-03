@@ -1,9 +1,11 @@
 protoc_include_wkt: true
 lint:
-  exclude_ids:
-  - RPCS_HAVE_COMMENTS
-  - REQUEST_RESPONSE_TYPES_UNIQUE
-  ignore_id_to_files:
-    SYNTAX_PROTO3:
-      - bar/bar_proto2.proto
-      - foo/foo_proto2.proto
+  rules:
+    remove:
+      - RPCS_HAVE_COMMENTS
+      - REQUEST_RESPONSE_TYPES_UNIQUE
+  ignores:
+    - id: SYNTAX_PROTO3
+      files:
+        - bar/bar_proto2.proto
+        - foo/foo_proto2.proto

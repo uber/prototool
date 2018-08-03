@@ -162,26 +162,15 @@ type CreateConfig struct {
 }
 
 // LintConfig is the lint config.
-//
-// Either IDs, or Group/IncludeIDs/ExcludeIDs can be set, but not both.
 type LintConfig struct {
-	// IDs are the list of linter IDs to use.
-	// Expected to not be set if Group/IncludeIDs/ExcludeIDs are set.
-	// Expected to be all uppercase.
-	// Expected to be unique.
-	IDs []string
-	// Group is the name of the lint group to use.
-	// Expected to not be set if IDs is set.
-	// Expected to be all lowercase.
-	Group string
+	// NoDefault is set to exclude the default set of linters.
+	NoDefault bool
 	// IncludeIDs are the list of linter IDs to use in addition to the defaults.
-	// Expected to not be set if IDs is set.
 	// Expected to be all uppercase.
 	// Expected to be unique.
 	// Expected to have no overlap with ExcludeIDs.
 	IncludeIDs []string
 	// ExcludeIDs are the list of linter IDs to exclude from the defaults.
-	// Expected to not be set if IDs is set.
 	// Expected to be all uppercase.
 	// Expected to be unique.
 	// Expected to have no overlap with IncludeIDs.
@@ -265,11 +254,16 @@ type ExternalConfig struct {
 		} `json:"packages,omitempty" yaml:"packages,omitempty"`
 	} `json:"create,omitempty" yaml:"create,omitempty"`
 	Lint struct {
-		IDs             []string            `json:"ids,omitempty" yaml:"ids,omitempty"`
-		Group           string              `json:"group,omitempty" yaml:"group,omitempty"`
-		IncludeIDs      []string            `json:"include_ids,omitempty" yaml:"include_ids,omitempty"`
-		ExcludeIDs      []string            `json:"exclude_ids,omitempty" yaml:"exclude_ids,omitempty"`
-		IgnoreIDToFiles map[string][]string `json:"ignore_id_to_files,omitempty" yaml:"ignore_id_to_files,omitempty"`
+		Ignores []struct {
+			ID    string   `json:"id,omitempty" yaml:"id,omitempty"`
+			Files []string `json:"files,omitempty" yaml:"files,omitempty"`
+		}
+		Rules struct {
+			NoDefault bool     `json:"no_default,omitempty" yaml:"no_default,omitempty"`
+			Add       []string `json:"add" yaml:"add"`
+			Remove    []string `json:"remove" yaml:"remove"`
+		}
+		Group string `json:"group,omitempty" yaml:"group,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
 	Gen struct {
 		GoOptions struct {
@@ -289,12 +283,8 @@ type ExternalConfig struct {
 
 // Validate returns an error if any of the restricted, yet previously supported,
 // ExternalConfig attributes are set. This includes:
-//   - Lint.Group
 //   - Gen.GoOptions.NoDefaultModifiers
 func (e ExternalConfig) Validate() error {
-	if e.Lint.Group != "" {
-		return fmt.Errorf("lint.group is not a configurable setting: have %v", e.Lint.Group)
-	}
 	if e.Gen.GoOptions.NoDefaultModifiers {
 		return fmt.Errorf("gen.go_options.no_default_modifiers is not a configurable setting")
 	}

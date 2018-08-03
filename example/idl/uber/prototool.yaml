@@ -5,11 +5,13 @@ protoc_includes:
 lint:
   # run "prototool list-linters" to see the currently configured linters
   # add "exclude_ids" to ignore specific linter IDs for all files
-  ignore_id_to_files:
-    REQUEST_RESPONSE_TYPES_IN_SAME_FILE:
-      - foo/foo.proto
-    REQUEST_RESPONSE_TYPES_UNIQUE:
-      - foo/foo.proto
+  ignores:
+    - id: REQUEST_RESPONSE_TYPES_IN_SAME_FILE
+      files:
+        - foo/foo.proto
+    - id: REQUEST_RESPONSE_TYPES_UNIQUE
+      files:
+        - foo/foo.proto
 gen:
   go_options:
     import_path: github.com/uber/prototool/example/idl/uber

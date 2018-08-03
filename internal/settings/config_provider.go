@@ -140,9 +140,9 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		includePaths = append(includePaths, includePath)
 	}
 	ignoreIDToFilePaths := make(map[string][]string)
-	for id, protoFilePaths := range e.Lint.IgnoreIDToFiles {
-		id = strings.ToUpper(id)
-		for _, protoFilePath := range protoFilePaths {
+	for _, ignore := range e.Lint.Ignores {
+		id := strings.ToUpper(ignore.ID)
+		for _, protoFilePath := range ignore.Files {
 			if !filepath.IsAbs(protoFilePath) {
 				protoFilePath = filepath.Join(dirPath, protoFilePath)
 			}
@@ -220,10 +220,9 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
-			IDs:                 strs.DedupeSort(e.Lint.IDs, strings.ToUpper),
-			Group:               strings.ToLower(e.Lint.Group),
-			IncludeIDs:          strs.DedupeSort(e.Lint.IncludeIDs, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSort(e.Lint.ExcludeIDs, strings.ToUpper),
+			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
+			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 		},
 		Gen: GenConfig{
@@ -254,9 +253,6 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		}
 	}
 
-	if len(config.Lint.IDs) > 0 && (len(config.Lint.Group) > 0 || len(config.Lint.IncludeIDs) > 0 || len(config.Lint.ExcludeIDs) > 0) {
-		return Config{}, fmt.Errorf("config was %v but can only specify either linters, or lint_group/lint_include/lint_exclude", e)
-	}
 	if intersection := strs.Intersection(config.Lint.IncludeIDs, config.Lint.ExcludeIDs); len(intersection) > 0 {
 		return Config{}, fmt.Errorf("config had intersection of %v between lint_include and lint_exclude", intersection)
 	}

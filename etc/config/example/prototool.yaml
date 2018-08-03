@@ -33,31 +33,29 @@ create:
 
 # Lint directives.
 lint:
-  # Linter * files to ignore.
-  ignore_id_to_files:
-    RPC_NAMES_CAMEL_CASE:
-      - path/to/foo.proto
-      - path/to/bar.proto
-    SYNTAX_PROTO3:
-      - path/to/foo.proto
+  # Linter files to ignore.
+  ignores:
+    - id: RPC_NAMES_CAMEL_CASE
+      files:
+        - path/to/foo.proto
+        - path/to/bar.proto
+    - id: SYNTAX_PROTO3
+      files:
+        - path/to/foo.proto
 
-  # When specifying linters, you can only specify ids, or any combination of
-  # include_ids,exclude_ids, but not ids and any of those two.
-  # Run prototool list-all-linters to see all available linters.
-  # All are specified just for this example.
-  # By default, the default group of linters is used.
+# Linter rules.
+# Run prototool list-all-linters to see all available linters.
+  rules:
+  # Determines whether or not to include the default set of linters.
+  no_default: true
 
-  # The specific linters to use.
-  ids:
+  # The specific linters to add.
+  add:
     - ENUM_NAMES_CAMEL_CASE
     - ENUM_NAMES_CAPITALIZED
 
-  # Linters to include that are not in the default lint group.
-  include_ids:
-    - REQUEST_RESPONSE_NAMES_MATCH_RPC
-
-  # Linters to exclude from the default lint group.
-  exclude_ids:
+  # The specific linters to remove.
+  remove:
     - ENUM_NAMES_CAMEL_CASE
 
 # Code generation directives.
