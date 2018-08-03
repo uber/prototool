@@ -45,11 +45,6 @@ const (
 )
 
 var (
-	// DefaultExcludePrefixes are the default prefixes to exclude.
-	DefaultExcludePrefixes = []string{
-		"vendor",
-	}
-
 	_genPluginTypeToString = map[GenPluginType]string{
 		GenPluginTypeNone: "",
 		GenPluginTypeGo:   "go",
@@ -259,7 +254,6 @@ type OutputPath struct {
 // It is meant to be set by a YAML or JSON config file, or flags.
 type ExternalConfig struct {
 	Excludes           []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
-	NoDefaultExcludes  bool     `json:"no_default_excludes,omitempty" yaml:"no_default_excludes,omitempty"`
 	ProtocVersion      string   `json:"protoc_version,omitempty" yaml:"protoc_version,omitempty"`
 	ProtocIncludes     []string `json:"protoc_includes,omitempty" yaml:"protoc_includes,omitempty"`
 	ProtocIncludeWKT   bool     `json:"protoc_include_wkt,omitempty" yaml:"protoc_include_wkt,omitempty"`
@@ -283,12 +277,12 @@ type ExternalConfig struct {
 			NoDefaultModifiers bool              `json:"no_default_modifiers,omitempty" yaml:"no_default_modifiers,omitempty"`
 			ExtraModifiers     map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`
 		} `json:"go_options,omitempty" yaml:"go_options,omitempty"`
-		PluginOverrides map[string]string `json:"plugin_overrides,omitempty" yaml:"plugin_overrides,omitempty"`
-		Plugins         []struct {
+		Plugins []struct {
 			Name   string `json:"name,omitempty" yaml:"name,omitempty"`
 			Type   string `json:"type,omitempty" yaml:"type,omitempty"`
 			Flags  string `json:"flags,omitempty" yaml:"flags,omitempty"`
 			Output string `json:"output,omitempty" yaml:"output,omitempty"`
+			Path   string `json:"path,omitempty" yaml:"path,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"gen,omitempty" yaml:"gen,omitempty"`
 }

@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Delete `harbormaster` global flag.
 - Refactor `create.dir_to_base_package` to the list `create.packages` See
   the documentation for more details.
+- Rename `create.dir_to_base_package` -> `create.dir_to_package`.
+- Move `prototool init` to `prototool config init`.
+- Move `gen.plugin_overrides` to `gen.plugins.path`.
+### Fixed
+- Fix `excludes` setting to correctly match file path prefixes.
 
 
 ## [0.5.0] - 2018-07-26
