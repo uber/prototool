@@ -35,6 +35,7 @@ type flags struct {
 	disableFormat  bool
 	disableLint    bool
 	dryRun         bool
+	fix            bool
 	headers        []string
 	keepaliveTime  string
 	listAllLinters bool
@@ -47,7 +48,6 @@ type flags struct {
 	protocURL      string
 	stdin          bool
 	uncomment      bool
-	noRewrite      bool
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -138,6 +138,6 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
 }
 
-func (f *flags) bindNoRewrite(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.noRewrite, "no-rewrite", false, "Do not rewrite the file options go_package, java_multiple_files, java_outer_classname, and java_package to match the package per the guidelines of the style guide.")
+func (f *flags) bindFix(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.fix, "fix", false, "Fix the file according to the Style Guide.")
 }
