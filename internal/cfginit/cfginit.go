@@ -57,11 +57,11 @@ protoc_version: {{.ProtocVersion}}
   {{.V}}packages:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
-	{{.V}}- directory: .
-	{{.V}}  name: bar
+    {{.V}}- directory: .
+    {{.V}}  name: bar
     # This means that a file created "idl/code.uber/a/b/c.proto" will have package "uber.a.b".
-	{{.V}}- directory: idl/code.uber
-	{{.V}}  name: uber
+    {{.V}}- directory: idl/code.uber
+    {{.V}}  name: uber
 
 # Lint directives.
 {{.V}}lint:
