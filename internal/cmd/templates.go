@@ -234,21 +234,18 @@ Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" wh
 
 $ make init example # make sure everything is built just in case
 
-$ cat input.json
-{"value":"hello"}
-
-$ cat input.json | prototool grpc example \
+$ prototool grpc example \
   --address 0.0.0.0:8080 \
   --method foo.ExcitedService/Exclamation \
-  --stdin
+  --data '{"value":"hello"}'
 {
   "value": "hello!"
 }
 
-$ cat input.json | prototool grpc example \
+$ prototool grpc example \
   --address 0.0.0.0:8080 \
   --method foo.ExcitedService/ExclamationServerStream \
-  --stdin
+  --data '{"value":"hello"}'
 {
   "value": "h"
 }

@@ -38,7 +38,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
 
 ## Current Status
 
-Prototool is stil in the early alpha stages, and should not be used in production yet. Expect significant breaking changes before the v1.0 release. To help with development, head to the [Development](#development) section and follow along!
+Prototool is stil in the beta stages, and should not be used in production yet. Expect breaking changes before the v1.0 release. To help with development, head to the [Development](#development) section and follow along!
 
 ## Installation
 
@@ -116,7 +116,7 @@ The idea with "directory builds" is that you often need more than just one file 
 
 ## Command Overview
 
-Let's go over some of the basic commands. There are more commands than listed here, and [some may be removed before v1.0](https://github.com/uber/prototool/issues/11), but the following commands are what you mostly need to know.
+Let's go over some of the basic commands.
 
 ##### `prototool config init`
 
@@ -132,7 +132,7 @@ Compile your Protobuf files and generate stubs according to the rules in your `p
 
 ##### `prototool lint`
 
-Lint your Protobuf files. The default rule set follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). You can add or exclude lint rules in your `prototool.yaml` file. The default rule set is "strict", and we are working on having two main sets of rules, as well as refining the Style Guide, in [this issue](https://github.com/uber/prototool/issues/3).
+Lint your Protobuf files. The default rule set follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). You can add or exclude lint rules in your `prototool.yaml` file. The default rule set is "strict", and we are working on having two main sets of rules.
 
 ##### `prototool format`
 
@@ -239,15 +239,18 @@ Either use `--data 'requestData'` as the the JSON data to input, or `--stdin` wh
 ```
 $ make init example # make sure everything is built just in case
 
-$ cat input.json
-{"value":"hello"}
-
-$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --stdin
+$ prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/Exclamation \
+  --data '{"value":"hello"}'
 {
   "value": "hello!"
 }
 
-$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationServerStream --stdin
+$ prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/ExclamationServerStream \
+  --data '{"value":"hello"}'
 {
   "value": "h"
 }
@@ -271,12 +274,18 @@ $ cat input.json
 {"value":"hello"}
 {"value":"salutations"}
 
-$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationClientStream --stdin
+$ cat input.json | prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/ExclamationClientStream \
+  --stdin
 {
   "value": "hellosalutations!"
 }
 
-$ cat input.json | prototool grpc example --address 0.0.0.0:8080 --method foo.ExcitedService/ExclamationBidiStream --stdin
+$ cat input.json | prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method foo.ExcitedService/ExclamationBidiStream \
+  --stdin
 {
   "value": "hello!"
 }
@@ -295,37 +304,38 @@ Prototool is meant to help enforce a consistent development style for Protobuf, 
 
 ## Vim Integration
 
-This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). It should be similarly easy to add support for Syntastic, Neomake, etc later.
+This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). It should be similarly easy to add support for Syntastic, Neomake, etc.
 
 The Vim integration will currently provide lint errors, optionally regenerate all the stubs, and optionally format your files on save. It
 will also optionally create new files from a template when opened.
 
-The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using Vundle, copy/paste the following into your vimrc and you should be good to go.
+The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using [vim-plug](https://github.com/junegunn/vim-plug), copy/paste the following into your vimrc and you should be good to go. If you are using [Vundle](https://github.com/VundleVim/Vundle.vim), just relace `Plug` with `Vundle` below.
 
 ```vim
 " Prototool must be installed as a binary for the Vim integration to work.
 
 " Add ale and prototool with your package manager.
-" Note that Vundle does not allow setting of a branch, and downloads
-" from dev by default. There may be minor changes to the Vim integration
-" on dev between releases, but this won't be common. To make sure you are
-" on the same branch as your Prototool install, go into your Vim bundle
-" directory and checkout the branch of the release you are on.
-Vundle 'w0rp/ale'
-Vundle 'uber/prototool' { 'rtp':'vim/prototool' }
+" Note that Plug downloads from dev by default. There may be minor changes
+" to the Vim integration on dev between releases, but this won't be common.
+" To make sure you are on the same branch as your Prototool install, set
+" the branch field in the options for uber/prototool per the vim-plug
+" documentation. Vundle does not allow setting branches, so on Vundle,
+" go into plug directory and checkout the branch of the release you are on.
+Plug 'w0rp/ale'
+Plug 'uber/prototool' { 'rtp':'vim/prototool' }
 
-" I would recommend setting just this for Golang, as well as the necessary set for proto.
+" We recommend setting just this for Golang, as well as the necessary set for proto.
 let g:ale_linters = {
 \   'go': ['golint'],
 \   'proto': ['prototool'],
 \}
-" If you don't set this, it will get annoying.
+" We recommend you set this.
 let g:ale_lint_on_text_changed = 'never'
 " Set to 'lint' to not do code generation.
 " Set to 'compile' to not do linting either and just compile without code generation.
 "let g:ale_proto_prototool_command = 'compile'
 
-" I have <leader> mapped to ",", uncomment this to set leader.
+" We generally have <leader> mapped to ",", uncomment this to set leader.
 "let mapleader=","
 
 " ,f will toggle formatting on and off.
@@ -350,9 +360,6 @@ Prototool is under active development, if you want to help, here's some places t
 
 - Try out `prototool` and file issues, including points that are unclear in the documentation.
 - Put up PRs with any changes you'd like to see made. We can't guarantee that many PRs will get merged for now, but we appreciate any input!
-- Follow along on the [big ticket items](https://github.com/uber/prototool/issues?q=is%3Aissue+is%3Aopen+label%3A%22big+ticket+item%22) to see the major development points.
-
-Over the coming months, we hope to push to a v1.0.
 
 Note that development of Prototool will only work with Golang 1.10 or newer. On initially cloning the repository, run `make init` if you have not already to download dependencies to `vendor`.
 
