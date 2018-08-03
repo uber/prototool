@@ -309,7 +309,7 @@ This repository is a self-contained plugin for use with the [ALE Lint Engine](ht
 The Vim integration will currently provide lint errors, optionally regenerate all the stubs, and optionally format your files on save. It
 will also optionally create new files from a template when opened.
 
-The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using [vim-plug](https://github.com/junegunn/vim-plug), copy/paste the following into your vimrc and you should be good to go. If you are using [Vundle](https://github.com/VundleVim/Vundle.vim), just relace `Plug` with `Vundle` below.
+The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using [vim-plug](https://github.com/junegunn/vim-plug), copy/paste the following into your vimrc and you should be good to go. If you are using [Vundle](https://github.com/VundleVim/Vundle.vim), just replace `Plug` with `Vundle` below.
 
 ```vim
 " Prototool must be installed as a binary for the Vim integration to work.
