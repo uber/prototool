@@ -139,5 +139,5 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindFix(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.fix, "fix", false, "Fix the file according to the Style Guide.")
+	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
 }
