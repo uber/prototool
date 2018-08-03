@@ -22,7 +22,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
   * [Configuration](#configuration)
   * [File Discovery](#file-discovery)
   * [Command Overview](#command-overview)
-    * [prototool init](#prototool-init)
+    * [prototool config init](#prototool-config-init)
     * [prototool compile](#prototool-compile)
     * [prototool gen](#prototool-gen)
     * [prototool lint](#prototool-lint)
@@ -88,7 +88,7 @@ Recommended base config file:
 protoc_version: 3.6.0
 ```
 
-The command `prototool init` will generate a config file in the current directory with all available configuration options commented out except `protoc_version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool init --uncomment` generates.
+The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc_version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
@@ -118,7 +118,7 @@ The idea with "directory builds" is that you often need more than just one file 
 
 Let's go over some of the basic commands. There are more commands than listed here, and [some may be removed before v1.0](https://github.com/uber/prototool/issues/11), but the following commands are what you mostly need to know.
 
-##### `prototool init`
+##### `prototool config init`
 
 Create a `prototool.yaml` file in the current directory, with all options except `protoc_version` commented out.
 

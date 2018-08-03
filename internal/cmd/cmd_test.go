@@ -112,8 +112,8 @@ func TestInit(t *testing.T) {
 		_ = os.RemoveAll(tmpDir)
 	}()
 
-	assertDo(t, 0, "", "init", tmpDir)
-	assertDo(t, 1, fmt.Sprintf("%s already exists", filepath.Join(tmpDir, settings.DefaultConfigFilename)), "init", tmpDir)
+	assertDo(t, 0, "", "config", "init", tmpDir)
+	assertDo(t, 1, fmt.Sprintf("%s already exists", filepath.Join(tmpDir, settings.DefaultConfigFilename)), "config", "init", tmpDir)
 }
 
 func TestLint(t *testing.T) {
