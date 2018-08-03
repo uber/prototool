@@ -63,31 +63,29 @@ protoc_version: {{.ProtocVersion}}
 
 # Lint directives.
 {{.V}}lint:
-  # Linter * files to ignore.
-{{.V}}  ignore_id_to_files:
-{{.V}}    RPC_NAMES_CAMEL_CASE:
-{{.V}}      - path/to/foo.proto
-{{.V}}      - path/to/bar.proto
-{{.V}}    SYNTAX_PROTO3:
-{{.V}}      - path/to/foo.proto
+  # Linter files to ignore.
+{{.V}}  ignores:
+{{.V}}    - id: RPC_NAMES_CAMEL_CASE
+{{.V}}      files:
+{{.V}}        - path/to/foo.proto
+{{.V}}        - path/to/bar.proto
+{{.V}}    - id: SYNTAX_PROTO3
+{{.V}}      files:
+{{.V}}        - path/to/foo.proto
 
-  # When specifying linters, you can only specify ids, or any combination of
-  # include_ids,exclude_ids, but not ids and any of those two.
-  # Run prototool list-all-linters to see all available linters.
-  # All are specified just for this example.
-  # By default, the default group of linters is used.
+# Linter rules.
+# Run prototool list-all-linters to see all available linters.
+{{.V}}  rules:
+  # Determines whether or not to include the default set of linters.
+{{.V}}  no_default: true
 
-  # The specific linters to use.
-{{.V}}  ids:
+  # The specific linters to add.
+{{.V}}  add:
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 {{.V}}    - ENUM_NAMES_CAPITALIZED
 
-  # Linters to include that are not in the default lint group.
-{{.V}}  include_ids:
-{{.V}}    - REQUEST_RESPONSE_NAMES_MATCH_RPC
-
-  # Linters to exclude from the default lint group.
-{{.V}}  exclude_ids:
+  # The specific linters to remove.
+{{.V}}  remove:
 {{.V}}    - ENUM_NAMES_CAMEL_CASE
 
 # Code generation directives.

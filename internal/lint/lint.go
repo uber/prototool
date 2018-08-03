@@ -177,44 +177,21 @@ func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), str
 //
 // If the config came from the settings package, this is already validated.
 func GetLinters(config settings.LintConfig) ([]Linter, error) {
-	if len(config.IDs) == 0 && (len(config.Group) == 0 || config.Group == DefaultGroup) && len(config.IncludeIDs) == 0 && len(config.ExcludeIDs) == 0 {
-		return DefaultLinters, nil
+	var linters []Linter
+	if !config.NoDefault {
+		linters = DefaultLinters
 	}
-
-	if len(config.IDs) > 0 {
-		var linters []Linter
-		// n^2 woot
-		for _, linter := range AllLinters {
-			for _, id := range config.IDs {
-				if linter.ID() == id {
-					linters = append(linters, linter)
-				}
-			}
-		}
+	if len(config.IncludeIDs) == 0 && len(config.ExcludeIDs) == 0 {
 		return linters, nil
 	}
 
-	baseLinters := DefaultLinters
-	var ok bool
-	if len(config.Group) > 0 && config.Group != DefaultGroup {
-		baseLinters, ok = GroupToLinters[config.Group]
-		if !ok {
-			return nil, fmt.Errorf("unknown lint group: %s", config.Group)
-		}
-	}
-
-	lintersMap := make(map[string]Linter, len(baseLinters))
-	for _, linter := range baseLinters {
-		lintersMap[linter.ID()] = linter
-	}
-	for _, excludeID := range config.ExcludeIDs {
-		delete(lintersMap, excludeID)
-	}
-	// n^2 woot
-	for _, linter := range AllLinters {
-		for _, id := range config.IncludeIDs {
-			if linter.ID() == id {
-				lintersMap[linter.ID()] = linter
+	linterMap := make(map[string]Linter, len(linters)+len(config.IncludeIDs)-len(config.ExcludeIDs))
+	if len(config.IncludeIDs) > 0 {
+		for _, linter := range AllLinters {
+			for _, id := range config.IncludeIDs {
+				if linter.ID() == id {
+					linterMap[id] == linter
+				}
 			}
 		}
 	}

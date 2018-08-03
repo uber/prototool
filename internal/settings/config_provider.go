@@ -140,9 +140,9 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		includePaths = append(includePaths, includePath)
 	}
 	ignoreIDToFilePaths := make(map[string][]string)
-	for id, protoFilePaths := range e.Lint.IgnoreIDToFiles {
-		id = strings.ToUpper(id)
-		for _, protoFilePath := range protoFilePaths {
+	for _, ignore := range e.Lint.Ignores {
+		id := strings.ToUpper(ignore.ID)
+		for _, protoFilePath := range ignore.Files {
 			if !filepath.IsAbs(protoFilePath) {
 				protoFilePath = filepath.Join(dirPath, protoFilePath)
 			}
@@ -220,10 +220,9 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
-			IDs:                 strs.DedupeSort(e.Lint.IDs, strings.ToUpper),
-			Group:               strings.ToLower(e.Lint.Group),
-			IncludeIDs:          strs.DedupeSort(e.Lint.IncludeIDs, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSort(e.Lint.ExcludeIDs, strings.ToUpper),
+			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
+			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 		},
 		Gen: GenConfig{
