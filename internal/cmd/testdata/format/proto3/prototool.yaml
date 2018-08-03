@@ -1,5 +1,6 @@
 protoc_include_wkt: true
 lint:
-  exclude_ids:
-  - RPCS_HAVE_COMMENTS
-  - REQUEST_RESPONSE_TYPES_UNIQUE
+  rules:
+    remove:
+      - RPCS_HAVE_COMMENTS
+      - REQUEST_RESPONSE_TYPES_UNIQUE

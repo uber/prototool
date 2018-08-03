@@ -1,7 +1,8 @@
 protoc_include_wkt: true
 lint:
-  exclude_ids:
-  - REQUEST_RESPONSE_TYPES_UNIQUE
+  rules:
+    remove:
+      - REQUEST_RESPONSE_TYPES_UNIQUE
 gen:
   go_options:
     import_path: github.com/uber/prototool/internal/cmd/testdata/grpc
