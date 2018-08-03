@@ -33,7 +33,7 @@ create:
 
 # Lint directives.
 lint:
-  # Linter * files to ignore.
+  # Linter files to ignore.
   ignores:
     - id: RPC_NAMES_CAMEL_CASE
       files:
@@ -42,12 +42,22 @@ lint:
     - id: SYNTAX_PROTO3
       files:
         - path/to/foo.proto
+
+# Linter rules.
+# Run prototool list-all-linters to see all available linters.
   rules:
-    add:
-      - ENUM_NAMES_CAMEL_CASE
-      - ENUM_NAMES_CAPITALIZED
-    remove:
-      - ENUM_NAMES_CAMEL_CASE
+  # Determines whether or not to include the default set of linters.
+  no_default: true
+
+  # The specific linters to add.
+  add:
+    - ENUM_NAMES_CAMEL_CASE
+    - ENUM_NAMES_CAPITALIZED
+
+  # The specific linters to remove.
+  remove:
+    - ENUM_NAMES_CAMEL_CASE
+
 # Code generation directives.
 gen:
   # Options that will apply to all plugins of type go, gogo, gogrpc, gogogrpc.

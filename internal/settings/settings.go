@@ -259,7 +259,7 @@ type ExternalConfig struct {
 			Files []string `json:"files,omitempty" yaml:"files,omitempty"`
 		}
 		Rules struct {
-			NoDefault bool     `json:"no_default, omitempty" yaml:"no_default,omitempty"`
+			NoDefault bool     `json:"no_default,omitempty" yaml:"no_default,omitempty"`
 			Add       []string `json:"add" yaml:"add"`
 			Remove    []string `json:"remove" yaml:"remove"`
 		}
