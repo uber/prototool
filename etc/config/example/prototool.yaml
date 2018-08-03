@@ -25,11 +25,11 @@ create:
   packages:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
-	- directory: .
-	  name: bar
+    - directory: .
+      name: bar
     # This means that a file created "idl/code.uber/a/b/c.proto" will have package "uber.a.b".
-	- directory: idl/code.uber
-	  name: uber
+    - directory: idl/code.uber
+      name: uber
 
 # Lint directives.
 lint:
