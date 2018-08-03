@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Move `prototool init` to `prototool config init`.
 - Move `gen.plugin_overrides` to `gen.plugins.path`.
 - Refactor `lint` configuration. See the documentation for details.
+- Refactor `format --no-rewrite` so that the previous default is now enabled via
+  `format --fix`.
 ### Fixed
 - Fix `excludes` setting to correctly match file path prefixes.
 

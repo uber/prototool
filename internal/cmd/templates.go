@@ -42,12 +42,12 @@ var (
 		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.All(args, flags.disableFormat, flags.disableLint, !flags.noRewrite)
+			return runner.All(args, flags.disableFormat, flags.disableLint, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
-			flags.bindNoRewrite(flagSet)
+			flags.bindFix(flagSet)
 		},
 	}
 
@@ -191,16 +191,15 @@ If Vim integration is set up, files will be generated when you open a new Protob
 	formatCmdTemplate = &cmdTemplate{
 		Use:   "format [dirOrFile]",
 		Short: "Format a proto file and compile with protoc to check for failures.",
-		Long:  `By default, the values for "java_multiple_files", "java_outer_classname", and "java_package" are updated to reflect what is expected by the Google Cloud APIs file structure at https://cloud.google.com/apis/design/file_structure, and the value of "go_package" is updated to reflect what we expect for the default Style Guide. By formatting, the linting for these values will pass by default. See the documentation for "create" for an example. This functionality can be suppressed by passing the flag "--no-rewrite".`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, !flags.noRewrite)
+			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDiffMode(flagSet)
 			flags.bindLintMode(flagSet)
 			flags.bindOverwrite(flagSet)
-			flags.bindNoRewrite(flagSet)
+			flags.bindFix(flagSet)
 		},
 	}
 

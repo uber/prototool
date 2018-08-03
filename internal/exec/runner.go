@@ -377,7 +377,7 @@ func (r *runner) ListAllLintGroups() error {
 	return nil
 }
 
-func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error {
+func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fix bool) error {
 	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
@@ -389,14 +389,14 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bo
 	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, rewrite, meta)
+	return r.format(overwrite, diffMode, lintMode, fix, meta)
 }
 
-func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta) error {
+func (r *runner) format(overwrite, diffMode, lintMode, fix bool, meta *meta) error {
 	success := true
 	for _, protoFiles := range meta.ProtoSet.DirPathToFiles {
 		for _, protoFile := range protoFiles {
-			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, rewrite, meta, protoFile)
+			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, fix, meta, protoFile)
 			if err != nil {
 				return err
 			}
@@ -414,7 +414,7 @@ func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta)
 // return true if there was no unexpected diff and we should exit with 0
 // return false if we should exit with non-zero
 // if false and nil error, we will return an ExitError outside of this function
-func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrite bool, meta *meta, protoFile *file.ProtoFile) (bool, error) {
+func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix bool, meta *meta, protoFile *file.ProtoFile) (bool, error) {
 	absSingleFilename, err := file.AbsClean(meta.SingleFilename)
 	if err != nil {
 		return false, err
@@ -427,7 +427,7 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrit
 	if err != nil {
 		return false, err
 	}
-	data, failures, err := r.newTransformer(rewrite).Transform(protoFile.Path, input)
+	data, failures, err := r.newTransformer(fix).Transform(protoFile.Path, input)
 	if err != nil {
 		return false, err
 	}
@@ -522,7 +522,7 @@ func (r *runner) JSONToBinary(args []string) error {
 	return err
 }
 
-func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) error {
+func (r *runner) All(args []string, disableFormat, disableLint, fix bool) error {
 	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
@@ -532,7 +532,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) er
 		return err
 	}
 	if !disableFormat {
-		if err := r.format(true, false, false, rewrite, meta); err != nil {
+		if err := r.format(true, false, false, fix, meta); err != nil {
 			return err
 		}
 	}
@@ -667,10 +667,10 @@ func (r *runner) newLintRunner() lint.Runner {
 	)
 }
 
-func (r *runner) newTransformer(rewrite bool) format.Transformer {
+func (r *runner) newTransformer(fix bool) format.Transformer {
 	transformerOptions := []format.TransformerOption{format.TransformerWithLogger(r.logger)}
-	if rewrite {
-		transformerOptions = append(transformerOptions, format.TransformerWithRewrite())
+	if fix {
+		transformerOptions = append(transformerOptions, format.TransformerWithFix())
 	}
 	return format.NewTransformer(transformerOptions...)
 }

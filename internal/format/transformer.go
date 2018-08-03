@@ -31,8 +31,8 @@ import (
 )
 
 type transformer struct {
-	logger  *zap.Logger
-	rewrite bool
+	logger *zap.Logger
+	fix    bool
 }
 
 func newTransformer(options ...TransformerOption) *transformer {
@@ -52,7 +52,7 @@ func (t *transformer) Transform(filename string, data []byte) ([]byte, []*text.F
 	}
 	descriptor.Filename = filename
 
-	firstPassVisitor := newFirstPassVisitor(filename, t.rewrite)
+	firstPassVisitor := newFirstPassVisitor(filename, t.fix)
 	for _, element := range descriptor.Elements {
 		element.Accept(firstPassVisitor)
 	}

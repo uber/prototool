@@ -139,14 +139,13 @@ Lint your Protobuf files. The default rule set follows the Style Guide at [etc/s
 Format a Protobuf file and print the formatted file to stdout. There are flags to perform different actions:
 
 - `-d` Write a diff instead.
+- `-f` Fix the file according to the Style Guide.
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
 
-By default, the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated
-to reflect what is expected by the [Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure),
-and the value of `go_package` is updated to reflect what we expect for the default Style Guide. By formatting, the linting for
-these values will pass by default. See the documentation below for [prototool create](#prototool-create) for an example. This functionality
-can be suppressed by passing the flag `--no-rewrite` to `prototool format`.
+Conretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
+[Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the value of `go_package` is updated to reflect what we expect for the
+default Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
 
 ##### `prototool create`
 
@@ -339,15 +338,15 @@ let g:ale_lint_on_text_changed = 'never'
 "let mapleader=","
 
 " ,f will toggle formatting on and off.
-" Change to PrototoolFormatNoRewriteToggle to toggle with --no-rewrite instead.
+" Change to PrototoolFormatFixToggle to toggle with --fix instead.
 nnoremap <silent> <leader>f :call PrototoolFormatToggle()<CR>
 " ,c will toggle create on and off.
 nnoremap <silent> <leader>c :call PrototoolCreateToggle()<CR>
 
 " Uncomment this to enable formatting by default.
 "call PrototoolFormatEnable()
-" Uncomment this to enable formatting with --no-rewrite by default.
-"call PrototoolFormatNoRewriteEnable()
+" Uncomment this to enable formatting with --fix by default.
+"call PrototoolFormatFixEnable()
 " Uncomment this to disable creating Protobuf files from a template by default.
 "call PrototoolCreateDisable()
 ```

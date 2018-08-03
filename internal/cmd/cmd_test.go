@@ -339,7 +339,7 @@ func TestGoldenFormat(t *testing.T) {
 	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/bar/bar_proto2.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/foo.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/foo_proto2.proto")
-	assertGoldenFormat(t, false, true, "testdata/format-rewrite/foo.proto")
+	assertGoldenFormat(t, false, true, "testdata/format-fix/foo.proto")
 }
 
 func TestJSONToBinaryToJSON(t *testing.T) {
@@ -701,10 +701,10 @@ func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes st
 	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint"}, filePaths...)...)
 }
 
-func assertGoldenFormat(t *testing.T, expectSuccess bool, rewrite bool, filePath string) {
+func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath string) {
 	args := []string{"format"}
-	if !rewrite {
-		args = append(args, "--no-rewrite")
+	if fix {
+		args = append(args, "--fix")
 	}
 	args = append(args, filePath)
 	output, exitCode := testDo(t, args...)
