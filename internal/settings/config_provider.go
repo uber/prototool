@@ -253,9 +253,6 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		}
 	}
 
-	if len(config.Lint.IDs) > 0 && (len(config.Lint.Group) > 0 || len(config.Lint.IncludeIDs) > 0 || len(config.Lint.ExcludeIDs) > 0) {
-		return Config{}, fmt.Errorf("config was %v but can only specify either linters, or lint_group/lint_include/lint_exclude", e)
-	}
 	if intersection := strs.Intersection(config.Lint.IncludeIDs, config.Lint.ExcludeIDs); len(intersection) > 0 {
 		return Config{}, fmt.Errorf("config had intersection of %v between lint_include and lint_exclude", intersection)
 	}

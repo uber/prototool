@@ -171,9 +171,8 @@ func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), str
 
 // GetLinters returns the Linters for the LintConfig.
 //
-// The config is expected to be valid, ie slices deduped, all upper-case,
-// and only either IDs or Group/IncludeIDs/ExcludeIDs, with no overlap between
-// IncludeIDs and ExcludeIDs.
+// The configuration is expected to be valid, deduplicated, and all upper-case.
+// IncludeIDs and ExcludeIDs MUST NOT have an intersection.
 //
 // If the config came from the settings package, this is already validated.
 func GetLinters(config settings.LintConfig) ([]Linter, error) {
@@ -185,21 +184,29 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 		return linters, nil
 	}
 
+	// Apply the configured linters to the default group.
 	linterMap := make(map[string]Linter, len(linters)+len(config.IncludeIDs)-len(config.ExcludeIDs))
+	for _, l := range linters {
+		linterMap[l.ID()] = l
+	}
 	if len(config.IncludeIDs) > 0 {
-		for _, linter := range AllLinters {
+		for _, l := range AllLinters {
 			for _, id := range config.IncludeIDs {
-				if linter.ID() == id {
-					linterMap[id] == linter
+				if l.ID() == id {
+					linterMap[id] = l
 				}
 			}
 		}
 	}
-	linters := make([]Linter, 0, len(lintersMap))
-	for _, linter := range lintersMap {
-		linters = append(linters, linter)
+	for _, excludeID := range config.ExcludeIDs {
+		delete(linterMap, excludeID)
 	}
-	return linters, nil
+
+	result := make([]Linter, 0, len(linterMap))
+	for _, l := range linterMap {
+		result = append(result, l)
+	}
+	return result, nil
 }
 
 // GetDirPathToDescriptors is a convenience function that gets the
