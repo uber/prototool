@@ -1,3 +1,3 @@
-protoc_include_wkt: true
-protoc_includes:
-  - ../
+protoc:
+  includes:
+    - ../

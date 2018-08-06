@@ -1,22 +1,25 @@
 # The Protobuf version to use from https://github.com/google/protobuf/releases.
-# By default use 3.6.1.
-# You probably want to set this to make your builds completely reproducible.
-protoc_version: 3.6.1
+# If not set, compile will fail if there are unused imports.
+# Setting this will ignore unused imports.
+allow_unused_imports: true
 
 # Paths to exclude from protoc.
 excludes:
   - path/to/a
   - path/to/b/file.proto
 
-# Additional paths to include with -I to protoc.
-# By default, the directory of the config file is included,
-# or the current directory if there is no config file.
-protoc_includes:
-  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+# Protoc directives.
+protoc:
+  # By default use 3.6.1.
+  # You probably want to set this to make your builds completely reproducible.
+  version: 3.6.1
 
-# If not set, compile will fail if there are unused imports.
-# Setting this will ignore unused imports.
-allow_unused_imports: true
+  # Additional paths to include with -I to protoc.
+  # By default, the directory of the config file is included,
+  # or the current directory if there is no config file.
+  includes:
+    - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+
 
 # Create directives.
 create:

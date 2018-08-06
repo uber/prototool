@@ -131,8 +131,8 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	includePaths := make([]string, 0, len(e.ProtocIncludes))
-	for _, includePath := range strs.DedupeSort(e.ProtocIncludes, nil) {
+	includePaths := make([]string, 0, len(e.Protoc.Includes))
+	for _, includePath := range strs.DedupeSort(e.Protoc.Includes, nil) {
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -211,7 +211,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		DirPath:         dirPath,
 		ExcludePrefixes: excludePrefixes,
 		Compile: CompileConfig{
-			ProtobufVersion:       e.ProtocVersion,
+			ProtobufVersion:       e.Protoc.Version,
 			IncludePaths:          includePaths,
 			IncludeWellKnownTypes: true, // Always include the well-known types.
 			AllowUnusedImports:    e.AllowUnusedImports,
