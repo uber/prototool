@@ -85,10 +85,11 @@ Prototool operates using a config file named `prototool.yaml`. For non-trivial u
 Recommended base config file:
 
 ```yaml
-protoc_version: 3.6.1
+protoc:
+  version: 3.6.1
 ```
 
-The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc_version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
+The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc.version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
@@ -120,7 +121,7 @@ Let's go over some of the basic commands.
 
 ##### `prototool config init`
 
-Create a `prototool.yaml` file in the current directory, with all options except `protoc_version` commented out.
+Create a `prototool.yaml` file in the current directory, with all options except `protoc.version` commented out.
 
 ##### `prototool compile`
 

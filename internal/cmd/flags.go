@@ -127,7 +127,7 @@ func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.protocURL, "protoc-url", "", "The url to use to download the protoc zip file, otherwise uses GitHub Releases. Setting this option will ignore the config protoc_version setting.")
+	flagSet.StringVar(&f.protocURL, "protoc-url", "", "The url to use to download the protoc zip file, otherwise uses GitHub Releases. Setting this option will ignore the config protoc.version setting.")
 }
 
 func (f *flags) bindStdin(flagSet *pflag.FlagSet) {

@@ -267,7 +267,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 		}
 	}()
 	// you need a new downloader for every ProtoSet as each prototool.yaml could
-	// have a different protoc_version value
+	// have a different protoc.version value
 	downloader := c.newDownloader(protoSet.Config)
 	if _, err := downloader.Download(); err != nil {
 		return cmdMetas, err
