@@ -297,7 +297,7 @@ $ cat input.json | prototool grpc example \
 
 Prototool is meant to help enforce a consistent development style for Protobuf, and as such you should follow some basic rules:
 
-- Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc_includes` to denote extra include directories, this is not recommended.
+- Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc.includes` to denote extra include directories, this is not recommended.
 - Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package`, `java_multiple_files`, `java_outer_classname`, and `java_package`.
 - Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool gen` do the best job.
 

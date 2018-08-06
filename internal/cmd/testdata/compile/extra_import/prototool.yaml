@@ -1,1 +1,2 @@
-protoc_include_wkt: true
+protoc:
+  include_wkt: true

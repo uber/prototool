@@ -1,3 +1,4 @@
 excludes:
   - g/h
-protoc_version: 3.3.0
+protoc:
+  version: 3.3.0
