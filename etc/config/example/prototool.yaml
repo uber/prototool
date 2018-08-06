@@ -1,5 +1,4 @@
 # The Protobuf version to use from https://github.com/google/protobuf/releases.
-
 # If not set, compile will fail if there are unused imports.
 # Setting this will ignore unused imports.
 allow_unused_imports: true

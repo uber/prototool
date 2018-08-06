@@ -242,12 +242,11 @@ type OutputPath struct {
 //
 // It is meant to be set by a YAML or JSON config file, or flags.
 type ExternalConfig struct {
-	Excludes           []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
 	AllowUnusedImports bool     `json:"allow_unused_imports,omitempty" yaml:"allow_unused_imports,omitempty"`
+	Excludes           []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
 	Protoc             struct {
-		Version    string   `json:"version,omitempty" yaml:"version,omitempty"`
-		Includes   []string `json:"includes,omitempty" yaml:"includes,omitempty"`
-		IncludeWKT bool     `json:"include_wkt,omitempty" yaml:"include_wkt,omitempty"`
+		Version  string   `json:"version,omitempty" yaml:"version,omitempty"`
+		Includes []string `json:"includes,omitempty" yaml:"includes,omitempty"`
 	} `json:"protoc,omitempty" yaml:"protoc,omitempty"`
 	Create struct {
 		Packages []struct {
@@ -265,7 +264,6 @@ type ExternalConfig struct {
 			Add       []string `json:"add" yaml:"add"`
 			Remove    []string `json:"remove" yaml:"remove"`
 		}
-		Group string `json:"group,omitempty" yaml:"group,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
 	Gen struct {
 		GoOptions struct {
