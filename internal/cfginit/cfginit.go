@@ -39,7 +39,7 @@ var tmpl = template.Must(template.New("tmpl").Parse(`# The Protobuf version to u
 {{.V}}  - path/to/b/file.proto
 
 # Protoc directives.
-{{.V}}protoc:
+protoc:
   # By default use {{.ProtocVersion}}.
   # You probably want to set this to make your builds completely reproducible.
   version: {{.ProtocVersion}}
