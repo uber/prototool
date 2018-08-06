@@ -73,20 +73,20 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}      files:
 {{.V}}        - path/to/foo.proto
 
-# Linter rules.
-# Run prototool list-all-linters to see all available linters.
+  # Linter rules.
+  # Run prototool list-all-linters to see all available linters.
 {{.V}}  rules:
-  # Determines whether or not to include the default set of linters.
-{{.V}}  no_default: true
+    # Determines whether or not to include the default set of linters.
+{{.V}}    no_default: true
 
-  # The specific linters to add.
-{{.V}}  add:
-{{.V}}    - ENUM_NAMES_CAMEL_CASE
-{{.V}}    - ENUM_NAMES_CAPITALIZED
+    # The specific linters to add.
+{{.V}}    add:
+{{.V}}      - ENUM_NAMES_CAMEL_CASE
+{{.V}}      - ENUM_NAMES_CAPITALIZED
 
-  # The specific linters to remove.
-{{.V}}  remove:
-{{.V}}    - ENUM_NAMES_CAMEL_CASE
+    # The specific linters to remove.
+{{.V}}    remove:
+{{.V}}      - ENUM_NAMES_CAMEL_CASE
 
 # Code generation directives.
 {{.V}}gen:
@@ -100,8 +100,6 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}    extra_modifiers:
 {{.V}}      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
 {{.V}}      google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
-
-{{.V}}  plugin_overrides:
 
   # The list of plugins.
 {{.V}}  plugins:

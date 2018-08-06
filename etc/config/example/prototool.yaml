@@ -43,20 +43,20 @@ lint:
       files:
         - path/to/foo.proto
 
-# Linter rules.
-# Run prototool list-all-linters to see all available linters.
+  # Linter rules.
+  # Run prototool list-all-linters to see all available linters.
   rules:
-  # Determines whether or not to include the default set of linters.
-  no_default: true
+    # Determines whether or not to include the default set of linters.
+    no_default: true
 
-  # The specific linters to add.
-  add:
-    - ENUM_NAMES_CAMEL_CASE
-    - ENUM_NAMES_CAPITALIZED
+    # The specific linters to add.
+    add:
+      - ENUM_NAMES_CAMEL_CASE
+      - ENUM_NAMES_CAPITALIZED
 
-  # The specific linters to remove.
-  remove:
-    - ENUM_NAMES_CAMEL_CASE
+    # The specific linters to remove.
+    remove:
+      - ENUM_NAMES_CAMEL_CASE
 
 # Code generation directives.
 gen:
@@ -70,8 +70,6 @@ gen:
     extra_modifiers:
       google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
       google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
-
-  plugin_overrides:
 
   # The list of plugins.
   plugins:
