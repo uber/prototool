@@ -31,7 +31,7 @@ const (
 	// github.com/google/protobuf to use.
 	//
 	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.6.0"
+	DefaultProtocVersion = "3.6.1"
 )
 
 var (

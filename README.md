@@ -85,7 +85,7 @@ Prototool operates using a config file named `prototool.yaml`. For non-trivial u
 Recommended base config file:
 
 ```yaml
-protoc_version: 3.6.0
+protoc_version: 3.6.1
 ```
 
 The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc_version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
