@@ -18,55 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package phab
+package settings
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/uber/prototool/internal/text"
 )
 
-func TestTextFailureToHarbormasterLintResult(t *testing.T) {
-	harbormasterLintResult, err := TextFailureToHarbormasterLintResult(
-		&text.Failure{
-			Filename: "path/to/foo.proto",
-			Line:     2,
-			Message:  "Foo is a foo.",
-		},
-	)
-	assert.NoError(t, err)
-	assert.Equal(
-		t,
-		&HarbormasterLintResult{
-			Name:        DefaultHarbormasterLintResultName,
-			Code:        DefaultHarbormasterLintResultCode,
-			Severity:    DefaultHarbormasterLintResultSeverity,
-			Path:        "path/to/foo.proto",
-			Line:        2,
-			Description: "Foo is a foo.",
-		},
-		harbormasterLintResult,
-	)
-	harbormasterLintResult, err = TextFailureToHarbormasterLintResult(
-		&text.Failure{
-			Filename: "path/to/foo.proto",
-			Line:     2,
-			ID:       "FOO",
-			Message:  "Foo is a foo.",
-		},
-	)
-	assert.NoError(t, err)
-	assert.Equal(
-		t,
-		&HarbormasterLintResult{
-			Name:        DefaultHarbormasterLintResultName,
-			Code:        "FOO",
-			Severity:    DefaultHarbormasterLintResultSeverity,
-			Path:        "path/to/foo.proto",
-			Line:        2,
-			Description: "Foo is a foo.",
-		},
-		harbormasterLintResult,
-	)
+func TestExternalConfigValidate(t *testing.T) {
+	t.Run("gen.go_options.no_default_modifiers", func(t *testing.T) {
+		e := ExternalConfig{}
+		e.Gen.GoOptions.NoDefaultModifiers = true
+		assert.EqualError(t, e.Validate(), "gen.go_options.no_default_modifiers is not a configurable setting")
+	})
 }

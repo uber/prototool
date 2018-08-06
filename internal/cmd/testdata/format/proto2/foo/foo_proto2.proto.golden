@@ -7,12 +7,6 @@ syntax = "proto2"; // inline comment1
 // comment3
 package foo; // inline comment3
 
-// comment16
-option (bar.file_dep_option) = {
-  hello: 1
-}; // inline comment16
-// comment6
-option (bar.file_option) = true; // inline comment6
 // comment7
 option (bar.file_option_proto2) = true; //inline comment7
 // comment4
@@ -24,10 +18,8 @@ option java_outer_classname = "FooProto2Proto"; // inline comment5
 // comment12
 option java_package = "com.foo"; // inline comment23
 
-//comment10
-import "bar/bar.proto"; //inline comment10
 // comment2
-import weak "bar/bar_proto2.proto"; // inline comment2
+import weak "foo/bar/bar_proto2.proto"; // inline comment2
 
 // baz
 

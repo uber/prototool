@@ -3,16 +3,10 @@
 # You probably want to set this to make your builds completely reproducible.
 protoc_version: 3.6.0
 
-# Paths to exclude when using directory mode.
-# These are prefixes, not regexes, so path/to/a will ignore anything beginning with
-# $(dirname some/dir/prototool.yaml)/path/to/a including for example $(dirname some/dir/prototool.yaml)/path/to/ab.
+# Paths to exclude from protoc.
 excludes:
   - path/to/a
   - path/to/b/file.proto
-
-# Do not use the default exclude paths.
-# The only default exclude path is "vendor".
-no_default_excludes: true
 
 # Additional paths to include with -I to protoc.
 # By default, the directory of the config file is included,
@@ -20,53 +14,49 @@ no_default_excludes: true
 protoc_includes:
   - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
 
-# Include the Well-Known Types when compiling with protoc.
-# For example, this allows you to do import "google/protobuf/timestamp.proto" in your Protobuf files.
-protoc_include_wkt: true
-
 # If not set, compile will fail if there are unused imports.
 # Setting this will ignore unused imports.
 allow_unused_imports: true
 
 # Create directives.
 create:
-  # Map from relative directory to base package.
+  # List of mappings from relative directory to base package.
   # This affects how packages are generated with create.
-  dir_to_base_package:
+  packages:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
-    .: bar
+    - directory: .
+      name: bar
     # This means that a file created "idl/code.uber/a/b/c.proto" will have package "uber.a.b".
-    idl/code.uber: uber
+    - directory: idl/code.uber
+      name: uber
 
 # Lint directives.
 lint:
-  # Linter * files to ignore.
-  ignore_id_to_files:
-    RPC_NAMES_CAMEL_CASE:
-      - path/to/foo.proto
-      - path/to/bar.proto
-    SYNTAX_PROTO3:
-      - path/to/foo.proto
+  # Linter files to ignore.
+  ignores:
+    - id: RPC_NAMES_CAMEL_CASE
+      files:
+        - path/to/foo.proto
+        - path/to/bar.proto
+    - id: SYNTAX_PROTO3
+      files:
+        - path/to/foo.proto
 
-  # When specifying linters, you can only specify ids, or any combination of
-  # include_ids,exclude_ids, but not ids and any of those two.
+  # Linter rules.
   # Run prototool list-all-linters to see all available linters.
-  # All are specified just for this example.
-  # By default, the default group of linters is used.
+  rules:
+    # Determines whether or not to include the default set of linters.
+    no_default: true
 
-  # The specific linters to use.
-  ids:
-    - ENUM_NAMES_CAMEL_CASE
-    - ENUM_NAMES_CAPITALIZED
+    # The specific linters to add.
+    add:
+      - ENUM_NAMES_CAMEL_CASE
+      - ENUM_NAMES_CAPITALIZED
 
-  # Linters to include that are not in the lint group.
-  include_ids:
-    - REQUEST_RESPONSE_NAMES_MATCH_RPC
-
-  # Linters to exclude from the lint group.
-  exclude_ids:
-    - ENUM_NAMES_CAMEL_CASE
+    # The specific linters to remove.
+    remove:
+      - ENUM_NAMES_CAMEL_CASE
 
 # Code generation directives.
 gen:
@@ -76,24 +66,10 @@ gen:
     # This is required if you have any go plugins.
     import_path: uber/foo/bar.git/idl/uber
 
-    # Do not include default modifiers with Mfile=package.
-    # By default, modifiers are included for the Well-Known Types if
-    # protoc_include_wkt is set, and for all files in the compilation relative
-    # to the import path.
-    # ** Generally do not set this unless you know what you are doing. **
-    #no_default_modifiers: true
-
     # Extra modifiers to include with Mfile=package.
     extra_modifiers:
       google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
       google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
-
-  # Plugin overrides. For example, if you set "grpc-gpp: /usr/local/bin/grpc_cpp_plugin",
-  # This will mean that a plugin named "grpc-gpp" in the plugins list will be looked for
-  # at "/usr/local/bin/grpc_cpp_plugin" by setting the
-  # "--plugin=protoc-gen-grpc-gpp=/usr/local/bin/grpc_cpp_plugin" flag on protoc.
-  plugin_overrides:
-    grpc-gpp: /usr/local/bin/grpc_cpp_plugin
 
   # The list of plugins.
   plugins:
@@ -119,6 +95,11 @@ gen:
       # If the directory does not exist, it will be created when running generation.
       # This needs to be a relative path.
       output: ../../.gen/proto/go
+
+      # Optional override for the plugin path. For example, if you set set path to
+      # /usr/local/bin/gogo_plugin", prototool will add the
+      # "--plugin=protoc-gen-gogo=/usr/local/bin/gogo_plugin" flag to protoc calls.
+      path: /usr/local/bin/gogo
 
     - name: yarpc-go
       type: gogo

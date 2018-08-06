@@ -22,8 +22,10 @@ package file
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/settings"
 	"go.uber.org/zap"
@@ -84,14 +86,13 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -125,14 +126,13 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -166,11 +166,11 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 						cwd + "/testdata/b/g/h",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -238,14 +238,13 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -275,14 +274,13 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -342,14 +340,13 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -379,14 +376,13 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -414,11 +410,11 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 						cwd + "/testdata/b/g/h",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -478,14 +474,13 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 					ExcludePrefixes: []string{
 						cwd + "/testdata/c/i",
 						cwd + "/testdata/d",
-						cwd + "/testdata/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.4.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.4.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -515,14 +510,13 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 					DirPath: cwd + "/testdata/a/d",
 					ExcludePrefixes: []string{
 						cwd + "/testdata/a/d/file3.proto",
-						cwd + "/testdata/a/d/vendor",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.2.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.2.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -550,11 +544,11 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 						cwd + "/testdata/b/g/h",
 					},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -597,16 +591,14 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/d",
-					ExcludePrefixes: []string{
-						cwd + "/testdata/d/vendor",
-					},
+					DirPath:         cwd + "/testdata/d",
+					ExcludePrefixes: []string{},
 					Compile: settings.CompileConfig{
-						ProtobufVersion: "3.3.0",
-						IncludePaths:    []string{},
+						ProtobufVersion:       "3.3.0",
+						IncludePaths:          []string{},
+						IncludeWellKnownTypes: true,
 					},
 					Lint: settings.LintConfig{
-						IDs:                 []string{},
 						IncludeIDs:          []string{},
 						ExcludeIDs:          []string{},
 						IgnoreIDToFilePaths: map[string][]string{},
@@ -620,6 +612,57 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 		},
 		protoSets,
 	)
+}
+
+func TestIsExcluded(t *testing.T) {
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+
+	tests := []struct {
+		desc     string
+		filePath string
+		stopPath string
+		excludes map[string]struct{}
+		excluded bool
+	}{
+		{
+			desc:     "Nothing excluded",
+			filePath: cwd,
+			excluded: false,
+		},
+		{
+			desc:     "String prefix of excluded dir is not excluded",
+			filePath: filepath.Join(cwd, "foo"),
+			stopPath: cwd,
+			excludes: map[string]struct{}{filepath.Join(cwd, "fooo"): struct{}{}},
+			excluded: false,
+		},
+		{
+			desc:     "Not excluded, terminates without stopPath",
+			filePath: filepath.Join(cwd, "foo"),
+			excludes: map[string]struct{}{filepath.Join(cwd, "bar"): struct{}{}},
+			excluded: false,
+		},
+		{
+			desc:     "Directory is exluded",
+			filePath: filepath.Join(cwd, "foo/bar"),
+			stopPath: cwd,
+			excludes: map[string]struct{}{filepath.Join(cwd, "foo"): struct{}{}},
+			excluded: true,
+		},
+		{
+			desc:     "File is exluded",
+			filePath: filepath.Join(cwd, "foo.proto"),
+			stopPath: cwd,
+			excludes: map[string]struct{}{filepath.Join(cwd, "foo.proto"): struct{}{}},
+			excluded: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			assert.Equal(t, tt.excluded, isExcluded(tt.filePath, tt.stopPath, tt.excludes))
+		})
+	}
 }
 
 func newTestProtoSetProvider(t *testing.T) ProtoSetProvider {

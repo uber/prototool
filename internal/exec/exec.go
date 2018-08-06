@@ -59,10 +59,10 @@ type Runner interface {
 	Lint(args []string, listAllLinters bool, listLinters bool) error
 	ListLintGroup(group string) error
 	ListAllLintGroups() error
-	Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error
+	Format(args []string, overwrite, diffMode, lintMode, fix bool) error
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error
-	All(args []string, disableFormat, disableLint, rewrite bool) error
+	All(args []string, disableFormat, disableLint, fix bool) error
 	GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, jsonOutput bool) error
 }
 
@@ -97,25 +97,6 @@ func RunnerWithProtocURL(protocURL string) RunnerOption {
 func RunnerWithPrintFields(printFields string) RunnerOption {
 	return func(runner *runner) {
 		runner.printFields = printFields
-	}
-}
-
-// RunnerWithDirMode returns a RunnerOption that will act as if the file
-// given is the directory of the file, but only print the failures
-// from that file.
-func RunnerWithDirMode() RunnerOption {
-	return func(runner *runner) {
-		runner.dirMode = true
-	}
-}
-
-// RunnerWithHarbormaster returns a RunnerOption that will print
-// failures as Harbormaster compatible JSON.
-//
-// https://secure.phabricator.com/conduit/method/harbormaster.sendmessage
-func RunnerWithHarbormaster() RunnerOption {
-	return func(runner *runner) {
-		runner.harbormaster = true
 	}
 }
 

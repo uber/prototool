@@ -33,16 +33,10 @@ var tmpl = template.Must(template.New("tmpl").Parse(`# The Protobuf version to u
 # You probably want to set this to make your builds completely reproducible.
 protoc_version: {{.ProtocVersion}}
 
-# Paths to exclude when using directory mode.
-# These are prefixes, not regexes, so path/to/a will ignore anything beginning with
-# $(dirname some/dir/prototool.yaml)/path/to/a including for example $(dirname some/dir/prototool.yaml)/path/to/ab.
+# Paths to exclude from protoc.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
-
-# Do not use the default exclude paths.
-# The only default exclude path is "vendor".
-{{.V}}no_default_excludes: true
 
 # Additional paths to include with -I to protoc.
 # By default, the directory of the config file is included,
@@ -50,53 +44,49 @@ protoc_version: {{.ProtocVersion}}
 {{.V}}protoc_includes:
 {{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
 
-# Include the Well-Known Types when compiling with protoc.
-# For example, this allows you to do import "google/protobuf/timestamp.proto" in your Protobuf files.
-{{.V}}protoc_include_wkt: true
-
 # If not set, compile will fail if there are unused imports.
 # Setting this will ignore unused imports.
 {{.V}}allow_unused_imports: true
 
 # Create directives.
 {{.V}}create:
-  # Map from relative directory to base package.
+  # List of mappings from relative directory to base package.
   # This affects how packages are generated with create.
-  {{.V}}dir_to_base_package:
+  {{.V}}packages:
     # This means that a file created "foo.proto" in the current directory will have package "bar".
     # A file created "a/b/foo.proto" will have package "bar.a.b".
-    {{.V}}.: bar
+    {{.V}}- directory: .
+    {{.V}}  name: bar
     # This means that a file created "idl/code.uber/a/b/c.proto" will have package "uber.a.b".
-    {{.V}}idl/code.uber: uber
+    {{.V}}- directory: idl/code.uber
+    {{.V}}  name: uber
 
 # Lint directives.
 {{.V}}lint:
-  # Linter * files to ignore.
-{{.V}}  ignore_id_to_files:
-{{.V}}    RPC_NAMES_CAMEL_CASE:
-{{.V}}      - path/to/foo.proto
-{{.V}}      - path/to/bar.proto
-{{.V}}    SYNTAX_PROTO3:
-{{.V}}      - path/to/foo.proto
+  # Linter files to ignore.
+{{.V}}  ignores:
+{{.V}}    - id: RPC_NAMES_CAMEL_CASE
+{{.V}}      files:
+{{.V}}        - path/to/foo.proto
+{{.V}}        - path/to/bar.proto
+{{.V}}    - id: SYNTAX_PROTO3
+{{.V}}      files:
+{{.V}}        - path/to/foo.proto
 
-  # When specifying linters, you can only specify ids, or any combination of
-  # include_ids,exclude_ids, but not ids and any of those two.
+  # Linter rules.
   # Run prototool list-all-linters to see all available linters.
-  # All are specified just for this example.
-  # By default, the default group of linters is used.
+{{.V}}  rules:
+    # Determines whether or not to include the default set of linters.
+{{.V}}    no_default: true
 
-  # The specific linters to use.
-{{.V}}  ids:
-{{.V}}    - ENUM_NAMES_CAMEL_CASE
-{{.V}}    - ENUM_NAMES_CAPITALIZED
+    # The specific linters to add.
+{{.V}}    add:
+{{.V}}      - ENUM_NAMES_CAMEL_CASE
+{{.V}}      - ENUM_NAMES_CAPITALIZED
 
-  # Linters to include that are not in the lint group.
-{{.V}}  include_ids:
-{{.V}}    - REQUEST_RESPONSE_NAMES_MATCH_RPC
-
-  # Linters to exclude from the lint group.
-{{.V}}  exclude_ids:
-{{.V}}    - ENUM_NAMES_CAMEL_CASE
+    # The specific linters to remove.
+{{.V}}    remove:
+{{.V}}      - ENUM_NAMES_CAMEL_CASE
 
 # Code generation directives.
 {{.V}}gen:
@@ -106,24 +96,10 @@ protoc_version: {{.ProtocVersion}}
     # This is required if you have any go plugins.
 {{.V}}    import_path: uber/foo/bar.git/idl/uber
 
-    # Do not include default modifiers with Mfile=package.
-    # By default, modifiers are included for the Well-Known Types if
-    # protoc_include_wkt is set, and for all files in the compilation relative
-    # to the import path.
-    # ** Generally do not set this unless you know what you are doing. **
-    #no_default_modifiers: true
-
     # Extra modifiers to include with Mfile=package.
 {{.V}}    extra_modifiers:
 {{.V}}      google/api/annotations.proto: google.golang.org/genproto/googleapis/api/annotations
 {{.V}}      google/api/http.proto: google.golang.org/genproto/googleapis/api/annotations
-
-  # Plugin overrides. For example, if you set "grpc-gpp: /usr/local/bin/grpc_cpp_plugin",
-  # This will mean that a plugin named "grpc-gpp" in the plugins list will be looked for
-  # at "/usr/local/bin/grpc_cpp_plugin" by setting the
-  # "--plugin=protoc-gen-grpc-gpp=/usr/local/bin/grpc_cpp_plugin" flag on protoc.
-{{.V}}  plugin_overrides:
-{{.V}}    grpc-gpp: /usr/local/bin/grpc_cpp_plugin
 
   # The list of plugins.
 {{.V}}  plugins:
@@ -149,6 +125,11 @@ protoc_version: {{.ProtocVersion}}
       # If the directory does not exist, it will be created when running generation.
       # This needs to be a relative path.
 {{.V}}      output: ../../.gen/proto/go
+
+      # Optional override for the plugin path. For example, if you set set path to
+      # /usr/local/bin/gogo_plugin", prototool will add the
+      # "--plugin=protoc-gen-gogo=/usr/local/bin/gogo_plugin" flag to protoc calls.
+{{.V}}      path: /usr/local/bin/gogo
 
 {{.V}}    - name: yarpc-go
 {{.V}}      type: gogo

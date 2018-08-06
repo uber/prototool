@@ -47,11 +47,11 @@ func TransformerWithLogger(logger *zap.Logger) TransformerOption {
 	}
 }
 
-// TransformerWithRewrite returns a TransformerOption that will update the file options
+// TransformerWithFix returns a TransformerOption that will update the file options
 // go_package, java_package to match the package per the guidelines of the style guide.
-func TransformerWithRewrite() TransformerOption {
+func TransformerWithFix() TransformerOption {
 	return func(transformer *transformer) {
-		transformer.rewrite = true
+		transformer.fix = true
 	}
 }
 

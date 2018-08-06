@@ -38,28 +38,25 @@ const wordWrapLength uint = 80
 
 var (
 	allCmdTemplate = &cmdTemplate{
-		Use:   "all dirOrProtoFiles...",
+		Use:   "all [dirOrFile]",
 		Short: "Compile, then format and overwrite, then re-compile and generate, then lint, stopping if any step fails.",
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.All(args, flags.disableFormat, flags.disableLint, !flags.noRewrite)
+			return runner.All(args, flags.disableFormat, flags.disableLint, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
-			flags.bindNoRewrite(flagSet)
+			flags.bindFix(flagSet)
 		},
 	}
 
 	binaryToJSONCmdTemplate = &cmdTemplate{
-		Use:   "binary-to-json dirOrProtoFiles... messagePath data",
+		Use:   "binary-to-json [dirOrFile] messagePath data",
 		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.MinimumNArgs(3),
+		Args:  cobra.RangeArgs(2, 3),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.BinaryToJSON(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 		},
 	}
 
@@ -73,14 +70,14 @@ var (
 	}
 
 	compileCmdTemplate = &cmdTemplate{
-		Use:   "compile dirOrProtoFiles...",
+		Use:   "compile [dirOrFile]",
 		Short: "Compile with protoc to check for failures.",
 		Long:  `Stubs will not be generated. To generate stubs, use the "gen" command. Calling "compile" has the effect of calling protoc with "-o /dev/null".`,
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Compile(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 			flags.bindDryRun(flagSet)
 		},
 	}
@@ -106,20 +103,22 @@ This matches what the linter expects. "SOME.PKG" will be computed as follows:
 - Otherwise, if there is no "prototool.yaml" that would apply to the new file,
   use "uber.prototool.generated".
 - Otherwise, if there is a "prototool.yaml" file, check if it has a
-  "dir_to_base_package" setting under the "create" section. If it does, this
+  "packages" setting under the "create" section. If it does, this
   package, concatenated with the relative path from the directory with the
  "prototool.yaml" will be used.
-- Otherwise, if there is no "dir_to_base_package" directive, just use the
+- Otherwise, if there is no "packages" directive, just use the
   relative path from the directory with the "prototool.yaml" file. If the file
-  is in the same directory as the "prototoo.yaml" file, use
+  is in the same directory as the "prototool.yaml" file, use
   "uber.prototool.generated".
 
 For example, assume you have the following file at "repo/prototool.yaml":
 
 create:
-  dir_to_base_package:
-    idl: uber
-    idl/baz: special
+  packages:
+	- directory: idl
+	  name: uber
+	- directory: idl/baz
+	  name: special
 
 - "prototool create repo/idl/foo/bar/bar.proto" will have the package
   "uber.foo.bar".
@@ -137,13 +136,14 @@ This is meant to mimic what you generally want - a base package for your idl dir
 Note you can override the directory that the "prototool.yaml" file is in as well. If we update our file at "repo/prototool.yaml" to this:
 
 create:
-  dir_to_base_package:
-    .: foo.bar
+  packages:
+	- directory: .
+	  name: foo.bar
 
 Then "prototool create repo/bar.proto" will have the package "foo.bar", and "prototool create repo/another/dir/bar.proto" will have the package "foo.bar.another.dir".
 
 If Vim integration is set up, files will be generated when you open a new Protobuf file.`,
-
+		Args: cobra.MinimumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Create(args, flags.pkg)
 		},
@@ -153,14 +153,11 @@ If Vim integration is set up, files will be generated when you open a new Protob
 	}
 
 	descriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "descriptor-proto dirOrProtoFiles... messagePath",
+		Use:   "descriptor-proto [dirOrFile] messagePath",
 		Short: "Get the descriptor proto for the message path.",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.MaximumNArgs(2),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.DescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 		},
 	}
 
@@ -174,54 +171,52 @@ If Vim integration is set up, files will be generated when you open a new Protob
 	}
 
 	fieldDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "field-descriptor-proto dirOrProtoFiles... fieldPath",
+		Use:   "field-descriptor-proto [dirOrFile] fieldPath",
 		Short: "Get the field descriptor proto for the field path.",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.RangeArgs(1, 2),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.FieldDescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 		},
 	}
 
 	filesCmdTemplate = &cmdTemplate{
-		Use:   "files dirOrProtoFiles...",
+		Use:   "files [dirOrFile]",
 		Short: "Print all files that match the input arguments.",
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Files(args)
 		},
 	}
 
 	formatCmdTemplate = &cmdTemplate{
-		Use:   "format dirOrProtoFiles...",
+		Use:   "format [dirOrFile]",
 		Short: "Format a proto file and compile with protoc to check for failures.",
-		Long:  `By default, the values for "java_multiple_files", "java_outer_classname", and "java_package" are updated to reflect what is expected by the Google Cloud APIs file structure at https://cloud.google.com/apis/design/file_structure, and the value of "go_package" is updated to reflect what we expect for the default Style Guide. By formatting, the linting for these values will pass by default. See the documentation for "create" for an example. This functionality can be suppressed by passing the flag "--no-rewrite".`,
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, !flags.noRewrite)
+			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDiffMode(flagSet)
 			flags.bindLintMode(flagSet)
 			flags.bindOverwrite(flagSet)
-			flags.bindNoRewrite(flagSet)
+			flags.bindFix(flagSet)
 		},
 	}
 
 	genCmdTemplate = &cmdTemplate{
-		Use:   "gen dirOrProtoFiles...",
+		Use:   "gen [dirOrFile]",
 		Short: "Generate with protoc.",
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Gen(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 			flags.bindDryRun(flagSet)
 		},
 	}
 
 	grpcCmdTemplate = &cmdTemplate{
-		Use:   "grpc dirOrProtoFiles...",
+		Use:   "grpc [dirOrFile]",
 		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
 		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
 
@@ -229,7 +224,7 @@ There is a full example for gRPC in the example directory of Prototool. Run "mak
 
 Start the example server in a separate terminal by doing "go run example/cmd/excited/main.go".
 
-prototool grpc dirOrProtoFiles... \
+prototool grpc [dirOrFile] \
   --address serverAddress \
   --method package.service/Method \
   --data 'requestData'
@@ -238,21 +233,18 @@ Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" wh
 
 $ make init example # make sure everything is built just in case
 
-$ cat input.json
-{"value":"hello"}
-
-$ cat input.json | prototool grpc example \
+$ prototool grpc example \
   --address 0.0.0.0:8080 \
   --method foo.ExcitedService/Exclamation \
-  --stdin
+  --data '{"value":"hello"}'
 {
   "value": "hello!"
 }
 
-$ cat input.json | prototool grpc example \
+$ prototool grpc example \
   --address 0.0.0.0:8080 \
   --method foo.ExcitedService/ExclamationServerStream \
-  --stdin
+  --data '{"value":"hello"}'
 {
   "value": "h"
 }
@@ -294,6 +286,7 @@ $ cat input.json | prototool grpc example \
 {
   "value": "salutations!"
 }`,
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.jsonOutput)
 		},
@@ -302,7 +295,6 @@ $ cat input.json | prototool grpc example \
 			flags.bindCallTimeout(flagSet)
 			flags.bindConnectTimeout(flagSet)
 			flags.bindData(flagSet)
-			flags.bindDirMode(flagSet)
 			flags.bindHeaders(flagSet)
 			flags.bindJSONOutput(flagSet)
 			flags.bindKeepaliveTime(flagSet)
@@ -311,7 +303,7 @@ $ cat input.json | prototool grpc example \
 		},
 	}
 
-	initCmdTemplate = &cmdTemplate{
+	configInitCmdTemplate = &cmdTemplate{
 		Use:   "init [dirPath]",
 		Short: "Generate an initial config file in the current or given directory.",
 		Long:  `All available options will be generated and commented out except for "protoc_version". Pass the "--uncomment" flag to uncomment all options.`,
@@ -325,26 +317,23 @@ $ cat input.json | prototool grpc example \
 	}
 
 	jsonToBinaryCmdTemplate = &cmdTemplate{
-		Use:   "json-to-binary dirOrProtoFiles... messagePath data",
+		Use:   "json-to-binary [dirOrFile] messagePath data",
 		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.MinimumNArgs(2),
+		Args:  cobra.RangeArgs(2, 3),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.JSONToBinary(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 		},
 	}
 
 	lintCmdTemplate = &cmdTemplate{
-		Use:   "lint dirOrProtoFiles...",
+		Use:   "lint [dirOrFile]",
 		Short: "Lint proto files and compile with protoc to check for failures.",
 		Long:  `The default rule set follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. You can add or exclude lint rules in your "prototool.yaml" file. The default rule set is very strict and is meant to enforce consistent development patterns.`,
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Lint(args, flags.listAllLinters, flags.listLinters)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
 		},
@@ -369,14 +358,11 @@ $ cat input.json | prototool grpc example \
 	}
 
 	serviceDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "service-descriptor-proto dirOrProtoFiles... servicePath",
+		Use:   "service-descriptor-proto [dirOrFile] servicePath",
 		Short: "Get the service descriptor proto for the service path.",
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.RangeArgs(1, 2),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.ServiceDescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindDirMode(flagSet)
 		},
 	}
 
@@ -467,18 +453,6 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithCachePath(flags.cachePath),
-		)
-	}
-	if flags.dirMode {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithDirMode(),
-		)
-	}
-	if flags.harbormaster {
-		runnerOptions = append(
-			runnerOptions,
-			exec.RunnerWithHarbormaster(),
 		)
 	}
 	if flags.printFields != "" {

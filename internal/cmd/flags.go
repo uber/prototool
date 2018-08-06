@@ -32,11 +32,10 @@ type flags struct {
 	data           string
 	debug          bool
 	diffMode       bool
-	dirMode        bool
 	disableFormat  bool
 	disableLint    bool
 	dryRun         bool
-	harbormaster   bool
+	fix            bool
 	headers        []string
 	jsonOutput     bool
 	keepaliveTime  string
@@ -50,7 +49,6 @@ type flags struct {
 	protocURL      string
 	stdin          bool
 	uncomment      bool
-	noRewrite      bool
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -81,10 +79,6 @@ func (f *flags) bindDiffMode(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.diffMode, "diff", "d", false, "Write a diff instead of writing the formatted file to stdout.")
 }
 
-func (f *flags) bindDirMode(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.dirMode, "dir-mode", false, "Run as if the directory the file was given, but only print the errors from the file. Useful for integration with editors.")
-}
-
 func (f *flags) bindDisableFormat(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.disableFormat, "disable-format", false, "Do not run formatting.")
 }
@@ -95,10 +89,6 @@ func (f *flags) bindDisableLint(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.dryRun, "dry-run", false, "Print the protoc commands that would have been run without actually running them.")
-}
-
-func (f *flags) bindHarbormaster(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.harbormaster, "harbormaster", false, "Print failures in JSON compatible with the Harbormaster API.")
 }
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
@@ -153,6 +143,6 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
 }
 
-func (f *flags) bindNoRewrite(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.noRewrite, "no-rewrite", false, "Do not rewrite the file options go_package, java_multiple_files, java_outer_classname, and java_package to match the package per the guidelines of the style guide.")
+func (f *flags) bindFix(flagSet *pflag.FlagSet) {
+	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
 }

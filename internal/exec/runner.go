@@ -23,7 +23,6 @@ package exec
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -47,7 +46,6 @@ import (
 	"github.com/uber/prototool/internal/format"
 	"github.com/uber/prototool/internal/grpc"
 	"github.com/uber/prototool/internal/lint"
-	"github.com/uber/prototool/internal/phab"
 	"github.com/uber/prototool/internal/protoc"
 	"github.com/uber/prototool/internal/reflect"
 	"github.com/uber/prototool/internal/settings"
@@ -66,12 +64,10 @@ type runner struct {
 	input       io.Reader
 	output      io.Writer
 
-	logger       *zap.Logger
-	cachePath    string
-	protocURL    string
-	printFields  string
-	dirMode      bool
-	harbormaster bool
+	logger      *zap.Logger
+	cachePath   string
+	protocURL   string
+	printFields string
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -167,7 +163,7 @@ func (r *runner) Clean() error {
 }
 
 func (r *runner) Files(args []string) error {
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -182,7 +178,7 @@ func (r *runner) Files(args []string) error {
 }
 
 func (r *runner) Compile(args []string, dryRun bool) error {
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -192,7 +188,7 @@ func (r *runner) Compile(args []string, dryRun bool) error {
 }
 
 func (r *runner) Gen(args []string, dryRun bool) error {
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -202,13 +198,8 @@ func (r *runner) Gen(args []string, dryRun bool) error {
 }
 
 func (r *runner) DescriptorProto(args []string) error {
-	if len(args) < 1 {
-		return nil
-	}
 	path := args[len(args)-1]
-	args = args[:len(args)-1]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 2)
 	if err != nil {
 		return err
 	}
@@ -232,13 +223,8 @@ func (r *runner) DescriptorProto(args []string) error {
 }
 
 func (r *runner) FieldDescriptorProto(args []string) error {
-	if len(args) < 1 {
-		return nil
-	}
 	path := args[len(args)-1]
-	args = args[:len(args)-1]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 2)
 	if err != nil {
 		return err
 	}
@@ -262,13 +248,8 @@ func (r *runner) FieldDescriptorProto(args []string) error {
 }
 
 func (r *runner) ServiceDescriptorProto(args []string) error {
-	if len(args) < 1 {
-		return nil
-	}
 	path := args[len(args)-1]
-	args = args[:len(args)-1]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 2)
 	if err != nil {
 		return err
 	}
@@ -332,7 +313,7 @@ func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool) erro
 	if listLinters {
 		return r.listLinters()
 	}
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -396,11 +377,11 @@ func (r *runner) ListAllLintGroups() error {
 	return nil
 }
 
-func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bool) error {
+func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fix bool) error {
 	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -408,14 +389,14 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, rewrite bo
 	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, rewrite, meta)
+	return r.format(overwrite, diffMode, lintMode, fix, meta)
 }
 
-func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta) error {
+func (r *runner) format(overwrite, diffMode, lintMode, fix bool, meta *meta) error {
 	success := true
 	for _, protoFiles := range meta.ProtoSet.DirPathToFiles {
 		for _, protoFile := range protoFiles {
-			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, rewrite, meta, protoFile)
+			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, fix, meta, protoFile)
 			if err != nil {
 				return err
 			}
@@ -433,12 +414,20 @@ func (r *runner) format(overwrite, diffMode, lintMode, rewrite bool, meta *meta)
 // return true if there was no unexpected diff and we should exit with 0
 // return false if we should exit with non-zero
 // if false and nil error, we will return an ExitError outside of this function
-func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrite bool, meta *meta, protoFile *file.ProtoFile) (bool, error) {
+func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix bool, meta *meta, protoFile *file.ProtoFile) (bool, error) {
+	absSingleFilename, err := file.AbsClean(meta.SingleFilename)
+	if err != nil {
+		return false, err
+	}
+	// we are not concerned with the current file
+	if meta.SingleFilename != "" && protoFile.Path != absSingleFilename {
+		return true, nil
+	}
 	input, err := ioutil.ReadFile(protoFile.Path)
 	if err != nil {
 		return false, err
 	}
-	data, failures, err := r.newTransformer(rewrite).Transform(protoFile.Path, input)
+	data, failures, err := r.newTransformer(fix).Transform(protoFile.Path, input)
 	if err != nil {
 		return false, err
 	}
@@ -465,7 +454,7 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrit
 			}
 			return false, nil
 		}
-		//!overwrite && !lintMode && !diffMode
+		//below is !overwrite && !lintMode && !diffMode
 		if _, err := io.Copy(r.output, bytes.NewReader(data)); err != nil {
 			return false, err
 		}
@@ -482,17 +471,12 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, rewrit
 }
 
 func (r *runner) BinaryToJSON(args []string) error {
-	if len(args) < 2 {
-		return nil
-	}
 	path := args[len(args)-2]
 	data, err := r.getInputData(args[len(args)-1])
 	if err != nil {
 		return err
 	}
-	args = args[:len(args)-2]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 3)
 	if err != nil {
 		return err
 	}
@@ -513,17 +497,12 @@ func (r *runner) BinaryToJSON(args []string) error {
 }
 
 func (r *runner) JSONToBinary(args []string) error {
-	if len(args) < 2 {
-		return nil
-	}
 	path := args[len(args)-2]
 	data, err := r.getInputData(args[len(args)-1])
 	if err != nil {
 		return err
 	}
-	args = args[:len(args)-2]
-
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 3)
 	if err != nil {
 		return err
 	}
@@ -543,8 +522,8 @@ func (r *runner) JSONToBinary(args []string) error {
 	return err
 }
 
-func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) error {
-	meta, err := r.getMeta(args)
+func (r *runner) All(args []string, disableFormat, disableLint, fix bool) error {
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -553,7 +532,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, rewrite bool) er
 		return err
 	}
 	if !disableFormat {
-		if err := r.format(true, false, false, rewrite, meta); err != nil {
+		if err := r.format(true, false, false, fix, meta); err != nil {
 			return err
 		}
 	}
@@ -612,7 +591,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		}
 	}
 
-	meta, err := r.getMeta(args)
+	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
@@ -689,10 +668,10 @@ func (r *runner) newLintRunner() lint.Runner {
 	)
 }
 
-func (r *runner) newTransformer(rewrite bool) format.Transformer {
+func (r *runner) newTransformer(fix bool) format.Transformer {
 	transformerOptions := []format.TransformerOption{format.TransformerWithLogger(r.logger)}
-	if rewrite {
-		transformerOptions = append(transformerOptions, format.TransformerWithRewrite())
+	if fix {
+		transformerOptions = append(transformerOptions, format.TransformerWithFix())
 	}
 	return format.NewTransformer(transformerOptions...)
 }
@@ -753,68 +732,46 @@ type meta struct {
 	ProtoSet *file.ProtoSet
 	// this will be empty if not in dir mode
 	// if in dir mode, this will be the single filename that we want to return errors for
-	InDirModeSingleFilename string
+	SingleFilename string
 }
 
-func (r *runner) getMeta(args []string) (*meta, error) {
-	if len(args) == 0 {
-		// TODO: does not fit in with workDirPath paradigm
-		args = []string{"."}
+// lenOfArgsIfSpecified makes this function more convenient when calling above.
+// It says "if the length of args is equal to lenOfArgsIfSpecified, then args
+// contains the dirOrFile parameter as it's first argument." For example, for
+// "prototool compile [dirOrFile]", lenOfArgsIfSpecified is 1, saying that if
+// we have 1 argument, the first argument is dirOrFile, if we have zero arguments,
+// we do not and assume the current directory is the dirOrFile.
+func (r *runner) getMeta(args []string, lenOfArgsIfSpecified int) (*meta, error) {
+	// TODO: does not fit in with workDirPath paradigm
+	fileOrDir := "."
+	if len(args) == lenOfArgsIfSpecified {
+		fileOrDir = args[0]
 	}
-	if len(args) == 1 {
-		fileOrDir := args[0]
-		fileInfo, err := os.Stat(fileOrDir)
-		if err != nil {
-			return nil, err
-		}
-		if fileInfo.Mode().IsDir() {
-			protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
-			if err != nil {
-				return nil, err
-			}
-			return &meta{
-				ProtoSet: protoSet,
-			}, nil
-		}
-		// TODO: allow symlinks?
-		if fileInfo.Mode().IsRegular() {
-			if r.dirMode {
-				protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
-				if err != nil {
-					return nil, err
-				}
-				return &meta{
-					ProtoSet:                protoSet,
-					InDirModeSingleFilename: fileOrDir,
-				}, nil
-			}
-			protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, fileOrDir)
-			if err != nil {
-				return nil, err
-			}
-			return &meta{
-				ProtoSet: protoSet,
-			}, nil
-		}
-		return nil, fmt.Errorf("%s is not a directory or a regular file", fileOrDir)
-	}
-	for _, arg := range args {
-		fileInfo, err := os.Stat(arg)
-		if err != nil {
-			return nil, err
-		}
-		// TODO: allow symlinks?
-		if !fileInfo.Mode().IsRegular() {
-			return nil, fmt.Errorf("multiple arguments only allowed if all arguments are regular files, %q is not a regular file", arg)
-		}
-	}
-	protoSet, err := r.protoSetProvider.GetForFiles(r.workDirPath, args...)
+	fileInfo, err := os.Stat(fileOrDir)
 	if err != nil {
 		return nil, err
 	}
-	return &meta{
-		ProtoSet: protoSet,
-	}, nil
+	if fileInfo.Mode().IsDir() {
+		protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, fileOrDir)
+		if err != nil {
+			return nil, err
+		}
+		return &meta{
+			ProtoSet: protoSet,
+		}, nil
+	}
+	// TODO: allow symlinks?
+	if fileInfo.Mode().IsRegular() {
+		protoSet, err := r.protoSetProvider.GetForDir(r.workDirPath, filepath.Dir(fileOrDir))
+		if err != nil {
+			return nil, err
+		}
+		return &meta{
+			ProtoSet:       protoSet,
+			SingleFilename: fileOrDir,
+		}, nil
+	}
+	return nil, fmt.Errorf("%s is not a directory or a regular file", fileOrDir)
 }
 
 // TODO: we filter failures in dir mode in printFailures but above we count any failure
@@ -837,11 +794,11 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 	bufWriter := bufio.NewWriter(r.output)
 	for _, failure := range failures {
 		shouldPrint := false
-		if meta.InDirModeSingleFilename == "" || meta.InDirModeSingleFilename == failure.Filename {
+		if meta.SingleFilename == "" || meta.SingleFilename == failure.Filename {
 			shouldPrint = true
-		} else if meta.InDirModeSingleFilename != "" {
+		} else if meta.SingleFilename != "" {
 			// TODO: the compiler may not return the rel path due to logic in bestFilePath
-			absSingleFilename, err := file.AbsClean(meta.InDirModeSingleFilename)
+			absSingleFilename, err := file.AbsClean(meta.SingleFilename)
 			if err != nil {
 				return err
 			}
@@ -854,19 +811,7 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 			}
 		}
 		if shouldPrint {
-			if r.harbormaster {
-				harbormasterLintResult, err := phab.TextFailureToHarbormasterLintResult(failure)
-				if err != nil {
-					return err
-				}
-				data, err := json.Marshal(harbormasterLintResult)
-				if err != nil {
-					return err
-				}
-				if _, err := fmt.Fprintln(bufWriter, string(data)); err != nil {
-					return err
-				}
-			} else if err := failure.Fprintln(bufWriter, failureFields...); err != nil {
+			if err := failure.Fprintln(bufWriter, failureFields...); err != nil {
 				return err
 			}
 		}

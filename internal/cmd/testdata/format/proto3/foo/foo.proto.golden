@@ -13,8 +13,6 @@ option (bar.file_dep_option) = {
 }; // inline comment16
 // comment6
 option (bar.file_option) = true; // inline comment6
-// comment7
-option (bar.file_option_proto2) = true; //inline comment7
 // comment4
 option go_package = "foopb"; // inline comment4
 // comment11
@@ -25,9 +23,7 @@ option java_outer_classname = "FooProto"; // inline comment5
 option java_package = "com.foo"; // inline comment23
 
 //comment10
-import "bar/bar.proto"; //inline comment10
-// comment2
-import public "bar/bar_proto2.proto"; // inline comment2
+import "foo/bar/bar.proto"; //inline comment10
 // comment9
 import "google/protobuf/timestamp.proto"; // inline comment9
 
@@ -41,10 +37,6 @@ message Baz {
   // comment14
   // still comment14
   option (bar.message_option) = true; // inline comment14
-  //
-  //  comment c-style
-  //  
-  option (bar.message_option_proto2) = true;
   // comment15
   option (bar.message_dep_option) = {
     hello: 1

@@ -41,15 +41,15 @@ type firstPassVisitor struct {
 	haveHitNonComment bool
 
 	filename                 string
-	rewrite                  bool
+	fix                      bool
 	goPackageOption          *proto.Option
 	javaMultipleFilesOption  *proto.Option
 	javaOuterClassnameOption *proto.Option
 	javaPackageOption        *proto.Option
 }
 
-func newFirstPassVisitor(filename string, rewrite bool) *firstPassVisitor {
-	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, rewrite: rewrite}
+func newFirstPassVisitor(filename string, fix bool) *firstPassVisitor {
+	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix}
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {
@@ -68,7 +68,7 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		v.PWithInlineComment(v.Package.InlineComment, `package `, v.Package.Name, `;`)
 		v.P()
 	}
-	if v.rewrite && v.Package != nil {
+	if v.fix && v.Package != nil {
 		if v.goPackageOption == nil {
 			v.goPackageOption = &proto.Option{Name: "go_package"}
 		}
@@ -145,7 +145,7 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 	// this will only hit file options since we don't do any
 	// visiting of children in this visitor
 	v.haveHitNonComment = true
-	if v.rewrite {
+	if v.fix {
 		switch element.Name {
 		case "go_package":
 			v.goPackageOption = element

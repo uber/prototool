@@ -117,6 +117,9 @@ func get(filePath string) (Config, error) {
 	if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
 		return Config{}, err
 	}
+	if err := externalConfig.Validate(); err != nil {
+		return Config{}, fmt.Errorf("invalid external configuration: %v", err)
+	}
 	return externalConfigToConfig(externalConfig, filepath.Dir(filePath))
 }
 
@@ -124,7 +127,7 @@ func get(filePath string) (Config, error) {
 //
 // This will return a valid Config, or an error.
 func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
-	excludePrefixes, err := getExcludePrefixes(e.Excludes, e.NoDefaultExcludes, dirPath)
+	excludePrefixes, err := getExcludePrefixes(e.Excludes, dirPath)
 	if err != nil {
 		return Config{}, err
 	}
@@ -134,14 +137,12 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
 		includePath = filepath.Clean(includePath)
-		//if includePath != dirPath {
 		includePaths = append(includePaths, includePath)
-		//}
 	}
 	ignoreIDToFilePaths := make(map[string][]string)
-	for id, protoFilePaths := range e.Lint.IgnoreIDToFiles {
-		id = strings.ToUpper(id)
-		for _, protoFilePath := range protoFilePaths {
+	for _, ignore := range e.Lint.Ignores {
+		id := strings.ToUpper(ignore.ID)
+		for _, protoFilePath := range ignore.Files {
 			if !filepath.IsAbs(protoFilePath) {
 				protoFilePath = filepath.Join(dirPath, protoFilePath)
 			}
@@ -162,12 +163,6 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		if plugin.Output == "" {
 			return Config{}, fmt.Errorf("output path required for plugin %s", plugin.Name)
 		}
-		path := ""
-		if len(e.Gen.PluginOverrides) > 0 {
-			if override, ok := e.Gen.PluginOverrides[plugin.Name]; ok && override != "" {
-				path = override
-			}
-		}
 		var relPath, absPath string
 		if filepath.IsAbs(plugin.Output) {
 			absPath = filepath.Clean(plugin.Output)
@@ -181,7 +176,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		}
 		genPlugins[i] = GenPlugin{
 			Name:  plugin.Name,
-			Path:  path,
+			Path:  plugin.Path,
 			Type:  genPluginType,
 			Flags: plugin.Flags,
 			OutputPath: OutputPath{
@@ -193,9 +188,17 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	sort.Slice(genPlugins, func(i int, j int) bool { return genPlugins[i].Name < genPlugins[j].Name })
 
 	createDirPathToBasePackage := make(map[string]string)
-	for relDirPath, basePackage := range e.Create.DirToBasePackage {
+	for _, pkg := range e.Create.Packages {
+		relDirPath := pkg.Directory
+		basePackage := pkg.Name
+		if relDirPath == "" {
+			return Config{}, fmt.Errorf("directory for create package is empty")
+		}
+		if basePackage == "" {
+			return Config{}, fmt.Errorf("name for create package is empty")
+		}
 		if filepath.IsAbs(relDirPath) {
-			return Config{}, fmt.Errorf("directory for dir_to_base package must be relative: %s", relDirPath)
+			return Config{}, fmt.Errorf("directory for create package must be relative: %s", relDirPath)
 		}
 		createDirPathToBasePackage[filepath.Clean(filepath.Join(dirPath, relDirPath))] = basePackage
 	}
@@ -210,17 +213,16 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		Compile: CompileConfig{
 			ProtobufVersion:       e.ProtocVersion,
 			IncludePaths:          includePaths,
-			IncludeWellKnownTypes: e.ProtocIncludeWKT,
+			IncludeWellKnownTypes: true, // Always include the well-known types.
 			AllowUnusedImports:    e.AllowUnusedImports,
 		},
 		Create: CreateConfig{
 			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
-			IDs:                 strs.DedupeSort(e.Lint.IDs, strings.ToUpper),
-			Group:               strings.ToLower(e.Lint.Group),
-			IncludeIDs:          strs.DedupeSort(e.Lint.IncludeIDs, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSort(e.Lint.ExcludeIDs, strings.ToUpper),
+			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
+			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 		},
 		Gen: GenConfig{
@@ -251,9 +253,6 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		}
 	}
 
-	if len(config.Lint.IDs) > 0 && (len(config.Lint.Group) > 0 || len(config.Lint.IncludeIDs) > 0 || len(config.Lint.ExcludeIDs) > 0) {
-		return Config{}, fmt.Errorf("config was %v but can only specify either linters, or lint_group/lint_include/lint_exclude", e)
-	}
 	if intersection := strs.Intersection(config.Lint.IncludeIDs, config.Lint.ExcludeIDs); len(intersection) > 0 {
 		return Config{}, fmt.Errorf("config had intersection of %v between lint_include and lint_exclude", intersection)
 	}
@@ -263,30 +262,22 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 func getExcludePrefixesForDir(dirPath string) ([]string, error) {
 	filePath := filepath.Join(dirPath, DefaultConfigFilename)
 	if _, err := os.Stat(filePath); err != nil {
-		excludePrefixes := make([]string, 0, len(DefaultExcludePrefixes))
-		for _, defaultExcludePrefix := range DefaultExcludePrefixes {
-			excludePrefixes = append(excludePrefixes, filepath.Join(dirPath, defaultExcludePrefix))
-		}
-		return excludePrefixes, nil
+		return []string{}, nil
 	}
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
 	s := struct {
-		ExcludePaths          []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
-		NoDefaultExcludePaths bool     `json:"no_default_excludes,omitempty" yaml:"no_default_excludes,omitempty"`
+		ExcludePaths []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
 	}{}
 	if err := yaml.Unmarshal(data, &s); err != nil {
 		return nil, err
 	}
-	return getExcludePrefixes(s.ExcludePaths, s.NoDefaultExcludePaths, dirPath)
+	return getExcludePrefixes(s.ExcludePaths, dirPath)
 }
 
-func getExcludePrefixes(excludes []string, noDefaultExcludes bool, dirPath string) ([]string, error) {
-	if !noDefaultExcludes {
-		excludes = append(DefaultExcludePrefixes, excludes...)
-	}
+func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 	excludePrefixes := make([]string, 0, len(excludes))
 	for _, excludePrefix := range strs.DedupeSort(excludes, nil) {
 		if !filepath.IsAbs(excludePrefix) {

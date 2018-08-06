@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - No changes yet.
 
 
+## [0.6.0] - 2018-08-03
+### Changed
+- Delete the ability to explicitly specify multiple files, and have the effect
+  of one file being specified be the same as the former `--dir-mode`. See
+  [#16](https://github.com/uber/prototool/issues/16) for more details.
+- Delete `protoc_include_wkt` setting. This is always set to true.
+- Delete `no_default_excludes` setting. This is always set to true.
+- Delete `gen.go_options.no_default_modifiers` setting.
+- Delete `lint.group` setting.
+- Delete `harbormaster` global flag.
+- Refactor `create.dir_to_base_package` to the list `create.packages` See
+  the documentation for more details.
+- Rename `create.dir_to_base_package` -> `create.dir_to_package`.
+- Move `prototool init` to `prototool config init`.
+- Move `gen.plugin_overrides` to `gen.plugins.path`.
+- Refactor `lint` configuration. See the documentation for details.
+- Refactor `format --no-rewrite` so that the previous default is now enabled via
+  `format --fix`.
+### Fixed
+- Fix `excludes` setting to correctly match file path prefixes.
+
+
 ## [0.5.0] - 2018-07-26
 ### Added
 - A linter to verify that no enum uses the option `allow_alias.`
@@ -96,7 +118,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/uber/prototool/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/uber/prototool/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/uber/prototool/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/uber/prototool/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/uber/prototool/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/uber/prototool/compare/v0.2.0...v0.3.0

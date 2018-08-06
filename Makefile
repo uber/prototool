@@ -37,13 +37,13 @@ golden: install
 		rm -f $${file}; \
 	done
 	for file in $(shell find internal/cmd/testdata/format -name '*.proto'); do \
-		prototool format --no-rewrite $${file} > $${file}.golden || true; \
+		prototool format $${file} > $${file}.golden || true; \
 	done
-	for file in $(shell find internal/cmd/testdata/format-rewrite -name '*.proto.golden'); do \
+	for file in $(shell find internal/cmd/testdata/format-fix -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
-	for file in $(shell find internal/cmd/testdata/format-rewrite -name '*.proto'); do \
-		prototool format $${file} > $${file}.golden || true; \
+	for file in $(shell find internal/cmd/testdata/format-fix -name '*.proto'); do \
+		prototool format --fix $${file} > $${file}.golden || true; \
 	done
 
 .PHONY: example
@@ -65,7 +65,7 @@ example: install
 internalgen: install
 	prototool gen internal/cmd/testdata/grpc
 	rm -f etc/config/example/prototool.yaml
-	prototool init etc/config/example --uncomment
+	prototool config init etc/config/example --uncomment
 
 .PHONY: generate
 generate: license golden example internalgen
