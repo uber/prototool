@@ -1,7 +1,7 @@
 # The Protobuf version to use from https://github.com/google/protobuf/releases.
-# By default use 3.6.0.
+# By default use 3.6.1.
 # You probably want to set this to make your builds completely reproducible.
-protoc_version: 3.6.0
+protoc_version: 3.6.1
 
 # Paths to exclude from protoc.
 excludes:
