@@ -144,7 +144,7 @@ Format a Protobuf file and print the formatted file to stdout. There are flags t
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
 
-Conretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
+Concretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
 [Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the value of `go_package` is updated to reflect what we expect for the
 default Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
 
