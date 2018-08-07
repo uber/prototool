@@ -82,7 +82,14 @@ func (d *downloader) ProtocPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(basePath, "bin", "protoc"), nil
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		return filepath.Join(basePath, "bin", "protoc"), nil
+	case "windows":
+		return filepath.Join(basePath, "bin", "protoc.exe"), nil
+	default:
+		return "", fmt.Errorf("unsupported value for runtime.GOOS: %v", runtime.GOOS)
+	}
 }
 
 func (d *downloader) WellKnownTypesIncludePath() (string, error) {
@@ -249,13 +256,24 @@ func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf(
-		"https://github.com/google/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
-		d.config.Compile.ProtobufVersion,
-		d.config.Compile.ProtobufVersion,
-		protocS,
-		unameM,
-	), nil
+	switch goos {
+	case "darwin", "linux":
+		return fmt.Sprintf(
+			"https://github.com/google/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
+			d.config.Compile.ProtobufVersion,
+			d.config.Compile.ProtobufVersion,
+			protocS,
+			unameM,
+		), nil
+	case "windows":
+		return fmt.Sprintf(
+			"https://github.com/google/protobuf/releases/download/v%s/protoc-%s-win32.zip",
+			d.config.Compile.ProtobufVersion,
+			d.config.Compile.ProtobufVersion,
+		), nil
+	default:
+		return "", fmt.Errorf("unsupported value for runtime.GOOS: %v", runtime.GOOS)
+	}
 }
 
 func (d *downloader) getBasePath() (string, error) {
@@ -318,6 +336,8 @@ func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(stri
 		return filepath.Join(home, "Library", "Caches", "prototool", unameS, unameM), nil
 	case "Linux":
 		return filepath.Join(home, ".cache", "prototool", unameS, unameM), nil
+	case "Windows":
+		return filepath.Join(home, ".cache", "prototool", unameS, unameM), nil
 	default:
 		return "", fmt.Errorf("invalid value for uname -s: %v", unameS)
 	}
@@ -329,6 +349,8 @@ func getProtocSPath(goos string) (string, error) {
 		return "osx", nil
 	case "linux":
 		return "linux", nil
+	case "windows":
+		return "windows", nil
 	default:
 		return "", fmt.Errorf("unsupported value for runtime.GOOS: %v", goos)
 	}
@@ -341,6 +363,8 @@ func getUnameSUnameMPaths(goos string, goarch string) (string, string, error) {
 		unameS = "Darwin"
 	case "linux":
 		unameS = "Linux"
+	case "windows":
+		unameS = "Windows"
 	default:
 		return "", "", fmt.Errorf("unsupported value for runtime.GOOS: %v", goos)
 	}
