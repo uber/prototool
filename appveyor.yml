@@ -1,0 +1,18 @@
+version: '{build}'
+platform: x64
+clone_depth: 2
+clone_folder: c:\gopath\src\github.com\uber\prototool
+environment:
+  GOPATH: c:\gopath
+  matrix:
+    - GOVERSION: 1.10.3
+install:
+  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - rmdir c:\go /s /q
+  - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.zip
+  - 7z x go%GOVERSION%.windows-amd64.zip -y -oC:\ > NUL
+build_script:
+  - go get github.com/Masterminds/glide
+  - glide install
+test_script:
+  - go test -v -race ./internal/...

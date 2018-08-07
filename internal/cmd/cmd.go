@@ -142,7 +142,7 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 
 func checkOS() error {
 	switch runtime.GOOS {
-	case "darwin", "linux":
+	case "darwin", "linux", "windows":
 		return nil
 	default:
 		return fmt.Errorf("%s is not a supported operating system", runtime.GOOS)

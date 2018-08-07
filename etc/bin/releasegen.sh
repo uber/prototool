@@ -9,6 +9,7 @@ goos() {
   case "${1}" in
     Darwin) echo darwin ;;
     Linux) echo linux ;;
+    Windows) echo windows ;;
     *) return 1 ;;
   esac
 }
@@ -23,7 +24,7 @@ goarch() {
 BASE_DIR="release"
 rm -rf "${BASE_DIR}"
 
-for os in Darwin Linux; do
+for os in Darwin Linux Windows; do
   for arch in x86_64; do
     dir="${BASE_DIR}/${os}/${arch}/prototool"
     tar_context_dir="$(dirname "${dir}")"
