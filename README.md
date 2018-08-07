@@ -322,7 +322,7 @@ The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs
 " documentation. Vundle does not allow setting branches, so on Vundle,
 " go into plug directory and checkout the branch of the release you are on.
 Plug 'w0rp/ale'
-Plug 'uber/prototool' { 'rtp':'vim/prototool' }
+Plug 'uber/prototool', { 'rtp':'vim/prototool' }
 
 " We recommend setting just this for Golang, as well as the necessary set for proto.
 let g:ale_linters = {
