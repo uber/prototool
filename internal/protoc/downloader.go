@@ -327,9 +327,13 @@ func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(stri
 	if xdgCacheHome != "" {
 		return filepath.Join(xdgCacheHome, "prototool", unameS, unameM), nil
 	}
-	home := getenvFunc("HOME")
+	homeVar := "HOME"
+	if unameS == "Windows" {
+		homeVar = "HOMEPATH"
+	}
+	home := getenvFunc(homeVar)
 	if home == "" {
-		return "", fmt.Errorf("HOME is not set")
+		return "", fmt.Errorf("%s is not set", homeVar)
 	}
 	switch unameS {
 	case "Darwin":

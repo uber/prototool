@@ -36,7 +36,7 @@ type Downloader interface {
 	// This will download to ${XDG_CACHE_HOME}/prototool/$(uname -s)/$(uname -m)
 	// unless overridden by a DownloaderOption.
 	// If ${XDG_CACHE_HOME} is not set, it defaults to ${HOME}/Library/Caches on
-	// Darwin, and ${HOME}/.cache on Linux and Windows.
+	// Darwin, ${HOME}/.cache on Linux, and ${HOMEPATH}\.cache on Windows.
 	// If ${HOME} is not set, an error will be returned.
 	//
 	// Returns the path to the downloaded protobuf artifacts.
