@@ -11,5 +11,8 @@ install:
   - rmdir c:\go /s /q
   - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.zip
   - 7z x go%GOVERSION%.windows-amd64.zip -y -oC:\ > NUL
+build_script:
+  - go get github.com/Masterminds/glide
+  - glide install
 test_script:
-  - make ci
+  - go test ./internal/...
