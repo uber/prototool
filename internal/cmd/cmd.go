@@ -115,7 +115,6 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())
-	flags.bindProtocURL(rootCmd.PersistentFlags())
 
 	if develMode {
 		rootCmd.AddCommand(binaryToJSONCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
