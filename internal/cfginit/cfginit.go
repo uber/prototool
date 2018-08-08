@@ -33,10 +33,6 @@ var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when sea
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
 
-# If not set, compile will fail if there are unused imports.
-# Setting this will ignore unused imports.
-{{.V}}allow_unused_imports: true
-
 # Protoc directives.
 protoc:
   # The Protobuf version to use from https://github.com/google/protobuf/releases.
@@ -50,6 +46,10 @@ protoc:
   {{.V}}includes:
   {{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
 
+
+  # If not set, compile will fail if there are unused imports.
+  # Setting this will ignore unused imports.
+  {{.V}}allow_unused_imports: true
 
 # Create directives.
 {{.V}}create:

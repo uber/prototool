@@ -441,22 +441,20 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 		goFlags = append(goFlags, genPlugin.Flags)
 	}
 	genGoPluginOptions := protoSet.Config.Gen.GoPluginOptions
-	if !genGoPluginOptions.NoDefaultModifiers {
-		modifiers := make(map[string]string)
-		for subDirPath, protoFiles := range protoSet.DirPathToFiles {
-			// you cannot include the files in the same package in the Mfile=package map
-			// or otherwise protoc-gen-go, protoc-gen-gogo, etc freak out and put
-			// these packages in as imports
-			if subDirPath != dirPath {
-				for _, protoFile := range protoFiles {
-					path, err := filepath.Rel(protoSet.Config.DirPath, protoFile.Path)
-					if err != nil {
-						// TODO: best effort, maybe error
-						path = protoFile.Path
-					}
-					// TODO: if relative path in OutputPath.RelPath jumps out of import path context, this will be wrong
-					modifiers[path] = filepath.Clean(filepath.Join(genGoPluginOptions.ImportPath, genPlugin.OutputPath.RelPath, filepath.Dir(path)))
+	modifiers := make(map[string]string)
+	for subDirPath, protoFiles := range protoSet.DirPathToFiles {
+		// you cannot include the files in the same package in the Mfile=package map
+		// or otherwise protoc-gen-go, protoc-gen-gogo, etc freak out and put
+		// these packages in as imports
+		if subDirPath != dirPath {
+			for _, protoFile := range protoFiles {
+				path, err := filepath.Rel(protoSet.Config.DirPath, protoFile.Path)
+				if err != nil {
+					// TODO: best effort, maybe error
+					path = protoFile.Path
 				}
+				// TODO: if relative path in OutputPath.RelPath jumps out of import path context, this will be wrong
+				modifiers[path] = filepath.Clean(filepath.Join(genGoPluginOptions.ImportPath, genPlugin.OutputPath.RelPath, filepath.Dir(path)))
 			}
 		}
 		for key, value := range modifiers {
