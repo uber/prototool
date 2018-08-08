@@ -85,10 +85,11 @@ Prototool operates using a config file named `prototool.yaml`. For non-trivial u
 Recommended base config file:
 
 ```yaml
-protoc_version: 3.6.1
+protoc:
+  version: 3.6.1
 ```
 
-The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc_version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
+The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc.version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
@@ -120,7 +121,7 @@ Let's go over some of the basic commands.
 
 ##### `prototool config init`
 
-Create a `prototool.yaml` file in the current directory, with all options except `protoc_version` commented out.
+Create a `prototool.yaml` file in the current directory, with all options except `protoc.version` commented out.
 
 ##### `prototool compile`
 
@@ -143,7 +144,7 @@ Format a Protobuf file and print the formatted file to stdout. There are flags t
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
 
-Conretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
+Concretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
 [Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the value of `go_package` is updated to reflect what we expect for the
 default Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
 
@@ -297,7 +298,7 @@ $ cat input.json | prototool grpc example \
 
 Prototool is meant to help enforce a consistent development style for Protobuf, and as such you should follow some basic rules:
 
-- Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc_includes` to denote extra include directories, this is not recommended.
+- Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc.includes` to denote extra include directories, this is not recommended.
 - Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package`, `java_multiple_files`, `java_outer_classname`, and `java_package`.
 - Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool gen` do the best job.
 
@@ -321,7 +322,7 @@ The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs
 " documentation. Vundle does not allow setting branches, so on Vundle,
 " go into plug directory and checkout the branch of the release you are on.
 Plug 'w0rp/ale'
-Plug 'uber/prototool' { 'rtp':'vim/prototool' }
+Plug 'uber/prototool', { 'rtp':'vim/prototool' }
 
 " We recommend setting just this for Golang, as well as the necessary set for proto.
 let g:ale_linters = {

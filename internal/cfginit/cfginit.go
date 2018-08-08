@@ -29,24 +29,27 @@ import (
 )
 
 var tmpl = template.Must(template.New("tmpl").Parse(`# The Protobuf version to use from https://github.com/google/protobuf/releases.
-# By default use {{.ProtocVersion}}.
-# You probably want to set this to make your builds completely reproducible.
-protoc_version: {{.ProtocVersion}}
+# If not set, compile will fail if there are unused imports.
+# Setting this will ignore unused imports.
+{{.V}}allow_unused_imports: true
 
 # Paths to exclude from protoc.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
 
-# Additional paths to include with -I to protoc.
-# By default, the directory of the config file is included,
-# or the current directory if there is no config file.
-{{.V}}protoc_includes:
-{{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+# Protoc directives.
+protoc:
+  # By default use {{.ProtocVersion}}.
+  # You probably want to set this to make your builds completely reproducible.
+  version: {{.ProtocVersion}}
 
-# If not set, compile will fail if there are unused imports.
-# Setting this will ignore unused imports.
-{{.V}}allow_unused_imports: true
+  # Additional paths to include with -I to protoc.
+  # By default, the directory of the config file is included,
+  # or the current directory if there is no config file.
+  {{.V}}includes:
+  {{.V}}  - ../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
+
 
 # Create directives.
 {{.V}}create:

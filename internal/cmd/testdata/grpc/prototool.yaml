@@ -1,4 +1,3 @@
-protoc_include_wkt: true
 lint:
   rules:
     remove:
