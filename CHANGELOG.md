@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Move `protoc_includes` and `protoc_version` settings under `protoc` key.
 - Move `allow_unused_imports` to `protoc.allow_unused_imports`.
+- Move `protoc-url` global flag under the applicable commands: all,
+  compile, format, gen, and lint.
 
 
 ## [0.6.0] - 2018-08-03
