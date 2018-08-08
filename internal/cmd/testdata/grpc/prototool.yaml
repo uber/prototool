@@ -2,7 +2,7 @@ lint:
   rules:
     remove:
       - REQUEST_RESPONSE_TYPES_UNIQUE
-gen:
+generate:
   go_options:
     import_path: github.com/uber/prototool/internal/cmd/testdata/grpc
   plugins:
