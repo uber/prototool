@@ -48,6 +48,7 @@ var (
 		fileOptionsEqualJavaMultipleFilesTrueLinter,
 		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
 		fileOptionsEqualJavaPackageComPrefixLinter,
+		fileOptionsGoPackageNotLongFormLinter,
 		fileOptionsGoPackageSameInDirLinter,
 		fileOptionsJavaMultipleFilesSameInDirLinter,
 		fileOptionsJavaPackageSameInDirLinter,
