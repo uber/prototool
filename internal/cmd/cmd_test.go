@@ -331,6 +331,12 @@ func TestLint(t *testing.T) {
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
 		"testdata/lint/keyword/package_starts_with_keyword.proto",
 	)
+	assertDoLintFile(
+		t,
+		false,
+		`5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
+		"testdata/lint/gopackagelongform/gopackagelongform.proto",
+	)
 }
 
 func TestGoldenFormat(t *testing.T) {

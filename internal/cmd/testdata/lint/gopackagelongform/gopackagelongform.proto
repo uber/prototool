@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package foo;
+
+option go_package = "path/to/foo;foopb";
+option java_multiple_files = true;
+option java_outer_classname = "GopackagelongformProto";
+option java_package = "com.foo";

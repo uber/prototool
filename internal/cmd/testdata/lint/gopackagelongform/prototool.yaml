@@ -1,0 +1,4 @@
+lint:
+  rules:
+    remove:
+      - FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
