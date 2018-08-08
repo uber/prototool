@@ -15,7 +15,6 @@ Prototool lets you:
 
 Prototool accomplishes this by downloading and calling protoc on the fly for you, handing error messages from protoc and your plugins, and using the generated FileDescriptorSets for internal functionality, as well as wrapping a few great external libraries already in the Protobuf ecosystem.
 
-  * [Current Status](#current-status)
   * [Installation](#installation)
   * [Quick Start](#quick-start)
   * [Full Example](#full-example)
@@ -35,10 +34,6 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
   * [Vim Integration](#vim-integration)
   * [Development](#development)
   * [Special Thanks](#special-thanks)
-
-## Current Status
-
-Prototool is stil in the beta stages, and should not be used in production yet. Expect breaking changes before the v1.0 release. To help with development, head to the [Development](#development) section and follow along!
 
 ## Installation
 

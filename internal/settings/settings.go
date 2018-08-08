@@ -197,11 +197,6 @@ type GenGoPluginOptions struct {
 	// The base import path. This should be the go path of the prototool.yaml file.
 	// This is required for go plugins.
 	ImportPath string
-	// Do not include default modifiers with Mfile=package.
-	// By default, modifiers are included for the Well-Known Types, and for
-	// all files in the compilation relative to the import path.
-	// Generally do not set this unless you know what you are doing.
-	NoDefaultModifiers bool
 	// ExtraModifiers to include with Mfile=package.
 	ExtraModifiers map[string]string
 }
@@ -242,11 +237,11 @@ type OutputPath struct {
 //
 // It is meant to be set by a YAML or JSON config file, or flags.
 type ExternalConfig struct {
-	AllowUnusedImports bool     `json:"allow_unused_imports,omitempty" yaml:"allow_unused_imports,omitempty"`
-	Excludes           []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
-	Protoc             struct {
-		Version  string   `json:"version,omitempty" yaml:"version,omitempty"`
-		Includes []string `json:"includes,omitempty" yaml:"includes,omitempty"`
+	Excludes []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
+	Protoc   struct {
+		AllowUnusedImports bool     `json:"allow_unused_imports,omitempty" yaml:"allow_unused_imports,omitempty"`
+		Version            string   `json:"version,omitempty" yaml:"version,omitempty"`
+		Includes           []string `json:"includes,omitempty" yaml:"includes,omitempty"`
 	} `json:"protoc,omitempty" yaml:"protoc,omitempty"`
 	Create struct {
 		Packages []struct {
@@ -267,9 +262,8 @@ type ExternalConfig struct {
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
 	Gen struct {
 		GoOptions struct {
-			ImportPath         string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
-			NoDefaultModifiers bool              `json:"no_default_modifiers,omitempty" yaml:"no_default_modifiers,omitempty"`
-			ExtraModifiers     map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`
+			ImportPath     string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
+			ExtraModifiers map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`
 		} `json:"go_options,omitempty" yaml:"go_options,omitempty"`
 		Plugins []struct {
 			Name   string `json:"name,omitempty" yaml:"name,omitempty"`
@@ -279,16 +273,6 @@ type ExternalConfig struct {
 			Path   string `json:"path,omitempty" yaml:"path,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"gen,omitempty" yaml:"gen,omitempty"`
-}
-
-// Validate returns an error if any of the restricted, yet previously supported,
-// ExternalConfig attributes are set. This includes:
-//   - Gen.GoOptions.NoDefaultModifiers
-func (e ExternalConfig) Validate() error {
-	if e.Gen.GoOptions.NoDefaultModifiers {
-		return fmt.Errorf("gen.go_options.no_default_modifiers is not a configurable setting")
-	}
-	return nil
 }
 
 // ConfigProvider provides Configs.

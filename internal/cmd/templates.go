@@ -48,6 +48,7 @@ var (
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
 			flags.bindFix(flagSet)
+			flags.bindProtocURL(flagSet)
 		},
 	}
 
@@ -79,6 +80,7 @@ var (
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDryRun(flagSet)
+			flags.bindProtocURL(flagSet)
 		},
 	}
 
@@ -200,6 +202,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindLintMode(flagSet)
 			flags.bindOverwrite(flagSet)
 			flags.bindFix(flagSet)
+			flags.bindProtocURL(flagSet)
 		},
 	}
 
@@ -212,6 +215,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDryRun(flagSet)
+			flags.bindProtocURL(flagSet)
 		},
 	}
 
@@ -300,6 +304,7 @@ $ cat input.json | prototool grpc example \
 			flags.bindKeepaliveTime(flagSet)
 			flags.bindMethod(flagSet)
 			flags.bindStdin(flagSet)
+			flags.bindProtocURL(flagSet)
 		},
 	}
 
@@ -336,6 +341,7 @@ $ cat input.json | prototool grpc example \
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
+			flags.bindProtocURL(flagSet)
 		},
 	}
 
