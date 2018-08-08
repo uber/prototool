@@ -117,9 +117,6 @@ func get(filePath string) (Config, error) {
 	if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
 		return Config{}, err
 	}
-	if err := externalConfig.Validate(); err != nil {
-		return Config{}, fmt.Errorf("invalid external configuration: %v", err)
-	}
 	return externalConfigToConfig(externalConfig, filepath.Dir(filePath))
 }
 
@@ -214,7 +211,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			ProtobufVersion:       e.Protoc.Version,
 			IncludePaths:          includePaths,
 			IncludeWellKnownTypes: true, // Always include the well-known types.
-			AllowUnusedImports:    e.AllowUnusedImports,
+			AllowUnusedImports:    e.Protoc.AllowUnusedImports,
 		},
 		Create: CreateConfig{
 			DirPathToBasePackage: createDirPathToBasePackage,
@@ -227,9 +224,8 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
-				ImportPath:         e.Gen.GoOptions.ImportPath,
-				NoDefaultModifiers: e.Gen.GoOptions.NoDefaultModifiers,
-				ExtraModifiers:     e.Gen.GoOptions.ExtraModifiers,
+				ImportPath:     e.Gen.GoOptions.ImportPath,
+				ExtraModifiers: e.Gen.GoOptions.ExtraModifiers,
 			},
 			Plugins: genPlugins,
 		},
