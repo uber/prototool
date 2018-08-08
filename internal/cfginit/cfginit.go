@@ -28,8 +28,7 @@ import (
 	"html/template"
 )
 
-var tmpl = template.Must(template.New("tmpl").Parse(`# The Protobuf version to use from https://github.com/google/protobuf/releases.
-# Paths to exclude from protoc.
+var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when searching for Protobuf files.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
@@ -40,6 +39,7 @@ var tmpl = template.Must(template.New("tmpl").Parse(`# The Protobuf version to u
 
 # Protoc directives.
 protoc:
+  # The Protobuf version to use from https://github.com/google/protobuf/releases.
   # By default use {{.ProtocVersion}}.
   # You probably want to set this to make your builds completely reproducible.
   version: {{.ProtocVersion}}
