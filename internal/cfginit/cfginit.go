@@ -92,7 +92,7 @@ protoc:
 {{.V}}      - ENUM_NAMES_CAMEL_CASE
 
 # Code generation directives.
-{{.V}}gen:
+{{.V}}generate:
   # Options that will apply to all plugins of type go and gogo.
 {{.V}}  go_options:
     # The base import path. This should be the go path of the prototool.yaml file.

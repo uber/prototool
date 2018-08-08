@@ -272,7 +272,7 @@ type ExternalConfig struct {
 			Output string `json:"output,omitempty" yaml:"output,omitempty"`
 			Path   string `json:"path,omitempty" yaml:"path,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
-	} `json:"gen,omitempty" yaml:"gen,omitempty"`
+	} `json:"generate,omitempty" yaml:"generate,omitempty"`
 }
 
 // ConfigProvider provides Configs.

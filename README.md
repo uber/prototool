@@ -23,7 +23,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
   * [Command Overview](#command-overview)
     * [prototool config init](#prototool-config-init)
     * [prototool compile](#prototool-compile)
-    * [prototool gen](#prototool-gen)
+    * [prototool generate](#prototool-generate)
     * [prototool lint](#prototool-lint)
     * [prototool format](#prototool-format)
     * [prototool create](#prototool-create)
@@ -63,7 +63,7 @@ prototool create foo.proto # create the file foo.proto from a template that pass
 prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml files
 prototool lint --list-linters # list all current lint rules being used
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
-prototool gen idl/uber # generate stubs, see the generation directives in the config file example
+prototool generate idl/uber # generate stubs, see the generation directives in the config file example
 prototool grpc idl/uber --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --data '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
 ```
 
@@ -122,7 +122,7 @@ Create a `prototool.yaml` file in the current directory, with all options except
 
 Compile your Protobuf files, but do not generate stubs. This has the effect of calling `protoc` with `-o /dev/null`.
 
-##### `prototool gen`
+##### `prototool generate`
 
 Compile your Protobuf files and generate stubs according to the rules in your `prototool.yaml` file. See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for an example.
 
@@ -295,7 +295,7 @@ Prototool is meant to help enforce a consistent development style for Protobuf, 
 
 - Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc.includes` to denote extra include directories, this is not recommended.
 - Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package`, `java_multiple_files`, `java_outer_classname`, and `java_package`.
-- Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool gen` do the best job.
+- Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool generate` do the best job.
 
 ## Vim Integration
 
