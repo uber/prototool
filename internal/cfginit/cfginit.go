@@ -28,18 +28,18 @@ import (
 	"html/template"
 )
 
-var tmpl = template.Must(template.New("tmpl").Parse(`# The Protobuf version to use from https://github.com/google/protobuf/releases.
-# If not set, compile will fail if there are unused imports.
-# Setting this will ignore unused imports.
-{{.V}}allow_unused_imports: true
-
-# Paths to exclude from protoc.
+var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when searching for Protobuf files.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
 
+# If not set, compile will fail if there are unused imports.
+# Setting this will ignore unused imports.
+{{.V}}allow_unused_imports: true
+
 # Protoc directives.
 protoc:
+  # The Protobuf version to use from https://github.com/google/protobuf/releases.
   # By default use {{.ProtocVersion}}.
   # You probably want to set this to make your builds completely reproducible.
   version: {{.ProtocVersion}}
@@ -93,7 +93,7 @@ protoc:
 
 # Code generation directives.
 {{.V}}gen:
-  # Options that will apply to all plugins of type go, gogo, gogrpc, gogogrpc.
+  # Options that will apply to all plugins of type go and gogo.
 {{.V}}  go_options:
     # The base import path. This should be the go path of the prototool.yaml file.
     # This is required if you have any go plugins.
