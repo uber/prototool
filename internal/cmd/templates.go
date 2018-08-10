@@ -206,8 +206,8 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 	}
 
-	genCmdTemplate = &cmdTemplate{
-		Use:   "gen [dirOrFile]",
+	generateCmdTemplate = &cmdTemplate{
+		Use:   "generate [dirOrFile]",
 		Short: "Generate with protoc.",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {

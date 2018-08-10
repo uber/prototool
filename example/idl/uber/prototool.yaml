@@ -13,7 +13,7 @@ lint:
     - id: REQUEST_RESPONSE_TYPES_UNIQUE
       files:
         - foo/foo.proto
-gen:
+generate:
   go_options:
     import_path: github.com/uber/prototool/example/idl/uber
     extra_modifiers:
