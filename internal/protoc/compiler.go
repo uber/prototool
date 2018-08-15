@@ -457,19 +457,20 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 				modifiers[path] = filepath.Clean(filepath.Join(genGoPluginOptions.ImportPath, genPlugin.OutputPath.RelPath, filepath.Dir(path)))
 			}
 		}
-		for key, value := range modifiers {
-			goFlags = append(goFlags, fmt.Sprintf("M%s=%s", key, value))
+	}
+	for key, value := range modifiers {
+		goFlags = append(goFlags, fmt.Sprintf("M%s=%s", key, value))
+	}
+	if protoSet.Config.Compile.IncludeWellKnownTypes {
+		var wktModifiers map[string]string
+		// one of these two must be true, we validate this above
+		if genPlugin.Type.IsGo() {
+			wktModifiers = wkt.FilenameToGoModifierMap
+		} else if genPlugin.Type.IsGogo() {
+			wktModifiers = wkt.FilenameToGogoModifierMap
 		}
-		if protoSet.Config.Compile.IncludeWellKnownTypes {
-			// one of these two must be true, we validate this above
-			if genPlugin.Type.IsGo() {
-				modifiers = wkt.FilenameToGoModifierMap
-			} else if genPlugin.Type.IsGogo() {
-				modifiers = wkt.FilenameToGogoModifierMap
-			}
-			for key, value := range modifiers {
-				goFlags = append(goFlags, fmt.Sprintf("M%s=%s", key, value))
-			}
+		for key, value := range wktModifiers {
+			goFlags = append(goFlags, fmt.Sprintf("M%s=%s", key, value))
 		}
 	}
 	for key, value := range genGoPluginOptions.ExtraModifiers {
