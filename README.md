@@ -40,7 +40,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
 Install Prototool from GitHub Releases.
 
 ```
-curl -sSL https://github.com/uber/prototool/releases/download/v0.7.0/prototool-$(uname -s)-$(uname -m) \
+curl -sSL https://github.com/uber/prototool/releases/download/v0.7.1/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
   chmod +x /usr/local/bin/prototool
 ```
