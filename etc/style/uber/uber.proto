@@ -100,7 +100,7 @@ import "google/protobuf/empty.proto";
 // must be explicitly set. For example:
 //
 // enum TrafficLight {
-//     TRAFIIC_LIGHT_INVALID = 0;
+//     TRAFFIC_LIGHT_INVALID = 0;
 //     TRAFFIC_LIGHT_UNSET = 1;
 //     TRAFFIC_LIGHT_GREEN = 2;
 //     TRAFFIC_LIGHT_YELLOW = 3;
