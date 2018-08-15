@@ -23,7 +23,7 @@ vendor:
 .PHONY: install
 install:
 	go install \
-		-ldflags "-X 'github.com/uber/prototool/internal/x/vars.GitCommit=$(shell git rev-list -1 HEAD)' -X 'github.com/uber/prototool/internal/x/vars.BuiltTimestamp=$(shell date -u)'" \
+		-ldflags "-X 'github.com/uber/prototool/internal/vars.GitCommit=$(shell git rev-list -1 HEAD)' -X 'github.com/uber/prototool/internal/vars.BuiltTimestamp=$(shell date -u)'" \
 		$(BINS)
 
 .PHONY: license
