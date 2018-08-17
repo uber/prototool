@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - No changes yet.
 
 
+## [1.0.0-rc1] 2018-08-16
+### Fixed
+- Fixed regression where `prototool version` did not output 'Git commit' and
+  'Built'.
+
+
+## [0.7.1] 2018-08-15
+### Fixed
+- Fixed an issue where Golang `Mname=package` modifiers were being duplicated.
+
+
 ## [0.7.0] - 2018-08-09
 ### Changed
 - Move `protoc_includes` and `protoc_version` settings under `protoc` key.
@@ -127,7 +138,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/uber/prototool/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/uber/prototool/compare/v1.0.0-rc1...HEAD
+[1.0.0-rc1]: https://github.com/uber/prototool/compare/v0.7.1...v1.0.0-rc1
+[0.7.1]: https://github.com/uber/prototool/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/uber/prototool/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/uber/prototool/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/uber/prototool/compare/v0.4.0...v0.5.0
