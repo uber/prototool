@@ -380,8 +380,11 @@ $ cat input.json | prototool grpc example \
 		Use:   "version",
 		Short: "Print the version.",
 		Args:  cobra.NoArgs,
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindOutput(flagSet)
+		},
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Version()
+			return runner.Version(flags.outputFormat)
 		},
 	}
 )
