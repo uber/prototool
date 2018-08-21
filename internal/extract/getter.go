@@ -166,7 +166,7 @@ func (g *getter) GetService(fileDescriptorSets []*descriptor.FileDescriptorSet, 
 }
 
 // TODO: we don't actually do full path resolution per the descriptor.proto spec
-// https://github.com/google/protobuf/blob/master/src/google/protobuf/descriptor.proto#L185
+// https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/descriptor.proto#L185
 
 func findDescriptorProto(path string, fileDescriptorProto *descriptor.FileDescriptorProto) (*descriptor.DescriptorProto, error) {
 	if fileDescriptorProto.GetPackage() == "" {
