@@ -140,7 +140,7 @@ type Config struct {
 
 // CompileConfig is the compile config.
 type CompileConfig struct {
-	// The Protobuf version to use from https://github.com/google/protobuf/releases.
+	// The Protobuf version to use from https://github.com/protocolbuffers/protobuf/releases.
 	// Must have a valid protoc zip file asset, so for example 3.5.0 is a valid version
 	// but 3.5.0.1 is not.
 	ProtobufVersion string

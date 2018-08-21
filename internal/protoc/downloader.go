@@ -221,7 +221,7 @@ func (d *downloader) getDownloadData(goos string, goarch string) (_ []byte, retE
 			// download this from GitHub Releases, so add
 			// extra context to the error message
 			if d.protocURL == "" {
-				return nil, fmt.Errorf("error downloading %s: %v\nMake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/google/protobuf/releases/v%s\nNote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
+				return nil, fmt.Errorf("error downloading %s: %v\nMake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/protocolbuffers/protobuf/releases/v%s\nNote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
 			}
 			return nil, err
 		}
@@ -250,7 +250,7 @@ func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf(
-		"https://github.com/google/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
+		"https://github.com/protocolbuffers/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
 		d.config.Compile.ProtobufVersion,
 		d.config.Compile.ProtobufVersion,
 		protocS,

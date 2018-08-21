@@ -35,7 +35,7 @@ var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when sea
 
 # Protoc directives.
 protoc:
-  # The Protobuf version to use from https://github.com/google/protobuf/releases.
+  # The Protobuf version to use from https://github.com/protocolbuffers/protobuf/releases.
   # By default use {{.ProtocVersion}}.
   # You probably want to set this to make your builds completely reproducible.
   version: {{.ProtocVersion}}
