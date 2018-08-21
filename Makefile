@@ -2,6 +2,8 @@ SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/examp
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
 BINS := github.com/uber/prototool/internal/cmd/prototool
 
+DOCKER_IMAGE := golang:1.10.3
+
 .PHONY: all
 all: lint cover
 
@@ -145,7 +147,7 @@ releasegen: internalgen
 	docker run \
 		--volume "$(CURDIR):/go/src/github.com/uber/prototool" \
 		--workdir "/go/src/github.com/uber/prototool" \
-		golang:1.10.0 \
+		$(DOCKER_IMAGE) \
 		bash -x etc/bin/releasegen.sh
 
 .PHONY: releaseinstall
