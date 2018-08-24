@@ -133,7 +133,7 @@ This document outlines how to create a release of prototool.
     ```
 
     Then, fork github.com/homebrew/homebrew-core if you have not already, and create
-    a new branch named "prototool-$VERSION". Update `Formula/prototool.pb` to use
+    a new branch named "prototool-$VERSION". Update `Formula/prototool.rb` to use
     the new version and SHA-256 hash.
 
     ```
