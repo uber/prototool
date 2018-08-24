@@ -37,7 +37,22 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
 
 ## Installation
 
-Install Prototool from GitHub Releases.
+Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/).
+
+```
+brew install prototool
+```
+
+This installs the `prototool` binary, along with bash completion, zsh completion, and man pages.
+You can also install all of the assets on Linux or without Homebrew from GitHub Releases.
+
+```
+curl -sSL https://github.com/uber/prototool/releases/download/v1.0.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
+  tar -C /usr/local --strip-components 1 -xz`
+```
+
+If you do not want to install bash completion, zsh completion, or man mages, you can install just the
+`prototool` binary from GitHub Releases as well.
 
 ```
 curl -sSL https://github.com/uber/prototool/releases/download/v1.0.0/prototool-$(uname -s)-$(uname -m) \

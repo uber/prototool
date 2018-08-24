@@ -150,6 +150,10 @@ releasegen: internalgen
 		$(DOCKER_IMAGE) \
 		bash -x etc/bin/releasegen.sh
 
+.PHONY: brewgen
+brewgen:
+	sh etc/bin/brewgen.sh
+
 .PHONY: releaseinstall
 releaseinstall: releasegen releaseclean
 	tar -C /usr/local --strip-components 1 -xzf release/prototool-$(shell uname -s)-$(shell uname -m).tar.gz
