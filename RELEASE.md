@@ -137,8 +137,8 @@ This document outlines how to create a release of prototool.
     the new version and SHA-256 hash.
 
     ```
-    #url "https://github.com/uber/prototool/archive/v1.22.0.tar.gz"
-    #sha256 "NEW_SHA_256_HASH_FROM_ABOVE"
+    url "https://github.com/uber/prototool/archive/v1.22.0.tar.gz"
+    sha256 "NEW_SHA_256_HASH_FROM_ABOVE"
     ```
 
     Create a commit with the message "prototool $VERSION" and open a PR with the same name.
