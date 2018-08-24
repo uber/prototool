@@ -35,7 +35,7 @@ for os in Darwin Linux; do
     mkdir -p "${dir}/etc/zsh/site-functions"
     mkdir -p "${dir}/share/man/man1"
     go run internal/cmd/gen-prototool-bash-completion/main.go > "${dir}/etc/bash_completion.d/prototool"
-    go run internal/cmd/gen-prototool-zsh-completion/main.go > "${dir}/etc/zsh/site-functions/prototool"
+    go run internal/cmd/gen-prototool-zsh-completion/main.go > "${dir}/etc/zsh/site-functions/_prototool"
     go run internal/cmd/gen-prototool-manpages/main.go "${dir}/share/man/man1"
     CGO_ENABLED=0 GOOS=$(goos "${os}") GOARCH=$(goarch "${arch}") \
       go build \
