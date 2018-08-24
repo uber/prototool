@@ -22,6 +22,7 @@ goarch() {
 
 BASE_DIR="release"
 
+go get github.com/Masterminds/glide
 rm -rf vendor
 glide install
 rm -rf "${BASE_DIR}"
