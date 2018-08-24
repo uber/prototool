@@ -122,3 +122,23 @@ This document outlines how to create a release of prototool.
     git commit -m 'Back to development'
     git push origin $BRANCH
     ```
+
+15. Update the formula in https://github.com/homebrew/homebrew-core. First, download
+    the newly created source tarball and compute the SHA-256 hash.
+
+    ```
+    # Use "sha256sum" instead of "shasum -a 256" on Linux.
+    # Do not forget the -sSL or you will get the wrong hash.
+    curl -sSL https://github.com/uber/prototool/archive/v1.22.0.tar.gz | shasum -a 256 | cut -f 1 -d ' '
+    ```
+
+    Then, fork github.com/homebrew/homebrew-core if you have not already, and create
+    a new branch named "prototool-$VERSION". Update `Formula/prototool.pb` to use
+    the new version and SHA-256 hash.
+
+    ```
+    #url "https://github.com/uber/prototool/archive/v1.22.0.tar.gz"
+    #sha256 "NEW_SHA_256_HASH_FROM_ABOVE"
+    ```
+
+    Create a commit with the message "prototool $VERSION" and open a PR with the same name.
