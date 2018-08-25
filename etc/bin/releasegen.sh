@@ -21,8 +21,11 @@ goarch() {
 }
 
 BASE_DIR="release"
-rm -rf "${BASE_DIR}"
 
+go get github.com/Masterminds/glide
+rm -rf vendor
+glide install
+rm -rf "${BASE_DIR}"
 for os in Darwin Linux; do
   for arch in x86_64; do
     dir="${BASE_DIR}/${os}/${arch}/prototool"
@@ -30,10 +33,10 @@ for os in Darwin Linux; do
     tar_dir="prototool"
     mkdir -p "${dir}/bin"
     mkdir -p "${dir}/etc/bash_completion.d"
-    mkdir -p "${dir}/etc/zsh_completion.d"
+    mkdir -p "${dir}/etc/zsh/site-functions"
     mkdir -p "${dir}/share/man/man1"
     go run internal/cmd/gen-prototool-bash-completion/main.go > "${dir}/etc/bash_completion.d/prototool"
-    go run internal/cmd/gen-prototool-zsh-completion/main.go > "${dir}/etc/zsh_completion.d/prototool"
+    go run internal/cmd/gen-prototool-zsh-completion/main.go > "${dir}/etc/zsh/site-functions/_prototool"
     go run internal/cmd/gen-prototool-manpages/main.go "${dir}/share/man/man1"
     CGO_ENABLED=0 GOOS=$(goos "${os}") GOARCH=$(goarch "${arch}") \
       go build \
