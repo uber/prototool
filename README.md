@@ -39,14 +39,14 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
 
 Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/).
 
-```
+```bash
 brew install prototool
 ```
 
 This installs the `prototool` binary, along with bash completion, zsh completion, and man pages.
 You can also install all of the assets on Linux or without Homebrew from GitHub Releases.
 
-```
+```bash
 curl -sSL https://github.com/uber/prototool/releases/download/v1.1.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
   tar -C /usr/local --strip-components 1 -xz`
 ```
@@ -54,7 +54,7 @@ curl -sSL https://github.com/uber/prototool/releases/download/v1.1.0/prototool-$
 If you do not want to install bash completion, zsh completion, or man mages, you can install just the
 `prototool` binary from GitHub Releases as well.
 
-```
+```bash
 curl -sSL https://github.com/uber/prototool/releases/download/v1.1.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
   chmod +x /usr/local/bin/prototool
@@ -69,7 +69,7 @@ versions in `glide.yaml`. We have specific version requirements, so not using th
 
 We'll start with a general overview of the commands. There are more commands, and we will get into usage below, but this shows the basic functionality.
 
-```
+```bash
 prototool help
 prototool lint path/to/foo.proto path/to/bar.proto # file mode, specify multiple specific files
 prototool lint idl/uber # directory mode, search for all .proto files recursively, obeying exclude_paths in prototool.yaml files
@@ -109,7 +109,7 @@ If multiple `prototool.yaml` files are found that match the input directory or f
 
 In most Prototool commands, you will see help along the following lines:
 
-```
+```bash
 $ prototool help lint
 Lint proto files and compile with protoc to check for failures.
 
@@ -246,7 +246,7 @@ Start the example server in a separate terminal by doing `go run example/cmd/exc
 
 Either use `--data 'requestData'` as the the JSON data to input, or `--stdin` which will result in the input being read from stdin as JSON.
 
-```
+```bash
 $ make init example # make sure everything is built just in case
 
 $ prototool grpc example \
