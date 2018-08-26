@@ -48,7 +48,7 @@ You can also install all of the assets on Linux or without Homebrew from GitHub 
 
 ```bash
 curl -sSL https://github.com/uber/prototool/releases/download/v1.1.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
-  tar -C /usr/local --strip-components 1 -xz`
+  tar -C /usr/local --strip-components 1 -xz
 ```
 
 If you do not want to install bash completion, zsh completion, or man mages, you can install just the
