@@ -63,7 +63,7 @@ func (c *baseLinter) Check(dirPath string, descriptors []*proto.Proto) ([]*text.
 		descriptors,
 	)
 	for _, failure := range failures {
-		failure.ID = c.id
+		failure.LintID = c.id
 	}
 	return failures, err
 }
