@@ -108,11 +108,11 @@ func ParseColonSeparatedFailureFields(s string) ([]FailureField, error) {
 
 // Failure is a failure with a position in text.
 type Failure struct {
-	Filename string
-	Line     int
-	Column   int
-	LintID   string
-	Message  string
+	Filename string `json:"filename,omitempty"`
+	Line     int    `json:"line,omitempty"`
+	Column   int    `json:"column,omitempty"`
+	LintID   string `json:"lintID,omitempty"`
+	Message  string `json:"message,omitempty"`
 }
 
 // FailureWriter is a writer that Failure.Println can accept.

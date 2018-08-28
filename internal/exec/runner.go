@@ -23,6 +23,7 @@ package exec
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -68,6 +69,7 @@ type runner struct {
 	cachePath   string
 	protocURL   string
 	printFields string
+	json        bool
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -806,7 +808,15 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 			}
 		}
 		if shouldPrint {
-			if err := failure.Fprintln(bufWriter, failureFields...); err != nil {
+			if r.json {
+				data, err := json.Marshal(failure)
+				if err != nil {
+					return err
+				}
+				if _, err := fmt.Fprintln(bufWriter, string(data)); err != nil {
+					return err
+				}
+			} else if err := failure.Fprintln(bufWriter, failureFields...); err != nil {
 				return err
 			}
 		}
