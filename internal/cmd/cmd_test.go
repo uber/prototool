@@ -54,11 +54,13 @@ func TestCompile(t *testing.T) {
 	assertDoCompileFiles(
 		t,
 		false,
+		false,
 		`testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
 		"testdata/compile/errors_on_import/dep_errors.proto",
 	)
 	assertDoCompileFiles(
 		t,
+		false,
 		false,
 		`testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
 		"testdata/compile/errors_on_import",
@@ -66,11 +68,13 @@ func TestCompile(t *testing.T) {
 	assertDoCompileFiles(
 		t,
 		false,
+		false,
 		`testdata/compile/extra_import/extra_import.proto:1:1:Import "dep.proto" was not used.`,
 		"testdata/compile/extra_import/extra_import.proto",
 	)
 	assertDoCompileFiles(
 		t,
+		false,
 		false,
 		`testdata/compile/json/json_camel_case_conflict.proto:1:1:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
 		"testdata/compile/json/json_camel_case_conflict.proto",
@@ -78,11 +82,13 @@ func TestCompile(t *testing.T) {
 	assertDoCompileFiles(
 		t,
 		false,
+		false,
 		`testdata/compile/semicolon/missing_package_semicolon.proto:5:1:Expected ";".`,
 		"testdata/compile/semicolon/missing_package_semicolon.proto",
 	)
 	assertDoCompileFiles(
 		t,
+		false,
 		false,
 		`testdata/compile/syntax/missing_syntax.proto:1:1:No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.
 		testdata/compile/syntax/missing_syntax.proto:4:3:Expected "required", "optional", or "repeated".`,
@@ -91,14 +97,23 @@ func TestCompile(t *testing.T) {
 	assertDoCompileFiles(
 		t,
 		true,
+		false,
 		``,
 		"testdata/compile/proto2/syntax_proto2.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
+		false,
 		`testdata/compile/notimported/not_imported.proto:11:3:"foo.Dep" seems to be defined in "dep.proto", which is not imported by "not_imported.proto".  To use it here, please add the necessary import.`,
 		"testdata/compile/notimported/not_imported.proto",
+	)
+	assertDoCompileFiles(
+		t,
+		false,
+		true,
+		`{"filename":"testdata/compile/errors_on_import/dep_errors.proto","line":6,"column":1,"message":"Expected \";\"."}`,
+		"testdata/compile/errors_on_import/dep_errors.proto",
 	)
 }
 
@@ -657,13 +672,17 @@ func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
 	assertDo(t, 0, strings.Join(linterIDs, "\n"), args...)
 }
 
-func assertDoCompileFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
+func assertDoCompileFiles(t *testing.T, expectSuccess bool, asJSON bool, expectedLinePrefixes string, filePaths ...string) {
 	lines := getCleanLines(expectedLinePrefixes)
 	expectedExitCode := 0
 	if !expectSuccess {
 		expectedExitCode = 255
 	}
-	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"compile"}, filePaths...)...)
+	cmd := []string{"compile"}
+	if asJSON {
+		cmd = append(cmd, "--json")
+	}
+	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append(cmd, filePaths...)...)
 }
 
 func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath string, pkgOverride string, expectedFileData string) {
