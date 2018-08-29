@@ -47,6 +47,7 @@ var (
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
 		},
@@ -80,6 +81,7 @@ var (
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDryRun(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
 		},
 	}
@@ -199,6 +201,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDiffMode(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindLintMode(flagSet)
 			flags.bindOverwrite(flagSet)
 			flags.bindFix(flagSet)
@@ -215,6 +218,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDryRun(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
 		},
 	}
@@ -338,6 +342,7 @@ $ cat input.json | prototool grpc example \
 			return runner.Lint(args, flags.listAllLinters, flags.listLinters)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindJSON(flagSet)
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
 			flags.bindProtocURL(flagSet)
@@ -458,6 +463,12 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithCachePath(flags.cachePath),
+		)
+	}
+	if flags.json {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithJSON(),
 		)
 	}
 	if flags.printFields != "" {

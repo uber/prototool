@@ -85,10 +85,10 @@ func RunnerWithCachePath(cachePath string) RunnerOption {
 	}
 }
 
-// RunnerWithProtocURL returns a RunnerOption that uses the given protoc zip file URL.
-func RunnerWithProtocURL(protocURL string) RunnerOption {
+// RunnerWithJSON returns a RunnerOption that will print failures as JSON.
+func RunnerWithJSON() RunnerOption {
 	return func(runner *runner) {
-		runner.protocURL = protocURL
+		runner.json = true
 	}
 }
 
@@ -97,6 +97,13 @@ func RunnerWithProtocURL(protocURL string) RunnerOption {
 func RunnerWithPrintFields(printFields string) RunnerOption {
 	return func(runner *runner) {
 		runner.printFields = printFields
+	}
+}
+
+// RunnerWithProtocURL returns a RunnerOption that uses the given protoc zip file URL.
+func RunnerWithProtocURL(protocURL string) RunnerOption {
+	return func(runner *runner) {
+		runner.protocURL = protocURL
 	}
 }
 

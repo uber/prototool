@@ -38,6 +38,7 @@ type flags struct {
 	fix            bool
 	headers        []string
 	keepaliveTime  string
+	json           bool
 	listAllLinters bool
 	listLinters    bool
 	lintMode       bool
@@ -96,6 +97,10 @@ func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.keepaliveTime, "keepalive-time", "", "The maximum idle time after which a keepalive probe is sent.")
+}
+
+func (f *flags) bindJSON(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.json, "json", false, "Output as JSON.")
 }
 
 func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {

@@ -108,11 +108,11 @@ func ParseColonSeparatedFailureFields(s string) ([]FailureField, error) {
 
 // Failure is a failure with a position in text.
 type Failure struct {
-	Filename string
-	Line     int
-	Column   int
-	ID       string
-	Message  string
+	Filename string `json:"filename,omitempty"`
+	Line     int    `json:"line,omitempty"`
+	Column   int    `json:"column,omitempty"`
+	LintID   string `json:"lint_id,omitempty"`
+	Message  string `json:"message,omitempty"`
 }
 
 // FailureWriter is a writer that Failure.Println can accept.
@@ -160,8 +160,8 @@ func (f *Failure) Fprintln(writer FailureWriter, fields ...FailureField) error {
 			}
 			written = true
 		case FailureFieldID:
-			if f.ID != "" {
-				if _, err := writer.WriteString(f.ID); err != nil {
+			if f.LintID != "" {
+				if _, err := writer.WriteString(f.LintID); err != nil {
 					return err
 				}
 				written = true
@@ -215,8 +215,8 @@ func (f *Failure) String() string {
 	buffer.WriteString(":")
 	buffer.WriteString(column)
 	buffer.WriteString(":")
-	if f.ID != "" {
-		buffer.WriteString(f.ID)
+	if f.LintID != "" {
+		buffer.WriteString(f.LintID)
 		buffer.WriteString(" ")
 	}
 	buffer.WriteString(f.Message)
@@ -224,9 +224,9 @@ func (f *Failure) String() string {
 }
 
 // NewFailuref is a helper that returns a new Failure.
-func NewFailuref(position scanner.Position, id string, format string, args ...interface{}) *Failure {
+func NewFailuref(position scanner.Position, lintID string, format string, args ...interface{}) *Failure {
 	return &Failure{
-		ID:       id,
+		LintID:   lintID,
 		Filename: position.Filename,
 		Line:     position.Line,
 		Column:   position.Column,
@@ -271,10 +271,10 @@ func (f sortFailures) Less(i int, j int) bool {
 	if f[i].Column > f[j].Column {
 		return false
 	}
-	if f[i].ID < f[j].ID {
+	if f[i].LintID < f[j].LintID {
 		return true
 	}
-	if f[i].ID > f[j].ID {
+	if f[i].LintID > f[j].LintID {
 		return false
 	}
 	if f[i].Message < f[j].Message {
