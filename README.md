@@ -47,7 +47,7 @@ This installs the `prototool` binary, along with bash completion, zsh completion
 You can also install all of the assets on Linux or without Homebrew from GitHub Releases.
 
 ```bash
-curl -sSL https://github.com/uber/prototool/releases/download/v1.1.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
+curl -sSL https://github.com/uber/prototool/releases/download/v1.2.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
   tar -C /usr/local --strip-components 1 -xz
 ```
 
@@ -55,7 +55,7 @@ If you do not want to install bash completion, zsh completion, or man mages, you
 `prototool` binary from GitHub Releases as well.
 
 ```bash
-curl -sSL https://github.com/uber/prototool/releases/download/v1.1.0/prototool-$(uname -s)-$(uname -m) \
+curl -sSL https://github.com/uber/prototool/releases/download/v1.2.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
   chmod +x /usr/local/bin/prototool
 ```
