@@ -111,7 +111,7 @@ type Failure struct {
 	Filename string `json:"filename,omitempty"`
 	Line     int    `json:"line,omitempty"`
 	Column   int    `json:"column,omitempty"`
-	LintID   string `json:"lintID,omitempty"`
+	LintID   string `json:"lint_id,omitempty"`
 	Message  string `json:"message,omitempty"`
 }
 
