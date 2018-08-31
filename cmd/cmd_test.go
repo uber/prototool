@@ -37,7 +37,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/uber/prototool/cmd/internal/internal/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/cmd/internal/testdata/grpc/gen/grpcpb"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"

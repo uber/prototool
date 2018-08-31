@@ -1,0 +1,6 @@
+create:
+  packages:
+    - directory: a/b
+      name: foo
+    - directory: a
+      name: foobar

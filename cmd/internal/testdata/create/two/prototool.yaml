@@ -1,0 +1,4 @@
+create:
+  packages:
+    - directory: .
+      name: foo
