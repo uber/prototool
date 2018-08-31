@@ -9,11 +9,11 @@
 /cmd/gen-prototool-zsh-completion/gen-prototool-zsh-completion
 /cmd/gen-prototool-manpages/gen-prototool-manpages
 /cmd/prototool/prototool
-/cmd/testdata/create/one/a/b/bar/baz.proto
-/cmd/testdata/create/one/a/c/bar/baz.proto
-/cmd/testdata/create/one/b/c/bar/baz.proto
-/cmd/testdata/create/one/baz.proto
-/cmd/testdata/create/two/baz.proto
+/cmd/internal/testdata/create/one/a/b/bar/baz.proto
+/cmd/internal/testdata/create/one/a/c/bar/baz.proto
+/cmd/internal/testdata/create/one/b/c/bar/baz.proto
+/cmd/internal/testdata/create/one/baz.proto
+/cmd/internal/testdata/create/two/baz.proto
 /main
 /prototool.iml
 /release
