@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package foobar.c.bar;
+package create.one.a.c.bar;
 
 option go_package = "barpb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
-option java_package = "com.foobar.c.bar";
+option java_package = "com.create.one.a.c.bar";

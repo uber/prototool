@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package uber.prototool.generated;
-
-option go_package = "generatedpb";
-option java_multiple_files = true;
-option java_outer_classname = "BazProto";
-option java_package = "com.uber.prototool.generated";
