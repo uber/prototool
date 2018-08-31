@@ -35,16 +35,16 @@ license:
 
 .PHONY: golden
 golden: install
-	for file in $(shell find cmd/testdata/format -name '*.proto.golden'); do \
+	for file in $(shell find cmd/internal/testdata/format -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
-	for file in $(shell find cmd/testdata/format -name '*.proto'); do \
+	for file in $(shell find cmd/internal/testdata/format -name '*.proto'); do \
 		prototool format $${file} > $${file}.golden || true; \
 	done
-	for file in $(shell find cmd/testdata/format-fix -name '*.proto.golden'); do \
+	for file in $(shell find cmd/internal/testdata/format-fix -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
-	for file in $(shell find cmd/testdata/format-fix -name '*.proto'); do \
+	for file in $(shell find cmd/internal/testdata/format-fix -name '*.proto'); do \
 		prototool format --fix $${file} > $${file}.golden || true; \
 	done
 
@@ -65,7 +65,7 @@ example: install
 
 .PHONY: internalgen
 internalgen: install
-	prototool generate cmd/testdata/grpc
+	prototool generate cmd/internal/testdata/grpc
 	rm -f etc/config/example/prototool.yaml
 	prototool config init etc/config/example --uncomment
 
