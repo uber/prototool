@@ -23,9 +23,9 @@ package main
 import (
 	"os"
 
-	"github.com/uber/prototool/internal/cmd"
+	"github.com/uber/prototool/cmd"
 )
 
 func main() {
-	os.Exit(cmd.GenZshCompletion(os.Stdin, os.Stdout, os.Stderr))
+	os.Exit(cmd.GenBashCompletion(os.Stdin, os.Stdout, os.Stderr))
 }

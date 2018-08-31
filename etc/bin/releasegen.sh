@@ -35,16 +35,16 @@ for os in Darwin Linux; do
     mkdir -p "${dir}/etc/bash_completion.d"
     mkdir -p "${dir}/etc/zsh/site-functions"
     mkdir -p "${dir}/share/man/man1"
-    go run internal/cmd/gen-prototool-bash-completion/main.go > "${dir}/etc/bash_completion.d/prototool"
-    go run internal/cmd/gen-prototool-zsh-completion/main.go > "${dir}/etc/zsh/site-functions/_prototool"
-    go run internal/cmd/gen-prototool-manpages/main.go "${dir}/share/man/man1"
+    go run cmd/gen-prototool-bash-completion/main.go > "${dir}/etc/bash_completion.d/prototool"
+    go run cmd/gen-prototool-zsh-completion/main.go > "${dir}/etc/zsh/site-functions/_prototool"
+    go run cmd/gen-prototool-manpages/main.go "${dir}/share/man/man1"
     CGO_ENABLED=0 GOOS=$(goos "${os}") GOARCH=$(goarch "${arch}") \
       go build \
       -a \
       -installsuffix cgo \
       -ldflags "-X 'github.com/uber/prototool/internal/vars.GitCommit=$(git rev-list -1 HEAD)' -X 'github.com/uber/prototool/internal/vars.BuiltTimestamp=$(date -u)'" \
       -o "${dir}/bin/prototool" \
-      internal/cmd/prototool/main.go
+      cmd/prototool/main.go
     tar -C "${tar_context_dir}" -cvzf "${BASE_DIR}/prototool-${os}-${arch}.tar.gz" "${tar_dir}"
     cp "${dir}/bin/prototool" "${BASE_DIR}/prototool-${os}-${arch}"
   done

@@ -1,6 +1,6 @@
 SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/)
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
-BINS := github.com/uber/prototool/internal/cmd/prototool
+BINS := github.com/uber/prototool/cmd/prototool
 
 DOCKER_IMAGE := golang:1.10.3
 
@@ -35,16 +35,16 @@ license:
 
 .PHONY: golden
 golden: install
-	for file in $(shell find internal/cmd/testdata/format -name '*.proto.golden'); do \
+	for file in $(shell find cmd/internal/testdata/format -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
-	for file in $(shell find internal/cmd/testdata/format -name '*.proto'); do \
+	for file in $(shell find cmd/internal/testdata/format -name '*.proto'); do \
 		prototool format $${file} > $${file}.golden || true; \
 	done
-	for file in $(shell find internal/cmd/testdata/format-fix -name '*.proto.golden'); do \
+	for file in $(shell find cmd/internal/testdata/format-fix -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
-	for file in $(shell find internal/cmd/testdata/format-fix -name '*.proto'); do \
+	for file in $(shell find cmd/internal/testdata/format-fix -name '*.proto'); do \
 		prototool format --fix $${file} > $${file}.golden || true; \
 	done
 
@@ -65,7 +65,7 @@ example: install
 
 .PHONY: internalgen
 internalgen: install
-	prototool generate internal/cmd/testdata/grpc
+	prototool generate cmd/internal/testdata/grpc
 	rm -f etc/config/example/prototool.yaml
 	prototool config init etc/config/example --uncomment
 

@@ -37,7 +37,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/cmd/internal/testdata/grpc/gen/grpcpb"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
@@ -55,65 +55,65 @@ func TestCompile(t *testing.T) {
 		t,
 		false,
 		false,
-		`testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
-		"testdata/compile/errors_on_import/dep_errors.proto",
+		`internal/testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
+		"internal/testdata/compile/errors_on_import/dep_errors.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		false,
-		`testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
-		"testdata/compile/errors_on_import",
+		`internal/testdata/compile/errors_on_import/dep_errors.proto:6:1:Expected ";".`,
+		"internal/testdata/compile/errors_on_import",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		false,
-		`testdata/compile/extra_import/extra_import.proto:1:1:Import "dep.proto" was not used.`,
-		"testdata/compile/extra_import/extra_import.proto",
+		`internal/testdata/compile/extra_import/extra_import.proto:1:1:Import "dep.proto" was not used.`,
+		"internal/testdata/compile/extra_import/extra_import.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		false,
-		`testdata/compile/json/json_camel_case_conflict.proto:1:1:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
-		"testdata/compile/json/json_camel_case_conflict.proto",
+		`internal/testdata/compile/json/json_camel_case_conflict.proto:1:1:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
+		"internal/testdata/compile/json/json_camel_case_conflict.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		false,
-		`testdata/compile/semicolon/missing_package_semicolon.proto:5:1:Expected ";".`,
-		"testdata/compile/semicolon/missing_package_semicolon.proto",
+		`internal/testdata/compile/semicolon/missing_package_semicolon.proto:5:1:Expected ";".`,
+		"internal/testdata/compile/semicolon/missing_package_semicolon.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		false,
-		`testdata/compile/syntax/missing_syntax.proto:1:1:No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.
-		testdata/compile/syntax/missing_syntax.proto:4:3:Expected "required", "optional", or "repeated".`,
-		"testdata/compile/syntax/missing_syntax.proto",
+		`internal/testdata/compile/syntax/missing_syntax.proto:1:1:No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.
+		internal/testdata/compile/syntax/missing_syntax.proto:4:3:Expected "required", "optional", or "repeated".`,
+		"internal/testdata/compile/syntax/missing_syntax.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		true,
 		false,
 		``,
-		"testdata/compile/proto2/syntax_proto2.proto",
+		"internal/testdata/compile/proto2/syntax_proto2.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		false,
-		`testdata/compile/notimported/not_imported.proto:11:3:"foo.Dep" seems to be defined in "dep.proto", which is not imported by "not_imported.proto".  To use it here, please add the necessary import.`,
-		"testdata/compile/notimported/not_imported.proto",
+		`internal/testdata/compile/notimported/not_imported.proto:11:3:"foo.Dep" seems to be defined in "dep.proto", which is not imported by "not_imported.proto".  To use it here, please add the necessary import.`,
+		"internal/testdata/compile/notimported/not_imported.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		true,
-		`{"filename":"testdata/compile/errors_on_import/dep_errors.proto","line":6,"column":1,"message":"Expected \";\"."}`,
-		"testdata/compile/errors_on_import/dep_errors.proto",
+		`{"filename":"internal/testdata/compile/errors_on_import/dep_errors.proto","line":6,"column":1,"message":"Expected \";\"."}`,
+		"internal/testdata/compile/errors_on_import/dep_errors.proto",
 	)
 }
 
@@ -137,19 +137,19 @@ func TestLint(t *testing.T) {
 		t,
 		true,
 		"",
-		"testdata/foo/success.proto",
+		"internal/testdata/foo/success.proto",
 	)
 	assertDoLintFile(
 		t,
 		false,
 		"1:1:SYNTAX_PROTO3",
-		"testdata/lint/syntaxproto2/syntax_proto2.proto",
+		"internal/testdata/lint/syntaxproto2/syntax_proto2.proto",
 	)
 	assertDoLintFile(
 		t,
 		false,
 		"11:1:MESSAGE_NAMES_CAPITALIZED",
-		"testdata/lint/capitalized/message_name_not_capitalized.proto",
+		"internal/testdata/lint/capitalized/message_name_not_capitalized.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -158,7 +158,7 @@ func TestLint(t *testing.T) {
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
-		"testdata/lint/required/file_options_required.proto",
+		"internal/testdata/lint/required/file_options_required.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -168,7 +168,7 @@ func TestLint(t *testing.T) {
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
 		1:1:PACKAGE_IS_DECLARED`,
-		"testdata/lint/base/base_file.proto",
+		"internal/testdata/lint/base/base_file.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -177,31 +177,31 @@ func TestLint(t *testing.T) {
 		6:1:FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE
 		7:1:FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX
 		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX`,
-		"testdata/lint/fileoptions/file_options_incorrect.proto",
+		"internal/testdata/lint/fileoptions/file_options_incorrect.proto",
 	)
 	assertDoLintFiles(
 		t,
 		false,
-		`testdata/lint/samedir/bar1.proto:1:1:PACKAGES_SAME_IN_DIR
-		testdata/lint/samedir/foo1.proto:1:1:PACKAGES_SAME_IN_DIR
-		testdata/lint/samedir/foo2.proto:1:1:PACKAGES_SAME_IN_DIR`,
-		"testdata/lint/samedir",
+		`internal/testdata/lint/samedir/bar1.proto:1:1:PACKAGES_SAME_IN_DIR
+		internal/testdata/lint/samedir/foo1.proto:1:1:PACKAGES_SAME_IN_DIR
+		internal/testdata/lint/samedir/foo2.proto:1:1:PACKAGES_SAME_IN_DIR`,
+		"internal/testdata/lint/samedir",
 	)
 	assertDoLintFiles(
 		t,
 		false,
-		`testdata/lint/samedirgopkg/bar1.proto:1:1:FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR
-		testdata/lint/samedirgopkg/foo1.proto:1:1:FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR
-		testdata/lint/samedirgopkg/foo2.proto:1:1:FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR`,
-		"testdata/lint/samedirgopkg",
+		`internal/testdata/lint/samedirgopkg/bar1.proto:1:1:FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR
+		internal/testdata/lint/samedirgopkg/foo1.proto:1:1:FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR
+		internal/testdata/lint/samedirgopkg/foo2.proto:1:1:FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR`,
+		"internal/testdata/lint/samedirgopkg",
 	)
 	assertDoLintFiles(
 		t,
 		false,
-		`testdata/lint/samedirjavapkg/bar1.proto:1:1:FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR
-		testdata/lint/samedirjavapkg/foo1.proto:1:1:FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR
-		testdata/lint/samedirjavapkg/foo2.proto:1:1:FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR`,
-		"testdata/lint/samedirjavapkg",
+		`internal/testdata/lint/samedirjavapkg/bar1.proto:1:1:FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR
+		internal/testdata/lint/samedirjavapkg/foo1.proto:1:1:FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR
+		internal/testdata/lint/samedirjavapkg/foo2.proto:1:1:FILE_OPTIONS_JAVA_PACKAGE_SAME_IN_DIR`,
+		"internal/testdata/lint/samedirjavapkg",
 	)
 	assertDoLintFile(
 		t,
@@ -245,7 +245,7 @@ func TestLint(t *testing.T) {
 		98:3:ENUMS_NO_ALLOW_ALIAS
 		108:5:ENUMS_NO_ALLOW_ALIAS
 		`,
-		"testdata/lint/lots/lots.proto",
+		"internal/testdata/lint/lots/lots.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -335,7 +335,7 @@ func TestLint(t *testing.T) {
 		90:3:ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
 		93:1:ENUMS_HAVE_COMMENTS
 		93:1:ENUM_NAMES_CAMEL_CASE`,
-		"testdata/lint/allgroup/lots.proto",
+		"internal/testdata/lint/allgroup/lots.proto",
 	)
 	assertDoLintFile(
 		t,
@@ -344,28 +344,28 @@ func TestLint(t *testing.T) {
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
 		1:1:FILE_OPTIONS_REQUIRE_JAVA_PACKAGE`,
-		"testdata/lint/keyword/package_starts_with_keyword.proto",
+		"internal/testdata/lint/keyword/package_starts_with_keyword.proto",
 	)
 	assertDoLintFile(
 		t,
 		false,
 		`5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
-		"testdata/lint/gopackagelongform/gopackagelongform.proto",
+		"internal/testdata/lint/gopackagelongform/gopackagelongform.proto",
 	)
 }
 
 func TestGoldenFormat(t *testing.T) {
 	t.Parallel()
-	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/bar/bar.proto")
-	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/bar/bar_proto2.proto")
-	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/foo.proto")
-	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/foo_proto2.proto")
-	assertGoldenFormat(t, false, true, "testdata/format-fix/foo.proto")
+	assertGoldenFormat(t, false, false, "internal/testdata/format/proto3/foo/bar/bar.proto")
+	assertGoldenFormat(t, false, false, "internal/testdata/format/proto2/foo/bar/bar_proto2.proto")
+	assertGoldenFormat(t, false, false, "internal/testdata/format/proto3/foo/foo.proto")
+	assertGoldenFormat(t, false, false, "internal/testdata/format/proto2/foo/foo_proto2.proto")
+	assertGoldenFormat(t, false, true, "internal/testdata/format-fix/foo.proto")
 }
 
 func TestJSONToBinaryToJSON(t *testing.T) {
 	t.Parallel()
-	assertJSONToBinaryToJSON(t, "testdata/foo/success.proto", "foo.Baz", `{"hello":100}`)
+	assertJSONToBinaryToJSON(t, "internal/testdata/foo/success.proto", "foo.Baz", `{"hello":100}`)
 }
 
 func TestCreate(t *testing.T) {
@@ -376,7 +376,7 @@ func TestCreate(t *testing.T) {
 		t,
 		true,
 		true,
-		"testdata/create/one/a/b/bar/baz.proto",
+		"internal/testdata/create/one/a/b/bar/baz.proto",
 		"",
 		`syntax = "proto3";
 
@@ -392,7 +392,7 @@ option java_package = "com.foo.bar";`,
 		t,
 		false, // do not expect success
 		false, // do not remove
-		"testdata/create/one/a/b/bar/baz.proto",
+		"internal/testdata/create/one/a/b/bar/baz.proto",
 		"",
 		``,
 	)
@@ -401,7 +401,7 @@ option java_package = "com.foo.bar";`,
 		t,
 		true,
 		true,
-		"testdata/create/one/a/b/bar/baz.proto",
+		"internal/testdata/create/one/a/b/bar/baz.proto",
 		"bat", // --package value
 		`syntax = "proto3";
 
@@ -417,7 +417,7 @@ option java_package = "com.bat";`,
 		t,
 		true,
 		true,
-		"testdata/create/one/a/c/bar/baz.proto",
+		"internal/testdata/create/one/a/c/bar/baz.proto",
 		"",
 		`syntax = "proto3";
 
@@ -433,7 +433,7 @@ option java_package = "com.foobar.c.bar";`,
 		t,
 		true,
 		true,
-		"testdata/create/one/b/c/bar/baz.proto",
+		"internal/testdata/create/one/b/c/bar/baz.proto",
 		"",
 		`syntax = "proto3";
 
@@ -449,7 +449,7 @@ option java_package = "com.b.c.bar";`,
 		t,
 		true,
 		true,
-		"testdata/create/one/baz.proto",
+		"internal/testdata/create/one/baz.proto",
 		"",
 		`syntax = "proto3";
 
@@ -465,7 +465,7 @@ option java_package = "com.uber.prototool.generated";`,
 		t,
 		true,
 		true,
-		"testdata/create/two/baz.proto",
+		"internal/testdata/create/two/baz.proto",
 		"",
 		`syntax = "proto3";
 
@@ -487,7 +487,7 @@ func TestGRPC(t *testing.T) {
 			"value": "hello!"
 		}
 		`,
-		"testdata/grpc/grpc.proto",
+		"internal/testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/Exclamation",
 		`{"value":"hello"}`,
 	)
@@ -498,7 +498,7 @@ func TestGRPC(t *testing.T) {
 			"value": "hellosalutations!"
 		}
 		`,
-		"testdata/grpc/grpc.proto",
+		"internal/testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationClientStream",
 		`{"value":"hello"}
 		{"value":"salutations"}`,
@@ -525,7 +525,7 @@ func TestGRPC(t *testing.T) {
 			"value": "!"
 		}
 		`,
-		"testdata/grpc/grpc.proto",
+		"internal/testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationServerStream",
 		`{"value":"hello"}`,
 	)
@@ -539,7 +539,7 @@ func TestGRPC(t *testing.T) {
 			"value": "salutations!"
 		}
 		`,
-		"testdata/grpc/grpc.proto",
+		"internal/testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationBidiStream",
 		`{"value":"hello"}
 		{"value":"salutations"}`,
@@ -586,7 +586,7 @@ func TestDescriptorProto(t *testing.T) {
     }
   ]
 }`,
-		"descriptor-proto", "testdata/foo/success.proto", "foo.Baz",
+		"descriptor-proto", "internal/testdata/foo/success.proto", "foo.Baz",
 	)
 }
 
@@ -602,7 +602,7 @@ func TestFieldDescriptorProto(t *testing.T) {
   "typeName": ".bar.Dep",
   "jsonName": "dep"
 }`,
-		"field-descriptor-proto", "testdata/foo/success.proto", "foo.Baz.dep",
+		"field-descriptor-proto", "internal/testdata/foo/success.proto", "foo.Baz.dep",
 	)
 }
 
@@ -651,7 +651,7 @@ func TestServiceDescriptorProto(t *testing.T) {
     }
   ]
 }`,
-		"service-descriptor-proto", "testdata/grpc", "grpc.ExcitedService",
+		"service-descriptor-proto", "internal/testdata/grpc", "grpc.ExcitedService",
 	)
 }
 
