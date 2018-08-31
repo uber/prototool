@@ -20,7 +20,7 @@
 
 // Package exec brings all the functionality of Prototool together in a format
 // easily consumable by CLI libraries. It is effectively the glue between
-// internal/cmd and all other packages.
+// cmd and all other packages.
 package exec
 
 import (

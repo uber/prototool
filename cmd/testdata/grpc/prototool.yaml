@@ -4,7 +4,7 @@ lint:
       - REQUEST_RESPONSE_TYPES_UNIQUE
 generate:
   go_options:
-    import_path: github.com/uber/prototool/internal/cmd/testdata/grpc
+    import_path: github.com/uber/prototool/cmd/testdata/grpc
   plugins:
     - name: gogoslick
       type: gogo

@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package b.c.bar;
+
+option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.b.c.bar";

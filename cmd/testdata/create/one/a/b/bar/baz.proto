@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package bat;
+
+option go_package = "batpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.bat";

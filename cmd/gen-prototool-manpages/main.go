@@ -23,7 +23,7 @@ package main
 import (
 	"os"
 
-	"github.com/uber/prototool/internal/cmd"
+	"github.com/uber/prototool/cmd"
 )
 
 func main() {
