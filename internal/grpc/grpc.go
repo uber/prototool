@@ -25,6 +25,8 @@ import (
 	"io"
 	"time"
 
+	"google.golang.org/grpc/credentials"
+
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"go.uber.org/zap"
 )
@@ -89,6 +91,13 @@ func HandlerWithHeader(key string, value string) HandlerOption {
 		// it takes care of validation
 		// if we switch out grpcurl we will probably change to a metadata.MD object
 		handler.headers = append(handler.headers, fmt.Sprintf("%s:%s", key, value))
+	}
+}
+
+// HandlerWithCredentials returns a HandlerOption that adds the given credentials.
+func HandlerWithCredentials(credentials credentials.TransportCredentials) HandlerOption {
+	return func(handler *handler) {
+		handler.credentials = credentials
 	}
 }
 

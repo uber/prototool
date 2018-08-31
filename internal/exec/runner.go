@@ -37,6 +37,8 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"google.golang.org/grpc/credentials"
+
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/cfginit"
@@ -547,7 +549,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, fix bool) error 
 	return nil
 }
 
-func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool) error {
+func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime, certificateFile string, stdin bool) error {
 	if address == "" {
 		return newExitErrorf(255, "must set address")
 	}
@@ -573,6 +575,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	var parsedCallTimeout time.Duration
 	var parsedConnectTimeout time.Duration
 	var parsedKeepaliveTime time.Duration
+	var creds credentials.TransportCredentials
 	var err error
 	if callTimeout != "" {
 		parsedCallTimeout, err = time.ParseDuration(callTimeout)
@@ -588,6 +591,12 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	}
 	if keepaliveTime != "" {
 		parsedKeepaliveTime, err = time.ParseDuration(keepaliveTime)
+		if err != nil {
+			return err
+		}
+	}
+	if certificateFile != "" {
+		creds, err = credentials.NewClientTLSFromFile(certificateFile, "")
 		if err != nil {
 			return err
 		}
@@ -610,6 +619,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		parsedCallTimeout,
 		parsedConnectTimeout,
 		parsedKeepaliveTime,
+		creds,
 	).Invoke(fileDescriptorSets, address, method, reader, r.output)
 }
 
@@ -702,6 +712,7 @@ func (r *runner) newGRPCHandler(
 	callTimeout time.Duration,
 	connectTimeout time.Duration,
 	keepaliveTime time.Duration,
+	creds credentials.TransportCredentials,
 ) grpc.Handler {
 	handlerOptions := []grpc.HandlerOption{
 		grpc.HandlerWithLogger(r.logger),
@@ -717,6 +728,9 @@ func (r *runner) newGRPCHandler(
 	}
 	if keepaliveTime != 0 {
 		handlerOptions = append(handlerOptions, grpc.HandlerWithKeepaliveTime(keepaliveTime))
+	}
+	if creds != nil {
+		handlerOptions = append(handlerOptions, grpc.HandlerWithCredentials(creds))
 	}
 	return grpc.NewHandler(handlerOptions...)
 }

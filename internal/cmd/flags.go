@@ -25,30 +25,31 @@ import (
 )
 
 type flags struct {
-	address        string
-	cachePath      string
-	callTimeout    string
-	connectTimeout string
-	data           string
-	debug          bool
-	diffMode       bool
-	disableFormat  bool
-	disableLint    bool
-	dryRun         bool
-	fix            bool
-	headers        []string
-	keepaliveTime  string
-	json           bool
-	listAllLinters bool
-	listLinters    bool
-	lintMode       bool
-	method         string
-	overwrite      bool
-	pkg            string
-	printFields    string
-	protocURL      string
-	stdin          bool
-	uncomment      bool
+	address         string
+	cachePath       string
+	callTimeout     string
+	certificateFile string
+	connectTimeout  string
+	data            string
+	debug           bool
+	diffMode        bool
+	disableFormat   bool
+	disableLint     bool
+	dryRun          bool
+	fix             bool
+	headers         []string
+	keepaliveTime   string
+	json            bool
+	listAllLinters  bool
+	listLinters     bool
+	lintMode        bool
+	method          string
+	overwrite       bool
+	pkg             string
+	printFields     string
+	protocURL       string
+	stdin           bool
+	uncomment       bool
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -61,6 +62,10 @@ func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindCallTimeout(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.callTimeout, "call-timeout", "60s", "The maximum time to for all calls to be completed.")
+}
+
+func (f *flags) bindCertificateFile(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.certificateFile, "certificate", "", "SSL Certificate to make requests with.")
 }
 
 func (f *flags) bindConnectTimeout(flagSet *pflag.FlagSet) {

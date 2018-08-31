@@ -296,11 +296,12 @@ $ cat input.json | prototool grpc example \
 }`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
+			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.certificateFile, flags.stdin)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindAddress(flagSet)
 			flags.bindCallTimeout(flagSet)
+			flags.bindCertificateFile(flagSet)
 			flags.bindConnectTimeout(flagSet)
 			flags.bindData(flagSet)
 			flags.bindHeaders(flagSet)
