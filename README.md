@@ -37,7 +37,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
 
 ## Installation
 
-NEW: Once [this PR](https://github.com/Homebrew/homebrew-core/pull/31440) is merged, Prototool will be able to be installed on Mac OS X via [Homebrew](https://brew.sh/).
+Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/).
 
 ```bash
 brew install prototool
