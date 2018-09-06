@@ -47,7 +47,7 @@ func (e *ExitError) Error() string {
 type Runner interface {
 	Init(args []string, uncomment bool) error
 	Create(args []string, pkg string) error
-	Version(output string) error
+	Version() error
 	Download() error
 	Clean() error
 	Files(args []string) error

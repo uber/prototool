@@ -90,15 +90,15 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	return runner
 }
 
-func (r *runner) Version(output string) error {
-	out := &struct {
-		Version              string `json:"version"`
-		DefaultProtocVersion string `json:"default_protoc_version"`
-		GoVersion            string `json:"go_version"`
-		GitCommit            string `json:"git_commit"`
-		BuiltTimestamp       string `json:"built_timestamp"`
-		GOOS                 string `json:"GOOS"`
-		GOARCH               string `json:"GOARCH"`
+func (r *runner) Version() error {
+	out := struct {
+		Version              string `json:"version,omitempty"`
+		DefaultProtocVersion string `json:"default_protoc_version,omitempty"`
+		GoVersion            string `json:"go_version,omitempty"`
+		GitCommit            string `json:"git_commit,omitempty"`
+		BuiltTimestamp       string `json:"built_timestamp,omitempty"`
+		GOOS                 string `json:"goos,omitempty"`
+		GOARCH               string `json:"goarch,omitempty"`
 	}{
 		Version:              vars.Version,
 		DefaultProtocVersion: vars.DefaultProtocVersion,
@@ -109,15 +109,15 @@ func (r *runner) Version(output string) error {
 		GOARCH:               runtime.GOARCH,
 	}
 
-	switch output {
-	case "json":
+	if r.json {
 		enc := json.NewEncoder(r.output)
 		enc.SetIndent("", "  ")
+
 		if err := enc.Encode(out); err != nil {
 			return err
 		}
 		return nil
-	default: // for backwards compatibility
+	} else {
 		tabWriter := newTabWriter(r.output)
 		if _, err := fmt.Fprintf(tabWriter, "Version:\t%s\n", out.Version); err != nil {
 			return err
