@@ -551,11 +551,7 @@ func TestVersion(t *testing.T) {
 }
 
 func TestVersionJSON(t *testing.T) {
-	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--output=json")
-}
-
-func TestVersionTabs(t *testing.T) {
-	assertRegexp(t, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version", "--output=tabs")
+	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
 func TestListAllLintGroups(t *testing.T) {
