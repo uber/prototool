@@ -21,6 +21,7 @@
 package grpc
 
 import (
+	"encoding/json"
 	"io"
 
 	"github.com/fullstorydev/grpcurl"
@@ -32,20 +33,23 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var jsonpbMarshaler = &jsonpb.Marshaler{Indent: "  "}
+var jsonpbMarshaler = &jsonpb.Marshaler{}
+var jsonpbPrettyMarshaler = &jsonpb.Marshaler{Indent: "  "}
 
 var _ grpcurl.InvocationEventHandler = &invocationEventHandler{}
 
 type invocationEventHandler struct {
-	output io.Writer
-	logger *zap.Logger
-	err    error
+	output     io.Writer
+	logger     *zap.Logger
+	jsonOutput bool
+	err        error
 }
 
-func newInvocationEventHandler(output io.Writer, logger *zap.Logger) *invocationEventHandler {
+func newInvocationEventHandler(output io.Writer, logger *zap.Logger, jsonOutput bool) *invocationEventHandler {
 	return &invocationEventHandler{
-		output: output,
-		logger: logger,
+		output:     output,
+		logger:     logger,
+		jsonOutput: jsonOutput,
 	}
 }
 
@@ -53,15 +57,52 @@ func (i *invocationEventHandler) OnResolveMethod(*desc.MethodDescriptor) {}
 
 func (i *invocationEventHandler) OnSendHeaders(metadata.MD) {}
 
-func (i *invocationEventHandler) OnReceiveHeaders(metadata.MD) {}
-
-func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
-	i.println(i.marshal(message))
+func (i *invocationEventHandler) OnReceiveHeaders(headers metadata.MD) {
+	if !i.jsonOutput {
+		return
+	}
+	if len(headers) != 0 {
+		if s := i.marshalJSON(headers); s != "" {
+			i.println(`{"headers":` + s + "}")
+		}
+	}
 }
 
-func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, _ metadata.MD) {
+func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
+	if !i.jsonOutput {
+		i.println(i.marshal(message, true))
+		return
+	}
+	if s := i.marshal(message, false); s != "" && s != "{}" {
+		i.println(`{"response":` + s + `}`)
+	}
+}
+
+func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, trailers metadata.MD) {
 	if err := s.Err(); err != nil {
 		i.err = err
+	}
+	if !i.jsonOutput {
+		return
+	}
+	ss := i.marshal(s.Proto(), false)
+	if ss == "{}" {
+		ss = ""
+	}
+	if ss != "" {
+		ss = `"status":` + ss
+	}
+	var st string
+	if len(trailers) != 0 {
+		if st = i.marshalJSON(trailers); st != "" {
+			st = `"trailers":` + st
+			if ss != "" {
+				st = `,` + st
+			}
+		}
+	}
+	if ss != "" || st != "" {
+		i.println(`{` + ss + st + `}`)
 	}
 }
 
@@ -69,13 +110,32 @@ func (i *invocationEventHandler) Err() error {
 	return i.err
 }
 
-func (i *invocationEventHandler) marshal(message proto.Message) string {
-	s, err := jsonpbMarshaler.MarshalToString(message)
+func (i *invocationEventHandler) marshal(message proto.Message, pretty bool) string {
+	if message == nil {
+		return ""
+	}
+	jsonMarshaler := jsonpbMarshaler
+	if pretty {
+		jsonMarshaler = jsonpbPrettyMarshaler
+	}
+	s, err := jsonMarshaler.MarshalToString(message)
 	if err != nil {
 		i.logger.Error("marshal error", zap.Error(err))
 		return ""
 	}
 	return s
+}
+
+func (i *invocationEventHandler) marshalJSON(input interface{}) string {
+	if input == nil {
+		return ""
+	}
+	data, err := json.Marshal(input)
+	if err != nil {
+		i.logger.Error("marshal error", zap.Error(err))
+		return ""
+	}
+	return string(data)
 }
 
 func (i *invocationEventHandler) println(s string) {

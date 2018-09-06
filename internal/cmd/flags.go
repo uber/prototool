@@ -37,6 +37,7 @@ type flags struct {
 	dryRun         bool
 	fix            bool
 	headers        []string
+	jsonOutput     bool
 	keepaliveTime  string
 	json           bool
 	listAllLinters bool
@@ -93,6 +94,10 @@ func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 	flagSet.StringSliceVarP(&f.headers, "header", "H", []string{}, "Additional request headers in 'name:value' format.")
+}
+
+func (f *flags) bindJSONOutput(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.jsonOutput, "json-output", false, "Output the response in JSON format along with header/trailer/status details.")
 }
 
 func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
