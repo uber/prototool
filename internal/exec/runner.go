@@ -117,32 +117,32 @@ func (r *runner) Version() error {
 			return err
 		}
 		return nil
-	} else {
-		tabWriter := newTabWriter(r.output)
-		if _, err := fmt.Fprintf(tabWriter, "Version:\t%s\n", out.Version); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(tabWriter, "Default protoc version:\t%s\n", out.DefaultProtocVersion); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintf(tabWriter, "Go version:\t%s\n", out.GoVersion); err != nil {
-			return err
-		}
-		if out.GitCommit != "" {
-			if _, err := fmt.Fprintf(tabWriter, "Git commit:\t%s\n", out.GitCommit); err != nil {
-				return err
-			}
-		}
-		if out.BuiltTimestamp != "" {
-			if _, err := fmt.Fprintf(tabWriter, "Built:\t%s\n", out.BuiltTimestamp); err != nil {
-				return err
-			}
-		}
-		if _, err := fmt.Fprintf(tabWriter, "OS/Arch:\t%s/%s\n", out.GOOS, out.GOARCH); err != nil {
-			return err
-		}
-		return tabWriter.Flush()
 	}
+
+	tabWriter := newTabWriter(r.output)
+	if _, err := fmt.Fprintf(tabWriter, "Version:\t%s\n", out.Version); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(tabWriter, "Default protoc version:\t%s\n", out.DefaultProtocVersion); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(tabWriter, "Go version:\t%s\n", out.GoVersion); err != nil {
+		return err
+	}
+	if out.GitCommit != "" {
+		if _, err := fmt.Fprintf(tabWriter, "Git commit:\t%s\n", out.GitCommit); err != nil {
+			return err
+		}
+	}
+	if out.BuiltTimestamp != "" {
+		if _, err := fmt.Fprintf(tabWriter, "Built:\t%s\n", out.BuiltTimestamp); err != nil {
+			return err
+		}
+	}
+	if _, err := fmt.Fprintf(tabWriter, "OS/Arch:\t%s/%s\n", out.GOOS, out.GOARCH); err != nil {
+		return err
+	}
+	return tabWriter.Flush()
 }
 
 func (r *runner) Init(args []string, uncomment bool) error {
