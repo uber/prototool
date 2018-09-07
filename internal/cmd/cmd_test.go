@@ -35,9 +35,12 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/uber/prototool/internal/desc"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
@@ -114,6 +117,22 @@ func TestCompile(t *testing.T) {
 		true,
 		`{"filename":"testdata/compile/errors_on_import/dep_errors.proto","line":6,"column":1,"message":"Expected \";\"."}`,
 		"testdata/compile/errors_on_import/dep_errors.proto",
+	)
+
+	assertDoCompileFilesOut(
+		t,
+		true,
+		"testdata/compile/out/desc.out",
+		"testdata/compile/out",
+		"testdata/compile/out/protoc.out",
+	)
+
+	assertDoCompileFilesOut(
+		t,
+		false,
+		"testdata/compile/out/protoc.out", /*already exists*/
+		"testdata/compile/out",
+		"testdata/compile/out/protoc.out",
 	)
 }
 
@@ -683,6 +702,58 @@ func assertDoCompileFiles(t *testing.T, expectSuccess bool, asJSON bool, expecte
 		cmd = append(cmd, "--json")
 	}
 	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append(cmd, filePaths...)...)
+}
+
+func assertDoCompileFilesOut(t *testing.T, expectSuccess bool, compileOutput string, filesOrDir string, wantBinPath string) {
+	// Tip for creating binary with protoc:
+	//
+	// Get includes using
+	//  `prototool compile --dry-run`
+	// Then use
+	//  `protoc [add includes here] -o protoc.out --include_imports`
+
+	output, exitCode := testDo(t, "compile", filesOrDir, "--out", compileOutput)
+	if !expectSuccess {
+		assert.NotZero(t, exitCode, "exit code was zero")
+		assert.NotEmpty(t, output, "expected error output")
+		return
+	}
+
+	if !assert.Zero(t, exitCode, "exit code was not zero") ||
+		!assert.Empty(t, output, "unexpected output") {
+		return
+	}
+
+	defer os.Remove(compileOutput)
+
+	// ensure we can unmarshal to FileDescriptorSet
+	outputBin, err := ioutil.ReadFile(compileOutput)
+	if !assert.NoError(t, err) {
+		return
+	}
+	outputSet := &descriptor.FileDescriptorSet{}
+	err = proto.Unmarshal(outputBin, outputSet)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	if wantBinPath == "" {
+		return
+	}
+
+	// validate output against compareBin by unmarshalling and sorting
+	wantBin, err := ioutil.ReadFile(wantBinPath)
+	if !assert.NoError(t, err) {
+		return
+	}
+
+	wantSet := &descriptor.FileDescriptorSet{}
+	err = proto.Unmarshal(wantBin, wantSet)
+	if !assert.NoError(t, err) {
+		return
+	}
+	desc.SortFileDescriptorSet(wantSet)
+	assert.Equal(t, wantSet, outputSet)
 }
 
 func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath string, pkgOverride string, expectedFileData string) {

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package bar;
+
+import "google/protobuf/timestamp.proto";
+import "foo/foo.proto";
+
+message Bar {
+  int64 hello = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  foo.Dep foodep = 3;
+}

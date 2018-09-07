@@ -35,6 +35,7 @@ type flags struct {
 	disableFormat  bool
 	disableLint    bool
 	dryRun         bool
+	compileOut     string
 	fix            bool
 	headers        []string
 	keepaliveTime  string
@@ -65,6 +66,10 @@ func (f *flags) bindCallTimeout(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindConnectTimeout(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.connectTimeout, "connect-timeout", "10s", "The maximum time to wait for the connection to be established.")
+}
+
+func (f *flags) bindCompileOut(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.compileOut, "out", "", "File path to compile file descriptor set to.")
 }
 
 func (f *flags) bindData(flagSet *pflag.FlagSet) {

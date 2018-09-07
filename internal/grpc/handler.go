@@ -125,7 +125,7 @@ func (h *handler) getDescriptorSourceForMethod(fileDescriptorSets []*descriptor.
 	if err != nil {
 		return nil, err
 	}
-	fileDescriptorSet, err := desc.SortFileDescriptorSet(service.FileDescriptorSet, service.FileDescriptorProto)
+	fileDescriptorSet, err := desc.SortFileDescriptorSetAtEnd(service.FileDescriptorSet, service.FileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}

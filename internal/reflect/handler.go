@@ -78,7 +78,7 @@ func (h *handler) getDynamicMessage(fileDescriptorSets []*descriptor.FileDescrip
 	if err != nil {
 		return nil, err
 	}
-	fileDescriptorSet, err := intdesc.SortFileDescriptorSet(message.FileDescriptorSet, message.FileDescriptorProto)
+	fileDescriptorSet, err := intdesc.SortFileDescriptorSetAtEnd(message.FileDescriptorSet, message.FileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}
