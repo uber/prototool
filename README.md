@@ -407,7 +407,6 @@ set -euo pipefail
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
-prototool config init "${TMPDIR}"
 echo $'protoc\n  version: 3.6.1' > "${TMPDIR}/prototool.yaml"
 echo 'syntax = "proto3";' > "${TMPDIR}/tmp.proto"
 prototool compile "${TMPDIR}"
