@@ -431,6 +431,8 @@ Instead of doing `prototool config init /tmp/prototool-bootstrap`.
 
 `protoc` is not statically compiled, and adding this packages fixes the problem.
 
+---
+
 **Question:** I don't like some of the choice you made in the Style Guide and that are enforced by default by the linter. Can we change some
 of the choices?\
 **Answer:** Sorry, but we can't - our goal with Prototool is to provide an easily-followable Style Guide that minimizes issues that arise
