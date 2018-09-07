@@ -82,7 +82,7 @@ func (c *configProvider) Get(filePath string) (Config, error) {
 
 func (c *configProvider) GetForData(dirPath string, externalConfigData string) (Config, error) {
 	var externalConfig ExternalConfig
-	if err := json.Unmarshal([]byte(externalConfigData), &externalConfig); err != nil {
+	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
 		return Config{}, err
 	}
 	dirPath = filepath.Clean(dirPath)
@@ -103,7 +103,7 @@ func (c *configProvider) GetExcludePrefixesForData(dirPath string, externalConfi
 	}
 	dirPath = filepath.Clean(dirPath)
 	var externalConfig ExternalConfig
-	if err := json.Unmarshal([]byte(externalConfigData), &externalConfig); err != nil {
+	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
 		return nil, err
 	}
 	return getExcludePrefixes(externalConfig.Excludes, dirPath)

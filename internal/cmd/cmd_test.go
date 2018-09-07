@@ -386,6 +386,15 @@ func TestLintConfigDataOverride(t *testing.T) {
 		"--config-data",
 		`{}`,
 	)
+	assertExact(
+		t,
+		1,
+		`json: unknown field "unknown_key"`,
+		"lint",
+		"gopackagelongform.proto",
+		"--config-data",
+		`{"unknown_key":"foo"}`,
+	)
 }
 
 func TestGoldenFormat(t *testing.T) {
