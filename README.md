@@ -488,7 +488,7 @@ docker build -t me/prototool-env .
 Then, assuming you are in the directory you want to pass to Prototool and you want to run `prototool compile`, run:
 
 ```bash
-docker run -v $(pwd):/in me/prototool-env compile /in
+docker run -v $(pwd):/in me/prototool-env compile
 ```
 
 ##### Lint/Format Choices
