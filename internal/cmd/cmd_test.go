@@ -550,6 +550,10 @@ func TestVersion(t *testing.T) {
 	assertRegexp(t, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
 }
 
+func TestVersionJSON(t *testing.T) {
+	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
+}
+
 func TestListAllLintGroups(t *testing.T) {
 	assertExact(t, 0, "all\ndefault", "list-all-lint-groups")
 }

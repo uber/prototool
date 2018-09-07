@@ -91,27 +91,55 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 }
 
 func (r *runner) Version() error {
+	out := struct {
+		Version              string `json:"version,omitempty"`
+		DefaultProtocVersion string `json:"default_protoc_version,omitempty"`
+		GoVersion            string `json:"go_version,omitempty"`
+		GitCommit            string `json:"git_commit,omitempty"`
+		BuiltTimestamp       string `json:"built_timestamp,omitempty"`
+		GOOS                 string `json:"goos,omitempty"`
+		GOARCH               string `json:"goarch,omitempty"`
+	}{
+		Version:              vars.Version,
+		DefaultProtocVersion: vars.DefaultProtocVersion,
+		GoVersion:            runtime.Version(),
+		GitCommit:            vars.GitCommit,
+		BuiltTimestamp:       vars.BuiltTimestamp,
+		GOOS:                 runtime.GOOS,
+		GOARCH:               runtime.GOARCH,
+	}
+
+	if r.json {
+		enc := json.NewEncoder(r.output)
+		enc.SetIndent("", "  ")
+
+		if err := enc.Encode(out); err != nil {
+			return err
+		}
+		return nil
+	}
+
 	tabWriter := newTabWriter(r.output)
-	if _, err := fmt.Fprintf(tabWriter, "Version:\t%s\n", vars.Version); err != nil {
+	if _, err := fmt.Fprintf(tabWriter, "Version:\t%s\n", out.Version); err != nil {
 		return err
 	}
-	if _, err := fmt.Fprintf(tabWriter, "Default protoc version:\t%s\n", vars.DefaultProtocVersion); err != nil {
+	if _, err := fmt.Fprintf(tabWriter, "Default protoc version:\t%s\n", out.DefaultProtocVersion); err != nil {
 		return err
 	}
-	if _, err := fmt.Fprintf(tabWriter, "Go version:\t%s\n", runtime.Version()); err != nil {
+	if _, err := fmt.Fprintf(tabWriter, "Go version:\t%s\n", out.GoVersion); err != nil {
 		return err
 	}
-	if vars.GitCommit != "" {
-		if _, err := fmt.Fprintf(tabWriter, "Git commit:\t%s\n", vars.GitCommit); err != nil {
+	if out.GitCommit != "" {
+		if _, err := fmt.Fprintf(tabWriter, "Git commit:\t%s\n", out.GitCommit); err != nil {
 			return err
 		}
 	}
-	if vars.BuiltTimestamp != "" {
-		if _, err := fmt.Fprintf(tabWriter, "Built:\t%s\n", vars.BuiltTimestamp); err != nil {
+	if out.BuiltTimestamp != "" {
+		if _, err := fmt.Fprintf(tabWriter, "Built:\t%s\n", out.BuiltTimestamp); err != nil {
 			return err
 		}
 	}
-	if _, err := fmt.Fprintf(tabWriter, "OS/Arch:\t%s/%s\n", runtime.GOOS, runtime.GOARCH); err != nil {
+	if _, err := fmt.Fprintf(tabWriter, "OS/Arch:\t%s/%s\n", out.GOOS, out.GOARCH); err != nil {
 		return err
 	}
 	return tabWriter.Flush()
