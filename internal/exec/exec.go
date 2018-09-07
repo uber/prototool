@@ -85,6 +85,13 @@ func RunnerWithCachePath(cachePath string) RunnerOption {
 	}
 }
 
+// RunnerWithConfigData returns a RunnerOption that uses the given config path.
+func RunnerWithConfigData(configData string) RunnerOption {
+	return func(runner *runner) {
+		runner.configData = configData
+	}
+}
+
 // RunnerWithJSON returns a RunnerOption that will print failures as JSON.
 func RunnerWithJSON() RunnerOption {
 	return func(runner *runner) {

@@ -119,6 +119,17 @@ func ProtoSetProviderWithLogger(logger *zap.Logger) ProtoSetProviderOption {
 	}
 }
 
+// ProtoSetProviderWithConfigData returns a ProtoSetProviderOption that uses the given configuration
+// data instead of using configuration files that are found. This acts as if there is only one
+// configuration file at the given directory path. All found configuration files are ignored.
+// Both configDirPath and configData must be non-empty.
+func ProtoSetProviderWithConfigData(configDirPath string, configData string) ProtoSetProviderOption {
+	return func(protoSetProvider *protoSetProvider) {
+		protoSetProvider.configDirPath = configDirPath
+		protoSetProvider.configData = configData
+	}
+}
+
 // ProtoSetProviderWithWalkTimeout returns a ProtoSetProviderOption will timeout after walking
 // a directory structure when searching for Protobuf files after the given amount of time.
 //

@@ -28,6 +28,7 @@ type flags struct {
 	address        string
 	cachePath      string
 	callTimeout    string
+	configData     string
 	connectTimeout string
 	data           string
 	debug          bool
@@ -61,6 +62,10 @@ func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindCallTimeout(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.callTimeout, "call-timeout", "60s", "The maximum time to for all calls to be completed.")
+}
+
+func (f *flags) bindConfigData(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.configData, "config-data", "", "The configuration data to use instead of reading prototool.yaml or prototool.json files. This will act as if there is a configuration file with the given data in the current directory, and no other configuration files recursively. This is an advanced feature and is not recommended to be generally used.")
 }
 
 func (f *flags) bindConnectTimeout(flagSet *pflag.FlagSet) {
