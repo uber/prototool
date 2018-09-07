@@ -424,7 +424,7 @@ But for Darwin or Linux, the above should work.
 
 ---
 
-**Question:** Can Prototool manage my external plugins such as protoc-gen-go?
+**Question:** Can Prototool manage my external plugins such as protoc-gen-go?\
 **Answer:** Unfortunately, no. This was an explicit design decision - Prototool is not meant to "know the world", instead
 Prototool just takes care of what it is good at (managing your Protobuf build) to keep Prototool simple, leaving you to do
 external plugin management. Prototool does provide the ability to use the "built-in" output directives `cpp, csharp, java, js, objc, php, python, ruby`
