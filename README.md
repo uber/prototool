@@ -34,6 +34,10 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
   * [Vim Integration](#vim-integration)
   * [Development](#development)
   * [FAQ](#faq)
+    * [Pre-Cache Protoc](#pre-cache-protoc)
+    * [Alpine Linux Issues](#alpine-linux-issues)
+    * [Managing External Plugins/Docker](#managing-external-pluginsdocker)
+    * [Lint/Format Choices](#lintformat-choices)
   * [Special Thanks](#special-thanks)
 
 ## Installation
@@ -383,6 +387,8 @@ All Golang code is purposefully under the `internal` package to not expose any A
 
 ## FAQ
 
+#### Pre-Cache Protoc
+
 **Question:** How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?\
 **Answer**: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
 read the configuration file to figure out what version of `protoc` to download. We may re-add this command in the future, however
@@ -414,14 +420,14 @@ prototool compile "${TMPDIR}"
 
 But for Darwin or Linux, the above should work.
 
----
+#### Alpine Linux Issues
 
 **Question:** Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!\
 **Answer:** `apk add libc6-compat`
 
 `protoc` is not statically compiled, and adding this packages fixes the problem.
 
----
+#### Managing External Plugins/Docker
 
 **Question:** Can Prototool manage my external plugins such as protoc-gen-go?\
 **Answer:** Unfortunately, no. This was an explicit design decision - Prototool is not meant to "know the world", instead
@@ -471,7 +477,7 @@ Then, assuming you are in the directory you want to pass to Prototool and you wa
 docker run -v $(pwd):/in me/prototool-env compile /in
 ```
 
----
+#### Lint/Format Choices
 
 **Question:** I don't like some of the choices made in the Style Guide and that are enforced by default by the linter and/or I don't like
 the choices made in the formatter. Can we change some things?\
