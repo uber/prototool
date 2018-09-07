@@ -365,10 +365,16 @@ Editor integration is a key goal of Prototool. We've demonstrated support intern
 
 ## Development
 
-Prototool is under active development, if you want to help, here's some places to start:
+Prototool is under active development. If you want to help, here's some places to start:
 
-- Try out `prototool` and file issues, including points that are unclear in the documentation.
-- Put up PRs with any changes you'd like to see made. We appreciate any input!
+- Try out `prototool` and file feature requests or bug reports.
+- Submit PRs with any changes you'd like to see made.
+
+We appreciate any input you have!
+
+Before filing an issue or submitting a PR, make sure to review the [Issue Guidelines](https://github.com/uber/prototool/blob/dev/.github/ISSUE_TEMPLATE.md), and before submitting a PR, make sure to also review
+the [PR Guidelines](https://github.com/uber/prototool/blob/dev/.github/PULL_REQUEST_TEMPLATE.md). The Issue Guidelines will show up in the description field when filing a new issue, and the PR guidelines will show up in the
+description field when submitting a PR, but clear the description field of this pre-populated text once you've read it :-)
 
 Note that development of Prototool will only work with Golang 1.10 or newer. On initially cloning the repository, run `make init` if you have not already to download dependencies to `vendor`.
 
