@@ -65,7 +65,7 @@ func (f *flags) bindCallTimeout(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindConfigData(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.configData, "config-data", "", "The configuration data to use instead of reading prototool.yaml or prototool.json files. This will act as if there is a configuration file with the given data in the current directory, and no other configuration files recursively. This is an advanced feature and is not recommended to be generally used.")
+	flagSet.StringVar(&f.configData, "config-data", "", "The configuration data to use instead of reading prototool.yaml or prototool.json files.\nThis will act as if there is a configuration file with the given data in the current directory, and no other configuration files recursively.\nThis is an advanced feature and is not recommended to be generally used.")
 }
 
 func (f *flags) bindConnectTimeout(flagSet *pflag.FlagSet) {
