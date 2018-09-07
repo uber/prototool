@@ -11,3 +11,5 @@ Before submitting, make sure to:
 PRs will not be properly evaluated until they pass CI - we've done what we can to make this easy
 to replicate locally, and we apologize if this comes across as impersonal. Our goal is to streamline
 Prototool development and make sure everyone is on the same page here.
+
+Please do not @ individual maintainers in the description! We appreciate it.

@@ -11,6 +11,8 @@ Before filing, a couple guidelines:
   you'd like to see with as many specifics as you can provide.
 - If this is a bug report, please provide specific steps to reproduce your issue.
 
+Please do not @ individual maintainers in the description! We appreciate it.
+
 If your issue doesn't meet the guidelines, we'll comment as such and close the issue - we don't
 mean to be impersonal, but we have to reduce the support burden and cannot be supporting all
 of Protobuf (in the case of Protobuf questions or Protoc issues) or have longstanding issues
