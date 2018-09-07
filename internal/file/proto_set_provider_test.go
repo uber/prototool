@@ -37,55 +37,54 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 	protoSetProvider := newTestProtoSetProvider(t)
 	protoSets, err := protoSetProvider.GetMultipleForFiles(
 		cwd,
-		"testdata/a/file.proto",
-		"testdata/b/file.proto",
-		"testdata/c/file.proto",
-		"testdata/a/d/file.proto",
-		"testdata/a/d/file2.proto",
-		"testdata/a/d/file3.proto",
-		"testdata/a/e/file.proto",
-		"testdata/a/f/file.proto",
-		"testdata/b/g/h/file.proto",
+		"testdata/valid/base/a/file.proto",
+		"testdata/valid/base/b/file.proto",
+		"testdata/valid/base/c/file.proto",
+		"testdata/valid/base/a/d/file.proto",
+		"testdata/valid/base/a/d/file2.proto",
+		"testdata/valid/base/a/d/file3.proto",
+		"testdata/valid/base/a/e/file.proto",
+		"testdata/valid/base/a/f/file.proto",
+		"testdata/valid/base/b/g/h/file.proto",
 	)
 	require.NoError(t, err)
 	require.Equal(
 		t,
 		[]*ProtoSet{
-
 			&ProtoSet{
 				WorkDirPath: cwd,
 				DirPath:     cwd,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a": []*ProtoFile{
+					cwd + "/testdata/valid/base/a": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/file.proto",
-							DisplayPath: "testdata/a/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/file.proto",
+							DisplayPath: "testdata/valid/base/a/file.proto",
 						},
 					},
-					cwd + "/testdata/c": []*ProtoFile{
+					cwd + "/testdata/valid/base/c": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/c/file.proto",
-							DisplayPath: "testdata/c/file.proto",
+							Path:        cwd + "/testdata/valid/base/c/file.proto",
+							DisplayPath: "testdata/valid/base/c/file.proto",
 						},
 					},
-					cwd + "/testdata/a/e": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/e/file.proto",
-							DisplayPath: "testdata/a/e/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
+							DisplayPath: "testdata/valid/base/a/e/file.proto",
 						},
 					},
-					cwd + "/testdata/a/f": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/f/file.proto",
-							DisplayPath: "testdata/a/f/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
+							DisplayPath: "testdata/valid/base/a/f/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata",
+					DirPath: cwd + "/testdata/valid/base",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/c/i",
-						cwd + "/testdata/d",
+						cwd + "/testdata/valid/base/c/i",
+						cwd + "/testdata/valid/base/d",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.4.0",
@@ -107,25 +106,25 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 				WorkDirPath: cwd,
 				DirPath:     cwd,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/d/file.proto",
-							DisplayPath: "testdata/a/d/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
+							DisplayPath: "testdata/valid/base/a/d/file.proto",
 						},
 						{
-							Path:        cwd + "/testdata/a/d/file2.proto",
-							DisplayPath: "testdata/a/d/file2.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file2.proto",
+							DisplayPath: "testdata/valid/base/a/d/file2.proto",
 						},
 						{
-							Path:        cwd + "/testdata/a/d/file3.proto",
-							DisplayPath: "testdata/a/d/file3.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file3.proto",
+							DisplayPath: "testdata/valid/base/a/d/file3.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/a/d",
+					DirPath: cwd + "/testdata/valid/base/a/d",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/a/d/file3.proto",
+						cwd + "/testdata/valid/base/a/d/file3.proto",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.2.0",
@@ -147,23 +146,23 @@ func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
 				WorkDirPath: cwd,
 				DirPath:     cwd,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/b": []*ProtoFile{
+					cwd + "/testdata/valid/base/b": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/b/file.proto",
-							DisplayPath: "testdata/b/file.proto",
+							Path:        cwd + "/testdata/valid/base/b/file.proto",
+							DisplayPath: "testdata/valid/base/b/file.proto",
 						},
 					},
-					cwd + "/testdata/b/g/h": []*ProtoFile{
+					cwd + "/testdata/valid/base/b/g/h": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/b/g/h/file.proto",
-							DisplayPath: "testdata/b/g/h/file.proto",
+							Path:        cwd + "/testdata/valid/base/b/g/h/file.proto",
+							DisplayPath: "testdata/valid/base/b/g/h/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/b",
+					DirPath: cwd + "/testdata/valid/base/b",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/b/g/h",
+						cwd + "/testdata/valid/base/b/g/h",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.3.0",
@@ -192,52 +191,51 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 	protoSetProvider := newTestProtoSetProvider(t)
 	protoSets, err := protoSetProvider.GetMultipleForFiles(
 		cwd,
-		"testdata/a/file.proto",
-		"testdata/c/file.proto",
-		"testdata/a/d/file.proto",
-		"testdata/a/d/file3.proto",
-		"testdata/a/e/file.proto",
-		"testdata/a/f/file.proto",
+		"testdata/valid/base/a/file.proto",
+		"testdata/valid/base/c/file.proto",
+		"testdata/valid/base/a/d/file.proto",
+		"testdata/valid/base/a/d/file3.proto",
+		"testdata/valid/base/a/e/file.proto",
+		"testdata/valid/base/a/f/file.proto",
 	)
 	require.NoError(t, err)
 	require.Equal(
 		t,
 		[]*ProtoSet{
-
 			&ProtoSet{
 				WorkDirPath: cwd,
 				DirPath:     cwd,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a": []*ProtoFile{
+					cwd + "/testdata/valid/base/a": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/file.proto",
-							DisplayPath: "testdata/a/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/file.proto",
+							DisplayPath: "testdata/valid/base/a/file.proto",
 						},
 					},
-					cwd + "/testdata/c": []*ProtoFile{
+					cwd + "/testdata/valid/base/c": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/c/file.proto",
-							DisplayPath: "testdata/c/file.proto",
+							Path:        cwd + "/testdata/valid/base/c/file.proto",
+							DisplayPath: "testdata/valid/base/c/file.proto",
 						},
 					},
-					cwd + "/testdata/a/e": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/e/file.proto",
-							DisplayPath: "testdata/a/e/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
+							DisplayPath: "testdata/valid/base/a/e/file.proto",
 						},
 					},
-					cwd + "/testdata/a/f": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/f/file.proto",
-							DisplayPath: "testdata/a/f/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
+							DisplayPath: "testdata/valid/base/a/f/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata",
+					DirPath: cwd + "/testdata/valid/base",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/c/i",
-						cwd + "/testdata/d",
+						cwd + "/testdata/valid/base/c/i",
+						cwd + "/testdata/valid/base/d",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.4.0",
@@ -259,21 +257,21 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 				WorkDirPath: cwd,
 				DirPath:     cwd,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/d/file.proto",
-							DisplayPath: "testdata/a/d/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
+							DisplayPath: "testdata/valid/base/a/d/file.proto",
 						},
 						{
-							Path:        cwd + "/testdata/a/d/file3.proto",
-							DisplayPath: "testdata/a/d/file3.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file3.proto",
+							DisplayPath: "testdata/valid/base/a/d/file3.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/a/d",
+					DirPath: cwd + "/testdata/valid/base/a/d",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/a/d/file3.proto",
+						cwd + "/testdata/valid/base/a/d/file3.proto",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.2.0",
@@ -296,50 +294,54 @@ func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
 	)
 }
 
-func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
+// We need to use valid as a representation of "cwd" so we verify
+// that we do the recursive search properly. We used to use actual cwd,
+// however since we added testdata/invalid, this will not work anymore.
+// This is why we have the subdirectory "base" inside valid.
+func TestProtoSetProviderGetMultipleForDirCwdAsValidRel(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
+	validDirPath := filepath.Join(cwd, "testdata", "valid")
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, ".")
+	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, filepath.Join(".", "testdata", "valid"))
 	require.NoError(t, err)
 	require.Equal(
 		t,
 		[]*ProtoSet{
-
 			&ProtoSet{
 				WorkDirPath: cwd,
-				DirPath:     cwd,
+				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a": []*ProtoFile{
+					cwd + "/testdata/valid/base/a": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/file.proto",
-							DisplayPath: "testdata/a/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/file.proto",
+							DisplayPath: "testdata/valid/base/a/file.proto",
 						},
 					},
-					cwd + "/testdata/c": []*ProtoFile{
+					cwd + "/testdata/valid/base/c": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/c/file.proto",
-							DisplayPath: "testdata/c/file.proto",
+							Path:        cwd + "/testdata/valid/base/c/file.proto",
+							DisplayPath: "testdata/valid/base/c/file.proto",
 						},
 					},
-					cwd + "/testdata/a/e": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/e/file.proto",
-							DisplayPath: "testdata/a/e/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
+							DisplayPath: "testdata/valid/base/a/e/file.proto",
 						},
 					},
-					cwd + "/testdata/a/f": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/f/file.proto",
-							DisplayPath: "testdata/a/f/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
+							DisplayPath: "testdata/valid/base/a/f/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata",
+					DirPath: cwd + "/testdata/valid/base",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/c/i",
-						cwd + "/testdata/d",
+						cwd + "/testdata/valid/base/c/i",
+						cwd + "/testdata/valid/base/d",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.4.0",
@@ -359,23 +361,23 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 			},
 			&ProtoSet{
 				WorkDirPath: cwd,
-				DirPath:     cwd,
+				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/d/file.proto",
-							DisplayPath: "testdata/a/d/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
+							DisplayPath: "testdata/valid/base/a/d/file.proto",
 						},
 						{
-							Path:        cwd + "/testdata/a/d/file2.proto",
-							DisplayPath: "testdata/a/d/file2.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file2.proto",
+							DisplayPath: "testdata/valid/base/a/d/file2.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/a/d",
+					DirPath: cwd + "/testdata/valid/base/a/d",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/a/d/file3.proto",
+						cwd + "/testdata/valid/base/a/d/file3.proto",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.2.0",
@@ -395,19 +397,19 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 			},
 			&ProtoSet{
 				WorkDirPath: cwd,
-				DirPath:     cwd,
+				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/b": []*ProtoFile{
+					cwd + "/testdata/valid/base/b": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/b/file.proto",
-							DisplayPath: "testdata/b/file.proto",
+							Path:        cwd + "/testdata/valid/base/b/file.proto",
+							DisplayPath: "testdata/valid/base/b/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/b",
+					DirPath: cwd + "/testdata/valid/base/b",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/b/g/h",
+						cwd + "/testdata/valid/base/b/g/h",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.3.0",
@@ -430,50 +432,54 @@ func TestProtoSetProviderGetMultipleForDirCwdRel(t *testing.T) {
 	)
 }
 
+// We need to use valid as a representation of "cwd" so we verify
+// that we do the recursive search properly. We used to use actual cwd,
+// however since we added testdata/invalid, this will not work anymore.
+// This is why we have the subdirectory "base" inside valid.
 func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
+	validDirPath := filepath.Join(cwd, "testdata", "valid")
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, cwd)
+	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, validDirPath)
 	require.NoError(t, err)
 	require.Equal(
 		t,
 		[]*ProtoSet{
-
 			&ProtoSet{
 				WorkDirPath: cwd,
-				DirPath:     cwd,
+				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a": []*ProtoFile{
+					cwd + "/testdata/valid/base/a": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/file.proto",
-							DisplayPath: "testdata/a/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/file.proto",
+							DisplayPath: "testdata/valid/base/a/file.proto",
 						},
 					},
-					cwd + "/testdata/c": []*ProtoFile{
+					cwd + "/testdata/valid/base/c": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/c/file.proto",
-							DisplayPath: "testdata/c/file.proto",
+							Path:        cwd + "/testdata/valid/base/c/file.proto",
+							DisplayPath: "testdata/valid/base/c/file.proto",
 						},
 					},
-					cwd + "/testdata/a/e": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/e/file.proto",
-							DisplayPath: "testdata/a/e/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
+							DisplayPath: "testdata/valid/base/a/e/file.proto",
 						},
 					},
-					cwd + "/testdata/a/f": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/f/file.proto",
-							DisplayPath: "testdata/a/f/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
+							DisplayPath: "testdata/valid/base/a/f/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata",
+					DirPath: cwd + "/testdata/valid/base",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/c/i",
-						cwd + "/testdata/d",
+						cwd + "/testdata/valid/base/c/i",
+						cwd + "/testdata/valid/base/d",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.4.0",
@@ -493,23 +499,23 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 			},
 			&ProtoSet{
 				WorkDirPath: cwd,
-				DirPath:     cwd,
+				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/a/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/a/d/file.proto",
-							DisplayPath: "testdata/a/d/file.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
+							DisplayPath: "testdata/valid/base/a/d/file.proto",
 						},
 						{
-							Path:        cwd + "/testdata/a/d/file2.proto",
-							DisplayPath: "testdata/a/d/file2.proto",
+							Path:        cwd + "/testdata/valid/base/a/d/file2.proto",
+							DisplayPath: "testdata/valid/base/a/d/file2.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/a/d",
+					DirPath: cwd + "/testdata/valid/base/a/d",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/a/d/file3.proto",
+						cwd + "/testdata/valid/base/a/d/file3.proto",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.2.0",
@@ -529,19 +535,19 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 			},
 			&ProtoSet{
 				WorkDirPath: cwd,
-				DirPath:     cwd,
+				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/b": []*ProtoFile{
+					cwd + "/testdata/valid/base/b": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/b/file.proto",
-							DisplayPath: "testdata/b/file.proto",
+							Path:        cwd + "/testdata/valid/base/b/file.proto",
+							DisplayPath: "testdata/valid/base/b/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath: cwd + "/testdata/b",
+					DirPath: cwd + "/testdata/valid/base/b",
 					ExcludePrefixes: []string{
-						cwd + "/testdata/b/g/h",
+						cwd + "/testdata/valid/base/b/g/h",
 					},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.3.0",
@@ -568,30 +574,30 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, "testdata/d/g")
+	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, "testdata/valid/base/d/g")
 	require.NoError(t, err)
 	require.Equal(
 		t,
 		[]*ProtoSet{
 			&ProtoSet{
 				WorkDirPath: cwd,
-				DirPath:     cwd + "/testdata/d/g",
+				DirPath:     cwd + "/testdata/valid/base/d/g",
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/d": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/d/file.proto",
-							DisplayPath: "testdata/d/file.proto",
+							Path:        cwd + "/testdata/valid/base/d/file.proto",
+							DisplayPath: "testdata/valid/base/d/file.proto",
 						},
 					},
-					cwd + "/testdata/d/g/h": []*ProtoFile{
+					cwd + "/testdata/valid/base/d/g/h": []*ProtoFile{
 						{
-							Path:        cwd + "/testdata/d/g/h/file.proto",
-							DisplayPath: "testdata/d/g/h/file.proto",
+							Path:        cwd + "/testdata/valid/base/d/g/h/file.proto",
+							DisplayPath: "testdata/valid/base/d/g/h/file.proto",
 						},
 					},
 				},
 				Config: settings.Config{
-					DirPath:         cwd + "/testdata/d",
+					DirPath:         cwd + "/testdata/valid/base/d",
 					ExcludePrefixes: []string{},
 					Compile: settings.CompileConfig{
 						ProtobufVersion:       "3.3.0",
@@ -612,6 +618,15 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 		},
 		protoSets,
 	)
+}
+
+func TestProtoSetProviderGetMultipleForDirTwoConfigFiles(t *testing.T) {
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	protoSetProvider := newTestProtoSetProvider(t)
+	_, err = protoSetProvider.GetMultipleForDir(cwd, "testdata/invalid")
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "multiple configuration files")
 }
 
 func TestIsExcluded(t *testing.T) {
