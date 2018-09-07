@@ -435,10 +435,11 @@ Prototool just takes care of what it is good at (managing your Protobuf build) t
 external plugin management. Prototool does provide the ability to use the "built-in" output directives `cpp, csharp, java, js, objc, php, python, ruby`
 provided by `protoc` out of the box, however.
 
-If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. Here's an example for `protoc-gen-go`:
+If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. Here's an example `Dockerfile` that
+results in a Docker image around 33MB that contains `prototool`, a cached `protoc`, and `protoc-gen-go`:
 
 ```dockerfile
-FROM golang:1.11.0-alpine3.8
+FROM golang:1.11.0-alpine3.8 AS build
 
 ARG PROTOTOOL_VERSION=v1.2.0
 ARG PROTOC_VERSION=3.6.1
@@ -461,6 +462,19 @@ RUN go get github.com/golang/protobuf/... && \
   cd /go/src/github.com/golang/protobuf && \
   git checkout $PROTOC_GEN_GO_VERSION && \
   go install ./protoc-gen-go
+
+FROM alpine:3.8
+
+WORKDIR /in
+
+RUN \
+  apk update && \
+  apk add libc6-compat && \
+  rm -rf /var/cache/apk/*
+
+COPY --from=build /bin/prototool /bin/prototool
+COPY --from=build /root/.cache/prototool /root/.cache/prototool
+COPY --from=build /go/bin/protoc-gen-go /bin/protoc-gen-go
 
 ENTRYPOINT ["/bin/prototool"]
 ```
