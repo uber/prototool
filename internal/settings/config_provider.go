@@ -21,6 +21,7 @@
 package settings
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -178,7 +179,7 @@ func getExternalConfig(filePath string) (ExternalConfig, error) {
 		if len(data) == 0 {
 			return externalConfig, nil
 		}
-		if err := json.Unmarshal(data, &externalConfig); err != nil {
+		if err := jsonUnmarshalStrict(data, &externalConfig); err != nil {
 			return ExternalConfig{}, err
 		}
 		return externalConfig, nil
@@ -361,4 +362,13 @@ func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 		excludePrefixes = append(excludePrefixes, excludePrefix)
 	}
 	return excludePrefixes, nil
+}
+
+// jsonUnmarshalStrict makes sure there are no unknown fields when unmarshalling.
+// This matches what yaml.UnmarshalStrict does basically.
+// json.Unmarshal allows unknown fields.
+func jsonUnmarshalStrict(data []byte, v interface{}) error {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	return decoder.Decode(v)
 }
