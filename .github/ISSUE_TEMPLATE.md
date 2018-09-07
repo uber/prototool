@@ -15,12 +15,10 @@ Please do not @ individual maintainers in the description! We appreciate it.
 
 If your issue doesn't meet the guidelines, we'll comment as such and close the issue - we don't
 mean to be impersonal, but we have to reduce the support burden and cannot be supporting all
-of Protobuf (in the case of Protobuf questions or Protoc issues) or have longstanding issues
-without specifics (in the case of feature requests or bug reports). If the issue is a feature
-request and we don't think it meets the guidelines, don't feel like us closing the issue means
-we can't ever address it, unless we specifically note that we won't be adding a given feature
-(in which case the issue should stay closed) - provide more specifics and re-open the issue.
-If the issue is a bug report, unless we respond that Prototool is working as intended, add
-steps to reproduce the issue and re-open the issue.
+of Protobuf. If the issue is a feature request and we don't think it meets the guidelines,
+don't feel like us closing the issue means we can't ever address it, unless we specifically
+note that we won't be adding a given feature (in which case the issue should stay closed)
+- provide more specifics and re-open the issue. If the issue is a bug report, unless we respond
+that Prototool is working as intended, add steps to reproduce the issue and re-open the issue.
 
 Again, thanks for your input, and we hope Prototool helps your development!
