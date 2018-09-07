@@ -424,6 +424,8 @@ EOF
 
 Instead of doing `prototool config init /tmp/prototool-bootstrap`.
 
+---
+
 **Question:** Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!\
 **Answer:** `apk add libc6-compat`
 
