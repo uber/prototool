@@ -432,7 +432,7 @@ provided by `protoc` out of the box, however.
 
 If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. Here's an example for `protoc-gen-go`:
 
-```docker
+```dockerfile
 FROM golang:1.11.0-alpine3.8
 
 ARG PROTOTOOL_VERSION=v1.2.0
