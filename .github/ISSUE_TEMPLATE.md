@@ -17,7 +17,7 @@ of Protobuf (in the case of Protobuf questions or Protoc issues) or have longsta
 without specifics (in the case of feature requests or bug reports). If the issue is a feature
 request and we don't think it meets the guidelines, don't feel like us closing the issue means
 we can't ever address it, unless we specifically note that we won't be adding a given feature
-(in which case the issue should be closed)- provide more specifics and re-open the issue.
+(in which case the issue should stay closed) - provide more specifics and re-open the issue.
 If the issue is a bug report, unless we respond that Prototool is working as intended, add
 steps to reproduce the issue and re-open the issue.
 
