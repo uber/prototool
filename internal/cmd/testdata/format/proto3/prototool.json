@@ -1,0 +1,10 @@
+{
+  "lint": {
+    "rules": {
+      "remove": [
+        "RPCS_HAVE_COMMENTS",
+        "REQUEST_RESPONSE_TYPES_UNIQUE"
+      ]
+    }
+  }
+}
