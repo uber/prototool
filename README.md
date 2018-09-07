@@ -391,7 +391,7 @@ here is a technique to accomplish this, including as a `RUN` directive for Docke
 ```bash
 # the first rm -rf call is not needed if this is a RUN directive for Docker
 rm -rf /tmp/prototool-bootstrap && \
-  prototool config init /tmp/prototool-bootstrap && \
+  echo $'protoc\n  version: 3.6.1' > /tmp/prototool-bootstrap/prototool.yaml && \
   echo 'syntax = "proto3";' > /tmp/prototool-bootstrap/tmp.proto && \
   prototool compile /tmp/prototool-bootstrap && \
   rm -rf /tmp/prototool-bootstrap
@@ -408,21 +408,12 @@ TMPDIR="$(mktemp -d)"
 trap 'rm -rf "${TMPDIR}"' EXIT
 
 prototool config init "${TMPDIR}"
+echo $'protoc\n  version: 3.6.1' > "${TMPDIR}/prototool.yaml"
 echo 'syntax = "proto3";' > "${TMPDIR}/tmp.proto"
 prototool compile "${TMPDIR}"
 ```
 
-But for Darwin or Linux, the above should work. If you want a specific `protoc` version, do:
-
-```bash
-# substitute /tmp/prototool-bootstrap for ${TMPDIR} if using mktemp -d
-cat << EOF > /tmp/prototool-bootstrap/prototool.yaml
-protoc:
-  version: VERSION_YOU_WANT
-EOF
-```
-
-Instead of doing `prototool config init /tmp/prototool-bootstrap`.
+But for Darwin or Linux, the above should work.
 
 ---
 
@@ -430,6 +421,56 @@ Instead of doing `prototool config init /tmp/prototool-bootstrap`.
 **Answer:** `apk add libc6-compat`
 
 `protoc` is not statically compiled, and adding this packages fixes the problem.
+
+---
+
+**Question:** Can Prototool manage my external plugins such as protoc-gen-go?
+**Answer:** Unfortunately, no. This was an explicit design decision - Prototool is not meant to "know the world", instead
+Prototool just takes care of what it is good at (managing your Protobuf build) to keep Prototool simple, leaving you to do
+external plugin management. Prototool does provide the ability to use the "built-in" output directives `cpp, csharp, java, js, objc, php, python, ruby`
+provided by `protoc` out of the box, however.
+
+If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. Here's an example for `protoc-gen-go`:
+
+```docker
+FROM golang:1.11.0-alpine3.8
+
+ARG PROTOTOOL_VERSION=v1.2.0
+ARG PROTOC_VERSION=3.6.1
+ARG PROTOC_GEN_GO_VERSION=v1.2.0
+
+RUN \
+  apk update && \
+  apk add curl git libc6-compat && \
+  rm -rf /var/cache/apk/*
+RUN \
+  curl -sSL https://github.com/uber/prototool/releases/download/$PROTOTOOL_VERSION/prototool-Linux-x86_64 -o /bin/prototool && \
+  chmod +x /bin/prototool
+RUN \
+  mkdir /tmp/prototool-bootstrap && \
+  echo $'protoc:\n  version:' $PROTOC_VERSION > /tmp/prototool-bootstrap/prototool.yaml && \
+  echo 'syntax = "proto3";' > /tmp/prototool-bootstrap/tmp.proto && \
+  prototool compile /tmp/prototool-bootstrap && \
+  rm -rf /tmp/prototool-bootstrap
+RUN go get github.com/golang/protobuf/... && \
+  cd /go/src/github.com/golang/protobuf && \
+  git checkout $PROTOC_GEN_GO_VERSION && \
+  go install ./protoc-gen-go
+
+ENTRYPOINT ["/bin/prototool"]
+```
+
+Assuming this is in a file named `Dockerfile` in your current directory, build the image with:
+
+```bash
+docker build -t me/prototool-env .
+```
+
+Then, assuming you are in the directory you want to pass to Prototool and you want to run `prototool compile`, run:
+
+```bash
+docker run -v $(pwd):/in me/prototool-env compile /in
+```
 
 ---
 
