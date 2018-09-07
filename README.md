@@ -33,6 +33,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
   * [Tips and Tricks](#tips-and-tricks)
   * [Vim Integration](#vim-integration)
   * [Development](#development)
+  * [FAQ](#faq)
   * [Special Thanks](#special-thanks)
 
 ## Installation
@@ -379,6 +380,50 @@ Before submitting a PR, make sure to:
 - Run `make` to make sure all tests pass. This is functionally equivalent to the tests run on CI.
 
 All Golang code is purposefully under the `internal` package to not expose any API for the time being.
+
+## FAQ
+
+**Q:** How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?
+
+**A**: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
+read the configuration file to figure out what version of `protoc` to download. We may re-add this command in the future, however
+here is a technique to accomplish this, including as a `RUN` directive for Docker:
+
+```bash
+# the first rm -rf call is not needed if this is a RUN directive for Docker
+rm -rf /tmp/prototool-bootstrap && \
+  prototool config init /tmp/prototool-bootstrap && \
+  echo 'syntax = "proto3";' > /tmp/prototool-bootstrap/tmp.proto && \
+  prototool compile /tmp/prototool-bootstrap && \
+  rm -rf /tmp/prototool-bootstrap
+```
+
+The better way to do this as part of a bash script would be to use `mktemp -d` i.e.:
+
+```bash
+#!/bin/bash
+
+set -euo pipefail
+
+TMPDIR="$(mktemp -d)"
+trap 'rm -rf "${TMPDIR}"' EXIT
+
+prototool config init "${TMPDIR}"
+echo 'syntax = "proto3";' > "${TMPDIR}/tmp.proto"
+prototool compile "${TMPDIR}"
+```
+
+But for Darwin or Linux, the above should work. If you want a specific `protoc` version, do:
+
+```bash
+# substitute /tmp/prototool-bootstrap for ${TMPDIR} if using mktemp -d
+cat << EOF > /tmp/prototool-bootstrap/prototool.yaml
+protoc:
+  version: VERSION_YOU_WANT
+EOF
+```
+
+Instead of doing `prototool config init /tmp/prototool-bootstrap`.
 
 ## Special Thanks
 
