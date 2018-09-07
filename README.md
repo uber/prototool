@@ -383,9 +383,9 @@ All Golang code is purposefully under the `internal` package to not expose any A
 
 ## FAQ
 
-**Q:** How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?
+**Question:** How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?
 
-**A**: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
+**Answer**: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
 read the configuration file to figure out what version of `protoc` to download. We may re-add this command in the future, however
 here is a technique to accomplish this, including as a `RUN` directive for Docker:
 
@@ -414,6 +414,21 @@ prototool compile "${TMPDIR}"
 ```
 
 But for Darwin or Linux, the above should work. If you want a specific `protoc` version, do:
+
+**Question:** Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!
+
+**Answer:** `apk add libc6-compat`.`protoc` is not statically compiled, and adding this packages fixes the problem.
+
+**Question:** I don't like some of the choice you made in the Style Guide and that are enforced by default by the linter. Can we change some
+of the choices?
+
+**Answer:** Sorry, but we can't - our goal with Prototool is to provide an easily-followable Style Guide that minimizes issues that arise
+in the use of Protobuf across a large organization. There are pros and cons to many of the choices in the Style Guide, but it's our belief
+that the best answer is a single answer, sometimes regardless of what that single answer is. If you want to ignore certain rules, you can
+do so through the configuration file, however especially if starting from a clean slate, we'd highly recommend using all of the lint rules
+as doing so results in consistent usage. Many of the lint rules exist to prevent backwards compatiblility problems down the road as your
+Protobuf schema evolves (for example, having unique response/response types per RPC, while potentially resulting in duplicated messages,
+means you won't affect an RPC you do not mean to by adding a field for another RPC).
 
 ```bash
 # substitute /tmp/prototool-bootstrap for ${TMPDIR} if using mktemp -d
