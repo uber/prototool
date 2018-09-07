@@ -414,6 +414,16 @@ prototool compile "${TMPDIR}"
 
 But for Darwin or Linux, the above should work. If you want a specific `protoc` version, do:
 
+```bash
+# substitute /tmp/prototool-bootstrap for ${TMPDIR} if using mktemp -d
+cat << EOF > /tmp/prototool-bootstrap/prototool.yaml
+protoc:
+  version: VERSION_YOU_WANT
+EOF
+```
+
+Instead of doing `prototool config init /tmp/prototool-bootstrap`.
+
 **Question:** Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!\
 **Answer:** `apk add libc6-compat`
 
@@ -428,16 +438,6 @@ do so through the configuration file, however especially if starting from a clea
 as doing so results in consistent usage. Many of the lint rules exist to prevent backwards compatiblility problems down the road as your
 Protobuf schema evolves (for example, having unique response/response types per RPC, while potentially resulting in duplicated messages,
 means you won't affect an RPC you do not mean to by adding a field for another RPC).
-
-```bash
-# substitute /tmp/prototool-bootstrap for ${TMPDIR} if using mktemp -d
-cat << EOF > /tmp/prototool-bootstrap/prototool.yaml
-protoc:
-  version: VERSION_YOU_WANT
-EOF
-```
-
-Instead of doing `prototool config init /tmp/prototool-bootstrap`.
 
 ## Special Thanks
 
