@@ -389,8 +389,8 @@ All Golang code is purposefully under the `internal` package to not expose any A
 
 ##### Pre-Cache Protoc
 
-**Question:** How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?\
-**Answer**: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
+*Question:* How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?\
+*Answer*: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
 read the configuration file to figure out what version of `protoc` to download. We may re-add this command in the future, however
 here is a technique to accomplish this, including as a `RUN` directive for Docker:
 
@@ -422,15 +422,15 @@ But for Darwin or Linux, the above should work.
 
 ##### Alpine Linux Issues
 
-**Question:** Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!\
-**Answer:** `apk add libc6-compat`
+*Question:* Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!\
+*Answer:* `apk add libc6-compat`
 
 `protoc` is not statically compiled, and adding this packages fixes the problem.
 
 ##### Managing External Plugins/Docker
 
-**Question:** Can Prototool manage my external plugins such as protoc-gen-go?\
-**Answer:** Unfortunately, no. This was an explicit design decision - Prototool is not meant to "know the world", instead
+*Question:* Can Prototool manage my external plugins such as protoc-gen-go?\
+*Answer:* Unfortunately, no. This was an explicit design decision - Prototool is not meant to "know the world", instead
 Prototool just takes care of what it is good at (managing your Protobuf build) to keep Prototool simple, leaving you to do
 external plugin management. Prototool does provide the ability to use the "built-in" output directives `cpp, csharp, java, js, objc, php, python, ruby`
 provided by `protoc` out of the box, however.
@@ -479,9 +479,9 @@ docker run -v $(pwd):/in me/prototool-env compile /in
 
 ##### Lint/Format Choices
 
-**Question:** I don't like some of the choices made in the Style Guide and that are enforced by default by the linter and/or I don't like
+*Question:* I don't like some of the choices made in the Style Guide and that are enforced by default by the linter and/or I don't like
 the choices made in the formatter. Can we change some things?\
-**Answer:** Sorry, but we can't - our goal with Prototool is to provide an easily-followable Style Guide and consistent format that minimizes
+*Answer:* Sorry, but we can't - our goal with Prototool is to provide an easily-followable Style Guide and consistent format that minimizes
 issues that arise in the use of Protobuf across a large organization. There are pros and cons to many of the choices in the Style Guide, but
 it's our belief that the best answer is a single answer, sometimes regardless of what that single answer is. If you want to ignore certain
 lint rules, you can do so through the configuration file, however especially if starting from a clean slate, we'd highly recommend using all
