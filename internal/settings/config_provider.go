@@ -64,12 +64,7 @@ func (c *configProvider) GetFilePathForDir(dirPath string) (string, error) {
 	if !filepath.IsAbs(dirPath) {
 		return "", fmt.Errorf("%s is not an absolute path", dirPath)
 	}
-	dirPath = filepath.Clean(dirPath)
-	filePath, _, err := getFilePathForDir(dirPath)
-	if err != nil {
-		return "", err
-	}
-	return filePath, nil
+	return getFilePathForDir(filepath.Clean(dirPath))
 }
 
 func (c *configProvider) Get(filePath string) (Config, error) {
@@ -96,20 +91,17 @@ func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, err
 // If no such file is found, "" is returned.
 // If multiple files named by one of the ConfigFilenames are found in the same
 // directory, error is returned.
-// Also returns all the directories this Config applies to.
-func getFilePathForDir(dirPath string) (string, []string, error) {
-	var dirPaths []string
+func getFilePathForDir(dirPath string) (string, error) {
 	for {
-		dirPaths = append(dirPaths, dirPath)
 		filePath, err := getSingleFilePathForDir(dirPath)
 		if err != nil {
-			return "", nil, err
+			return "", err
 		}
 		if filePath != "" {
-			return filePath, dirPaths, nil
+			return filePath, nil
 		}
 		if dirPath == "/" {
-			return "", dirPaths, nil
+			return "", nil
 		}
 		dirPath = filepath.Dir(dirPath)
 	}
