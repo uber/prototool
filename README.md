@@ -441,16 +441,16 @@ results in a Docker image around 33MB that contains `prototool`, a cached `proto
 ```dockerfile
 FROM golang:1.11.0-alpine3.8 AS build
 
-ARG PROTOTOOL_VERSION=v1.2.0
+ARG PROTOTOOL_VERSION=1.2.0
 ARG PROTOC_VERSION=3.6.1
-ARG PROTOC_GEN_GO_VERSION=v1.2.0
+ARG PROTOC_GEN_GO_VERSION=1.2.0
 
 RUN \
   apk update && \
   apk add curl git libc6-compat && \
   rm -rf /var/cache/apk/*
 RUN \
-  curl -sSL https://github.com/uber/prototool/releases/download/$PROTOTOOL_VERSION/prototool-Linux-x86_64 -o /bin/prototool && \
+  curl -sSL https://github.com/uber/prototool/releases/download/v$PROTOTOOL_VERSION/prototool-Linux-x86_64 -o /bin/prototool && \
   chmod +x /bin/prototool
 RUN \
   mkdir /tmp/prototool-bootstrap && \
@@ -460,7 +460,7 @@ RUN \
   rm -rf /tmp/prototool-bootstrap
 RUN go get github.com/golang/protobuf/... && \
   cd /go/src/github.com/golang/protobuf && \
-  git checkout $PROTOC_GEN_GO_VERSION && \
+  git checkout v$PROTOC_GEN_GO_VERSION && \
   go install ./protoc-gen-go
 
 FROM alpine:3.8
