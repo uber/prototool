@@ -415,7 +415,9 @@ prototool compile "${TMPDIR}"
 But for Darwin or Linux, the above should work. If you want a specific `protoc` version, do:
 
 **Question:** Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!\
-**Answer:** `apk add libc6-compat`.`protoc` is not statically compiled, and adding this packages fixes the problem.
+**Answer:** `apk add libc6-compat`
+
+`protoc` is not statically compiled, and adding this packages fixes the problem.
 
 **Question:** I don't like some of the choice you made in the Style Guide and that are enforced by default by the linter. Can we change some
 of the choices?\
