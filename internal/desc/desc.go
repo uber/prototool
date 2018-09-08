@@ -22,15 +22,16 @@ package desc
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 )
 
-// SortFileDescriptorSet sorts a FileDescriptorSet for github.com/jhump/protoreflect
+// SortFileDescriptorSetAtEnd sorts a FileDescriptorSet for github.com/jhump/protoreflect
 // by returning a new FileDescriptorSet with the given FileDescriptorProto at the end.
 // This also verifies that all FileDescriptorProto names are unique and the name of the
 // FileDescriptorProto is within the FileDescriptorSet.
-func SortFileDescriptorSet(fileDescriptorSet *descriptor.FileDescriptorSet, fileDescriptorProto *descriptor.FileDescriptorProto) (*descriptor.FileDescriptorSet, error) {
+func SortFileDescriptorSetAtEnd(fileDescriptorSet *descriptor.FileDescriptorSet, fileDescriptorProto *descriptor.FileDescriptorProto) (*descriptor.FileDescriptorSet, error) {
 	// best-effort checks
 	names := make(map[string]struct{}, len(fileDescriptorSet.File))
 	for _, iFileDescriptorProto := range fileDescriptorSet.File {
@@ -53,4 +54,51 @@ func SortFileDescriptorSet(fileDescriptorSet *descriptor.FileDescriptorSet, file
 	}
 	newFileDescriptorSet.File = append(newFileDescriptorSet.File, fileDescriptorProto)
 	return newFileDescriptorSet, nil
+}
+
+// SortFileDescriptorSet sorts a FileDescriptorSet in place by using its
+// relative import path and file name retrieved from GetName().
+//
+// This assumes that the give FileDescriptorSet is valid.
+func SortFileDescriptorSet(fileDescriptorSet *descriptor.FileDescriptorSet) {
+	sort.Slice(fileDescriptorSet.File, func(i, j int) bool {
+		return fileDescriptorSet.File[i].GetName() < fileDescriptorSet.File[j].GetName()
+	})
+}
+
+// MergeFileDescriptorSets deduplicates and sorts multiple file descriptor sets
+// into a single set.
+func MergeFileDescriptorSets(sets []*descriptor.FileDescriptorSet) *descriptor.FileDescriptorSet {
+	// Here we rely soley on GetName() to uniquely identify each
+	// FileDescriptorProto. GetName() returns the unique proto file name,
+	// including the import path from the current directory.
+	//
+	// eg: GetName() would return "bar/bar.proto" and "foo/foo.proto",
+	// respectively, for bar.proto and foo.proto in the following directory
+	// structure.
+	//
+	//  .
+	//  ├── bar
+	//  │   └── bar.proto
+	//  ├── foo
+	//  │   └── foo.proto
+	//  └── prototool.yaml
+	files := map[string]*descriptor.FileDescriptorProto{}
+	for _, fileDescriptorSet := range sets {
+		for _, fileDescriptorProto := range fileDescriptorSet.File {
+			name := fileDescriptorProto.GetName()
+			if _, ok := files[name]; !ok {
+				files[name] = fileDescriptorProto
+			}
+		}
+	}
+
+	unifiedFiles := make([]*descriptor.FileDescriptorProto, 0, len(files))
+	for _, f := range files {
+		unifiedFiles = append(unifiedFiles, f)
+	}
+
+	set := &descriptor.FileDescriptorSet{File: unifiedFiles}
+	SortFileDescriptorSet(set)
+	return set
 }

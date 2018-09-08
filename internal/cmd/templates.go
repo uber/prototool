@@ -73,16 +73,22 @@ var (
 
 	compileCmdTemplate = &cmdTemplate{
 		Use:   "compile [dirOrFile]",
-		Short: "Compile with protoc to check for failures.",
-		Long:  `Stubs will not be generated. To generate stubs, use the "gen" command. Calling "compile" has the effect of calling protoc with "-o /dev/null".`,
-		Args:  cobra.MaximumNArgs(1),
+		Short: "Compile with protoc to check for failures and get the FileDescriptorSet.",
+		Long: `Stubs will not be generated. To generate stubs, use the "generate" command.
+
+Calling "compile" with no arguments has the effect of calling protoc with "-o /dev/null". This can be used to validate proto files.
+
+If "--out" is specifed with a file name, "compile" will write the FileDescriptorSet to the given file. eg "prototool compile foo.proto --out desc.out".
+	`,
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Compile(args, flags.dryRun)
+			return runner.Compile(args, flags.dryRun, flags.compileOut)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindCompileOut(flagSet)
 		},
 	}
 

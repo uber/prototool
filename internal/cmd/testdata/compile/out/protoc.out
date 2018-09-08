@@ -1,0 +1,18 @@
+
+W
+foo/foo.protofoo"
+Dep
+hello (RhelloB
+com.fooBFooProtoPZfoopbbproto3
+÷
+google/protobuf/timestamp.protogoogle.protobuf";
+	Timestamp
+seconds (Rseconds
+nanos (RnanosB~
+com.google.protobufBTimestampProtoPZ+github.com/golang/protobuf/ptypes/timestampø¢GPBªGoogle.Protobuf.WellKnownTypesbproto3
+Ñ
+bar/bar_imports_foo.protobargoogle/protobuf/timestamp.protofoo/foo.proto"w
+Bar
+hello (Rhello8
+	timestamp (2.google.protobuf.TimestampR	timestamp 
+foodep (2.foo.DepRfoodepbproto3

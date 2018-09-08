@@ -38,9 +38,11 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/create"
+	"github.com/uber/prototool/internal/desc"
 	"github.com/uber/prototool/internal/diff"
 	"github.com/uber/prototool/internal/extract"
 	"github.com/uber/prototool/internal/file"
@@ -207,14 +209,45 @@ func (r *runner) Files(args []string) error {
 	return nil
 }
 
-func (r *runner) Compile(args []string, dryRun bool) error {
+func (r *runner) Compile(args []string, dryRun bool, outputPath string) error {
 	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
-	_, err = r.compile(false, false, dryRun, meta)
-	return err
+
+	if outputPath == "" {
+		// validate the protobuf files and return
+		_, err = r.compile(false, false, dryRun, meta)
+		return err
+	}
+
+	// otherwise, dump FileDescriptorSets to outputPath
+	fileDescriptorSets, err := r.compile(false, true, dryRun, meta)
+	if err != nil {
+		return err
+	}
+	return r.fileDescriptorSetsToFile(outputPath, fileDescriptorSets)
+}
+
+// writes a single FileDescriptorSet containing all given FileDescriptorProtos
+func (r *runner) fileDescriptorSetsToFile(outputPath string, sets []*descriptor.FileDescriptorSet) error {
+	// TODO(peats-bond): have an option (-w) to overwrite output file
+	file := filepath.Join(r.workDirPath, outputPath)
+	if _, err := os.Stat(file); err == nil {
+		return fmt.Errorf("%s already exists", file)
+	}
+
+	if err := os.MkdirAll(filepath.Dir(outputPath), 0755 /*user:rwx group:rx other: rx*/); err != nil {
+		return err
+	}
+
+	data, err := proto.Marshal(desc.MergeFileDescriptorSets(sets))
+	if err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(file, data, 0644 /*user:rw group:r other: r*/)
 }
 
 func (r *runner) Gen(args []string, dryRun bool) error {

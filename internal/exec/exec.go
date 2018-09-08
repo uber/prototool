@@ -51,7 +51,7 @@ type Runner interface {
 	Download() error
 	Clean() error
 	Files(args []string) error
-	Compile(args []string, dryRun bool) error
+	Compile(args []string, dryRun bool, outputPath string) error
 	Gen(args []string, dryRun bool) error
 	DescriptorProto(args []string) error
 	FieldDescriptorProto(args []string) error
