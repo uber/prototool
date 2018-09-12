@@ -505,7 +505,7 @@ docker run -v $(pwd):/in me/prototool-env compile
 *Question:* I don't like some of the choices made in the Style Guide and that are enforced by default by the linter and/or I don't like
 the choices made in the formatter. Can we change some things?
 
-*Answer:* Sorry, but we can't - The goal of `prototool` is to provide a straightforward Style Guide and consistent formatting that minimizes various issues that arise from Protobuf usage across large organizations. There are pros and cons to many of the choices in the Style Guide, but it's our belief that the best answer is a **single** answer, sometimes regardless of what that single answer is.
+*Answer:* Sorry, but we can't - The goal of Prototool is to provide a straightforward Style Guide and consistent formatting that minimizes various issues that arise from Protobuf usage across large organizations. There are pros and cons to many of the choices in the Style Guide, but it's our belief that the best answer is a **single** answer, sometimes regardless of what that single answer is.
 
 It is possible to ignore lint rules via configuration. However, especially if starting from a clean slate, we highly recommend using all default lint rules for consistency.
 
