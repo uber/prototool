@@ -45,6 +45,12 @@ const (
 )
 
 var (
+	// ConfigFilenames are all possible config filenames.
+	ConfigFilenames = []string{
+		DefaultConfigFilename,
+		"prototool.json",
+	}
+
 	_genPluginTypeToString = map[GenPluginType]string{
 		GenPluginTypeNone: "",
 		GenPluginTypeGo:   "go",
@@ -194,7 +200,7 @@ type GenConfig struct {
 //
 // This will be used for plugin types go, gogo, gogrpc, gogogrpc.
 type GenGoPluginOptions struct {
-	// The base import path. This should be the go path of the prototool.yaml file.
+	// The base import path. This should be the go path of the config file.
 	// This is required for go plugins.
 	ImportPath string
 	// ExtraModifiers to include with Mfile=package.
@@ -277,34 +283,41 @@ type ExternalConfig struct {
 
 // ConfigProvider provides Configs.
 type ConfigProvider interface {
-	// GetForDir tries to find a file named DefaultConfigFilename starting in the
+	// GetForDir tries to find a file named by one of the ConfigFilenames starting in the
 	// given directory, and going up a directory until hitting root.
 	//
 	// The directory must be an absolute path.
 	//
 	// If such a file is found, it is read as an ExternalConfig and converted to a Config.
 	// If no such file is found, Config{} is returned.
+	// If multiple files named by one of the ConfigFilenames are found in the same
+	// directory, error is returned.
 	GetForDir(dirPath string) (Config, error)
 	// Get tries to find a file named filePath with a config.
 	//
 	// The path must be an absolute path.
+	// The file must have either the extension .yaml or .json.
 	//
 	// If such a file is found, it is read as an ExternalConfig and converted to a Config.
 	// If no such file is found, Config{} is returned.
 	Get(filePath string) (Config, error)
-	// GetFilePathForDir tries to find a file named DefaultConfigFilename starting in the
+	// GetFilePathForDir tries to find a file named by one of the ConfigFilenames starting in the
 	// given directory, and going up a directory until hitting root.
 	//
 	// The directory must be an absolute path.
 	//
 	// If such a file is found, it is returned.
 	// If no such file is found, "" is returned.
+	// If multiple files named by one of the ConfigFilenames are found in the same
+	// directory, error is returned.
 	GetFilePathForDir(dirPath string) (string, error)
 
-	// GetForDir tries to find a file named DefaultConfigFilename in the given
+	// GetForDir tries to find a file named by one of the ConfigFilenames in the given
 	// directory and returns the cleaned absolute exclude prefixes. Unlike other functions
 	// on ConfigProvider, this has no recursive functionality - if there is no
 	// config file, nothing is returned.
+	// If multiple files named by one of the ConfigFilenames are found in the same
+	// directory, error is returned.
 	GetExcludePrefixesForDir(dirPath string) ([]string, error)
 }
 

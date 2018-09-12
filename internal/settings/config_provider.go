@@ -21,6 +21,8 @@
 package settings
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -62,9 +64,7 @@ func (c *configProvider) GetFilePathForDir(dirPath string) (string, error) {
 	if !filepath.IsAbs(dirPath) {
 		return "", fmt.Errorf("%s is not an absolute path", dirPath)
 	}
-	dirPath = filepath.Clean(dirPath)
-	filePath, _ := getFilePathForDir(dirPath)
-	return filePath, nil
+	return getFilePathForDir(filepath.Clean(dirPath))
 }
 
 func (c *configProvider) Get(filePath string) (Config, error) {
@@ -83,41 +83,85 @@ func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, err
 	return getExcludePrefixesForDir(dirPath)
 }
 
-// getFilePathForDir tries to find a file named DefaultConfigFilename starting in the
+// getFilePathForDir tries to find a file named by one of the ConfigFilenames starting in the
 // given directory, and going up a directory until hitting root.
 //
 // The directory must be an absolute path.
 //
 // If no such file is found, "" is returned.
-// Also returns all the directories this Config applies to.
-func getFilePathForDir(dirPath string) (string, []string) {
-	var dirPaths []string
+// If multiple files named by one of the ConfigFilenames are found in the same
+// directory, error is returned.
+func getFilePathForDir(dirPath string) (string, error) {
 	for {
-		dirPaths = append(dirPaths, dirPath)
-		filePath := filepath.Join(dirPath, DefaultConfigFilename)
-		if _, err := os.Stat(filePath); err == nil {
-			return filePath, dirPaths
+		filePath, err := getSingleFilePathForDir(dirPath)
+		if err != nil {
+			return "", err
+		}
+		if filePath != "" {
+			return filePath, nil
 		}
 		if dirPath == "/" {
-			return "", dirPaths
+			return "", nil
 		}
 		dirPath = filepath.Dir(dirPath)
 	}
 }
 
+// getSingleFilePathForDir gets the file named by one of the ConfigFilenames in the
+// given directory. Having multiple such files results in an error being returned. If no file is
+// found, this returns "".
+func getSingleFilePathForDir(dirPath string) (string, error) {
+	var filePaths []string
+	for _, configFilename := range ConfigFilenames {
+		filePath := filepath.Join(dirPath, configFilename)
+		if _, err := os.Stat(filePath); err == nil {
+			filePaths = append(filePaths, filePath)
+		}
+	}
+	switch len(filePaths) {
+	case 0:
+		return "", nil
+	case 1:
+		return filePaths[0], nil
+	default:
+		return "", fmt.Errorf("multiple configuration files in the same directory: %v", filePaths)
+	}
+}
+
 // get reads the config at the given path.
 //
-// This is expected to be in YAML format.
+// This is expected to be in YAML or JSON format, which is denoted by the file extension.
 func get(filePath string) (Config, error) {
-	data, err := ioutil.ReadFile(filePath)
+	externalConfig, err := getExternalConfig(filePath)
 	if err != nil {
 		return Config{}, err
 	}
-	externalConfig := ExternalConfig{}
-	if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
-		return Config{}, err
-	}
 	return externalConfigToConfig(externalConfig, filepath.Dir(filePath))
+}
+
+func getExternalConfig(filePath string) (ExternalConfig, error) {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return ExternalConfig{}, err
+	}
+	if len(data) == 0 {
+		return ExternalConfig{}, nil
+	}
+	externalConfig := ExternalConfig{}
+	switch filepath.Ext(filePath) {
+	case ".json":
+		if err := jsonUnmarshalStrict(data, &externalConfig); err != nil {
+			return ExternalConfig{}, err
+		}
+		return externalConfig, nil
+	case ".yaml":
+		if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
+			return ExternalConfig{}, err
+		}
+		return externalConfig, nil
+	default:
+		return ExternalConfig{}, fmt.Errorf("unknown config file extension, must be .json or .yaml: %s", filePath)
+	}
 }
 
 // externalConfigToConfig converts an ExternalConfig to a Config.
@@ -256,21 +300,18 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 }
 
 func getExcludePrefixesForDir(dirPath string) ([]string, error) {
-	filePath := filepath.Join(dirPath, DefaultConfigFilename)
-	if _, err := os.Stat(filePath); err != nil {
-		return []string{}, nil
-	}
-	data, err := ioutil.ReadFile(filePath)
+	filePath, err := getSingleFilePathForDir(dirPath)
 	if err != nil {
 		return nil, err
 	}
-	s := struct {
-		ExcludePaths []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
-	}{}
-	if err := yaml.Unmarshal(data, &s); err != nil {
+	if filePath == "" {
+		return []string{}, nil
+	}
+	externalConfig, err := getExternalConfig(filePath)
+	if err != nil {
 		return nil, err
 	}
-	return getExcludePrefixes(s.ExcludePaths, dirPath)
+	return getExcludePrefixes(externalConfig.Excludes, dirPath)
 }
 
 func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
@@ -289,4 +330,13 @@ func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 		excludePrefixes = append(excludePrefixes, excludePrefix)
 	}
 	return excludePrefixes, nil
+}
+
+// jsonUnmarshalStrict makes sure there are no unknown fields when unmarshalling.
+// This matches what yaml.UnmarshalStrict does basically.
+// json.Unmarshal allows unknown fields.
+func jsonUnmarshalStrict(data []byte, v interface{}) error {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	return decoder.Decode(v)
 }

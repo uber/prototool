@@ -104,16 +104,16 @@ This matches what the linter expects. "SOME.PKG" will be computed as follows:
 
 - If "--package" is specified, "SOME.PKG" will be the value passed to
   "--package".
-- Otherwise, if there is no "prototool.yaml" that would apply to the new file,
-  use "uber.prototool.generated".
-- Otherwise, if there is a "prototool.yaml" file, check if it has a
-  "packages" setting under the "create" section. If it does, this
+- Otherwise, if there is no "prototool.yaml" or "prototool.json" that would
+  apply to the new file, use "uber.prototool.generated".
+- Otherwise, if there is a "prototool.yaml" or "prototool.json" file, check if
+  it has a "packages" setting under the "create" section. If it does, this
   package, concatenated with the relative path from the directory with the
- "prototool.yaml" will be used.
+ "prototool.yaml" or "prototool.json" will be used.
 - Otherwise, if there is no "packages" directive, just use the
-  relative path from the directory with the "prototool.yaml" file. If the file
-  is in the same directory as the "prototool.yaml" file, use
-  "uber.prototool.generated".
+  relative path from the directory with the "prototool.yaml" or
+  "prototool.json" file. If the file is in the same directory as the
+  "prototool.yaml" or "prototool.json" file, use "uber.prototool.generated".
 
 For example, assume you have the following file at "repo/prototool.yaml":
 
@@ -137,7 +137,7 @@ create:
 
 This is meant to mimic what you generally want - a base package for your idl directory, followed by packages matching the directory structure.
 
-Note you can override the directory that the "prototool.yaml" file is in as well. If we update our file at "repo/prototool.yaml" to this:
+Note you can override the directory that the "prototool.yaml" or "prototool.json" file is in as well. If we update our file at "repo/prototool.yaml" to this:
 
 create:
   packages:
@@ -336,7 +336,7 @@ $ cat input.json | prototool grpc example \
 	lintCmdTemplate = &cmdTemplate{
 		Use:   "lint [dirOrFile]",
 		Short: "Lint proto files and compile with protoc to check for failures.",
-		Long:  `The default rule set follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. You can add or exclude lint rules in your "prototool.yaml" file. The default rule set is very strict and is meant to enforce consistent development patterns.`,
+		Long:  `The default rule set follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. You can add or exclude lint rules in your configuration file. The default rule set is very strict and is meant to enforce consistent development patterns.`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Lint(args, flags.listAllLinters, flags.listLinters)

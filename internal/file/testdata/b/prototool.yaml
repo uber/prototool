@@ -1,4 +1,0 @@
-excludes:
-  - g/h
-protoc:
-  version: 3.3.0

@@ -77,10 +77,10 @@ We'll start with a general overview of the commands. There are more commands, an
 ```bash
 prototool help
 prototool lint path/to/foo.proto path/to/bar.proto # file mode, specify multiple specific files
-prototool lint idl/uber # directory mode, search for all .proto files recursively, obeying exclude_paths in prototool.yaml files
+prototool lint idl/uber # directory mode, search for all .proto files recursively, obeying exclude_paths in prototool.yaml or prototool.json files
 prototool lint # same as "prototool lint .", by default the current directory is used in directory mode
 prototool create foo.proto # create the file foo.proto from a template that passes lint
-prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml files
+prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml or prototool.json files
 prototool lint --list-linters # list all current lint rules being used
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
 prototool generate idl/uber # generate stubs, see the generation directives in the config file example
@@ -95,7 +95,7 @@ The make command `make example` runs prototool while installing the necessary pl
 
 ## Configuration
 
-Prototool operates using a config file named `prototool.yaml`. For non-trivial use, you should have a config file checked in to at least the root of your repository. It is important because the directory of an associated config file is passed to `protoc` as an include directory with `-I`, so this is the logical location your Protobuf file imports should start from.
+Prototool operates using a config file named either `prototool.yaml` or `prototool.json`. Only one of `prototool.yaml` or `prototool.json` can exist in a given directory. For non-trivial use, you should have a config file checked in to at least the root of your repository. It is important because the directory of an associated config file is passed to `protoc` as an include directory with `-I`, so this is the logical location your Protobuf file imports should start from.
 
 Recommended base config file:
 
@@ -108,7 +108,7 @@ The command `prototool config init` will generate a config file in the current d
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
-If multiple `prototool.yaml` files are found that match the input directory or files, an error will be returned.
+If multiple `prototool.yaml` or `prototool.json` files are found that match the input directory or files, an error will be returned.
 
 ## File Discovery
 
@@ -124,11 +124,11 @@ Usage:
 
 `dirOrFile` can take two forms:
 
-- You can specify exactly one directory. If this is done, Prototool goes up until it finds a `prototool.yaml` file (or uses the current directory if none is found), and then walks starting at this location for all `.proto` files, and these are used, except for files in the `excludes` lists in `prototool.yaml` files.
+- You can specify exactly one directory. If this is done, Prototool goes up until it finds a `prototool.yaml` or `prototool.json` file (or uses the current directory if none is found), and then walks starting at this location for all `.proto` files, and these are used, except for files in the `excludes` lists in `prototool.yaml` or `prototool.json` files.
 - You can specify exactly one file. This has the effect as if you specified the directory of this file (using the logic above), but errors are only printed for that file. This is useful for e.g. Vim integration.
 - You can specify nothing. This has the effect as if you specified the current directory as the directory.
 
-The idea with "directory builds" is that you often need more than just one file to do a `protoc` call, for example if you have types in other files in the same package that are not referenced by their fully-qualified name, and/or if you need to know what directories to specify with `-I` to `protoc` (by default, the directory of the `prototool.yaml` file is used).
+The idea with "directory builds" is that you often need more than just one file to do a `protoc` call, for example if you have types in other files in the same package that are not referenced by their fully-qualified name, and/or if you need to know what directories to specify with `-I` to `protoc` (by default, the directory of the `prototool.yaml` or `prototool.json` file is used).
 
 ## Command Overview
 
@@ -144,11 +144,11 @@ Compile your Protobuf files, but do not generate stubs. This has the effect of c
 
 ##### `prototool generate`
 
-Compile your Protobuf files and generate stubs according to the rules in your `prototool.yaml` file. See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for an example.
+Compile your Protobuf files and generate stubs according to the rules in your `prototool.yaml` or `prototool.json` file. See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for an example.
 
 ##### `prototool lint`
 
-Lint your Protobuf files. The default rule set follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). You can add or exclude lint rules in your `prototool.yaml` file. The default rule set is "strict", and we are working on having two main sets of rules.
+Lint your Protobuf files. The default rule set follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). You can add or exclude lint rules in your `prototool.yaml` or `prototool.json` file. The default rule set is "strict", and we are working on having two main sets of rules.
 
 ##### `prototool format`
 
@@ -181,13 +181,12 @@ option java_package = "com.SOME.PKG.pb";
 This matches what the linter expects. `SOME.PKG` will be computed as follows:
 
 - If `--package` is specified, `SOME.PKG` will be the value passed to `--package`.
-- Otherwise, if there is no `prototool.yaml` that would apply to the new file, use `uber.prototool.generated`.
-- Otherwise, if there is a `prototool.yaml` file, check if it has a `packages` setting under the
+- Otherwise, if there is no `prototool.yaml` or `prototool.json` that would apply to the new file, use `uber.prototool.generated`.
+- Otherwise, if there is a `prototool.yaml` or `prototool.json` file, check if it has a `packages` setting under the
   `create` section (see [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for an example).
-  If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml`
-  will be used.
+  If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml` or `prototool.json` file will be used.
 - Otherwise, if there is no `packages` directive, just use the relative path from the directory
-  with the `prototool.yaml` file. If the file is in the same directory as the `prototoo.yaml` file,
+  with the `prototool.yaml` or `prototool.json` file. If the file is in the same directory as the `prototoo.yaml` file,
   use `uber.prototool.generated`
 
 For example, assume you have the following file at `repo/prototool.yaml`:
@@ -211,7 +210,7 @@ create:
 This is meant to mimic what you generally want - a base package for your idl directory, followed
 by packages matching the directory structure.
 
-Note you can override the directory that the `prototool.yaml` file is in as well. If we update our
+Note you can override the directory that the `prototool.yaml` or `prototool.json` file is in as well. If we update our
 file at `repo/prototool.yaml` to this:
 
 ```yaml
@@ -313,7 +312,7 @@ $ cat input.json | prototool grpc example \
 
 Prototool is meant to help enforce a consistent development style for Protobuf, and as such you should follow some basic rules:
 
-- Have all your imports start from the directory your `prototool.yaml` is in. While there is a configuration option `protoc.includes` to denote extra include directories, this is not recommended.
+- Have all your imports start from the directory your `prototool.yaml` or `prototool.json` file is in. While there is a configuration option `protoc.includes` to denote extra include directories, this is not recommended.
 - Have all Protobuf files in the same directory use the same `package`, and use the same values for `go_package`, `java_multiple_files`, `java_outer_classname`, and `java_package`.
 - Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool generate` do the best job.
 

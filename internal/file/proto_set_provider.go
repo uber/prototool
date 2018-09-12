@@ -184,7 +184,7 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 }
 
 // walkAndGetAllProtoFiles collects the .proto files nested under the given absDirPath.
-// absDirPath represents the absolute path at which the prototool.yaml configuration is
+// absDirPath represents the absolute path at which the configuration file is
 // found, whereas absWorkDirPath represents absolute path at which prototool was invoked.
 // absWorkDirPath is only used to determine the ProtoFile.DisplayPath, also known as
 // the relative path from where prototool was invoked.
