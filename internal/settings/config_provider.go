@@ -165,20 +165,17 @@ func getExternalConfig(filePath string) (ExternalConfig, error) {
 	if err != nil {
 		return ExternalConfig{}, err
 	}
+	if len(data) == 0 {
+		return ExternalConfig{}, nil
+	}
 	externalConfig := ExternalConfig{}
 	switch filepath.Ext(filePath) {
 	case ".json":
-		if len(data) == 0 {
-			return externalConfig, nil
-		}
 		if err := jsonUnmarshalStrict(data, &externalConfig); err != nil {
 			return ExternalConfig{}, err
 		}
 		return externalConfig, nil
 	case ".yaml":
-		if len(data) == 0 {
-			return externalConfig, nil
-		}
 		if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
 			return ExternalConfig{}, err
 		}
