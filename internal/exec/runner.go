@@ -91,7 +91,7 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	if runner.configData != "" {
 		protoSetProviderOptions = append(
 			protoSetProviderOptions,
-			file.ProtoSetProviderWithConfigData(workDirPath, runner.configData),
+			file.ProtoSetProviderWithConfigData(runner.configData),
 		)
 	}
 	runner.protoSetProvider = file.NewProtoSetProvider(protoSetProviderOptions...)

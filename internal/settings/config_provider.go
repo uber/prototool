@@ -76,11 +76,14 @@ func (c *configProvider) Get(filePath string) (Config, error) {
 }
 
 func (c *configProvider) GetForData(dirPath string, externalConfigData string) (Config, error) {
+	if !filepath.IsAbs(dirPath) {
+		return Config{}, fmt.Errorf("%s is not an absolute path", dirPath)
+	}
+	dirPath = filepath.Clean(dirPath)
 	var externalConfig ExternalConfig
 	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
 		return Config{}, err
 	}
-	dirPath = filepath.Clean(dirPath)
 	return externalConfigToConfig(externalConfig, dirPath)
 }
 

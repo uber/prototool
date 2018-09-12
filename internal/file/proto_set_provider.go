@@ -33,7 +33,6 @@ import (
 
 type protoSetProvider struct {
 	logger         *zap.Logger
-	configDirPath  string
 	configData     string
 	walkTimeout    time.Duration
 	configProvider settings.ConfigProvider
@@ -92,9 +91,6 @@ func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) 
 }
 
 func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
-	if err := c.validateOptions(); err != nil {
-		return nil, err
-	}
 	workDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
@@ -103,8 +99,10 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 	if err != nil {
 		return nil, err
 	}
-	configDirPath := c.configDirPath
-	if configDirPath == "" {
+	// If c.configData != ", the user has specified configuration via the command line.
+	// Set the configuration directory to the current working directory.
+	configDirPath := workDirPath
+	if c.configData == "" {
 		configFilePath, err := c.configProvider.GetFilePathForDir(absDirPath)
 		if err != nil {
 			return nil, err
@@ -122,7 +120,7 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 		return nil, err
 	}
 	dirPathToProtoFiles := getDirPathToProtoFiles(protoFiles)
-	protoSets, err := c.getBaseProtoSets(dirPathToProtoFiles)
+	protoSets, err := c.getBaseProtoSets(workDirPath, dirPathToProtoFiles)
 	if err != nil {
 		return nil, err
 	}
@@ -135,9 +133,6 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 }
 
 func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
-	if err := c.validateOptions(); err != nil {
-		return nil, err
-	}
 	workDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
@@ -147,7 +142,7 @@ func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...
 		return nil, err
 	}
 	dirPathToProtoFiles := getDirPathToProtoFiles(protoFiles)
-	protoSets, err := c.getBaseProtoSets(dirPathToProtoFiles)
+	protoSets, err := c.getBaseProtoSets(workDirPath, dirPathToProtoFiles)
 	if err != nil {
 		return nil, err
 	}
@@ -159,14 +154,14 @@ func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...
 	return protoSets, nil
 }
 
-func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*ProtoFile) ([]*ProtoSet, error) {
+func (c *protoSetProvider) getBaseProtoSets(absWorkDirPath string, dirPathToProtoFiles map[string][]*ProtoFile) ([]*ProtoSet, error) {
 	filePathToProtoSet := make(map[string]*ProtoSet)
 	for dirPath, protoFiles := range dirPathToProtoFiles {
 		var configFilePath string
 		var err error
-		// we only want one ProtoSet if we have set configDirPath and configData
+		// we only want one ProtoSet if we have set configData
 		// since we are overriding all configuration files
-		if c.configDirPath == "" {
+		if c.configData == "" {
 			configFilePath, err = c.configProvider.GetFilePathForDir(dirPath)
 			if err != nil {
 				return nil, err
@@ -181,9 +176,8 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 		}
 		protoSet.DirPathToFiles[dirPath] = append(protoSet.DirPathToFiles[dirPath], protoFiles...)
 		var config settings.Config
-		// we have already validated that configData is also set
-		if c.configDirPath != "" {
-			config, err = c.configProvider.GetForData(c.configDirPath, c.configData)
+		if c.configData != "" {
+			config, err = c.configProvider.GetForData(absWorkDirPath, c.configData)
 			if err != nil {
 				return nil, err
 			}
@@ -218,10 +212,10 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 		timedOut       bool
 	)
 	allExcludes := make(map[string]struct{})
-	// if we have a configDirPath and configData, we compute the exclude prefixes once
+	// if we have a configData, we compute the exclude prefixes once
 	// from this dirPath and data, and do not do it again in the below walk function
-	if c.configDirPath != "" {
-		excludes, err := c.configProvider.GetExcludePrefixesForData(c.configDirPath, c.configData)
+	if c.configData != "" {
+		excludes, err := c.configProvider.GetExcludePrefixesForData(absWorkDirPath, c.configData)
 		if err != nil {
 			return nil, err
 		}
@@ -246,8 +240,8 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 				// Verify if we should skip this directory/file.
 				if fileInfo.IsDir() {
 					// Add the excluded files with respect to the current file path.
-					// Do not add if we have configDirPath and configData.
-					if c.configDirPath == "" {
+					// Do not add if we have configData.
+					if c.configData == "" {
 						excludes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
 						if err != nil {
 							return err
@@ -301,14 +295,6 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 		}
 		return nil, fmt.Errorf("internal prototool error")
 	}
-}
-
-func (c *protoSetProvider) validateOptions() error {
-	if (c.configDirPath == "") != (c.configData == "") {
-		// this is a system error, this should not be possible for a user to configure
-		return fmt.Errorf("both configDirPath and configData in protoSetProvider must be set or unset")
-	}
-	return nil
 }
 
 func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
