@@ -396,6 +396,7 @@ All Golang code is purposefully under the `internal` package to not expose any A
 ##### Pre-Cache Protoc
 
 *Question:* How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?\
+
 *Answer*: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
 read the configuration file to figure out what version of `protoc` to download. We may re-add this command in the future, however
 here is a technique to accomplish this, including as a `RUN` directive for Docker:
