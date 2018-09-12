@@ -33,6 +33,11 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
   * [Tips and Tricks](#tips-and-tricks)
   * [Vim Integration](#vim-integration)
   * [Development](#development)
+  * [FAQ](#faq)
+    * [Pre-Cache Protoc](#pre-cache-protoc)
+    * [Alpine Linux Issues](#alpine-linux-issues)
+    * [Managing External Plugins/Docker](#managing-external-pluginsdocker)
+    * [Lint/Format Choices](#lintformat-choices)
   * [Special Thanks](#special-thanks)
 
 ## Installation
@@ -385,6 +390,126 @@ Before submitting a PR, make sure to:
 - Run `make` to make sure all tests pass. This is functionally equivalent to the tests run on CI.
 
 All Golang code is purposefully under the `internal` package to not expose any API for the time being.
+
+## FAQ
+
+##### Pre-Cache Protoc
+
+*Question:* How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?
+
+*Answer*: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
+read the configuration file to figure out what version of `protoc` to download. We may re-add this command in the future, however
+here is a technique to accomplish this, including as a `RUN` directive for Docker:
+
+```bash
+# the first rm -rf call is not needed if this is a RUN directive for Docker
+rm -rf /tmp/prototool-bootstrap && \
+  echo $'protoc\n  version: 3.6.1' > /tmp/prototool-bootstrap/prototool.yaml && \
+  echo 'syntax = "proto3";' > /tmp/prototool-bootstrap/tmp.proto && \
+  prototool compile /tmp/prototool-bootstrap && \
+  rm -rf /tmp/prototool-bootstrap
+```
+
+The better way to do this as part of a bash script would be to use `mktemp -d` i.e.:
+
+```bash
+#!/bin/bash
+
+set -euo pipefail
+
+TMPDIR="$(mktemp -d)"
+trap 'rm -rf "${TMPDIR}"' EXIT
+
+echo $'protoc\n  version: 3.6.1' > "${TMPDIR}/prototool.yaml"
+echo 'syntax = "proto3";' > "${TMPDIR}/tmp.proto"
+prototool compile "${TMPDIR}"
+```
+
+But for Darwin or Linux, the above should work.
+
+##### Alpine Linux Issues
+
+*Question:* Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!
+
+*Answer:* `apk add libc6-compat`
+
+`protoc` is not statically compiled, and adding this packages fixes the problem.
+
+##### Managing External Plugins/Docker
+
+*Question:* Can Prototool manage my external plugins such as protoc-gen-go?
+
+*Answer:* Unfortunately, no. This was an explicit design decision - Prototool is not meant to "know the world", instead
+Prototool just takes care of what it is good at (managing your Protobuf build) to keep Prototool simple, leaving you to do
+external plugin management. Prototool does provide the ability to use the "built-in" output directives `cpp, csharp, java, js, objc, php, python, ruby`
+provided by `protoc` out of the box, however.
+
+If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. Here's an example `Dockerfile` that
+results in a Docker image around 33MB that contains `prototool`, a cached `protoc`, and `protoc-gen-go`:
+
+```dockerfile
+FROM golang:1.11.0-alpine3.8 AS build
+
+ARG PROTOTOOL_VERSION=1.2.0
+ARG PROTOC_VERSION=3.6.1
+ARG PROTOC_GEN_GO_VERSION=1.2.0
+
+RUN \
+  apk update && \
+  apk add curl git libc6-compat && \
+  rm -rf /var/cache/apk/*
+RUN \
+  curl -sSL https://github.com/uber/prototool/releases/download/v$PROTOTOOL_VERSION/prototool-Linux-x86_64 -o /bin/prototool && \
+  chmod +x /bin/prototool
+RUN \
+  mkdir /tmp/prototool-bootstrap && \
+  echo $'protoc:\n  version:' $PROTOC_VERSION > /tmp/prototool-bootstrap/prototool.yaml && \
+  echo 'syntax = "proto3";' > /tmp/prototool-bootstrap/tmp.proto && \
+  prototool compile /tmp/prototool-bootstrap && \
+  rm -rf /tmp/prototool-bootstrap
+RUN go get github.com/golang/protobuf/... && \
+  cd /go/src/github.com/golang/protobuf && \
+  git checkout v$PROTOC_GEN_GO_VERSION && \
+  go install ./protoc-gen-go
+
+FROM alpine:3.8
+
+WORKDIR /in
+
+RUN \
+  apk update && \
+  apk add libc6-compat && \
+  rm -rf /var/cache/apk/*
+
+COPY --from=build /bin/prototool /bin/prototool
+COPY --from=build /root/.cache/prototool /root/.cache/prototool
+COPY --from=build /go/bin/protoc-gen-go /bin/protoc-gen-go
+
+ENTRYPOINT ["/bin/prototool"]
+```
+
+Assuming this is in a file named `Dockerfile` in your current directory, build the image with:
+
+```bash
+docker build -t me/prototool-env .
+```
+
+Then, assuming you are in the directory you want to pass to Prototool and you want to run `prototool compile`, run:
+
+```bash
+docker run -v $(pwd):/in me/prototool-env compile
+```
+
+##### Lint/Format Choices
+
+*Question:* I don't like some of the choices made in the Style Guide and that are enforced by default by the linter and/or I don't like
+the choices made in the formatter. Can we change some things?
+
+*Answer:* Sorry, but we can't - The goal of Prototool is to provide a straightforward Style Guide and consistent formatting that minimizes various issues that arise from Protobuf usage across large organizations. There are pros and cons to many of the choices in the Style Guide, but it's our belief that the best answer is a **single** answer, sometimes regardless of what that single answer is.
+
+It is possible to ignore lint rules via configuration. However, especially if starting from a clean slate, we highly recommend using all default lint rules for consistency.
+
+Many of the lint rules exist to mitigate backwards compatibility problems as schemas evolves. For example: requiring a unique request-response pair per RPC - while this potentially resuls in duplicated messages, this makes it impossible to affect an adjacent RPC by adding or modifying an existing field.
 
 ## Special Thanks
 
