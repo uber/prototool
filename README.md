@@ -505,13 +505,11 @@ docker run -v $(pwd):/in me/prototool-env compile
 *Question:* I don't like some of the choices made in the Style Guide and that are enforced by default by the linter and/or I don't like
 the choices made in the formatter. Can we change some things?
 
-*Answer:* Sorry, but we can't - our goal with Prototool is to provide an easily-followable Style Guide and consistent format that minimizes
-issues that arise in the use of Protobuf across a large organization. There are pros and cons to many of the choices in the Style Guide, but
-it's our belief that the best answer is a single answer, sometimes regardless of what that single answer is. If you want to ignore certain
-lint rules, you can do so through the configuration file, however especially if starting from a clean slate, we'd highly recommend using all
-of the lint rules as doing so results in consistent usage. Many of the lint rules exist to prevent backwards compatiblility problems down the
-road as your Protobuf schema evolves (for example, having unique response/response types per RPC, while potentially resulting in duplicated
-messages, means you won't affect an RPC you do not mean to by adding a field for another RPC).
+*Answer:* Sorry, but we can't - The goal of `prototool` is to provide a straightforward Style Guide and consistent formatting that minimizes various issues that arise from Protobuf usage across large organizations. There are pros and cons to many of the choices in the Style Guide, but it's our belief that the best answer is a **single** answer, sometimes regardless of what that single answer is.
+
+It is possible to ignore lint rules via configuration. However, especially if starting from a clean slate, we highly recommend using all default lint rules for consistency.
+
+Many of the lint rules exist to mitigate backwards compatibility problems as schemas evolves. For example: requiring a unique request-response pair per RPC; while potentially resulting in duplicated messages, it is impossible to affect an adjacent RPC, by adding or modifying an existing field.
 
 ## Special Thanks
 
