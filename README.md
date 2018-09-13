@@ -42,7 +42,7 @@ Prototool accomplishes this by downloading and calling protoc on the fly for you
 
 ## Installation
 
-Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/).
+Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/) or Linux via [Linuxbrew](http://linuxbrew.sh/).
 
 ```bash
 brew install prototool
