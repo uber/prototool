@@ -69,6 +69,7 @@ type compiler struct {
 	logger              *zap.Logger
 	cachePath           string
 	protocURL           string
+	noCache             bool
 	doGen               bool
 	doFileDescriptorSet bool
 }
@@ -268,7 +269,10 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 	}()
 	// you need a new downloader for every ProtoSet as each configuration file could
 	// have a different protoc.version value
-	downloader := c.newDownloader(protoSet.Config)
+	downloader, err := c.newDownloader(protoSet.Config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create downloader")
+	}
 	if _, err := downloader.Download(); err != nil {
 		return cmdMetas, err
 	}
@@ -354,7 +358,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 	return cmdMetas, nil
 }
 
-func (c *compiler) newDownloader(config settings.Config) Downloader {
+func (c *compiler) newDownloader(config settings.Config) (Downloader, error) {
 	downloaderOptions := []DownloaderOption{
 		DownloaderWithLogger(c.logger),
 	}
@@ -362,6 +366,12 @@ func (c *compiler) newDownloader(config settings.Config) Downloader {
 		downloaderOptions = append(
 			downloaderOptions,
 			DownloaderWithCachePath(c.cachePath),
+		)
+	}
+	if c.noCache {
+		downloaderOptions = append(
+			downloaderOptions,
+			DownloaderWithNoCache(),
 		)
 	}
 	if c.protocURL != "" {

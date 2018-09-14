@@ -99,6 +99,13 @@ func RunnerWithJSON() RunnerOption {
 	}
 }
 
+// RunnerWithNoCache returns a RunnerOption that will disable the protoc cache.
+func RunnerWithNoCache() RunnerOption {
+	return func(runner *runner) {
+		runner.noCache = true
+	}
+}
+
 // RunnerWithPrintFields returns a RunnerOption that uses the given colon-separated
 // print fields. The default is filename:line:column:message.
 func RunnerWithPrintFields(printFields string) RunnerOption {

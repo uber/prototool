@@ -93,8 +93,17 @@ func DownloaderWithProtocURL(protocURL string) DownloaderOption {
 	}
 }
 
+// DownloaderWithNoCache returns a DownloaderOption that disables caching.
+//
+// The default is https://github.com/protocolbuffers/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
+func DownloaderWithNoCache() DownloaderOption {
+	return func(downloader *downloader) {
+		downloader.noCache = true
+	}
+}
+
 // NewDownloader returns a new Downloader for the given config and DownloaderOptions.
-func NewDownloader(config settings.Config, options ...DownloaderOption) Downloader {
+func NewDownloader(config settings.Config, options ...DownloaderOption) (Downloader, error) {
 	return newDownloader(config, options...)
 }
 
@@ -152,6 +161,13 @@ func CompilerWithCachePath(cachePath string) CompilerOption {
 func CompilerWithProtocURL(protocURL string) CompilerOption {
 	return func(compiler *compiler) {
 		compiler.protocURL = protocURL
+	}
+}
+
+// CompilerWithNoCache disables caching.
+func CompilerWithNoCache() CompilerOption {
+	return func(compiler *compiler) {
+		compiler.noCache = true
 	}
 }
 

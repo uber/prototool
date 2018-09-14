@@ -44,6 +44,7 @@ type flags struct {
 	listLinters    bool
 	lintMode       bool
 	method         string
+	noCache        bool
 	overwrite      bool
 	pkg            string
 	printFields    string
@@ -122,6 +123,10 @@ func (f *flags) bindListLinters(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindMethod(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.method, "method", "", "The GRPC method to call in the form package.Service/Method. This is required.")
+}
+
+func (f *flags) bindNoCache(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.noCache, "no-cache", false, "Disable the Prototool cache for protoc.")
 }
 
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {

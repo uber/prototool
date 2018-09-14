@@ -70,6 +70,7 @@ type runner struct {
 	configData  string
 	protocURL   string
 	printFields string
+	noCache     bool
 	json        bool
 }
 
@@ -185,7 +186,11 @@ func (r *runner) Download() error {
 	if err != nil {
 		return err
 	}
-	path, err := r.newDownloader(config).Download()
+	d, err := r.newDownloader(config)
+	if err != nil {
+		return err
+	}
+	path, err := d.Download()
 	if err != nil {
 		return err
 	}
@@ -197,7 +202,11 @@ func (r *runner) Clean() error {
 	if err != nil {
 		return err
 	}
-	return r.newDownloader(config).Delete()
+	d, err := r.newDownloader(config)
+	if err != nil {
+		return err
+	}
+	return d.Delete()
 }
 
 func (r *runner) Files(args []string) error {
@@ -649,7 +658,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	).Invoke(fileDescriptorSets, address, method, reader, r.output)
 }
 
-func (r *runner) newDownloader(config settings.Config) protoc.Downloader {
+func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {
 	downloaderOptions := []protoc.DownloaderOption{
 		protoc.DownloaderWithLogger(r.logger),
 	}
@@ -663,6 +672,12 @@ func (r *runner) newDownloader(config settings.Config) protoc.Downloader {
 		downloaderOptions = append(
 			downloaderOptions,
 			protoc.DownloaderWithProtocURL(r.protocURL),
+		)
+	}
+	if r.noCache {
+		downloaderOptions = append(
+			downloaderOptions,
+			protoc.DownloaderWithNoCache(),
 		)
 	}
 	return protoc.NewDownloader(config, downloaderOptions...)
@@ -682,6 +697,12 @@ func (r *runner) newCompiler(doGen bool, doFileDescriptorSet bool) protoc.Compil
 		compilerOptions = append(
 			compilerOptions,
 			protoc.CompilerWithProtocURL(r.protocURL),
+		)
+	}
+	if r.noCache {
+		compilerOptions = append(
+			compilerOptions,
+			protoc.CompilerWithNoCache(),
 		)
 	}
 	if doGen {
