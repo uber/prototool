@@ -34,6 +34,7 @@ import (
 	"github.com/uber/prototool/internal/extract"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
 )
 
@@ -43,6 +44,7 @@ type handler struct {
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
 	headers        []string
+	credentials    credentials.TransportCredentials
 
 	getter extract.Getter
 }
@@ -97,7 +99,7 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 func (h *handler) dial(address string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), h.connectTimeout)
 	defer cancel()
-	return grpcurl.BlockingDial(ctx, "tcp", address, nil, h.getDialOptions()...)
+	return grpcurl.BlockingDial(ctx, "tcp", address, h.credentials, h.getDialOptions()...)
 }
 
 func (h *handler) getDialOptions() []grpc.DialOption {
