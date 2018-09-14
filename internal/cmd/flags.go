@@ -47,6 +47,8 @@ type flags struct {
 	overwrite      bool
 	pkg            string
 	printFields    string
+	protocBinPath  string
+	protocWKTPath  string
 	protocURL      string
 	stdin          bool
 	uncomment      bool
@@ -138,6 +140,14 @@ func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.protocURL, "protoc-url", "", "The url to use to download the protoc zip file, otherwise uses GitHub Releases. Setting this option will ignore the config protoc.version setting.")
+}
+
+func (f *flags) bindProtocBinPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.protocBinPath, "protoc-bin-path", "", "The path to the protoc binary. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-wkt-path and must not be used with the protoc-url flag.")
+}
+
+func (f *flags) bindProtocWKTPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.protocWKTPath, "protoc-wkt-path", "", "The path to the well-known types. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-bin-path and must not be used with the protoc-url flag.")
 }
 
 func (f *flags) bindStdin(flagSet *pflag.FlagSet) {

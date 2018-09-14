@@ -65,12 +65,14 @@ type runner struct {
 	input       io.Reader
 	output      io.Writer
 
-	logger      *zap.Logger
-	cachePath   string
-	configData  string
-	protocURL   string
-	printFields string
-	json        bool
+	logger        *zap.Logger
+	cachePath     string
+	configData    string
+	protocBinPath string
+	protocWKTPath string
+	protocURL     string
+	printFields   string
+	json          bool
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -185,7 +187,11 @@ func (r *runner) Download() error {
 	if err != nil {
 		return err
 	}
-	path, err := r.newDownloader(config).Download()
+	d, err := r.newDownloader(config)
+	if err != nil {
+		return err
+	}
+	path, err := d.Download()
 	if err != nil {
 		return err
 	}
@@ -197,7 +203,11 @@ func (r *runner) Clean() error {
 	if err != nil {
 		return err
 	}
-	return r.newDownloader(config).Delete()
+	d, err := r.newDownloader(config)
+	if err != nil {
+		return err
+	}
+	return d.Delete()
 }
 
 func (r *runner) Files(args []string) error {
@@ -649,7 +659,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	).Invoke(fileDescriptorSets, address, method, reader, r.output)
 }
 
-func (r *runner) newDownloader(config settings.Config) protoc.Downloader {
+func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {
 	downloaderOptions := []protoc.DownloaderOption{
 		protoc.DownloaderWithLogger(r.logger),
 	}
@@ -657,6 +667,18 @@ func (r *runner) newDownloader(config settings.Config) protoc.Downloader {
 		downloaderOptions = append(
 			downloaderOptions,
 			protoc.DownloaderWithCachePath(r.cachePath),
+		)
+	}
+	if r.protocBinPath != "" {
+		downloaderOptions = append(
+			downloaderOptions,
+			protoc.DownloaderWithProtocBinPath(r.protocBinPath),
+		)
+	}
+	if r.protocWKTPath != "" {
+		downloaderOptions = append(
+			downloaderOptions,
+			protoc.DownloaderWithProtocWKTPath(r.protocWKTPath),
 		)
 	}
 	if r.protocURL != "" {
@@ -676,6 +698,18 @@ func (r *runner) newCompiler(doGen bool, doFileDescriptorSet bool) protoc.Compil
 		compilerOptions = append(
 			compilerOptions,
 			protoc.CompilerWithCachePath(r.cachePath),
+		)
+	}
+	if r.protocBinPath != "" {
+		compilerOptions = append(
+			compilerOptions,
+			protoc.CompilerWithProtocBinPath(r.protocBinPath),
+		)
+	}
+	if r.protocWKTPath != "" {
+		compilerOptions = append(
+			compilerOptions,
+			protoc.CompilerWithProtocWKTPath(r.protocWKTPath),
 		)
 	}
 	if r.protocURL != "" {

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Accept `prototool.json` files for configuation in addition to
   `prototool.yaml` files.
 - Add `--config-data` flag.
+- Add `protoc-bin-path` and `protoc-wkt-path` flags to manually
+  set the paths for where `protoc` is run and where the
+  well-known types are included from.
 
 
 ## [1.2.0] - 2018-08-29

@@ -51,6 +51,8 @@ var (
 			flags.bindJSON(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -88,6 +90,8 @@ var (
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -225,6 +229,8 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindOverwrite(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -240,6 +246,8 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -329,6 +337,8 @@ $ cat input.json | prototool grpc example \
 			flags.bindMethod(flagSet)
 			flags.bindStdin(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -371,6 +381,8 @@ $ cat input.json | prototool grpc example \
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -506,6 +518,18 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithJSON(),
+		)
+	}
+	if flags.protocBinPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocBinPath(flags.protocBinPath),
+		)
+	}
+	if flags.protocWKTPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocWKTPath(flags.protocWKTPath),
 		)
 	}
 	if flags.printFields != "" {
