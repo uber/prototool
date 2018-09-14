@@ -60,7 +60,6 @@ type downloader struct {
 	// and wktPath.
 	noCache bool
 	binPath string
-	wktPath string
 }
 
 func newDownloader(config settings.Config, options ...DownloaderOption) (*downloader, error) {
@@ -82,28 +81,7 @@ func newDownloader(config settings.Config, options ...DownloaderOption) (*downlo
 		if _, err := os.Stat(binPath); os.IsNotExist(err) {
 			return nil, err
 		}
-		// Assume that the well-known types are adjacent to the protoc binary
-		// since this is how protoc is packaged by default.
-		//
-		//  Ex:
-		//   protoc-3.6.1.zip
-		//     bin/
-		//     bin/protoc
-		//     include/
-		//     include/google
-		//     ...
-		//
-		// TODO: This makes strong assumptions with regard to
-		//       the file layout.
-		//       Consider adding a protoc.no_defaults flag (similar
-		//       to the previously removed protoc_include_wkt
-		//       setting).
-		wktPath := filepath.Join(binPath, "../..", "include")
-		if _, err := os.Stat(wktPath); os.IsNotExist(err) {
-			return nil, fmt.Errorf("failed to find the well-known types in %q", wktPath)
-		}
 		downloader.binPath = binPath
-		downloader.wktPath = wktPath
 	}
 	return downloader, nil
 }
@@ -130,8 +108,8 @@ func (d *downloader) ProtocPath() (string, error) {
 }
 
 func (d *downloader) WellKnownTypesIncludePath() (string, error) {
-	if d.wktPath != "" {
-		return d.wktPath, nil
+	if d.noCache {
+		return "", nil
 	}
 	basePath, err := d.Download()
 	if err != nil {
