@@ -86,8 +86,13 @@ func newDownloader(config settings.Config, options ...DownloaderOption) (*downlo
 		if _, err := os.Stat(cleanWKTPath); os.IsNotExist(err) {
 			return nil, err
 		}
-		if _, err := os.Stat(filepath.Join(cleanWKTPath, "google", "protobuf")); os.IsNotExist(err) {
+		protobufPath := filepath.Join(cleanWKTPath, "google", "protobuf")
+		info, err := os.Stat(protobufPath)
+		if os.IsNotExist(err) {
 			return nil, err
+		}
+		if !info.IsDir() {
+			return nil, fmt.Errorf("%q is not a valid well-known types directory", protobufPath)
 		}
 		downloader.protocBinPath = cleanBinPath
 		downloader.protocWKTPath = cleanWKTPath
