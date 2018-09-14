@@ -86,6 +86,9 @@ func newDownloader(config settings.Config, options ...DownloaderOption) (*downlo
 		if _, err := os.Stat(cleanWKTPath); os.IsNotExist(err) {
 			return nil, err
 		}
+		if _, err := os.Stat(filepath.Join(cleanWKTPath, "google", "protobuf")); os.IsNotExist(err) {
+			return nil, err
+		}
 		downloader.protocBinPath = cleanBinPath
 		downloader.protocWKTPath = cleanWKTPath
 	}
