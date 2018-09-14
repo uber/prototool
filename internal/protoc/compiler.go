@@ -515,12 +515,10 @@ func getIncludes(downloader Downloader, config settings.Config, dirPath string, 
 		if err != nil {
 			return nil, err
 		}
-		if wellKnownTypesIncludePath != "" {
-			includes = append(includes, wellKnownTypesIncludePath)
-			// TODO: not exactly platform independent
-			if strings.HasPrefix(dirPath, wellKnownTypesIncludePath) {
-				fileInIncludePath = true
-			}
+		includes = append(includes, wellKnownTypesIncludePath)
+		// TODO: not exactly platform independent
+		if strings.HasPrefix(dirPath, wellKnownTypesIncludePath) {
+			fileInIncludePath = true
 		}
 	}
 	// you want your proto files to be in at least one of the -I directories
