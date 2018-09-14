@@ -44,10 +44,11 @@ type flags struct {
 	listLinters    bool
 	lintMode       bool
 	method         string
-	noCache        bool
 	overwrite      bool
 	pkg            string
 	printFields    string
+	protocBinPath  string
+	protocWktPath  string
 	protocURL      string
 	stdin          bool
 	uncomment      bool
@@ -125,10 +126,6 @@ func (f *flags) bindMethod(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.method, "method", "", "The GRPC method to call in the form package.Service/Method. This is required.")
 }
 
-func (f *flags) bindNoCache(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.noCache, "no-cache", false, "Disable the Prototool cache for protoc.")
-}
-
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.overwrite, "overwrite", "w", false, "Overwrite the existing file instead of writing the formatted file to stdout.")
 }
@@ -143,6 +140,14 @@ func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.protocURL, "protoc-url", "", "The url to use to download the protoc zip file, otherwise uses GitHub Releases. Setting this option will ignore the config protoc.version setting.")
+}
+
+func (f *flags) bindProtocBinPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.protocBinPath, "protoc-bin-path", "", "The path to the protoc binary. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-wkt-path.")
+}
+
+func (f *flags) bindProtocWktPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.protocWktPath, "protoc-wkt-path", "", "The path to the well-known types. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-bin-path.")
 }
 
 func (f *flags) bindStdin(flagSet *pflag.FlagSet) {

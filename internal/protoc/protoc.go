@@ -84,21 +84,27 @@ func DownloaderWithCachePath(cachePath string) DownloaderOption {
 	}
 }
 
+// DownloaderWithProtocBinPath returns a DownloaderOption that uses the given protoc binary path.
+func DownloaderWithProtocBinPath(protocBinPath string) DownloaderOption {
+	return func(downloader *downloader) {
+		downloader.protocBinPath = protocBinPath
+	}
+}
+
+// DownloaderWithProtocWktPath returns a DownloaderOption that uses the given path to include
+// the well-known types.
+func DownloaderWithProtocWktPath(protocWktPath string) DownloaderOption {
+	return func(downloader *downloader) {
+		downloader.protocWktPath = protocWktPath
+	}
+}
+
 // DownloaderWithProtocURL returns a DownloaderOption that uses the given protoc zip file URL.
 //
 // The default is https://github.com/protocolbuffers/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
 func DownloaderWithProtocURL(protocURL string) DownloaderOption {
 	return func(downloader *downloader) {
 		downloader.protocURL = protocURL
-	}
-}
-
-// DownloaderWithNoCache returns a DownloaderOption that disables caching.
-//
-// The default is https://github.com/protocolbuffers/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
-func DownloaderWithNoCache() DownloaderOption {
-	return func(downloader *downloader) {
-		downloader.noCache = true
 	}
 }
 
@@ -155,19 +161,28 @@ func CompilerWithCachePath(cachePath string) CompilerOption {
 	}
 }
 
+// CompilerWithProtocBinPath returns a CompilerOption that uses the given protoc binary path.
+//
+func CompilerWithProtocBinPath(protocBinPath string) CompilerOption {
+	return func(compiler *compiler) {
+		compiler.protocBinPath = protocBinPath
+	}
+}
+
+// CompilerWithProtocWktPath returns a CompilerOption that uses the given path to include the
+// well-known types.
+func CompilerWithProtocWktPath(protocWktPath string) CompilerOption {
+	return func(compiler *compiler) {
+		compiler.protocWktPath = protocWktPath
+	}
+}
+
 // CompilerWithProtocURL returns a CompilerOption that uses the given protoc zip file URL.
 //
 // The default is https://github.com/protocolbuffers/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
 func CompilerWithProtocURL(protocURL string) CompilerOption {
 	return func(compiler *compiler) {
 		compiler.protocURL = protocURL
-	}
-}
-
-// CompilerWithNoCache disables caching.
-func CompilerWithNoCache() CompilerOption {
-	return func(compiler *compiler) {
-		compiler.noCache = true
 	}
 }
 

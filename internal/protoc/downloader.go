@@ -42,8 +42,6 @@ import (
 	"go.uber.org/zap"
 )
 
-const _filePrefix = "file://"
-
 type downloader struct {
 	lock sync.RWMutex
 
@@ -58,8 +56,8 @@ type downloader struct {
 	// If set, Prototool will invoke protoc and include
 	// the well-known-types, from the configured binPath
 	// and wktPath.
-	noCache bool
-	binPath string
+	protocBinPath string
+	protocWktPath string
 }
 
 func newDownloader(config settings.Config, options ...DownloaderOption) (*downloader, error) {
@@ -73,15 +71,23 @@ func newDownloader(config settings.Config, options ...DownloaderOption) (*downlo
 	if downloader.config.Compile.ProtobufVersion == "" {
 		downloader.config.Compile.ProtobufVersion = vars.DefaultProtocVersion
 	}
-	if downloader.noCache {
-		if !strings.HasPrefix(downloader.protocURL, _filePrefix) {
-			return nil, fmt.Errorf("cannot disable caching without protoc-url=file://<protoc>")
+	if downloader.protocBinPath != "" || downloader.protocWktPath != "" {
+		if downloader.protocURL != "" {
+			return nil, fmt.Errorf("cannot use protoc-url in combination with either protoc-bin-path or protoc-wkt-path")
 		}
-		binPath := strings.TrimPrefix(downloader.protocURL, _filePrefix)
-		if _, err := os.Stat(binPath); os.IsNotExist(err) {
+		if downloader.protocBinPath == "" || downloader.protocWktPath == "" {
+			return nil, fmt.Errorf("both protoc-bin-path and protoc-wkt-path must be set")
+		}
+		cleanBinPath := filepath.Clean(downloader.protocBinPath)
+		if _, err := os.Stat(cleanBinPath); os.IsNotExist(err) {
 			return nil, err
 		}
-		downloader.binPath = binPath
+		cleanWktPath := filepath.Clean(downloader.protocWktPath)
+		if _, err := os.Stat(cleanWktPath); os.IsNotExist(err) {
+			return nil, err
+		}
+		downloader.protocBinPath = cleanBinPath
+		downloader.protocWktPath = cleanWktPath
 	}
 	return downloader, nil
 }
@@ -97,8 +103,8 @@ func (d *downloader) Download() (string, error) {
 }
 
 func (d *downloader) ProtocPath() (string, error) {
-	if d.binPath != "" {
-		return d.binPath, nil
+	if d.protocBinPath != "" {
+		return d.protocBinPath, nil
 	}
 	basePath, err := d.Download()
 	if err != nil {
@@ -108,8 +114,8 @@ func (d *downloader) ProtocPath() (string, error) {
 }
 
 func (d *downloader) WellKnownTypesIncludePath() (string, error) {
-	if d.noCache {
-		return "", nil
+	if d.protocWktPath != "" {
+		return d.protocWktPath, nil
 	}
 	basePath, err := d.Download()
 	if err != nil {
@@ -129,8 +135,8 @@ func (d *downloader) Delete() error {
 }
 
 func (d *downloader) cache() (string, error) {
-	if d.binPath != "" {
-		return d.binPath, nil
+	if d.protocBinPath != "" {
+		return d.protocBinPath, nil
 	}
 
 	d.lock.Lock()
@@ -241,8 +247,8 @@ func (d *downloader) getDownloadData(goos string, goarch string) (_ []byte, retE
 	}()
 
 	switch {
-	case strings.HasPrefix(url, _filePrefix):
-		return ioutil.ReadFile(strings.TrimPrefix(url, _filePrefix))
+	case strings.HasPrefix(url, "file://"):
+		return ioutil.ReadFile(strings.TrimPrefix(url, "file://"))
 	case strings.HasPrefix(url, "http://"), strings.HasPrefix(url, "https://"):
 		response, err := http.Get(url)
 		if err != nil || response.StatusCode != http.StatusOK {

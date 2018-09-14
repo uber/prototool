@@ -65,13 +65,14 @@ type runner struct {
 	input       io.Reader
 	output      io.Writer
 
-	logger      *zap.Logger
-	cachePath   string
-	configData  string
-	protocURL   string
-	printFields string
-	noCache     bool
-	json        bool
+	logger        *zap.Logger
+	cachePath     string
+	configData    string
+	protocBinPath string
+	protocWktPath string
+	protocURL     string
+	printFields   string
+	json          bool
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -668,16 +669,22 @@ func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error
 			protoc.DownloaderWithCachePath(r.cachePath),
 		)
 	}
+	if r.protocBinPath != "" {
+		downloaderOptions = append(
+			downloaderOptions,
+			protoc.DownloaderWithProtocBinPath(r.protocBinPath),
+		)
+	}
+	if r.protocWktPath != "" {
+		downloaderOptions = append(
+			downloaderOptions,
+			protoc.DownloaderWithProtocWktPath(r.protocWktPath),
+		)
+	}
 	if r.protocURL != "" {
 		downloaderOptions = append(
 			downloaderOptions,
 			protoc.DownloaderWithProtocURL(r.protocURL),
-		)
-	}
-	if r.noCache {
-		downloaderOptions = append(
-			downloaderOptions,
-			protoc.DownloaderWithNoCache(),
 		)
 	}
 	return protoc.NewDownloader(config, downloaderOptions...)
@@ -693,16 +700,22 @@ func (r *runner) newCompiler(doGen bool, doFileDescriptorSet bool) protoc.Compil
 			protoc.CompilerWithCachePath(r.cachePath),
 		)
 	}
+	if r.protocBinPath != "" {
+		compilerOptions = append(
+			compilerOptions,
+			protoc.CompilerWithProtocBinPath(r.protocBinPath),
+		)
+	}
+	if r.protocWktPath != "" {
+		compilerOptions = append(
+			compilerOptions,
+			protoc.CompilerWithProtocWktPath(r.protocWktPath),
+		)
+	}
 	if r.protocURL != "" {
 		compilerOptions = append(
 			compilerOptions,
 			protoc.CompilerWithProtocURL(r.protocURL),
-		)
-	}
-	if r.noCache {
-		compilerOptions = append(
-			compilerOptions,
-			protoc.CompilerWithNoCache(),
 		)
 	}
 	if doGen {

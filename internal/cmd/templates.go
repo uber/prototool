@@ -51,7 +51,8 @@ var (
 			flags.bindJSON(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
-			flags.bindNoCache(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWktPath(flagSet)
 		},
 	}
 
@@ -89,7 +90,8 @@ var (
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
-			flags.bindNoCache(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWktPath(flagSet)
 		},
 	}
 
@@ -227,7 +229,8 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindOverwrite(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
-			flags.bindNoCache(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWktPath(flagSet)
 		},
 	}
 
@@ -243,7 +246,8 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
-			flags.bindNoCache(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWktPath(flagSet)
 		},
 	}
 
@@ -333,7 +337,8 @@ $ cat input.json | prototool grpc example \
 			flags.bindMethod(flagSet)
 			flags.bindStdin(flagSet)
 			flags.bindProtocURL(flagSet)
-			flags.bindNoCache(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWktPath(flagSet)
 		},
 	}
 
@@ -376,7 +381,8 @@ $ cat input.json | prototool grpc example \
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
 			flags.bindProtocURL(flagSet)
-			flags.bindNoCache(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWktPath(flagSet)
 		},
 	}
 
@@ -514,10 +520,16 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 			exec.RunnerWithJSON(),
 		)
 	}
-	if flags.noCache {
+	if flags.protocBinPath != "" {
 		runnerOptions = append(
 			runnerOptions,
-			exec.RunnerWithNoCache(),
+			exec.RunnerWithProtocBinPath(flags.protocBinPath),
+		)
+	}
+	if flags.protocWktPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocWktPath(flags.protocWktPath),
 		)
 	}
 	if flags.printFields != "" {

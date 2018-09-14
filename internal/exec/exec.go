@@ -99,18 +99,25 @@ func RunnerWithJSON() RunnerOption {
 	}
 }
 
-// RunnerWithNoCache returns a RunnerOption that will disable the protoc cache.
-func RunnerWithNoCache() RunnerOption {
-	return func(runner *runner) {
-		runner.noCache = true
-	}
-}
-
 // RunnerWithPrintFields returns a RunnerOption that uses the given colon-separated
 // print fields. The default is filename:line:column:message.
 func RunnerWithPrintFields(printFields string) RunnerOption {
 	return func(runner *runner) {
 		runner.printFields = printFields
+	}
+}
+
+// RunnerWithProtocBinPath returns a RunnerOption that uses the given protoc binary path.
+func RunnerWithProtocBinPath(protocBinPath string) RunnerOption {
+	return func(runner *runner) {
+		runner.protocBinPath = protocBinPath
+	}
+}
+
+// RunnerWithProtocWktPath returns a RunnerOption that uses the given path to include the well-known types.
+func RunnerWithProtocWktPath(protocWktPath string) RunnerOption {
+	return func(runner *runner) {
+		runner.protocWktPath = protocWktPath
 	}
 }
 
