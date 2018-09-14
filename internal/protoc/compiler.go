@@ -69,7 +69,7 @@ type compiler struct {
 	logger              *zap.Logger
 	cachePath           string
 	protocBinPath       string
-	protocWktPath       string
+	protocWKTPath       string
 	protocURL           string
 	doGen               bool
 	doFileDescriptorSet bool
@@ -375,10 +375,10 @@ func (c *compiler) newDownloader(config settings.Config) (Downloader, error) {
 			DownloaderWithProtocBinPath(c.protocBinPath),
 		)
 	}
-	if c.protocWktPath != "" {
+	if c.protocWKTPath != "" {
 		downloaderOptions = append(
 			downloaderOptions,
-			DownloaderWithProtocWktPath(c.protocWktPath),
+			DownloaderWithProtocWKTPath(c.protocWKTPath),
 		)
 	}
 	if c.protocURL != "" {

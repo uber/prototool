@@ -48,7 +48,7 @@ type flags struct {
 	pkg            string
 	printFields    string
 	protocBinPath  string
-	protocWktPath  string
+	protocWKTPath  string
 	protocURL      string
 	stdin          bool
 	uncomment      bool
@@ -146,8 +146,8 @@ func (f *flags) bindProtocBinPath(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.protocBinPath, "protoc-bin-path", "", "The path to the protoc binary. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-wkt-path.")
 }
 
-func (f *flags) bindProtocWktPath(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.protocWktPath, "protoc-wkt-path", "", "The path to the well-known types. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-bin-path.")
+func (f *flags) bindProtocWKTPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.protocWKTPath, "protoc-wkt-path", "", "The path to the well-known types. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-bin-path.")
 }
 
 func (f *flags) bindStdin(flagSet *pflag.FlagSet) {

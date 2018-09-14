@@ -91,11 +91,11 @@ func DownloaderWithProtocBinPath(protocBinPath string) DownloaderOption {
 	}
 }
 
-// DownloaderWithProtocWktPath returns a DownloaderOption that uses the given path to include
+// DownloaderWithProtocWKTPath returns a DownloaderOption that uses the given path to include
 // the well-known types.
-func DownloaderWithProtocWktPath(protocWktPath string) DownloaderOption {
+func DownloaderWithProtocWKTPath(protocWKTPath string) DownloaderOption {
 	return func(downloader *downloader) {
-		downloader.protocWktPath = protocWktPath
+		downloader.protocWKTPath = protocWKTPath
 	}
 }
 
@@ -169,11 +169,11 @@ func CompilerWithProtocBinPath(protocBinPath string) CompilerOption {
 	}
 }
 
-// CompilerWithProtocWktPath returns a CompilerOption that uses the given path to include the
+// CompilerWithProtocWKTPath returns a CompilerOption that uses the given path to include the
 // well-known types.
-func CompilerWithProtocWktPath(protocWktPath string) CompilerOption {
+func CompilerWithProtocWKTPath(protocWKTPath string) CompilerOption {
 	return func(compiler *compiler) {
-		compiler.protocWktPath = protocWktPath
+		compiler.protocWKTPath = protocWKTPath
 	}
 }
 

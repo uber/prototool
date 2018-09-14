@@ -114,10 +114,10 @@ func RunnerWithProtocBinPath(protocBinPath string) RunnerOption {
 	}
 }
 
-// RunnerWithProtocWktPath returns a RunnerOption that uses the given path to include the well-known types.
-func RunnerWithProtocWktPath(protocWktPath string) RunnerOption {
+// RunnerWithProtocWKTPath returns a RunnerOption that uses the given path to include the well-known types.
+func RunnerWithProtocWKTPath(protocWKTPath string) RunnerOption {
 	return func(runner *runner) {
-		runner.protocWktPath = protocWktPath
+		runner.protocWKTPath = protocWKTPath
 	}
 }
 

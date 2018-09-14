@@ -57,7 +57,7 @@ type downloader struct {
 	// the well-known-types, from the configured binPath
 	// and wktPath.
 	protocBinPath string
-	protocWktPath string
+	protocWKTPath string
 }
 
 func newDownloader(config settings.Config, options ...DownloaderOption) (*downloader, error) {
@@ -71,23 +71,23 @@ func newDownloader(config settings.Config, options ...DownloaderOption) (*downlo
 	if downloader.config.Compile.ProtobufVersion == "" {
 		downloader.config.Compile.ProtobufVersion = vars.DefaultProtocVersion
 	}
-	if downloader.protocBinPath != "" || downloader.protocWktPath != "" {
+	if downloader.protocBinPath != "" || downloader.protocWKTPath != "" {
 		if downloader.protocURL != "" {
 			return nil, fmt.Errorf("cannot use protoc-url in combination with either protoc-bin-path or protoc-wkt-path")
 		}
-		if downloader.protocBinPath == "" || downloader.protocWktPath == "" {
+		if downloader.protocBinPath == "" || downloader.protocWKTPath == "" {
 			return nil, fmt.Errorf("both protoc-bin-path and protoc-wkt-path must be set")
 		}
 		cleanBinPath := filepath.Clean(downloader.protocBinPath)
 		if _, err := os.Stat(cleanBinPath); os.IsNotExist(err) {
 			return nil, err
 		}
-		cleanWktPath := filepath.Clean(downloader.protocWktPath)
-		if _, err := os.Stat(cleanWktPath); os.IsNotExist(err) {
+		cleanWKTPath := filepath.Clean(downloader.protocWKTPath)
+		if _, err := os.Stat(cleanWKTPath); os.IsNotExist(err) {
 			return nil, err
 		}
 		downloader.protocBinPath = cleanBinPath
-		downloader.protocWktPath = cleanWktPath
+		downloader.protocWKTPath = cleanWKTPath
 	}
 	return downloader, nil
 }
@@ -114,8 +114,8 @@ func (d *downloader) ProtocPath() (string, error) {
 }
 
 func (d *downloader) WellKnownTypesIncludePath() (string, error) {
-	if d.protocWktPath != "" {
-		return d.protocWktPath, nil
+	if d.protocWKTPath != "" {
+		return d.protocWKTPath, nil
 	}
 	basePath, err := d.Download()
 	if err != nil {
