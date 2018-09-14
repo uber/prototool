@@ -75,12 +75,36 @@ func (c *configProvider) Get(filePath string) (Config, error) {
 	return get(filePath)
 }
 
+func (c *configProvider) GetForData(dirPath string, externalConfigData string) (Config, error) {
+	if !filepath.IsAbs(dirPath) {
+		return Config{}, fmt.Errorf("%s is not an absolute path", dirPath)
+	}
+	dirPath = filepath.Clean(dirPath)
+	var externalConfig ExternalConfig
+	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
+		return Config{}, err
+	}
+	return externalConfigToConfig(externalConfig, dirPath)
+}
+
 func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, error) {
 	if !filepath.IsAbs(dirPath) {
 		return nil, fmt.Errorf("%s is not an absolute path", dirPath)
 	}
 	dirPath = filepath.Clean(dirPath)
 	return getExcludePrefixesForDir(dirPath)
+}
+
+func (c *configProvider) GetExcludePrefixesForData(dirPath string, externalConfigData string) ([]string, error) {
+	if !filepath.IsAbs(dirPath) {
+		return nil, fmt.Errorf("%s is not an absolute path", dirPath)
+	}
+	dirPath = filepath.Clean(dirPath)
+	var externalConfig ExternalConfig
+	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
+		return nil, err
+	}
+	return getExcludePrefixes(externalConfig.Excludes, dirPath)
 }
 
 // getFilePathForDir tries to find a file named by one of the ConfigFilenames starting in the

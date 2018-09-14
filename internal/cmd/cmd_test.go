@@ -354,6 +354,49 @@ func TestLint(t *testing.T) {
 	)
 }
 
+func TestLintConfigDataOverride(t *testing.T) {
+	cwd, err := os.Getwd()
+	require.NoError(t, err)
+	require.NoError(t, os.Chdir("testdata/lint/gopackagelongform"))
+	defer func() {
+		require.NoError(t, os.Chdir(cwd))
+	}()
+	assertDoLintFile(
+		t,
+		false,
+		`5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
+		"gopackagelongform.proto",
+		"--config-data",
+		`{"lint":{"rules":{"remove":["FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX"]}}}`,
+	)
+	assertDoLintFile(
+		t,
+		false,
+		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX`,
+		"gopackagelongform.proto",
+		"--config-data",
+		`{"lint":{"rules":{"remove":["FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM"]}}}`,
+	)
+	assertDoLintFile(
+		t,
+		false,
+		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
+		5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
+		"gopackagelongform.proto",
+		"--config-data",
+		`{}`,
+	)
+	assertExact(
+		t,
+		1,
+		`json: unknown field "unknown_key"`,
+		"lint",
+		"gopackagelongform.proto",
+		"--config-data",
+		`{"unknown_key":"foo"}`,
+	)
+}
+
 func TestGoldenFormat(t *testing.T) {
 	t.Parallel()
 	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/bar/bar.proto")
@@ -709,7 +752,7 @@ func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath 
 	}
 }
 
-func assertDoLintFile(t *testing.T, expectSuccess bool, expectedLinePrefixesWithoutFile string, filePath string) {
+func assertDoLintFile(t *testing.T, expectSuccess bool, expectedLinePrefixesWithoutFile string, filePath string, args ...string) {
 	lines := getCleanLines(expectedLinePrefixesWithoutFile)
 	for i, line := range lines {
 		lines[i] = filePath + ":" + line
@@ -718,7 +761,7 @@ func assertDoLintFile(t *testing.T, expectSuccess bool, expectedLinePrefixesWith
 	if !expectSuccess {
 		expectedExitCode = 255
 	}
-	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), "lint", filePath)
+	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint", filePath}, args...)...)
 }
 
 func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {

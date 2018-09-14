@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Accept `prototool.json` files for configuation in addition to
   `prototool.yaml` files.
+- Add `--config-data` flag.
 
 
 ## [1.2.0] - 2018-08-29

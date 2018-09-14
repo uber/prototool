@@ -311,14 +311,20 @@ type ConfigProvider interface {
 	// If multiple files named by one of the ConfigFilenames are found in the same
 	// directory, error is returned.
 	GetFilePathForDir(dirPath string) (string, error)
+	// GetForData returns a Config for the given ExternalConfigData in JSON format.
+	// The Config will be as if there was a configuration file at the given dirPath.
+	GetForData(dirPath string, externalConfigData string) (Config, error)
 
-	// GetForDir tries to find a file named by one of the ConfigFilenames in the given
+	// GetExcludePrefixesForDir tries to find a file named by one of the ConfigFilenames in the given
 	// directory and returns the cleaned absolute exclude prefixes. Unlike other functions
 	// on ConfigProvider, this has no recursive functionality - if there is no
 	// config file, nothing is returned.
 	// If multiple files named by one of the ConfigFilenames are found in the same
 	// directory, error is returned.
 	GetExcludePrefixesForDir(dirPath string) ([]string, error)
+	// GetExcludePrefixesForData gets the exclude prefixes for the given ExternalConfigData in JSON format.
+	// The logic will act is if there was a configuration file at the given dirPath.
+	GetExcludePrefixesForData(dirPath string, externalConfigData string) ([]string, error)
 }
 
 // ConfigProviderOption is an option for a new ConfigProvider.

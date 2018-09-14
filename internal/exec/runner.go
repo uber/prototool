@@ -67,6 +67,7 @@ type runner struct {
 
 	logger      *zap.Logger
 	cachePath   string
+	configData  string
 	protocURL   string
 	printFields string
 	json        bool
@@ -84,9 +85,16 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	runner.configProvider = settings.NewConfigProvider(
 		settings.ConfigProviderWithLogger(runner.logger),
 	)
-	runner.protoSetProvider = file.NewProtoSetProvider(
+	protoSetProviderOptions := []file.ProtoSetProviderOption{
 		file.ProtoSetProviderWithLogger(runner.logger),
-	)
+	}
+	if runner.configData != "" {
+		protoSetProviderOptions = append(
+			protoSetProviderOptions,
+			file.ProtoSetProviderWithConfigData(runner.configData),
+		)
+	}
+	runner.protoSetProvider = file.NewProtoSetProvider(protoSetProviderOptions...)
 	return runner
 }
 
@@ -750,6 +758,9 @@ func (r *runner) newGRPCHandler(
 }
 
 func (r *runner) getConfig(dirPath string) (settings.Config, error) {
+	if r.configData != "" {
+		return r.configProvider.GetForData(dirPath, r.configData)
+	}
 	return r.configProvider.GetForDir(dirPath)
 }
 
