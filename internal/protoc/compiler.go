@@ -272,7 +272,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 	// have a different protoc.version value
 	downloader, err := c.newDownloader(protoSet.Config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create downloader: %v", err)
+		return nil, err
 	}
 	if _, err := downloader.Download(); err != nil {
 		return cmdMetas, err
