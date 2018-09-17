@@ -124,7 +124,7 @@ This document outlines how to create a release of prototool.
     ```
 
 15. Update the Homebrew formula using `brew bump-formula-pr`. This will create
-    a fork of github.com/homebrew/homebrew-core and create a PR with the
+    a fork of github.com/Homebrew/homebrew-core and create a PR with the
     updated formula for Prototool.
 
     ```
