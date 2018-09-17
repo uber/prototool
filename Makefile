@@ -2,7 +2,7 @@ SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/examp
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
 BINS := github.com/uber/prototool/internal/cmd/prototool
 
-DOCKER_IMAGE := golang:1.10.3
+DOCKER_IMAGE := golang:1.11.0
 
 .PHONY: all
 all: lint cover

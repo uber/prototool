@@ -123,22 +123,10 @@ This document outlines how to create a release of prototool.
     git push origin $BRANCH
     ```
 
-15. Update the formula in https://github.com/homebrew/homebrew-core. First, download
-    the newly created source tarball and compute the SHA-256 hash.
+15. Update the Homebrew formula using `brew bump-formula-pr`. This will create
+    a fork of github.com/Homebrew/homebrew-core and create a PR with the
+    updated formula for Prototool.
 
     ```
-    # Use "sha256sum" instead of "shasum -a 256" on Linux.
-    # Do not forget the -sSL or you will get the wrong hash.
-    curl -sSL https://github.com/uber/prototool/archive/v1.22.0.tar.gz | shasum -a 256 | cut -f 1 -d ' '
+    brew bump-formula-pr --url=https://github.com/uber/prototool/archive/v$VERSION.tar.gz prototool
     ```
-
-    Then, fork github.com/homebrew/homebrew-core if you have not already, and create
-    a new branch named "prototool-$VERSION". Update `Formula/prototool.rb` to use
-    the new version and SHA-256 hash.
-
-    ```
-    url "https://github.com/uber/prototool/archive/v1.22.0.tar.gz"
-    sha256 "NEW_SHA_256_HASH_FROM_ABOVE"
-    ```
-
-    Create a commit with the message "prototool $VERSION" and open a PR with the same name.
