@@ -1,5 +1,5 @@
-hash: e103ef81d6b447b46f5afb30e2d4bcf841a26eb52a11b8743f9dc8f35d16e855
-updated: 2018-08-06T20:27:03.235802403+02:00
+hash: c454f5e88b3968824d779330aac18b9ee85c744b9912e5b4d0534808b17b617d
+updated: 2018-09-25T15:16:02.58806782-07:00
 imports:
 - name: github.com/beorn7/perks
   version: 3a771d992973f24aa725d07868b467d1ddfceafb
@@ -10,7 +10,7 @@ imports:
   subpackages:
   - md2man
 - name: github.com/emicklei/proto
-  version: 92ccf4bb8fea88ece4fda55edd4d9cb9c329e18c
+  version: 31ca1a37608053a92355be293b13f08fe25e526e
 - name: github.com/fullstorydev/grpcurl
   version: 75759db6597e7005ab69d3c344eee234377d7cbd
 - name: github.com/gogo/protobuf
@@ -112,11 +112,12 @@ imports:
 - name: go.uber.org/atomic
   version: 1ea20fb1cbb1cc08cbd0d913a96dead89aa18289
 - name: go.uber.org/dig
-  version: 9b2360b34259248adbcf16a1f61ec7750ff19d33
+  version: 27eb30e15ef3e7f67cd86f2b65c618e3e308c104
   subpackages:
   - internal/digreflect
+  - internal/dot
 - name: go.uber.org/fx
-  version: 4556160e761570faf2b4e89547c04cdcd96e0c7a
+  version: b156a883a62423b7d9ab651d1689c42c4d788787
   subpackages:
   - internal/fxlog
   - internal/fxreflect
@@ -130,7 +131,7 @@ imports:
   - push
   - tallypush
 - name: go.uber.org/thriftrw
-  version: fb439a9a7f5a388d8606aae1c1ff6654b8b67fbe
+  version: c8eb6919acebb42254375c897469d986c91405ae
   subpackages:
   - version
 - name: go.uber.org/yarpc
@@ -164,7 +165,7 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/net
-  version: f4c29de78a2a91c00474a2e689954305c350adf9
+  version: 8a410e7b638dca158bf9e766925842f6651ff828
   subpackages:
   - bpf
   - context
@@ -200,7 +201,7 @@ imports:
   - protobuf/ptype
   - protobuf/source_context
 - name: google.golang.org/grpc
-  version: f4da7eee5364ac9080de84ca40411a08a63d0426
+  version: e00d24941bcee35dd163f4377d5371349f14baaf
   repo: https://github.com/grpc/grpc-go
   subpackages:
   - balancer
