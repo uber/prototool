@@ -4,7 +4,7 @@ protoc:
   # note vendor is .gitignored
   - ../../../vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis
 lint:
-  # run "prototool list-linters" to see the currently configured linters
+  # run "prototool lint --list-linters" to see the currently configured linters
   # add "exclude_ids" to ignore specific linter IDs for all files
   ignores:
     - id: REQUEST_RESPONSE_TYPES_IN_SAME_FILE
