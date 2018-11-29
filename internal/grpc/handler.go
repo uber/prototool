@@ -97,7 +97,24 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 func (h *handler) dial(address string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), h.connectTimeout)
 	defer cancel()
-	return grpcurl.BlockingDial(ctx, "tcp", address, nil, h.getDialOptions()...)
+	network, address, err := getNetworkAddress(address)
+	if err != nil {
+		return nil, fmt.Errorf("grpc dial: %v", err)
+	}
+	return grpcurl.BlockingDial(ctx, network, address, nil, h.getDialOptions()...)
+}
+
+func getNetworkAddress(address string) (string, string, error) {
+	split := strings.SplitN(address, "://", 2)
+	if len(split) != 2 {
+		return "tcp", address, nil
+	}
+	switch split[0] {
+	case "tcp", "unix":
+		return split[0], split[1], nil
+	default:
+		return "", "", fmt.Errorf("invalid network, only tcp or unix allowed: %s", split[0])
+	}
 }
 
 func (h *handler) getDialOptions() []grpc.DialOption {
