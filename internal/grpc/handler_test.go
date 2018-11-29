@@ -32,30 +32,44 @@ func TestGetNetworkAddress(t *testing.T) {
 		address       string
 		expectNetwork string
 		expectAddress string
+		expectError   string
 	}{
 		{
-			desc:          "no prefix defaults to tcp",
+			desc:          "no scheme defaults to tcp",
 			address:       "127.0.0.1:1234",
 			expectNetwork: "tcp",
 			expectAddress: "127.0.0.1:1234",
 		},
 		{
-			desc:          "tcp prefix",
+			desc:          "tcp scheme",
 			address:       "tcp://127.0.0.1:1234",
 			expectNetwork: "tcp",
 			expectAddress: "127.0.0.1:1234",
 		},
 		{
-			desc:          "unix prefix",
+			desc:          "unix scheme",
 			address:       "unix:///foo",
 			expectNetwork: "unix",
 			expectAddress: "/foo",
 		},
+		{
+			desc:        "invalid scheme",
+			address:     "foo:///bar",
+			expectError: "invalid network, only tcp or unix allowed: foo",
+		},
 	}
 
 	for _, tt := range tests {
-		net, addr := getNetworkAddress(tt.address)
-		require.Equal(t, tt.expectNetwork, net)
-		require.Equal(t, tt.expectAddress, addr)
+		t.Run(tt.desc, func(t *testing.T) {
+			net, addr, err := getNetworkAddress(tt.address)
+			if tt.expectError != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tt.expectError)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, tt.expectNetwork, net)
+			require.Equal(t, tt.expectAddress, addr)
+		})
 	}
 }
