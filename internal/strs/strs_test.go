@@ -90,6 +90,7 @@ func TestToUpperSnakeCase(t *testing.T) {
 	assert.Equal(t, "_CAMEL_CASE", ToUpperSnakeCase("_CamelCase"))
 	assert.Equal(t, "CAMEL_CASE__HELLO", ToUpperSnakeCase("CamelCase__Hello"))
 	assert.Equal(t, "ABBR_CAMEL", ToUpperSnakeCase("ABBRCamel"))
+	assert.Equal(t, "FOO_ABBR_CAMEL", ToUpperSnakeCase("FooABBRCamel"))
 }
 
 func TestToUpperCamelCase(t *testing.T) {
