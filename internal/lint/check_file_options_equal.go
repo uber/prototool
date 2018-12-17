@@ -36,6 +36,14 @@ var fileOptionsEqualGoPackagePbSuffixLinter = NewLinter(
 	}),
 )
 
+var fileOptionsEqualGoPackageLastTwoSuffixLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_GO_PACKAGE_LAST_TWO_SUFFIX",
+	`Verifies that the file option "go_package" is equal to the last two values of the package separated by "."s, or just the package name if there are no "."s.`,
+	newCheckFileOptionsEqual("go_package", func(_ *proto.Proto, pkg *proto.Package) string {
+		return protostrs.GoPackageLastTwo(pkg.Name)
+	}),
+)
+
 var fileOptionsEqualJavaMultipleFilesTrueLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE",
 	`Verifies that the file option "java_multiple_files" is equal to true.`,

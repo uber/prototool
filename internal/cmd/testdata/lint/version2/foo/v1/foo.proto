@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo.v1";
+
+// FooType is a foo type, and wants to tell you what type of Foo it is.
+enum FooType {
+  FOO_TYPE_INVALID = 0;
+  FOO_TYPE_UNSET = 1;
+  FOO_TYPE_BALLOON = 2;
+  FOO_TYPE_TREE = 3;
+}
+
+// Foo is a foo, it goes around the world and talks to bars.
+message Foo {
+  FooType type = 1;
+  sint32 latitude_micros = 3;
+  sint32 longitude_micros = 4;
+  string bar_id = 5;
+}
+
+
+// Bar is a bar that a Foo can talk to.
+message Bar {
+  // Type is the type of Bar.
+  enum Type {
+    TYPE_INVALID = 0;
+    TYPE_UNSET = 1;
+    TYPE_REMOTE_CONTROL = 2;
+    TYPE_FAN = 3;
+  }
+
+  Type type = 1;
+  string id = 2;
+  repeated string planet_ids = 3;
+}
+
+// Planet is a planet.
+message Planet {
+  string id = 1;
+  string name = 2;
+}
+
+// Galaxy is a galaxy.
+message Galaxy {
+  string id = 1;
+  string name = 2;
+}
+
+// Quasar is a quasar.
+message Quasar {
+  string id = 1;
+  string name = 2;
+}
+
+// ShowingOffBuiltInFieldOptions shows off built in field options.
+message ShowingOffBuiltInFieldOptions {
+  string foo = 1 [deprecated = true];
+}
+
+message SendFooRequest {
+  Foo foo = 1;
+}
+
+message SendFooResponse {}
+
+message GetPlanetRequest {
+  string planet_id = 1;
+}
+
+message GetPlanetResponse {
+  Planet planet = 1;
+}
+
+message StreamGalaxiesRequest {}
+
+message StreamGalaxiesResponse {
+  Galaxy galaxy = 1;
+}
+
+message StreamQuasarsRequest {
+  Quasar quasar = 1;
+}
+
+message StreamQuasarsResponse {
+  repeated Quasar quasars = 1;
+}
+
+// HelloAPI is the hello API.
+service HelloAPI {
+  // SendFoo sends a foo.
+  rpc SendFoo(SendFooRequest) returns (SendFooResponse);
+  // GetPlanet gets a planet.
+  rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse);
+  // StreamGalaxies streams galaxies.
+  rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse);
+  // StreamQuasars streams quasars.
+  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse);
+}
