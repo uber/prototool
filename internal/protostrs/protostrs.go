@@ -99,7 +99,8 @@ func MajorVersion(packageName string) (uint64, bool) {
 		return 0, false
 	}
 	versionPart := split[len(split)-1]
-	if len(versionPart) == 0 {
+	// Must be 'v' along with at least one number.
+	if len(versionPart) < 2 {
 		return 0, false
 	}
 	if versionPart[0] != 'v' {

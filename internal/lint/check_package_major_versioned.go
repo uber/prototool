@@ -64,8 +64,7 @@ func (v *packageMajorVersionedVisitor) Finally() error {
 		v.AddFailuref(scanner.Position{Filename: v.filename}, "No package declaration found.")
 		return nil
 	}
-	_, ok := protostrs.MajorVersion(v.pkg.Name)
-	if !ok {
+	if _, ok := protostrs.MajorVersion(v.pkg.Name); !ok {
 		v.AddFailuref(v.pkg.Position, `Package should be of the form "package.vMAJORVERSION" but was %q.`, v.pkg.Name)
 	}
 	return nil
