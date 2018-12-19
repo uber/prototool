@@ -26,11 +26,11 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:705be935aaa5909d8603236d539948c303da6712339a625294c31db3d53737e2"
+  digest = "1:2eb252b946fc4d4e9cc929c8f748b430220db73b7e6545ec7cb92b05a6a116d4"
   name = "github.com/emicklei/proto"
   packages = ["."]
   pruneopts = ""
-  revision = "31ca1a37608053a92355be293b13f08fe25e526e"
+  revision = "e4c3d8119041027a1d3b012ca2160948802618d7"
 
 [[projects]]
   digest = "1:56cea09a633a117b1eaf1edd0d9b7ac889ea2594a09b948f8d11a3a4c9982081"

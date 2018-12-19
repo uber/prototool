@@ -15,7 +15,7 @@ required = [
 
 [[constraint]]
   name = "github.com/emicklei/proto"
-  revision = "31ca1a37608053a92355be293b13f08fe25e526e"
+  revision = "e4c3d8119041027a1d3b012ca2160948802618d7"
 
 [[constraint]]
   name = "github.com/fullstorydev/grpcurl"
