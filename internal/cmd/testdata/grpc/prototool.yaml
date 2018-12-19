@@ -6,7 +6,7 @@ generate:
   go_options:
     import_path: github.com/uber/prototool/internal/cmd/testdata/grpc
   plugins:
-    - name: gogoslick
-      type: gogo
+    - name: go
+      type: go
       flags: plugins=grpc
       output: gen/grpcpb
