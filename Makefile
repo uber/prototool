@@ -2,7 +2,34 @@ SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/examp
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
 BINS := github.com/uber/prototool/internal/cmd/prototool
 
-DOCKER_IMAGE := golang:1.11.0
+SHELL := /bin/bash -o pipefail
+UNAME_OS := $(shell uname -s)
+UNAME_ARCH := $(shell uname -m)
+
+TMP_BASE := .tmp
+TMP := $(TMP_BASE)/$(UNAME_OS)/$(UNAME_ARCH)
+TMP_LIB := $(TMP)/lib
+TMP_BIN = $(TMP)/bin
+
+DOCKER_IMAGE := golang:1.11.4
+
+DEP_VERSION := 0.5.0
+DEP := $(TMP_BIN)/dep-$(DEP_VERSION)
+
+DEP_LIB := $(TMP_LIB)/dep-$(DEP_VERSION)
+ifeq ($(UNAME_OS),Darwin)
+DEP_OS := darwin
+else
+DEP_OS = linux
+endif
+ifeq ($(UNAME_ARCH),x86_64)
+DEP_ARCH := amd64
+endif
+$(DEP):
+	@rm -rf $(DEP_LIB)
+	@mkdir -p $(TMP_BIN) $(DEP_LIB)
+	curl -sSL "https://github.com/golang/dep/releases/download/v$(DEP_VERSION)/dep-$(DEP_OS)-$(DEP_ARCH)" -o "$(DEP)"
+	chmod +x "$(DEP)"
 
 .PHONY: all
 all: lint cover
@@ -11,16 +38,14 @@ all: lint cover
 ci: init lint codecov
 
 .PHONY: init
-init:
-	go get github.com/Masterminds/glide
+init: $(DEP)
 	rm -rf vendor
-	glide install
+	$(DEP) ensure -v
 
 .PHONY: vendor
-vendor:
-	go get github.com/Masterminds/glide
+vendor: $(DEP)
 	rm -rf vendor
-	glide update
+	$(DEP) ensure -update -v
 
 .PHONY: install
 install:

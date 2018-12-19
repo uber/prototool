@@ -22,9 +22,35 @@ goarch() {
 
 BASE_DIR="release"
 
-go get github.com/Masterminds/glide
+UNAME_OS="$(uname -s)"
+UNAME_ARCH="$(uname -m)"
+
+TMP_BASE=".tmp"
+TMP="${TMP_BASE}/${UNAME_OS}/${UNAME_ARCH}"
+TMP_LIB="${TMP}/lib"
+TMP_BIN="${TMP}/bin"
+
+DEP_VERSION="0.5.0"
+DEP="${TMP_BIN}/dep-${DEP_VERSION}"
+
+DEP_LIB="${TMP_LIB}/dep-${DEP_VERSION}"
+if [ "${UNAME_OS}" = "Darwin" ]; then
+  DEP_OS="darwin"
+else
+  DEP_OS="linux"
+fi
+if [ "${UNAME_ARCH}" = "x86_64" ]; then
+  DEP_ARCH="amd64"
+fi
+
+rm -rf "${DEP_LIB}"
+mkdir -p "${TMP_BIN}" "${DEP_LIB}"
+curl -sSL "https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-${DEP_OS}-${DEP_ARCH}" -o "${DEP}"
+chmod +x "${DEP}"
+
 rm -rf vendor
-glide install
+"${DEP}" ensure -v
+
 rm -rf "${BASE_DIR}"
 for os in Darwin Linux; do
   for arch in x86_64; do

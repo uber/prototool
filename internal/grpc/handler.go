@@ -21,6 +21,7 @@
 package grpc
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -29,6 +30,8 @@ import (
 	"time"
 
 	"github.com/fullstorydev/grpcurl"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/desc"
 	"github.com/uber/prototool/internal/extract"
@@ -80,7 +83,7 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger)
 	ctx, cancel := context.WithTimeout(context.Background(), h.callTimeout)
 	defer cancel()
-	if err := grpcurl.InvokeRpc(
+	if err := grpcurl.InvokeRPC(
 		ctx,
 		descriptorSource,
 		clientConn,
@@ -157,13 +160,13 @@ func getServiceForMethod(method string) (string, error) {
 	return split[0], nil
 }
 
-func decodeFunc(reader io.Reader) func() ([]byte, error) {
+func decodeFunc(reader io.Reader) func(proto.Message) error {
 	decoder := json.NewDecoder(reader)
-	return func() ([]byte, error) {
+	return func(message proto.Message) error {
 		var rawMessage json.RawMessage
 		if err := decoder.Decode(&rawMessage); err != nil {
-			return nil, err
+			return err
 		}
-		return rawMessage, nil
+		return jsonpb.Unmarshal(bytes.NewReader(rawMessage), message)
 	}
 }

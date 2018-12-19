@@ -1,0 +1,62 @@
+required = [
+  "github.com/golang/lint/golint",
+  "github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway",
+  "github.com/kisielk/errcheck",
+  "github.com/stretchr/testify",
+  "github.com/wadey/gocovmerge",
+  "golang.org/x/lint",
+  "golang.org/x/tools/cmd/cover",
+  "google.golang.org/genproto/googleapis/api/annotations",
+  "go.uber.org/tools/update-license",
+  "go.uber.org/yarpc/encoding/protobuf/protoc-gen-yarpc-go",
+  "honnef.co/go/tools/cmd/staticcheck",
+  "honnef.co/go/tools/cmd/unused",
+]
+
+[[constraint]]
+  name = "github.com/emicklei/proto"
+  revision = "31ca1a37608053a92355be293b13f08fe25e526e"
+
+[[constraint]]
+  name = "github.com/fullstorydev/grpcurl"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/golang/protobuf"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/gogo/protobuf"
+  version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/jhump/protoreflect"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "github.com/mitchellh/go-wordwrap"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/spf13/cobra"
+  version = "0.0.3"
+
+[[constraint]]
+  name = "github.com/spf13/pflag"
+  version = "1.0.3"
+
+[[constraint]]
+  name = "go.uber.org/multierr"
+  version = "1.1.0"
+
+[[constraint]]
+  name = "go.uber.org/zap"
+  version = "1.9.1"
+
+[[constraint]]
+  name = "google.golang.org/grpc"
+  version = "1.17.0"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.2.2"

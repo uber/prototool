@@ -1,5 +1,6 @@
 /.glide
 /.idea
+/.tmp
 /brew
 /example/gen/proto/java
 /cover
