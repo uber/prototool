@@ -27,6 +27,7 @@ package protostrs
 
 import (
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/uber/prototool/internal/strs"
@@ -42,6 +43,22 @@ func GoPackage(packageName string) string {
 	}
 	split := strings.Split(packageName, ".")
 	return split[len(split)-1] + "pb"
+}
+
+// GoPackageLastTwo returns the value for the file option "go_package" given
+// a package name. This will be equal to the last two values of the package
+// separated by "."s. If packageName is empty, this will return an empty string.
+// If packageName has only one value when separated by "."s, this will be that
+// value.
+func GoPackageLastTwo(packageName string) string {
+	if packageName == "" {
+		return ""
+	}
+	split := strings.Split(packageName, ".")
+	if len(split) == 1 {
+		return split[0]
+	}
+	return split[len(split)-2] + split[len(split)-1]
 }
 
 // JavaOuterClassname returns the value for the file option
@@ -66,4 +83,33 @@ func JavaPackage(packageName string) string {
 		return ""
 	}
 	return "com." + packageName
+}
+
+// MajorVersion extracts the major version number from the package name, if
+// present. A package must be of the form "foo.vMAJORVERSION". Returns the
+// version and true if the package is of this form, 0 and false otherwise.
+func MajorVersion(packageName string) (uint64, bool) {
+	if packageName == "" {
+		return 0, false
+	}
+	split := strings.Split(packageName, ".")
+	// A package named "vX" should not count as it is just a single package name,
+	// not a package name and a version.
+	if len(split) < 2 {
+		return 0, false
+	}
+	versionPart := split[len(split)-1]
+	// Must be 'v' along with at least one number.
+	if len(versionPart) < 2 {
+		return 0, false
+	}
+	if versionPart[0] != 'v' {
+		return 0, false
+	}
+	versionString := versionPart[1:]
+	version, err := strconv.ParseUint(versionString, 10, 64)
+	if err != nil {
+		return 0, false
+	}
+	return version, true
 }

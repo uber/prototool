@@ -32,6 +32,13 @@ func TestGoPackage(t *testing.T) {
 	assert.Equal(t, "barpb", GoPackage("foo.bar"))
 }
 
+func TestGoPackageLastTwo(t *testing.T) {
+	assert.Equal(t, "", GoPackageLastTwo(""))
+	assert.Equal(t, "foo", GoPackageLastTwo("foo"))
+	assert.Equal(t, "foobar", GoPackageLastTwo("foo.bar"))
+	assert.Equal(t, "foobar", GoPackageLastTwo("first.foo.bar"))
+}
+
 func TestJavaOuterClassname(t *testing.T) {
 	assert.Equal(t, "", JavaOuterClassname(""))
 	assert.Equal(t, "FileProto", JavaOuterClassname("file.proto"))
@@ -49,4 +56,36 @@ func TestJavaPackage(t *testing.T) {
 	assert.Equal(t, "", JavaPackage(""))
 	assert.Equal(t, "com.foo", JavaPackage("foo"))
 	assert.Equal(t, "com.foo.bar", JavaPackage("foo.bar"))
+}
+
+func TestMajorVersion(t *testing.T) {
+	version, ok := MajorVersion("foo.v0")
+	assert.True(t, ok)
+	assert.Equal(t, 0, int(version))
+	version, ok = MajorVersion("foo.v1")
+	assert.True(t, ok)
+	assert.Equal(t, 1, int(version))
+	version, ok = MajorVersion("foo.bar.v1")
+	assert.True(t, ok)
+	assert.Equal(t, 1, int(version))
+	version, ok = MajorVersion("foo.bar.v18")
+	assert.True(t, ok)
+	assert.Equal(t, 18, int(version))
+	version, ok = MajorVersion("foo.bar.v180")
+	assert.True(t, ok)
+	assert.Equal(t, 180, int(version))
+	_, ok = MajorVersion("foo.barv1")
+	assert.False(t, ok)
+	_, ok = MajorVersion("barv1")
+	assert.False(t, ok)
+	_, ok = MajorVersion("v1")
+	assert.False(t, ok)
+	_, ok = MajorVersion("foo.barv")
+	assert.False(t, ok)
+	_, ok = MajorVersion("barv")
+	assert.False(t, ok)
+	_, ok = MajorVersion("v")
+	assert.False(t, ok)
+	_, ok = MajorVersion("foo.bar.v-1")
+	assert.False(t, ok)
 }
