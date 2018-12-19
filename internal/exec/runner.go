@@ -122,11 +122,7 @@ func (r *runner) Version() error {
 	if r.json {
 		enc := json.NewEncoder(r.output)
 		enc.SetIndent("", "  ")
-
-		if err := enc.Encode(out); err != nil {
-			return err
-		}
-		return nil
+		return enc.Encode(out)
 	}
 
 	tabWriter := newTabWriter(r.output)
