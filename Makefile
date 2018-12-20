@@ -63,8 +63,6 @@ example: install
 	@go install github.com/golang/protobuf/protoc-gen-go
 	rm -rf example/gen
 	prototool all example/idl/uber
-	touch ./example/gen/proto/go/foo/.nocover
-	touch ./example/gen/proto/go/sub/.nocover
 	go build ./example/gen/proto/go/foo
 	go build ./example/gen/proto/go/sub
 	go build ./example/cmd/excited/main.go
