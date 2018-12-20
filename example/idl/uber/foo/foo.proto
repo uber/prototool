@@ -8,7 +8,6 @@ option java_outer_classname = "FooProto";
 option java_package = "com.foo";
 
 import "foo/dep.proto";
-import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "sub/sub.proto";
@@ -90,11 +89,7 @@ service HelloService {
   // Foo does a foo.
   rpc Foo(sub.Dep) returns (FooResponse);
   // Bar does a bar.
-  rpc Bar(BarRequest) returns (foo.Dep) {
-    option (google.api.http) = {
-      get: "/bar/{id}"
-    };
-  }
+  rpc Bar(BarRequest) returns (foo.Dep);
 }
 
 message ExclamationRequest {

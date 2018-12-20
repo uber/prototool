@@ -1,6 +1,8 @@
 SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/)
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
-BINS := github.com/uber/prototool/internal/cmd/prototool
+BINS := github.com/uber/prototool/cmd/prototool
+
+DOCKER_IMAGE := golang:1.11.4
 
 SHELL := /bin/bash -o pipefail
 UNAME_OS := $(shell uname -s)
@@ -11,41 +13,24 @@ TMP := $(TMP_BASE)/$(UNAME_OS)/$(UNAME_ARCH)
 TMP_LIB := $(TMP)/lib
 TMP_BIN = $(TMP)/bin
 
-DOCKER_IMAGE := golang:1.11.4
-
-DEP_VERSION := 0.5.0
-DEP := $(TMP_BIN)/dep-$(DEP_VERSION)
-
-DEP_LIB := $(TMP_LIB)/dep-$(DEP_VERSION)
-ifeq ($(UNAME_OS),Darwin)
-DEP_OS := darwin
-else
-DEP_OS = linux
-endif
-ifeq ($(UNAME_ARCH),x86_64)
-DEP_ARCH := amd64
-endif
-$(DEP):
-	@rm -rf $(DEP_LIB)
-	@mkdir -p $(TMP_BIN) $(DEP_LIB)
-	curl -sSL "https://github.com/golang/dep/releases/download/v$(DEP_VERSION)/dep-$(DEP_OS)-$(DEP_ARCH)" -o "$(DEP)"
-	chmod +x "$(DEP)"
+unexport GOPATH
+export GO111MODULE := on
+export GOBIN := $(abspath $(TMP_BIN))
+export PATH := $(GOBIN):$(PATH)
 
 .PHONY: all
 all: lint cover
 
 .PHONY: ci
-ci: init lint codecov
+ci: lint codecov
 
 .PHONY: init
-init: $(DEP)
-	rm -rf vendor
-	$(DEP) ensure -v
+init:
+	go mod download
 
 .PHONY: vendor
-vendor: $(DEP)
-	rm -rf vendor
-	$(DEP) ensure -update -v
+vendor:
+	go mod tidy -v
 
 .PHONY: install
 install:
@@ -55,7 +40,7 @@ install:
 
 .PHONY: license
 license:
-	@go install ./vendor/go.uber.org/tools/update-license
+	@go install go.uber.org/tools/update-license
 	update-license $(SRCS)
 
 .PHONY: golden
@@ -75,14 +60,9 @@ golden: install
 
 .PHONY: example
 example: install
-	@go install ./vendor/github.com/gogo/protobuf/protoc-gen-gogoslick
-	@go install ./vendor/github.com/golang/protobuf/protoc-gen-go
-	@go install ./vendor/github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-	@go install ./vendor/go.uber.org/yarpc/encoding/protobuf/protoc-gen-yarpc-go
+	@go install github.com/golang/protobuf/protoc-gen-go
 	rm -rf example/gen
 	prototool all example/idl/uber
-	touch ./example/gen/proto/go/foo/.nocover
-	touch ./example/gen/proto/go/sub/.nocover
 	go build ./example/gen/proto/go/foo
 	go build ./example/gen/proto/go/sub
 	go build ./example/cmd/excited/main.go
@@ -110,7 +90,7 @@ checknodiffgenerated:
 
 .PHONY: golint
 golint:
-	@go install ./vendor/github.com/golang/lint/golint
+	@go install github.com/golang/lint/golint
 	for file in $(SRCS); do \
 		golint $${file}; \
 		if [ -n "$$(golint $${file})" ]; then \
@@ -124,22 +104,22 @@ vet:
 
 .PHONY:
 errcheck:
-	@go install ./vendor/github.com/kisielk/errcheck
+	@go install github.com/kisielk/errcheck
 	errcheck -ignoretests $(PKGS)
 
 .PHONY: staticcheck
 staticcheck:
-	@go install ./vendor/honnef.co/go/tools/cmd/staticcheck
+	@go install honnef.co/go/tools/cmd/staticcheck
 	staticcheck --tests=false $(PKGS)
 
 .PHONY: unused
 unused:
-	@go install ./vendor/honnef.co/go/tools/cmd/unused
+	@go install honnef.co/go/tools/cmd/unused
 	unused --tests=false $(PKGS)
 
 .PHONY: checklicense
 checklicense: install
-	@go install ./vendor/go.uber.org/tools/update-license
+	@go install go.uber.org/tools/update-license
 	@echo update-license --dry $(SRCS)
 	@if [ -n "$$(update-license --dry $(SRCS))" ]; then \
 		echo "These files need to have their license updated by running make license:"; \
@@ -148,7 +128,9 @@ checklicense: install
 	fi
 
 .PHONY: lint
-lint: checknodiffgenerated golint vet errcheck staticcheck unused checklicense
+# TODO: re-add errcheck staticcheck unused when they are fixed for Golang modules
+#lint: checknodiffgenerated golint vet errcheck staticcheck unused checklicense
+lint: checknodiffgenerated golint vet checklicense
 
 .PHONY: test
 test:
@@ -156,8 +138,8 @@ test:
 
 .PHONY: cover
 cover:
-	@go install ./vendor/golang.org/x/tools/cmd/cover
-	@go install ./vendor/github.com/wadey/gocovmerge
+	@go install golang.org/x/tools/cmd/cover
+	@go install github.com/wadey/gocovmerge
 	./etc/bin/cover.sh $(PKGS)
 	go tool cover -html=coverage.txt -o cover.html
 	go tool cover -func=coverage.txt | grep total
@@ -170,8 +152,8 @@ codecov: cover
 .PHONY: releasegen
 releasegen: internalgen
 	docker run \
-		--volume "$(CURDIR):/go/src/github.com/uber/prototool" \
-		--workdir "/go/src/github.com/uber/prototool" \
+		--volume "$(CURDIR):/app" \
+		--workdir "/app" \
 		$(DOCKER_IMAGE) \
 		bash -x etc/bin/releasegen.sh
 
@@ -192,8 +174,15 @@ releaseclean:
 
 .PHONY: clean
 clean:
-	go clean -i $(PKGS)
-	git clean -xdf --exclude vendor
+	git clean -xdf
 
 .PHONY: cleanall
 cleanall: clean releaseclean
+
+.PHONY: dockerall
+dockerall:
+	docker run \
+		--volume "$(CURDIR):/app" \
+		--workdir "/app" \
+		$(DOCKER_IMAGE) \
+		make all

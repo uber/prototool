@@ -65,10 +65,11 @@ curl -sSL https://github.com/uber/prototool/releases/download/v1.3.0/prototool-$
   chmod +x /usr/local/bin/prototool
 ```
 
-Prototool is purposefully all put under internal in an attempt to emphasize that you should not install `prototool` with `go get`.
-Although you can technically `go get` from `internal`, we do not check in the vendor directory, so `go get` will not respect the
-versions in `Gopkg.toml`. We have specific version requirements, so not using these can and probably will result in errors when building
-`prototool` and/or result in unexpected runtime errors.
+You can also install the `prototool` binary using `go get` if using go1.11+ with module support enabled.
+
+```
+go get github.com/uber/prototool/cmd/prototool@dev
+```
 
 ## Quick Start
 
@@ -388,7 +389,7 @@ Before submitting a PR, make sure to:
 - Run `make generate` to make sure there is no diff.
 - Run `make` to make sure all tests pass. This is functionally equivalent to the tests run on CI.
 
-All Golang code is purposefully under the `internal` package to not expose any API for the time being.
+The entire implementation is purposefully under the `internal` package to not expose any API for the time being.
 
 ## FAQ
 
@@ -447,7 +448,7 @@ If you want to have a consistent build environment for external plugins, we reco
 results in a Docker image around 33MB that contains `prototool`, a cached `protoc`, and `protoc-gen-go`:
 
 ```dockerfile
-FROM golang:1.11.0-alpine3.8 AS build
+FROM golang:1.11.4-alpine3.8 AS build
 
 ARG PROTOTOOL_VERSION=1.3.0
 ARG PROTOC_VERSION=3.6.1
