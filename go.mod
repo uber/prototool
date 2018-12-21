@@ -5,6 +5,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/proto v1.6.7
 	github.com/fullstorydev/grpcurl v1.1.0
+	github.com/gofrs/flock v0.7.0
 	github.com/golang/lint v0.0.0-20171212024629-883fe33ffc43
 	github.com/golang/protobuf v1.2.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
