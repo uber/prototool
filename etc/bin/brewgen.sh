@@ -19,6 +19,5 @@ CGO_ENABLED=0 \
   go build \
   -a \
   -installsuffix cgo \
-  -ldflags "-X 'github.com/uber/prototool/internal/vars.GitCommit=$(git rev-list -1 HEAD)' -X 'github.com/uber/prototool/internal/vars.BuiltTimestamp=$(date -u)'" \
   -o "${BUILD_DIR}/bin/prototool" \
   cmd/prototool/main.go

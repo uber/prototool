@@ -1,6 +1,6 @@
 SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/)
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
-BINS := github.com/uber/prototool/cmd/prototool
+BINS := ./cmd/prototool
 
 DOCKER_IMAGE := golang:1.11.4
 
@@ -34,9 +34,7 @@ vendor:
 
 .PHONY: install
 install:
-	go install \
-		-ldflags "-X 'github.com/uber/prototool/internal/vars.GitCommit=$(shell git rev-list -1 HEAD)' -X 'github.com/uber/prototool/internal/vars.BuiltTimestamp=$(shell date -u)'" \
-		$(BINS)
+	go install $(BINS)
 
 .PHONY: license
 license:

@@ -105,16 +105,12 @@ func (r *runner) Version() error {
 		Version              string `json:"version,omitempty"`
 		DefaultProtocVersion string `json:"default_protoc_version,omitempty"`
 		GoVersion            string `json:"go_version,omitempty"`
-		GitCommit            string `json:"git_commit,omitempty"`
-		BuiltTimestamp       string `json:"built_timestamp,omitempty"`
 		GOOS                 string `json:"goos,omitempty"`
 		GOARCH               string `json:"goarch,omitempty"`
 	}{
 		Version:              vars.Version,
 		DefaultProtocVersion: vars.DefaultProtocVersion,
 		GoVersion:            runtime.Version(),
-		GitCommit:            vars.GitCommit,
-		BuiltTimestamp:       vars.BuiltTimestamp,
 		GOOS:                 runtime.GOOS,
 		GOARCH:               runtime.GOARCH,
 	}
@@ -134,16 +130,6 @@ func (r *runner) Version() error {
 	}
 	if _, err := fmt.Fprintf(tabWriter, "Go version:\t%s\n", out.GoVersion); err != nil {
 		return err
-	}
-	if out.GitCommit != "" {
-		if _, err := fmt.Fprintf(tabWriter, "Git commit:\t%s\n", out.GitCommit); err != nil {
-			return err
-		}
-	}
-	if out.BuiltTimestamp != "" {
-		if _, err := fmt.Fprintf(tabWriter, "Built:\t%s\n", out.BuiltTimestamp); err != nil {
-			return err
-		}
 	}
 	if _, err := fmt.Fprintf(tabWriter, "OS/Arch:\t%s/%s\n", out.GOOS, out.GOARCH); err != nil {
 		return err
