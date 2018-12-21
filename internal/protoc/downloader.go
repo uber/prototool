@@ -23,6 +23,7 @@ package protoc
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"crypto/sha512"
 	"encoding/base64"
 	"fmt"
@@ -34,12 +35,19 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/gofrs/flock"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
+)
+
+const (
+	fileLockRetryDelay = 250 * time.Millisecond
+	fileLockTimeout    = 10 * time.Second
 )
 
 type downloader struct {
@@ -142,7 +150,7 @@ func (d *downloader) Delete() error {
 	return os.RemoveAll(basePath)
 }
 
-func (d *downloader) cache() (string, error) {
+func (d *downloader) cache() (_ string, retErr error) {
 	if d.protocBinPath != "" {
 		return d.protocBinPath, nil
 	}
@@ -154,6 +162,16 @@ func (d *downloader) cache() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	lock, err := newFlock(basePath)
+	if err != nil {
+		return "", err
+	}
+	if err := flockLock(lock); err != nil {
+		return "", err
+	}
+	defer func() { retErr = multierr.Append(retErr, flockUnlock(lock)) }()
+
 	if err := d.checkDownloaded(basePath); err != nil {
 		if err := d.download(basePath); err != nil {
 			return "", err
@@ -395,4 +413,33 @@ func getUnameSUnameMPaths(goos string, goarch string) (string, string, error) {
 		return "", "", fmt.Errorf("unsupported value for runtime.GOARCH: %v", goarch)
 	}
 	return unameS, unameM, nil
+}
+
+func newFlock(basePath string) (*flock.Flock, error) {
+	fileLockPath := basePath + ".lock"
+	// mkdir is atomic
+	if err := os.MkdirAll(filepath.Dir(fileLockPath), 0755); err != nil {
+		return nil, err
+	}
+	return flock.New(fileLockPath), nil
+}
+
+func flockLock(lock *flock.Flock) error {
+	ctx, cancel := context.WithTimeout(context.Background(), fileLockTimeout)
+	defer cancel()
+	locked, err := lock.TryLockContext(ctx, fileLockRetryDelay)
+	if err != nil {
+		return fmt.Errorf("error acquiring file lock at %s - if you think this is in error, remove %s: %v", lock.Path(), lock.Path(), err)
+	}
+	if !locked {
+		return fmt.Errorf("could not acquire file lock at %s after %v - if you think this is in error, remove %s", lock.Path(), fileLockTimeout, lock.Path())
+	}
+	return nil
+}
+
+func flockUnlock(lock *flock.Flock) error {
+	if err := lock.Unlock(); err != nil {
+		return fmt.Errorf("error unlocking file lock at %s: %v", lock.Path(), err)
+	}
+	return nil
 }
