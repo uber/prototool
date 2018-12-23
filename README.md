@@ -159,6 +159,34 @@ Lint rules can be set using the configuration file. See the configuration at [et
 
 The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
 
+Files must be valid Protobuf that can be compiled with `protoc`, so prior to linting, `prototool lint` will compile your using `protoc`.
+Note, however, this is very fast - for the two files in [etc/uber/style](etc/uber/style), compiling and linting only takes approximately
+3/100ths of a second:
+
+```
+$ time prototool lint etc/style/uber
+
+real	0m0.037s
+user	0m0.026s
+sys	0m0.017s
+```
+
+For all 694 Protobuf files currently in [googleapis](https://github.com/googleapis/googleapis), this takes approximately 3/4ths of a second:
+
+```
+$ cat prototool.yaml
+protoc:
+  allow_unused_imports: true
+lint:
+  group: google
+
+$ time prototool lint .
+
+real	0m0.734s
+user	0m3.835s
+sys	0m0.924s
+```
+
 ##### `prototool format`
 
 Format a Protobuf file and print the formatted file to stdout. There are flags to perform different actions:
