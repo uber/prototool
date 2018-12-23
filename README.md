@@ -67,8 +67,17 @@ curl -sSL https://github.com/uber/prototool/releases/download/v1.3.0/prototool-$
 
 You can also install the `prototool` binary using `go get` if using go1.11+ with module support enabled.
 
-```
+```bash
 go get github.com/uber/prototool/cmd/prototool@dev
+```
+
+You may want to use [gobin](https://github.com/myitcv/gobin) to install `prototool` outside of a module.
+
+```bash
+# Install to $GOBIN, or $GOPATH/bin if $GOBIN is not set, or $HOME/go/bin if neither are set
+gobin github.com/uber/prototool/cmd/prototool@dev
+# Install to /path/to/bin
+GOBIN=/path/to/bin gobin github.com/uber/prototool/cmd/prototool@dev
 ```
 
 ## Quick Start
