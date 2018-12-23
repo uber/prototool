@@ -5,7 +5,7 @@ package style.uber.dep;
 option go_package = "deppb";
 option java_multiple_files = true;
 option java_outer_classname = "DepProto";
-option java_package = "com.style.dep";
+option java_package = "com.style.uber.dep";
 
 // Dep is a dep.
 message Dep {
