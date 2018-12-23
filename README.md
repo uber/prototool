@@ -152,9 +152,9 @@ Compile your Protobuf files and generate stubs according to the rules in your `p
 
 Lint your Protobuf files.
 
-Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](etc/config/example.prototool.yaml) for all available options. There are two pre-configured groups of rules:
+Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for all available options. There are two pre-configured groups of rules:
 
-- `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](etc/style/google.google.proto).
+- `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](etc/style/google/google.proto).
 - `uber`: This lint group follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
 
 The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
