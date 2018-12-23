@@ -143,9 +143,8 @@ var (
 
 	// GroupToLinters is the map from linter group to the corresponding slice of linters.
 	GroupToLinters = map[string][]Linter{
-		"default": DefaultLinters,
-		"google":  GoogleLinters,
-		"uber":    UberLinters,
+		"google": GoogleLinters,
+		"uber":   UberLinters,
 	}
 )
 

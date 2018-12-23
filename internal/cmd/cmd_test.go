@@ -735,11 +735,10 @@ func TestListAllLinters(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, 0, "default\ngoogle\nuber", "lint", "--list-all-lint-groups")
+	assertExact(t, 0, "google\nuber", "lint", "--list-all-lint-groups")
 }
 
 func TestListLintGroup(t *testing.T) {
-	assertLinters(t, lint.DefaultLinters, "lint", "--list-lint-group", "default")
 	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google")
 	assertLinters(t, lint.UberLinters, "lint", "--list-lint-group", "uber")
 }
