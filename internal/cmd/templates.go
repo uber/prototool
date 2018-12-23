@@ -370,11 +370,14 @@ $ cat input.json | prototool grpc example \
 	lintCmdTemplate = &cmdTemplate{
 		Use:   "lint [dirOrFile]",
 		Short: "Lint proto files and compile with protoc to check for failures.",
-		Long: `Lint rules can be set using the configutation file. See the configuration at https://github.com/uber/prototool/blob/dev/etc/config/example/prototool.yaml for all available options. There are two pre-configured groups of rules:
+		Long: `Lint rules can be set using the configuration file. See the configuration at https://github.com/uber/prototool/blob/dev/etc/config/example/prototool.yaml for all available options. There are two pre-configured groups of rules:
 
 google: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed.
 
-uber: This lint group follows the Style Guide at Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. This is a very strict rule group and is meant to enforce consistent development patterns.`,
+uber: This lint group follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. This is a very strict rule group and is meant to enforce consistent development patterns.
+
+The "uber" lint group represents the default lint group, and will be used if no lint group is configured.
+`,
 
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {

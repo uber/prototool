@@ -83,7 +83,7 @@ prototool lint # same as "prototool lint .", by default the current directory is
 prototool create foo.proto # create the file foo.proto from a template that passes lint
 prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml or prototool.json files
 prototool lint --list-linters # list all current lint rules being used
-prototool lint --list-all-lint-group # list all available lint groups available for configuration
+prototool lint --list-all-lint-groups # list all available lint groups available for configuration, currently "google" and "uber"
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
 prototool generate idl/uber # generate stubs, see the generation directives in the config file example
 prototool grpc idl/uber --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --data '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
@@ -150,7 +150,14 @@ Compile your Protobuf files and generate stubs according to the rules in your `p
 
 ##### `prototool lint`
 
-Lint your Protobuf files. The default rule set follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). You can add or exclude lint rules in your `prototool.yaml` or `prototool.json` file. The default rule set is "strict", and we are working on having two main sets of rules.
+Lint your Protobuf files.
+
+Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](etc/config/example.prototool.yaml) for all available options. There are two pre-configured groups of rules:
+
+- `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](etc/style/google.google.proto).
+- `uber`: This lint group follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
+
+The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
 
 ##### `prototool format`
 
@@ -163,7 +170,7 @@ Format a Protobuf file and print the formatted file to stdout. There are flags t
 
 Concretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
 [Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the value of `go_package` is updated to reflect what we expect for the
-default Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
+Uber Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
 
 ##### `prototool create`
 
@@ -507,6 +514,8 @@ docker run -v $(pwd):/in me/prototool-env compile
 the choices made in the formatter. Can we change some things?
 
 *Answer:* Sorry, but we can't - The goal of Prototool is to provide a straightforward Style Guide and consistent formatting that minimizes various issues that arise from Protobuf usage across large organizations. There are pros and cons to many of the choices in the Style Guide, but it's our belief that the best answer is a **single** answer, sometimes regardless of what that single answer is.
+
+We do have multiple lint groups available, see the help section on `prototool lint` above.
 
 It is possible to ignore lint rules via configuration. However, especially if starting from a clean slate, we highly recommend using all default lint rules for consistency.
 
