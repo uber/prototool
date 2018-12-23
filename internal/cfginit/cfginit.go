@@ -66,6 +66,13 @@ protoc:
 
 # Lint directives.
 {{.V}}lint:
+  # The lint group to use.
+  # The default group is the "default" lint group, which is equal to the "uber" lint group.
+  # Run prototool lint --list-all-lint-groups to see all available lint groups.
+  # Run prototool lint --list-lint-group GROUP to list the linters in the given lint group.
+  # Setting this value will result in lint.rules.no_default being ignored.
+{{.V}}  group: uber
+
   # Linter files to ignore.
 {{.V}}  ignores:
 {{.V}}    - id: RPC_NAMES_CAMEL_CASE
@@ -77,9 +84,12 @@ protoc:
 {{.V}}        - path/to/foo.proto
 
   # Linter rules.
-  # Run prototool list-all-linters to see all available linters.
+  # Run prototool lint --list-all-linters to see all available linters.
+  # Run prototool lint --list-linters to see the currently configured linters.
 {{.V}}  rules:
     # Determines whether or not to include the default set of linters.
+	# This allows all linters to be turned off except those explicitly specified in add.
+	# This value is ignored if lint.group is set.
 {{.V}}    no_default: true
 
     # The specific linters to add.

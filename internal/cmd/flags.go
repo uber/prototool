@@ -25,33 +25,35 @@ import (
 )
 
 type flags struct {
-	address        string
-	cachePath      string
-	callTimeout    string
-	configData     string
-	connectTimeout string
-	data           string
-	debug          bool
-	diffMode       bool
-	disableFormat  bool
-	disableLint    bool
-	dryRun         bool
-	fix            bool
-	headers        []string
-	keepaliveTime  string
-	json           bool
-	listAllLinters bool
-	listLinters    bool
-	lintMode       bool
-	method         string
-	overwrite      bool
-	pkg            string
-	printFields    string
-	protocBinPath  string
-	protocWKTPath  string
-	protocURL      string
-	stdin          bool
-	uncomment      bool
+	address           string
+	cachePath         string
+	callTimeout       string
+	configData        string
+	connectTimeout    string
+	data              string
+	debug             bool
+	diffMode          bool
+	disableFormat     bool
+	disableLint       bool
+	dryRun            bool
+	fix               bool
+	headers           []string
+	keepaliveTime     string
+	json              bool
+	listAllLinters    bool
+	listLinters       bool
+	listAllLintGroups bool
+	listLintGroup     string
+	lintMode          bool
+	method            string
+	overwrite         bool
+	pkg               string
+	printFields       string
+	protocBinPath     string
+	protocWKTPath     string
+	protocURL         string
+	stdin             bool
+	uncomment         bool
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -120,6 +122,14 @@ func (f *flags) bindListAllLinters(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindListLinters(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.listLinters, "list-linters", false, "List the configured linters instead of running lint.")
+}
+
+func (f *flags) bindListAllLintGroups(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.listAllLintGroups, "list-all-lint-groups", false, "List all available lint groups instead of running lint.")
+}
+
+func (f *flags) bindListLintGroup(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.listLintGroup, "list-lint-group", "", "List the linters in the given lint group instead of running lint.")
 }
 
 func (f *flags) bindMethod(flagSet *pflag.FlagSet) {

@@ -624,10 +624,6 @@ func TestVersionJSON(t *testing.T) {
 	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
-func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, 0, "default\ngoogle\nuber", "list-all-lint-groups")
-}
-
 func TestDescriptorProto(t *testing.T) {
 	assertExact(
 		t,
@@ -736,6 +732,16 @@ func TestListLinters(t *testing.T) {
 
 func TestListAllLinters(t *testing.T) {
 	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters")
+}
+
+func TestListAllLintGroups(t *testing.T) {
+	assertExact(t, 0, "default\ngoogle\nuber", "lint", "--list-all-lint-groups")
+}
+
+func TestListLintGroup(t *testing.T) {
+	assertLinters(t, lint.DefaultLinters, "lint", "--list-lint-group", "default")
+	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google")
+	assertLinters(t, lint.UberLinters, "lint", "--list-lint-group", "uber")
 }
 
 func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {

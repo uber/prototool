@@ -210,13 +210,22 @@ func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), str
 
 // GetLinters returns the Linters for the LintConfig.
 //
+// The group, if set, is expected to be lower-case.
+//
 // The configuration is expected to be valid, deduplicated, and all upper-case.
 // IncludeIDs and ExcludeIDs MUST NOT have an intersection.
 //
 // If the config came from the settings package, this is already validated.
 func GetLinters(config settings.LintConfig) ([]Linter, error) {
 	var linters []Linter
-	if !config.NoDefault {
+	var ok bool
+	if config.Group != "" {
+		linters, ok = GroupToLinters[config.Group]
+		if !ok {
+			return nil, fmt.Errorf("unknown lint group: %s", config.Group)
+		}
+	} else if !config.NoDefault {
+		// we ignore NoDefault if Group is set
 		linters = DefaultLinters
 	}
 	if len(config.IncludeIDs) == 0 && len(config.ExcludeIDs) == 0 {
