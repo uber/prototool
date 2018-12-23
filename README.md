@@ -4,16 +4,16 @@
 
 Prototool lets you:
 
-- Handle installation of protoc and the import of all of the Well-Known Types behind the scenes in a platform-independent manner without any work on the part of the user.
-- Standardize building of your Protobuf files with a common configuration, abstracting away all of the pain of protoc for you.
-- Lint your Protobuf files with common linting rules according to [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style), [Uber's Style Guide](https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto), or your own set of configured lint rules.
-- Format your Protobuf files in a consistent manner.
-- Generate Protobuf files from a template that passes lint, taking care of package naming for you.
-- Generate stubs using any plugin based on a simple configuration file, including handling imports of all the Well-Known Types.
-- Call gRPC endpoints with ease, taking care of the JSON to binary conversion for you.
-- Output errors and lint failures in a common file:line:column:message format, making integration with editors possible, Vim integration is provided out of the box.
+- Handle installation of `protoc` and the import of all of the Well-Known Types behind the scenes in a platform-independent manner without any work on the part of the user.
+- Standardize building of your Protobuf files with a common [configuration](#configuration), abstracting away all of the pain of protoc for you.
+- [Lint](#prototool-lint) your Protobuf files with common linting rules according to [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style), [Uber's Style Guide](https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto), or your own set of configured lint rules.
+- [Format](#prototool-format) your Protobuf files in a consistent manner.
+- [Create](#prototool-create) Protobuf files from a template that passes lint, taking care of package naming for you.
+- [Generate](#prototool-generate) stubs using any plugin based on a simple configuration file, including handling imports of all the Well-Known Types.
+- Call [gRPC](#prototool-grpc) endpoints with ease, taking care of the JSON to binary conversion for you.
+- Output errors and lint failures in a common `file:line:column:message` format, making integration with editors possible, [Vim integration](#vim-integration) is provided out of the box.
 
-Prototool accomplishes this by downloading and calling protoc on the fly for you, handing error messages from protoc and your plugins, and using the generated FileDescriptorSets for internal functionality, as well as wrapping a few great external libraries already in the Protobuf ecosystem. Compiling, linting and formatting commands run in around 3/100ths of second for a single Protobuf file, or under a second for a larger number (500+) of Protobuf files.
+Prototool accomplishes this by downloading and calling `protoc` on the fly for you, handing error messages from `protoc` and your plugins, and using the generated `FileDescriptorSets` for internal functionality, as well as wrapping a few great external libraries already in the Protobuf ecosystem. Compiling, linting and formatting commands run in around 3/100ths of second for a single Protobuf file, or under a second for a larger number (500+) of Protobuf files.
 
   * [Installation](#installation)
   * [Quick Start](#quick-start)
