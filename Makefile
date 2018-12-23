@@ -64,7 +64,7 @@ example: install
 	go build ./example/gen/proto/go/foo
 	go build ./example/gen/proto/go/sub
 	go build ./example/cmd/excited/main.go
-	prototool lint etc/style
+	prototool lint etc/style/uber
 
 .PHONY: internalgen
 internalgen: install

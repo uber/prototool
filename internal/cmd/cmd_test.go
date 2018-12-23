@@ -625,7 +625,7 @@ func TestVersionJSON(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, 0, "all\ndefault", "list-all-lint-groups")
+	assertExact(t, 0, "default\ngoogle\nuber", "list-all-lint-groups")
 }
 
 func TestDescriptorProto(t *testing.T) {
@@ -731,6 +731,7 @@ func TestServiceDescriptorProto(t *testing.T) {
 
 func TestListLinters(t *testing.T) {
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters")
+	assertLinters(t, lint.UberLinters, "lint", "--list-linters")
 }
 
 func TestListAllLinters(t *testing.T) {

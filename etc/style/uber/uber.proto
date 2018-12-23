@@ -51,7 +51,7 @@ option java_package = "com.style.uber";
 import "dep/dep.proto";
 // Google's well-known types should be directly imported from
 // "google/protobuf" as shown.
-import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 // Next come the definitions.
 // There is one newline between the package options and the definitions.
@@ -158,6 +158,8 @@ message Foo {
   // developing.
 
   string bar_id = 5;
+  style.uber.dep.Dep dep = 6;
+  google.protobuf.Timestamp timestamp = 7;
 }
 
 
