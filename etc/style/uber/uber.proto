@@ -5,13 +5,6 @@
 // There are places in this style guide that reference line places, i.e. the
 // first line is always the syntax line, however for demonstration purposes,
 // this is violated so we can comment on such style choices here.
-//
-// Topics not covered:
-//
-// - Extensions
-// - Reserved keyword
-// - Most options (message options, field options, etc)
-// - Custom options
 
 // Tab style is two spaces.
 // Comments are always //, not /**/.
