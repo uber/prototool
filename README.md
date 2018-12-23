@@ -157,13 +157,20 @@ Lint rules can be set using the configuration file. See the configuration at [et
 - `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](etc/style/google/google.proto).
 - `uber`: This lint group follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
 
+Configuration of your group can be done by setting the `lint.group` option in your `prototool.yaml` file:
+
+```yaml
+lint:
+  group: google
+```
+
 The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
 
 Files must be valid Protobuf that can be compiled with `protoc`, so prior to linting, `prototool lint` will compile your using `protoc`.
 Note, however, this is very fast - for the two files in [etc/uber/style](etc/uber/style), compiling and linting only takes approximately
 3/100ths of a second:
 
-```
+```bash
 $ time prototool lint etc/style/uber
 
 real	0m0.037s
@@ -173,7 +180,7 @@ sys	0m0.017s
 
 For all 694 Protobuf files currently in [googleapis](https://github.com/googleapis/googleapis), this takes approximately 3/4ths of a second:
 
-```
+```bash
 $ cat prototool.yaml
 protoc:
   allow_unused_imports: true

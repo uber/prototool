@@ -376,8 +376,36 @@ google: This lint group follows the Style Guide at https://developers.google.com
 
 uber: This lint group follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. This is a very strict rule group and is meant to enforce consistent development patterns.
 
+Configuration of your group can be done by setting the "lint.group" option in your "prototool.yaml" file:
+
+lint:
+  group: google
+
 The "uber" lint group represents the default lint group, and will be used if no lint group is configured.
-`,
+
+Files must be valid Protobuf that can be compiled with protoc, so prior to linting, prototool lint will compile your using protoc.
+Note, however, this is very fast - for two files, compiling and linting only takes approximately
+3/100ths of a second:
+
+$ time prototool lint etc/style/uber
+
+real	0m0.037s
+user	0m0.026s
+sys	0m0.017s
+
+For all 694 Protobuf files currently in https://github.com/googleapis/googleapis, this takes approximately 3/4ths of a second:
+
+$ cat prototool.yaml
+protoc:
+  allow_unused_imports: true
+lint:
+  group: google
+
+$ time prototool lint .
+
+real	0m0.734s
+user	0m3.835s
+sys	0m0.924s`,
 
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
