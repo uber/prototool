@@ -88,8 +88,8 @@ protoc:
   # Run prototool lint --list-linters to see the currently configured linters.
 {{.V}}  rules:
     # Determines whether or not to include the default set of linters.
-	# This allows all linters to be turned off except those explicitly specified in add.
-	# This value is ignored if lint.group is set.
+    # This allows all linters to be turned off except those explicitly specified in add.
+    # This value is ignored if lint.group is set.
 {{.V}}    no_default: true
 
     # The specific linters to add.
