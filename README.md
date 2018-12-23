@@ -166,6 +166,8 @@ lint:
 
 The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
 
+See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
+
 Files must be valid Protobuf that can be compiled with `protoc`, so prior to linting, `prototool lint` will compile your using `protoc`.
 Note, however, this is very fast - for the two files in [etc/uber/style](etc/uber/style), compiling and linting only takes approximately
 3/100ths of a second:
