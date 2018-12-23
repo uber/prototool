@@ -83,6 +83,7 @@ prototool lint # same as "prototool lint .", by default the current directory is
 prototool create foo.proto # create the file foo.proto from a template that passes lint
 prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml or prototool.json files
 prototool lint --list-linters # list all current lint rules being used
+prototool lint --list-all-lint-group # list all available lint groups available for configuration
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
 prototool generate idl/uber # generate stubs, see the generation directives in the config file example
 prototool grpc idl/uber --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --data '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
