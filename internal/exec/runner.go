@@ -173,11 +173,8 @@ func (r *runner) CacheUpdate() error {
 	if err != nil {
 		return err
 	}
-	path, err := d.Download()
-	if err != nil {
-		return err
-	}
-	return r.println(path)
+	_, err = d.Download()
+	return err
 }
 
 func (r *runner) CacheDelete() error {
