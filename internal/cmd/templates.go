@@ -45,6 +45,7 @@ var (
 			return runner.All(args, flags.disableFormat, flags.disableLint, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
@@ -64,16 +65,36 @@ var (
 			return runner.BinaryToJSON(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	cacheUpdateCmdTemplate = &cmdTemplate{
+		Use:   "update",
+		Short: "Update the cache by downloading all artifacts.",
+		Args:  cobra.NoArgs,
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.CacheUpdate()
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 		},
 	}
 
-	cleanCmdTemplate = &cmdTemplate{
-		Use:   "clean",
-		Short: "Delete the cache.",
+	cacheDeleteCmdTemplate = &cmdTemplate{
+		Use:   "delete",
+		Short: "Delete all artifacts in the cache.",
 		Args:  cobra.NoArgs,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Clean()
+			return runner.CacheDelete()
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 		},
 	}
 
@@ -86,6 +107,7 @@ var (
 			return runner.Compile(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
@@ -174,19 +196,11 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.DescriptorProto(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
-		},
-	}
-
-	downloadCmdTemplate = &cmdTemplate{
-		Use:   "download",
-		Short: "Download the protobuf artifacts to a cache.",
-		Args:  cobra.NoArgs,
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Download()
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindConfigData(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -198,7 +212,11 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.FieldDescriptorProto(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -222,6 +240,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDiffMode(flagSet)
 			flags.bindJSON(flagSet)
@@ -242,6 +261,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.Gen(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
@@ -327,6 +347,7 @@ $ cat input.json | prototool grpc example \
 			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindAddress(flagSet)
 			flags.bindCallTimeout(flagSet)
@@ -363,7 +384,11 @@ $ cat input.json | prototool grpc example \
 			return runner.JSONToBinary(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -376,6 +401,7 @@ $ cat input.json | prototool grpc example \
 			return runner.Lint(args, flags.listAllLinters, flags.listLinters)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindListAllLinters(flagSet)
@@ -412,7 +438,11 @@ $ cat input.json | prototool grpc example \
 			return runner.ServiceDescriptorProto(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 

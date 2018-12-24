@@ -164,7 +164,7 @@ func (r *runner) Create(args []string, pkg string) error {
 	return r.newCreateHandler(pkg).Create(args...)
 }
 
-func (r *runner) Download() error {
+func (r *runner) CacheUpdate() error {
 	config, err := r.getConfig(r.workDirPath)
 	if err != nil {
 		return err
@@ -180,7 +180,7 @@ func (r *runner) Download() error {
 	return r.println(path)
 }
 
-func (r *runner) Clean() error {
+func (r *runner) CacheDelete() error {
 	config, err := r.getConfig(r.workDirPath)
 	if err != nil {
 		return err
