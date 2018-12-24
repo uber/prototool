@@ -76,7 +76,16 @@ var (
 	cacheUpdateCmdTemplate = &cmdTemplate{
 		Use:   "update",
 		Short: "Update the cache by downloading all artifacts.",
-		Args:  cobra.NoArgs,
+		Long: `This will download artifacts to a cache directory before running any commands. Note that calling this command is not necessary, all artifacts are automatically downloaded when required by other commands. This just provides a mechanism to pre-cache artifacts during your build.
+
+Artifacts are downloaded to the following directories based on flags and environment variables:
+
+- If --cache-path is set, then this directory will be used.
+- Otherwise, if $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool
+  will be used.
+- Otherwise, if on Linux, $HOME/.cache/prototool will be used, or on Darwin,
+  $HOME/Library/Caches/prototool will be used.`,
+		Args: cobra.NoArgs,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.CacheUpdate()
 		},
@@ -89,12 +98,14 @@ var (
 	cacheDeleteCmdTemplate = &cmdTemplate{
 		Use:   "delete",
 		Short: "Delete all artifacts in the cache.",
-		Args:  cobra.NoArgs,
+		Long: `The following directory will be deleted based on environment variables:
+
+- If $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool will be deleted.
+- Otherwise, if on Linux, $HOME/.cache/prototool will be deleted, or on Darwin,
+  $HOME/Library/Caches/prototool will be deleted.`,
+		Args: cobra.NoArgs,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.CacheDelete()
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindCachePath(flagSet)
 		},
 	}
 
