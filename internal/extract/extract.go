@@ -28,10 +28,30 @@ import (
 	"go.uber.org/zap"
 )
 
+// Packages is a set of extracted packages.
+type Packages struct {
+	// Map from fully-qualified name to package.
+	// Fully-qualified name includes prefix '.'.
+	FullyQualifiedNameToPackage map[string]*Package
+}
+
+// Package is an extracted package.
+type Package struct {
+	// Fully-qualified name includes prefix '.'.
+	FullyQualifiedName string
+	// The fully-qualified names of the direct dependencies.
+	// For recursive dependencies, look these names up in the Packages struct.
+	DepFullyQualifiedNames []string
+	// The fully-qualified names of the importers.
+	// For recursive importers, look these names up in the Packages struct.
+	ImporterFullyQualifiedNames []string
+}
+
 // Field is an extracted field.
 type Field struct {
 	*descriptor.FieldDescriptorProto
 
+	// Fully-qualified path includes prefix '.'.
 	FullyQualifiedPath  string
 	DescriptorProto     *descriptor.DescriptorProto
 	FileDescriptorProto *descriptor.FileDescriptorProto
@@ -42,6 +62,7 @@ type Field struct {
 type Message struct {
 	*descriptor.DescriptorProto
 
+	// Fully-qualified path includes prefix '.'.
 	FullyQualifiedPath  string
 	FileDescriptorProto *descriptor.FileDescriptorProto
 	FileDescriptorSet   *descriptor.FileDescriptorSet
@@ -51,6 +72,7 @@ type Message struct {
 type Service struct {
 	*descriptor.ServiceDescriptorProto
 
+	// Fully-qualified path includes prefix '.'.
 	FullyQualifiedPath  string
 	FileDescriptorProto *descriptor.FileDescriptorProto
 	FileDescriptorSet   *descriptor.FileDescriptorSet
@@ -61,6 +83,8 @@ type Service struct {
 // Paths can begin with ".".
 // The first FileDescriptorSet with a match will be returned.
 type Getter interface {
+	// Get the packages.
+	GetPackages(fileDescriptorSets []*descriptor.FileDescriptorSet) (*Packages, error)
 	// Get the field that matches the path.
 	// Return non-nil value, or error otherwise including if nothing found.
 	GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error)

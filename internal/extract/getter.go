@@ -42,6 +42,10 @@ func newGetter(options ...GetterOption) *getter {
 	return getter
 }
 
+func (g *getter) GetPackages(fileDescriptorSets []*descriptor.FileDescriptorSet) (*Packages, error) {
+	return nil, nil
+}
+
 func (g *getter) GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error) {
 	if len(path) == 0 {
 		return nil, fmt.Errorf("empty path")
