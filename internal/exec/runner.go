@@ -641,6 +641,33 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	).Invoke(fileDescriptorSets, address, method, reader, r.output)
 }
 
+func (r *runner) InspectPackages(args []string) error {
+	meta, err := r.getMeta(args, 1)
+	if err != nil {
+		return err
+	}
+	r.printAffectedFiles(meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	if err != nil {
+		return err
+	}
+	if len(fileDescriptorSets) == 0 {
+		return fmt.Errorf("no FileDescriptorSets returned")
+	}
+	packages, err := r.newGetter().GetPackages(fileDescriptorSets)
+	if err != nil {
+		return err
+	}
+	if packages != nil {
+		for fullyQualifiedName := range packages.FullyQualifiedNameToPackage {
+			if err := r.println(fullyQualifiedName); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {
 	downloaderOptions := []protoc.DownloaderOption{
 		protoc.DownloaderWithLogger(r.logger),

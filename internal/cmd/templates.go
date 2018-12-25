@@ -342,6 +342,21 @@ $ cat input.json | prototool grpc example \
 		},
 	}
 
+	inspectPackagesCmdTemplate = &cmdTemplate{
+		Use:   "packages [dirOrFile]",
+		Short: "List all packages.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackages(args)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindConfigData(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
 	configInitCmdTemplate = &cmdTemplate{
 		Use:   "init [dirPath]",
 		Short: "Generate an initial config file in the current or given directory.",
