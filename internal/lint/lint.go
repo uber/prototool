@@ -87,35 +87,64 @@ var (
 	}
 
 	// DefaultLinters is the slice of default Linters.
-	DefaultLinters = copyLintersWithout(
-		AllLinters,
-		enumFieldNamesUppercaseLinter,
-		enumFieldPrefixesExceptMessageLinter,
-		enumsHaveCommentsLinter,
-		enumZeroValuesInvalidExceptMessageLinter,
-		fileOptionsEqualGoPackageLastTwoSuffixLinter,
-		fileOptionsUnsetJavaMultipleFilesLinter,
-		fileOptionsUnsetJavaOuterClassnameLinter,
-		messageFieldsNotFloatsLinter,
-		messagesHaveCommentsLinter,
-		messagesHaveCommentsExceptRequestResponseTypesLinter,
-		messageFieldNamesLowercaseLinter,
-		packageMajorVersionedLinter,
-		requestResponseNamesMatchRPCLinter,
-		rpcsHaveCommentsLinter,
-		servicesHaveCommentsLinter,
-	)
+	DefaultLinters = UberLinters
 
-	// DefaultGroup is the default group.
-	DefaultGroup = "default"
+	// GoogleLinters is the slice of linters for the google lint group.
+	GoogleLinters = []Linter{
+		enumFieldNamesUpperSnakeCaseLinter,
+		enumNamesCamelCaseLinter,
+		enumNamesCapitalizedLinter,
+		messageFieldNamesLowerSnakeCaseLinter,
+		messageNamesCamelCaseLinter,
+		messageNamesCapitalizedLinter,
+		rpcNamesCamelCaseLinter,
+		rpcNamesCapitalizedLinter,
+		serviceNamesCamelCaseLinter,
+		serviceNamesCapitalizedLinter,
+	}
 
-	// AllGroup is the group of all known linters.
-	AllGroup = "all"
+	// UberLinters is the slice of linters for the uber lint group.
+	UberLinters = []Linter{
+		commentsNoCStyleLinter,
+		enumFieldNamesUpperSnakeCaseLinter,
+		enumFieldPrefixesLinter,
+		enumNamesCamelCaseLinter,
+		enumNamesCapitalizedLinter,
+		enumZeroValuesInvalidLinter,
+		enumsNoAllowAliasLinter,
+		fileOptionsEqualGoPackagePbSuffixLinter,
+		fileOptionsEqualJavaMultipleFilesTrueLinter,
+		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
+		fileOptionsEqualJavaPackageComPrefixLinter,
+		fileOptionsGoPackageNotLongFormLinter,
+		fileOptionsGoPackageSameInDirLinter,
+		fileOptionsJavaMultipleFilesSameInDirLinter,
+		fileOptionsJavaPackageSameInDirLinter,
+		fileOptionsRequireGoPackageLinter,
+		fileOptionsRequireJavaMultipleFilesLinter,
+		fileOptionsRequireJavaOuterClassnameLinter,
+		fileOptionsRequireJavaPackageLinter,
+		messageFieldNamesLowerSnakeCaseLinter,
+		messageNamesCamelCaseLinter,
+		messageNamesCapitalizedLinter,
+		oneofNamesLowerSnakeCaseLinter,
+		packageIsDeclaredLinter,
+		packageLowerSnakeCaseLinter,
+		packagesSameInDirLinter,
+		rpcNamesCamelCaseLinter,
+		rpcNamesCapitalizedLinter,
+		requestResponseTypesInSameFileLinter,
+		requestResponseTypesUniqueLinter,
+		serviceNamesCamelCaseLinter,
+		serviceNamesCapitalizedLinter,
+		syntaxProto3Linter,
+		wktDirectlyImportedLinter,
+	}
 
 	// GroupToLinters is the map from linter group to the corresponding slice of linters.
 	GroupToLinters = map[string][]Linter{
-		DefaultGroup: DefaultLinters,
-		AllGroup:     AllLinters,
+		"google": GoogleLinters,
+		"uber":   UberLinters,
 	}
 )
 
@@ -180,13 +209,22 @@ func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), str
 
 // GetLinters returns the Linters for the LintConfig.
 //
+// The group, if set, is expected to be lower-case.
+//
 // The configuration is expected to be valid, deduplicated, and all upper-case.
 // IncludeIDs and ExcludeIDs MUST NOT have an intersection.
 //
 // If the config came from the settings package, this is already validated.
 func GetLinters(config settings.LintConfig) ([]Linter, error) {
 	var linters []Linter
-	if !config.NoDefault {
+	var ok bool
+	if config.Group != "" {
+		linters, ok = GroupToLinters[config.Group]
+		if !ok {
+			return nil, fmt.Errorf("unknown lint group: %s", config.Group)
+		}
+	} else if !config.NoDefault {
+		// we ignore NoDefault if Group is set
 		linters = DefaultLinters
 	}
 	if len(config.IncludeIDs) == 0 && len(config.ExcludeIDs) == 0 {
@@ -300,23 +338,4 @@ func shouldIgnore(linter Linter, descriptor *proto.Proto, ignoreIDToFilePaths ma
 		}
 	}
 	return false, nil
-}
-
-func copyLintersWithout(linters []Linter, remove ...Linter) []Linter {
-	c := make([]Linter, 0, len(linters))
-	for _, linter := range linters {
-		if !linterIn(linter, remove) {
-			c = append(c, linter)
-		}
-	}
-	return c
-}
-
-func linterIn(linter Linter, s []Linter) bool {
-	for _, e := range s {
-		if e == linter {
-			return true
-		}
-	}
-	return false
 }

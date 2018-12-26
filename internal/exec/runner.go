@@ -333,15 +333,21 @@ func (r *runner) printCommands(doGen bool, protoSet *file.ProtoSet) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool) error {
-	if listAllLinters && listLinters {
-		return newExitErrorf(255, "can only set one of list-all-linters, list-linters")
+func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string) error {
+	if moreThanOneSet(listAllLinters, listLinters, listAllLintGroups, listLintGroup != "") {
+		return newExitErrorf(255, "can only set one of list-all-linters, list-linters, list-all-lint-groups, list-lint-group")
 	}
 	if listAllLinters {
 		return r.listAllLinters()
 	}
 	if listLinters {
 		return r.listLinters()
+	}
+	if listAllLintGroups {
+		return r.listAllLintGroups()
+	}
+	if listLintGroup != "" {
+		return r.listLintGroup(listLintGroup)
 	}
 	meta, err := r.getMeta(args, 1)
 	if err != nil {
@@ -385,7 +391,7 @@ func (r *runner) listAllLinters() error {
 	return r.printLinters(lint.AllLinters)
 }
 
-func (r *runner) ListLintGroup(group string) error {
+func (r *runner) listLintGroup(group string) error {
 	linters, ok := lint.GroupToLinters[strings.ToLower(group)]
 	if !ok {
 		return newExitErrorf(255, "unknown lint group: %s", strings.ToLower(group))
@@ -393,7 +399,7 @@ func (r *runner) ListLintGroup(group string) error {
 	return r.printLinters(linters)
 }
 
-func (r *runner) ListAllLintGroups() error {
+func (r *runner) listAllLintGroups() error {
 	groups := make([]string, 0, len(lint.GroupToLinters))
 	for group := range lint.GroupToLinters {
 		groups = append(groups, group)
@@ -408,7 +414,7 @@ func (r *runner) ListAllLintGroups() error {
 }
 
 func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fix bool) error {
-	if (overwrite && diffMode) || (overwrite && lintMode) || (diffMode && lintMode) {
+	if moreThanOneSet(overwrite, diffMode, lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
 	meta, err := r.getMeta(args, 1)
@@ -1070,4 +1076,14 @@ func newExitErrorf(code int, format string, args ...interface{}) *ExitError {
 
 func newTabWriter(writer io.Writer) *tabwriter.Writer {
 	return tabwriter.NewWriter(writer, 0, 0, 2, ' ', 0)
+}
+
+func moreThanOneSet(values ...bool) bool {
+	numSet := 0
+	for _, value := range values {
+		if value {
+			numSet++
+		}
+	}
+	return numSet > 1
 }

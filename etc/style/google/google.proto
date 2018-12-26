@@ -1,0 +1,32 @@
+// Protobuf Google Style Guide
+//
+// This style guide matches https://developers.google.com/protocol-buffers/docs/style.
+
+syntax = "proto2";
+
+package style.google;
+
+// Use CamelCase (with an initial capital) for message names – for example, SongServerRequest.
+// Use underscore_separated_names for field names – for example, song_name.
+
+message SongServerRequest {
+  required string song_name = 1;
+}
+
+// Use CamelCase (with an initial capital) for enum type names and CAPITALS_WITH_UNDERSCORES for value names.
+
+enum Foo {
+  FIRST_VALUE = 0;
+  SECOND_VALUE = 1;
+}
+
+// If your .proto defines an RPC service, you should use CamelCase (with an initial capital)
+// for both the service name and any RPC method names.
+
+message FooRequest {}
+
+message FooResponse {}
+
+service FooService {
+  rpc GetSomething(FooRequest) returns (FooResponse);
+}

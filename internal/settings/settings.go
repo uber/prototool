@@ -169,7 +169,13 @@ type CreateConfig struct {
 
 // LintConfig is the lint config.
 type LintConfig struct {
+	// Group is the specific group of linters to use.
+	// The default group is the "default" lint group, which is equal
+	// to the "uber" lint group.
+	// Setting this value will result in NoDefault being ignored.
+	Group string
 	// NoDefault is set to exclude the default set of linters.
+	// This value is ignored if Group is set.
 	NoDefault bool
 	// IncludeIDs are the list of linter IDs to use in addition to the defaults.
 	// Expected to be all uppercase.
@@ -256,6 +262,7 @@ type ExternalConfig struct {
 		} `json:"packages,omitempty" yaml:"packages,omitempty"`
 	} `json:"create,omitempty" yaml:"create,omitempty"`
 	Lint struct {
+		Group   string `json:"group,omitempty" yaml:"group,omitempty"`
 		Ignores []struct {
 			ID    string   `json:"id,omitempty" yaml:"id,omitempty"`
 			Files []string `json:"files,omitempty" yaml:"files,omitempty"`
