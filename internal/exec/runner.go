@@ -658,9 +658,20 @@ func (r *runner) InspectPackages(args []string) error {
 	if err != nil {
 		return err
 	}
-	if packages != nil {
-		for name := range packages.NameToPackage {
-			if err := r.println(name); err != nil {
+	if packages == nil {
+		return nil
+	}
+	for _, pkg := range packages.SortedPackages() {
+		if r.json {
+			data, err := json.MarshalIndent(pkg, "", "  ")
+			if err != nil {
+				return err
+			}
+			if err := r.println(string(data)); err != nil {
+				return err
+			}
+		} else {
+			if err := r.println(pkg.Name); err != nil {
 				return err
 			}
 		}
@@ -891,7 +902,7 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 		}
 		if shouldPrint {
 			if r.json {
-				data, err := json.Marshal(failure)
+				data, err := json.MarshalIndent(failure, "", "  ")
 				if err != nil {
 					return err
 				}

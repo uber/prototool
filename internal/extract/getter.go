@@ -191,8 +191,8 @@ func getPackageNameToFileDescriptorProtos(fileDescriptorSets []*descriptor.FileD
 			if pkg == "" {
 				return nil, fmt.Errorf("no package on FileDescriptorProto")
 			}
-			if pkg[0] != '.' {
-				return nil, fmt.Errorf("malformed package fully-qualified name: %s", pkg)
+			if pkg[0] == '.' {
+				return nil, fmt.Errorf("malformed package fully-qualified name %s on FileDescriptorProto %+v", pkg, fileDescriptorProto)
 			}
 			existingMap, ok := packageNameToFileNameToFileDescriptorProto[pkg]
 			if !ok {

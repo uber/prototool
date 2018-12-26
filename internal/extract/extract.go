@@ -24,6 +24,8 @@
 package extract
 
 import (
+	"sort"
+
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"go.uber.org/zap"
 )
@@ -33,6 +35,16 @@ type Packages struct {
 	// Map from fully-qualified name to package.
 	// Fully-qualified name includes prefix '.'.
 	NameToPackage map[string]*Package
+}
+
+// SortedPackages returns the list of packages sorted by name.
+func (p *Packages) SortedPackages() []*Package {
+	packages := make([]*Package, 0, len(p.NameToPackage))
+	for _, pkg := range p.NameToPackage {
+		packages = append(packages, pkg)
+	}
+	sort.Stable(sortPackages(packages))
+	return packages
 }
 
 // Package is an extracted package.
@@ -111,4 +123,20 @@ func GetterWithLogger(logger *zap.Logger) GetterOption {
 // NewGetter returns a new Getter.
 func NewGetter(options ...GetterOption) Getter {
 	return newGetter(options...)
+}
+
+type sortPackages []*Package
+
+func (s sortPackages) Len() int          { return len(s) }
+func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }
+func (s sortPackages) Less(i int, j int) bool {
+	if s[i] == nil && s[j] == nil {
+	}
+	if s[i] == nil && s[j] != nil {
+		return true
+	}
+	if s[i] != nil && s[j] == nil {
+		return false
+	}
+	return s[i].Name < s[j].Name
 }

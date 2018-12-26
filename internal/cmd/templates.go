@@ -351,6 +351,7 @@ $ cat input.json | prototool grpc example \
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindConfigData(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
