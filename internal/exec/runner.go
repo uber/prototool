@@ -642,19 +642,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 }
 
 func (r *runner) InspectPackages(args []string) error {
-	meta, err := r.getMeta(args, 1)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
-	if err != nil {
-		return err
-	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
-	}
-	packages, err := r.newGetter().GetPackages(fileDescriptorSets)
+	packages, err := r.getPackages(args)
 	if err != nil {
 		return err
 	}
@@ -677,6 +665,121 @@ func (r *runner) InspectPackages(args []string) error {
 		}
 	}
 	return nil
+}
+
+func (r *runner) InspectPackage(args []string, name string) error {
+	if name == "" {
+		return newExitErrorf(255, "must set name")
+	}
+	packages, err := r.getPackages(args)
+	if err != nil {
+		return err
+	}
+	if packages == nil {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	pkg, ok := packages.NameToPackage[name]
+	if !ok {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	if r.json {
+		data, err := json.MarshalIndent(pkg, "", "  ")
+		if err != nil {
+			return err
+		}
+		if err := r.println(string(data)); err != nil {
+			return err
+		}
+	} else {
+		tabWriter := newTabWriter(r.output)
+		if _, err := fmt.Fprintf(tabWriter, "Name:\t%s\n", pkg.Name); err != nil {
+			return err
+		}
+		if len(pkg.Deps) > 0 {
+			if _, err := fmt.Fprintf(tabWriter, "Deps:\n"); err != nil {
+				return err
+			}
+			for _, dep := range pkg.Deps {
+				if _, err := fmt.Fprintf(tabWriter, "\t- %s\n", dep); err != nil {
+					return err
+				}
+			}
+		}
+		if len(pkg.Importers) > 0 {
+			if _, err := fmt.Fprintf(tabWriter, "Importers:\n"); err != nil {
+				return err
+			}
+			for _, importer := range pkg.Importers {
+				if _, err := fmt.Fprintf(tabWriter, "\t- %s\n", importer); err != nil {
+					return err
+				}
+			}
+		}
+		return tabWriter.Flush()
+	}
+	return nil
+}
+
+func (r *runner) InspectPackageDeps(args []string, name string) error {
+	if name == "" {
+		return newExitErrorf(255, "must set name")
+	}
+	packages, err := r.getPackages(args)
+	if err != nil {
+		return err
+	}
+	if packages == nil {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	pkg, ok := packages.NameToPackage[name]
+	if !ok {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	for _, dep := range pkg.Deps {
+		if err := r.println(dep); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *runner) InspectPackageImporters(args []string, name string) error {
+	if name == "" {
+		return newExitErrorf(255, "must set name")
+	}
+	packages, err := r.getPackages(args)
+	if err != nil {
+		return err
+	}
+	if packages == nil {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	pkg, ok := packages.NameToPackage[name]
+	if !ok {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	for _, importer := range pkg.Importers {
+		if err := r.println(importer); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *runner) getPackages(args []string) (*extract.Packages, error) {
+	meta, err := r.getMeta(args, 1)
+	if err != nil {
+		return nil, err
+	}
+	r.printAffectedFiles(meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	if err != nil {
+		return nil, err
+	}
+	if len(fileDescriptorSets) == 0 {
+		return nil, fmt.Errorf("no FileDescriptorSets returned")
+	}
+	return r.newGetter().GetPackages(fileDescriptorSets)
 }
 
 func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {

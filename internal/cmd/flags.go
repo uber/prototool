@@ -44,6 +44,7 @@ type flags struct {
 	listLinters    bool
 	lintMode       bool
 	method         string
+	name           string
 	overwrite      bool
 	pkg            string
 	printFields    string
@@ -124,6 +125,10 @@ func (f *flags) bindListLinters(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindMethod(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.method, "method", "", "The GRPC method to call in the form package.Service/Method. This is required.")
+}
+
+func (f *flags) bindName(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.name, "name", "", "The package name. This is required.")
 }
 
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
