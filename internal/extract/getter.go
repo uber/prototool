@@ -21,9 +21,11 @@
 package extract
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"go.uber.org/zap"
 )
@@ -43,7 +45,19 @@ func newGetter(options ...GetterOption) *getter {
 }
 
 func (g *getter) GetPackages(fileDescriptorSets []*descriptor.FileDescriptorSet) (*Packages, error) {
-	return nil, nil
+	packageNameToFileDescriptorProtos, err := getPackageNameToFileDescriptorProtos(fileDescriptorSets)
+	if err != nil {
+		return nil, err
+	}
+	packages := &Packages{
+		NameToPackage: make(map[string]*Package),
+	}
+	for packageName := range packageNameToFileDescriptorProtos {
+		packages.NameToPackage[packageName] = &Package{
+			Name: packageName,
+		}
+	}
+	return packages, nil
 }
 
 func (g *getter) GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error) {
@@ -167,6 +181,53 @@ func (g *getter) GetService(fileDescriptorSets []*descriptor.FileDescriptorSet, 
 		FileDescriptorProto:    fileDescriptorProto,
 		FileDescriptorSet:      fileDescriptorSet,
 	}, nil
+}
+
+func getPackageNameToFileDescriptorProtos(fileDescriptorSets []*descriptor.FileDescriptorSet) (map[string][]*descriptor.FileDescriptorProto, error) {
+	packageNameToFileNameToFileDescriptorProto := make(map[string]map[string]*descriptor.FileDescriptorProto)
+	for _, fileDescriptorSet := range fileDescriptorSets {
+		for _, fileDescriptorProto := range fileDescriptorSet.GetFile() {
+			pkg := fileDescriptorProto.GetPackage()
+			if pkg == "" {
+				return nil, fmt.Errorf("no package on FileDescriptorProto")
+			}
+			if pkg[0] != '.' {
+				return nil, fmt.Errorf("malformed package fully-qualified name: %s", pkg)
+			}
+			existingMap, ok := packageNameToFileNameToFileDescriptorProto[pkg]
+			if !ok {
+				existingMap = make(map[string]*descriptor.FileDescriptorProto)
+				packageNameToFileNameToFileDescriptorProto[pkg] = existingMap
+			}
+			name := fileDescriptorProto.GetName()
+			existing, ok := existingMap[name]
+			if ok {
+				// we don't technically need to do this verification but
+				// we do for safety, if this ends up never erroring we
+				// can remove this if it becomes a performance issue
+				data, err := proto.Marshal(fileDescriptorProto)
+				if err != nil {
+					return nil, err
+				}
+				existingData, err := proto.Marshal(existing)
+				if err != nil {
+					return nil, err
+				}
+				if !bytes.Equal(data, existingData) {
+					return nil, fmt.Errorf("unequal FileDescriptorProtos for %s", name)
+				}
+			} else {
+				existingMap[name] = fileDescriptorProto
+			}
+		}
+	}
+	m := make(map[string][]*descriptor.FileDescriptorProto)
+	for packageName, fileNameToFileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
+		for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
+			m[packageName] = append(m[packageName], fileDescriptorProto)
+		}
+	}
+	return m, nil
 }
 
 // TODO: we don't actually do full path resolution per the descriptor.proto spec

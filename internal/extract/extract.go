@@ -32,19 +32,19 @@ import (
 type Packages struct {
 	// Map from fully-qualified name to package.
 	// Fully-qualified name includes prefix '.'.
-	FullyQualifiedNameToPackage map[string]*Package
+	NameToPackage map[string]*Package
 }
 
 // Package is an extracted package.
 type Package struct {
 	// Fully-qualified name includes prefix '.'.
-	FullyQualifiedName string
+	Name string `json:"name,omitempty" yaml:"name,omitempty"`
 	// The fully-qualified names of the direct dependencies.
 	// For recursive dependencies, look these names up in the Packages struct.
-	DepFullyQualifiedNames []string
+	Deps []string `json:"deps,omitempty" yaml:"deps,omitempty"`
 	// The fully-qualified names of the importers.
 	// For recursive importers, look these names up in the Packages struct.
-	ImporterFullyQualifiedNames []string
+	Importers []string `json:"importers,omitempty" yaml:"importers,omitempty"`
 }
 
 // Field is an extracted field.

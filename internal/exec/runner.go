@@ -659,8 +659,8 @@ func (r *runner) InspectPackages(args []string) error {
 		return err
 	}
 	if packages != nil {
-		for fullyQualifiedName := range packages.FullyQualifiedNameToPackage {
-			if err := r.println(fullyQualifiedName); err != nil {
+		for name := range packages.NameToPackage {
+			if err := r.println(name); err != nil {
 				return err
 			}
 		}
