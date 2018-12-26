@@ -1005,7 +1005,7 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 		}
 		if shouldPrint {
 			if r.json {
-				data, err := json.MarshalIndent(failure, "", "  ")
+				data, err := json.Marshal(failure)
 				if err != nil {
 					return err
 				}
