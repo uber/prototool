@@ -63,7 +63,6 @@ type Package struct {
 type Field struct {
 	*descriptor.FieldDescriptorProto
 
-	// Fully-qualified path includes prefix '.'.
 	FullyQualifiedPath  string
 	DescriptorProto     *descriptor.DescriptorProto
 	FileDescriptorProto *descriptor.FileDescriptorProto
@@ -74,7 +73,6 @@ type Field struct {
 type Message struct {
 	*descriptor.DescriptorProto
 
-	// Fully-qualified path includes prefix '.'.
 	FullyQualifiedPath  string
 	FileDescriptorProto *descriptor.FileDescriptorProto
 	FileDescriptorSet   *descriptor.FileDescriptorSet
@@ -84,7 +82,6 @@ type Message struct {
 type Service struct {
 	*descriptor.ServiceDescriptorProto
 
-	// Fully-qualified path includes prefix '.'.
 	FullyQualifiedPath  string
 	FileDescriptorProto *descriptor.FileDescriptorProto
 	FileDescriptorSet   *descriptor.FileDescriptorSet
