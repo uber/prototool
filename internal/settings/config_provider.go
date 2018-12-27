@@ -301,6 +301,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		Lint: LintConfig{
 			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
 			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 		},

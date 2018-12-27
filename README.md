@@ -4,16 +4,16 @@
 
 Prototool lets you:
 
-- Handle installation of protoc and the import of all of the Well-Known Types behind the scenes in a platform-independent manner without any work on the part of the user.
-- Standardize building of your Protobuf files with a common configuration, abstracting away all of the pain of protoc for you.
-- Lint your Protobuf files with common linting rules according to a Style Guide.
-- Format your Protobuf files in a consistent manner.
-- Generate Protobuf files from a template that passes lint, taking care of package naming for you.
-- Generate stubs using any plugin based on a simple configuration file, including handling imports of all the Well-Known Types.
-- Call gRPC endpoints with ease, taking care of the JSON to binary conversion for you.
-- Output errors and lint failures in a common file:line:column:message format, making integration with editors possible, Vim integration is provided out of the box.
+- Handle installation of `protoc` and the import of all of the Well-Known Types behind the scenes in a platform-independent manner without any work on the part of the user.
+- Standardize building of your Protobuf files with a common [configuration](#configuration), abstracting away all of the pain of protoc for you.
+- [Lint](#prototool-lint) your Protobuf files with common linting rules according to [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style), [Uber's Style Guide](https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto), or your own set of configured lint rules.
+- [Format](#prototool-format) your Protobuf files in a consistent manner.
+- [Create](#prototool-create) Protobuf files from a template that passes lint, taking care of package naming for you.
+- [Generate](#prototool-generate) stubs using any plugin based on a simple configuration file, including handling imports of all the Well-Known Types.
+- Call [gRPC](#prototool-grpc) endpoints with ease, taking care of the JSON to binary conversion for you.
+- Output errors and lint failures in a common `file:line:column:message` format, making integration with editors possible, [Vim integration](#vim-integration) is provided out of the box.
 
-Prototool accomplishes this by downloading and calling protoc on the fly for you, handing error messages from protoc and your plugins, and using the generated FileDescriptorSets for internal functionality, as well as wrapping a few great external libraries already in the Protobuf ecosystem.
+Prototool accomplishes this by downloading and calling `protoc` on the fly for you, handing error messages from `protoc` and your plugins, and using the generated `FileDescriptorSets` for internal functionality, as well as wrapping a few great external libraries already in the Protobuf ecosystem. Compiling, linting and formatting commands run in around 3/100ths of second for a single Protobuf file, or under a second for a larger number (500+) of Protobuf files.
 
   * [Installation](#installation)
   * [Quick Start](#quick-start)
@@ -67,8 +67,17 @@ curl -sSL https://github.com/uber/prototool/releases/download/v1.3.0/prototool-$
 
 You can also install the `prototool` binary using `go get` if using go1.11+ with module support enabled.
 
-```
+```bash
 go get github.com/uber/prototool/cmd/prototool@dev
+```
+
+You may want to use [gobin](https://github.com/myitcv/gobin) to install `prototool` outside of a module.
+
+```bash
+# Install to $GOBIN, or $GOPATH/bin if $GOBIN is not set, or $HOME/go/bin if neither are set
+gobin github.com/uber/prototool/cmd/prototool@dev
+# Install to /path/to/bin
+GOBIN=/path/to/bin gobin github.com/uber/prototool/cmd/prototool@dev
 ```
 
 ## Quick Start
@@ -83,6 +92,7 @@ prototool lint # same as "prototool lint .", by default the current directory is
 prototool create foo.proto # create the file foo.proto from a template that passes lint
 prototool files idl/uber # list the files that will be used after applying exclude_paths from corresponding prototool.yaml or prototool.json files
 prototool lint --list-linters # list all current lint rules being used
+prototool lint --list-all-lint-groups # list all available lint groups, currently "google" and "uber"
 prototool compile idl/uber # make sure all .proto files in idl/uber compile, but do not generate stubs
 prototool generate idl/uber # generate stubs, see the generation directives in the config file example
 prototool grpc idl/uber --address 0.0.0.0:8080 --method foo.ExcitedService/Exclamation --data '{"value":"hello"}' # call the foo.ExcitedService method Exclamation with the given data on 0.0.0.0:8080
@@ -157,7 +167,54 @@ See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for a ful
 
 ##### `prototool lint`
 
-Lint your Protobuf files. The default rule set follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). You can add or exclude lint rules in your `prototool.yaml` or `prototool.json` file. The default rule set is "strict", and we are working on having two main sets of rules.
+Lint your Protobuf files.
+
+Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for all available options. There are two pre-configured groups of rules:
+
+- `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](etc/style/google/google.proto).
+- `uber`: This lint group follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
+
+Configuration of your group can be done by setting the `lint.group` option in your `prototool.yaml` file:
+
+```yaml
+lint:
+  group: google
+```
+
+See the `prototool.yaml` files at [etc/style/google/prototool.yaml](etc/style/google/prototool.yaml) and
+[etc/style/uber/prototool.yaml](etc/style/uber/prototool.yaml) for examples.
+
+The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
+
+See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
+
+Files must be valid Protobuf that can be compiled with `protoc`, so prior to linting, `prototool lint` will compile your using `protoc`.
+Note, however, this is very fast - for the two files in [etc/uber/style](etc/uber/style), compiling and linting only takes approximately
+3/100ths of a second:
+
+```bash
+$ time prototool lint etc/style/uber
+
+real	0m0.037s
+user	0m0.026s
+sys	0m0.017s
+```
+
+For all 694 Protobuf files currently in [googleapis](https://github.com/googleapis/googleapis), this takes approximately 3/4ths of a second:
+
+```bash
+$ cat prototool.yaml
+protoc:
+  allow_unused_imports: true
+lint:
+  group: google
+
+$ time prototool lint .
+
+real	0m0.734s
+user	0m3.835s
+sys	0m0.924s
+```
 
 ##### `prototool format`
 
@@ -170,7 +227,7 @@ Format a Protobuf file and print the formatted file to stdout. There are flags t
 
 Concretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
 [Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the value of `go_package` is updated to reflect what we expect for the
-default Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
+Uber Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
 
 ##### `prototool create`
 
@@ -514,6 +571,8 @@ docker run -v $(pwd):/in me/prototool-env compile
 the choices made in the formatter. Can we change some things?
 
 *Answer:* Sorry, but we can't - The goal of Prototool is to provide a straightforward Style Guide and consistent formatting that minimizes various issues that arise from Protobuf usage across large organizations. There are pros and cons to many of the choices in the Style Guide, but it's our belief that the best answer is a **single** answer, sometimes regardless of what that single answer is.
+
+We do have multiple lint groups available, see the help section on `prototool lint` above.
 
 It is possible to ignore lint rules via configuration. However, especially if starting from a clean slate, we highly recommend using all default lint rules for consistency.
 
