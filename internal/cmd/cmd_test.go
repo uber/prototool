@@ -370,7 +370,12 @@ func TestLint(t *testing.T) {
 		`5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
 		"testdata/lint/gopackagelongform/gopackagelongform.proto",
 	)
-
+	assertDoLintFile(
+		t,
+		false,
+		`10:1:GOGO_NOT_IMPORTED`,
+		"testdata/lint/gogonotimported/gogonotimported.proto",
+	)
 	assertDoLintFile(
 		t,
 		false,
