@@ -48,7 +48,6 @@ import (
 	"github.com/uber/prototool/internal/grpc"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/protoc"
-	"github.com/uber/prototool/internal/reflect"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
@@ -193,7 +192,7 @@ func (r *runner) Clean() error {
 }
 
 func (r *runner) Files(args []string) error {
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
@@ -208,7 +207,7 @@ func (r *runner) Files(args []string) error {
 }
 
 func (r *runner) Compile(args []string, dryRun bool) error {
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
@@ -218,88 +217,13 @@ func (r *runner) Compile(args []string, dryRun bool) error {
 }
 
 func (r *runner) Gen(args []string, dryRun bool) error {
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
 	r.printAffectedFiles(meta)
 	_, err = r.compile(true, false, dryRun, meta)
 	return err
-}
-
-func (r *runner) DescriptorProto(args []string) error {
-	path := args[len(args)-1]
-	meta, err := r.getMeta(args, 2)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
-	if err != nil {
-		return err
-	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
-	}
-	message, err := r.newGetter().GetMessage(fileDescriptorSets, path)
-	if err != nil {
-		return err
-	}
-	data, err := jsonMarshaler.MarshalToString(message.DescriptorProto)
-	if err != nil {
-		return err
-	}
-	return r.println(data)
-}
-
-func (r *runner) FieldDescriptorProto(args []string) error {
-	path := args[len(args)-1]
-	meta, err := r.getMeta(args, 2)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
-	if err != nil {
-		return err
-	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
-	}
-	field, err := r.newGetter().GetField(fileDescriptorSets, path)
-	if err != nil {
-		return err
-	}
-	data, err := jsonMarshaler.MarshalToString(field.FieldDescriptorProto)
-	if err != nil {
-		return err
-	}
-	return r.println(data)
-}
-
-func (r *runner) ServiceDescriptorProto(args []string) error {
-	path := args[len(args)-1]
-	meta, err := r.getMeta(args, 2)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
-	if err != nil {
-		return err
-	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
-	}
-	service, err := r.newGetter().GetService(fileDescriptorSets, path)
-	if err != nil {
-		return err
-	}
-	data, err := jsonMarshaler.MarshalToString(service.ServiceDescriptorProto)
-	if err != nil {
-		return err
-	}
-	return r.println(data)
 }
 
 func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
@@ -349,7 +273,7 @@ func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, list
 	if listLintGroup != "" {
 		return r.listLintGroup(listLintGroup)
 	}
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
@@ -417,7 +341,7 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fix bool) 
 	if moreThanOneSet(overwrite, diffMode, lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
@@ -506,60 +430,8 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix bo
 	return true, nil
 }
 
-func (r *runner) BinaryToJSON(args []string) error {
-	path := args[len(args)-2]
-	data, err := r.getInputData(args[len(args)-1])
-	if err != nil {
-		return err
-	}
-	meta, err := r.getMeta(args, 3)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
-	if err != nil {
-		return err
-	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
-	}
-	out, err := r.newReflectHandler().BinaryToJSON(fileDescriptorSets, path, data)
-	if err != nil {
-		return err
-	}
-	_, err = r.output.Write(out)
-	return err
-}
-
-func (r *runner) JSONToBinary(args []string) error {
-	path := args[len(args)-2]
-	data, err := r.getInputData(args[len(args)-1])
-	if err != nil {
-		return err
-	}
-	meta, err := r.getMeta(args, 3)
-	if err != nil {
-		return err
-	}
-	r.printAffectedFiles(meta)
-	fileDescriptorSets, err := r.compile(false, true, false, meta)
-	if err != nil {
-		return err
-	}
-	if len(fileDescriptorSets) == 0 {
-		return fmt.Errorf("no FileDescriptorSets returned")
-	}
-	out, err := r.newReflectHandler().JSONToBinary(fileDescriptorSets, path, data)
-	if err != nil {
-		return err
-	}
-	_, err = r.output.Write(out)
-	return err
-}
-
 func (r *runner) All(args []string, disableFormat, disableLint, fix bool) error {
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
@@ -627,7 +499,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		}
 	}
 
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
@@ -742,7 +614,7 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 }
 
 func (r *runner) getPackages(args []string) (*extract.Packages, error) {
-	meta, err := r.getMeta(args, 1)
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return nil, err
 	}
@@ -851,12 +723,6 @@ func (r *runner) newGetter() extract.Getter {
 	)
 }
 
-func (r *runner) newReflectHandler() reflect.Handler {
-	return reflect.NewHandler(
-		reflect.HandlerWithLogger(r.logger),
-	)
-}
-
 func (r *runner) newCreateHandler(pkg string) create.Handler {
 	handlerOptions := []create.HandlerOption{create.HandlerWithLogger(r.logger)}
 	if pkg != "" {
@@ -903,16 +769,10 @@ type meta struct {
 	SingleFilename string
 }
 
-// lenOfArgsIfSpecified makes this function more convenient when calling above.
-// It says "if the length of args is equal to lenOfArgsIfSpecified, then args
-// contains the dirOrFile parameter as it's first argument." For example, for
-// "prototool compile [dirOrFile]", lenOfArgsIfSpecified is 1, saying that if
-// we have 1 argument, the first argument is dirOrFile, if we have zero arguments,
-// we do not and assume the current directory is the dirOrFile.
-func (r *runner) getMeta(args []string, lenOfArgsIfSpecified int) (*meta, error) {
+func (r *runner) getMeta(args []string) (*meta, error) {
 	// TODO: does not fit in with workDirPath paradigm
 	fileOrDir := "."
-	if len(args) == lenOfArgsIfSpecified {
+	if len(args) == 1 {
 		fileOrDir = args[0]
 	}
 	fileInfo, err := os.Stat(fileOrDir)

@@ -123,13 +123,8 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	flags.bindDebug(rootCmd.PersistentFlags())
 
 	if develMode {
-		rootCmd.AddCommand(binaryToJSONCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		rootCmd.AddCommand(cleanCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(descriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		rootCmd.AddCommand(downloadCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(fieldDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(jsonToBinaryCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(serviceDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 
 		// we may or may not want to expose these to users
 		// but will not build them into the binary for v1.0
