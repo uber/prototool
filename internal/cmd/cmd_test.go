@@ -96,6 +96,13 @@ func TestCompile(t *testing.T) {
 	)
 	assertDoCompileFiles(
 		t,
+		false,
+		false,
+		`testdata/compile/recursive/one.proto:1:1:File recursively imports itself one.proto -> two.proto -> one.proto.`,
+		"testdata/compile/recursive/one.proto",
+	)
+	assertDoCompileFiles(
+		t,
 		true,
 		false,
 		``,
