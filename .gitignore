@@ -2,6 +2,7 @@
 /.idea
 /.tmp
 /brew
+/example/gen/proto/descriptor
 /example/gen/proto/java
 /cmd/prototool/prototool
 /cover

@@ -50,8 +50,9 @@ var (
 	pluginFailedRegexp       = regexp.MustCompile("^--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 	otherPluginFailureRegexp = regexp.MustCompile("^--(.*)_out: (.*)$")
 
-	extraImportRegexp  = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
-	fileNotFoundRegexp = regexp.MustCompile("^(.*): File not found.$")
+	extraImportRegexp     = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
+	recursiveImportRegexp = regexp.MustCompile("^(.*): File recursively imports itself: (.*)$")
+	fileNotFoundRegexp    = regexp.MustCompile("^(.*): File not found.$")
 	// protoc outputs both this line and fileNotFound, so we end up ignoring this one
 	// TODO figure out what the error is for errors in the import
 	importNotFoundRegexp              = regexp.MustCompile("^(.*): Import (.*) was not found or had errors.$")
@@ -188,7 +189,21 @@ func (c *compiler) ProtocCommands(protoSet *file.ProtoSet) ([]string, error) {
 func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 	genDirs := make(map[string]struct{})
 	for _, genPlugin := range protoSet.Config.Gen.Plugins {
-		genDirs[genPlugin.OutputPath.AbsPath] = struct{}{}
+		baseOutputPath := genPlugin.OutputPath.AbsPath
+		// If there is no single output file, protoc plugins take care of making
+		// sub-directories, so we only need to make the base directory.
+		// Otherwise, we need to make all sub-directories of the output file.
+		if genPlugin.FileSuffix == "" {
+			genDirs[baseOutputPath] = struct{}{}
+		} else {
+			for dirPath := range protoSet.DirPathToFiles {
+				relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
+				if err != nil {
+					return err
+				}
+				genDirs[filepath.Dir(filepath.Join(baseOutputPath, relOutputFilePath))] = struct{}{}
+			}
+		}
 	}
 	for genDir := range genDirs {
 		// we could choose a different permission set, but this seems reasonable
@@ -431,14 +446,38 @@ func getPluginFlagSet(protoSet *file.ProtoSet, dirPath string, genPlugin setting
 	if err != nil {
 		return nil, err
 	}
-	flagSet := []string{fmt.Sprintf("--%s_out=%s", genPlugin.Name, genPlugin.OutputPath.AbsPath)}
+	outputPath := genPlugin.OutputPath.AbsPath
+	if genPlugin.FileSuffix != "" {
+		relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
+		if err != nil {
+			return nil, err
+		}
+		outputPath = filepath.Join(outputPath, relOutputFilePath)
+	}
+	flagSet := []string{fmt.Sprintf("--%s_out=%s", genPlugin.Name, outputPath)}
 	if len(protoFlags) > 0 {
-		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, genPlugin.OutputPath.AbsPath)}
+		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, outputPath)}
 	}
 	if genPlugin.Path != "" {
 		flagSet = append(flagSet, fmt.Sprintf("--plugin=protoc-gen-%s=%s", genPlugin.Name, genPlugin.Path))
 	}
+	if genPlugin.IncludeImports {
+		flagSet = append(flagSet, "--include_imports")
+	}
+	if genPlugin.IncludeSourceInfo {
+		flagSet = append(flagSet, "--include_source_info")
+	}
 	return flagSet, nil
+}
+
+func getRelOutputFilePath(protoSet *file.ProtoSet, dirPath string, fileSuffix string) (string, error) {
+	relPath, err := filepath.Rel(protoSet.Config.DirPath, dirPath)
+	if err != nil {
+		// if we cannot find the relative path, we have a real problem
+		// this should never happen, but could in a bad case with links
+		return "", fmt.Errorf("could not find relative path for %q to %q, this is a system error, please file a bug at github.com/uber/prototool/issues/new: %v", dirPath, protoSet.Config.DirPath, err)
+	}
+	return filepath.Join(relPath, filepath.Base(relPath)+"."+fileSuffix), nil
 }
 
 // the return value corresponds to CodeGeneratorRequest.Parameter
@@ -573,6 +612,12 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 			return &text.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
 				Message:  fmt.Sprintf(`Import "%s" was not used.`, matches[2]),
+			}
+		}
+		if matches := recursiveImportRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
+			return &text.Failure{
+				Filename: bestFilePath(cmdMeta, matches[1]),
+				Message:  fmt.Sprintf(`File recursively imports itself %s.`, matches[2]),
 			}
 		}
 		if matches := fileNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
