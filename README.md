@@ -155,7 +155,15 @@ Compile your Protobuf files, but do not generate stubs. This has the effect of c
 
 ##### `prototool generate`
 
-Compile your Protobuf files and generate stubs according to the rules in your `prototool.yaml` or `prototool.json` file. See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for an example.
+Compile your Protobuf files and generate stubs according to the rules in your `prototool.yaml` or `prototool.json` file.
+
+See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for all available options. There are special
+options available for Golang plugins, and plugins that output a single file instead of a set of files. Specifically, you
+can output a single JAR for the built-in `protoc` `java` plugin, and you can output a file with the serialized
+`FileDescriptorSet` using the built-in `protoc` `descriptor_set` plugin, optionally also calling `--include_imports`
+and/or `--include_source_info`.
+
+See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for a full example.
 
 ##### `prototool lint`
 

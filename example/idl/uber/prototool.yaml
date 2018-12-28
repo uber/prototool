@@ -19,3 +19,9 @@ generate:
       output: ../../gen/proto/go
     - name: java
       output: ../../gen/proto/java
+      file_suffix: jar
+    - name: descriptor_set
+      output: ../../gen/proto/descriptor
+      file_suffix: bin
+      include_imports: true
+      include_source_info: true
