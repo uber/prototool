@@ -648,16 +648,16 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 }
 
 func (r *runner) InspectPackages(args []string) error {
-	packages, err := r.getPackages(args)
+	packageSet, err := r.getPackageSet(args)
 	if err != nil {
 		return err
 	}
-	if packages == nil {
+	if packageSet == nil {
 		return nil
 	}
-	for _, pkg := range packages.SortedPackages() {
+	for _, pkg := range packageSet.Packages() {
 		if r.json {
-			data, err := json.MarshalIndent(pkg, "", "  ")
+			data, err := json.MarshalIndent(pkg.ToExternalPackage(), "", "  ")
 			if err != nil {
 				return err
 			}
@@ -665,7 +665,7 @@ func (r *runner) InspectPackages(args []string) error {
 				return err
 			}
 		} else {
-			if err := r.println(pkg.Name); err != nil {
+			if err := r.println(pkg.Name()); err != nil {
 				return err
 			}
 		}
@@ -677,18 +677,18 @@ func (r *runner) InspectPackage(args []string, name string) error {
 	if name == "" {
 		return newExitErrorf(255, "must set name")
 	}
-	packages, err := r.getPackages(args)
+	packageSet, err := r.getPackageSet(args)
 	if err != nil {
 		return err
 	}
-	if packages == nil {
+	if packageSet == nil {
 		return fmt.Errorf("package not found: %s", name)
 	}
-	pkg, ok := packages.NameToPackage[name]
+	pkg, ok := packageSet.GetPackage(name)
 	if !ok {
 		return fmt.Errorf("package not found: %s", name)
 	}
-	data, err := json.MarshalIndent(pkg, "", "  ")
+	data, err := json.MarshalIndent(pkg.ToExternalPackage(), "", "  ")
 	if err != nil {
 		return err
 	}
@@ -699,18 +699,18 @@ func (r *runner) InspectPackageDeps(args []string, name string) error {
 	if name == "" {
 		return newExitErrorf(255, "must set name")
 	}
-	packages, err := r.getPackages(args)
+	packageSet, err := r.getPackageSet(args)
 	if err != nil {
 		return err
 	}
-	if packages == nil {
+	if packageSet == nil {
 		return fmt.Errorf("package not found: %s", name)
 	}
-	pkg, ok := packages.NameToPackage[name]
+	pkg, ok := packageSet.GetPackage(name)
 	if !ok {
 		return fmt.Errorf("package not found: %s", name)
 	}
-	for _, dep := range pkg.Deps {
+	for _, dep := range pkg.Deps() {
 		if err := r.println(dep); err != nil {
 			return err
 		}
@@ -722,18 +722,18 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	if name == "" {
 		return newExitErrorf(255, "must set name")
 	}
-	packages, err := r.getPackages(args)
+	packageSet, err := r.getPackageSet(args)
 	if err != nil {
 		return err
 	}
-	if packages == nil {
+	if packageSet == nil {
 		return fmt.Errorf("package not found: %s", name)
 	}
-	pkg, ok := packages.NameToPackage[name]
+	pkg, ok := packageSet.GetPackage(name)
 	if !ok {
 		return fmt.Errorf("package not found: %s", name)
 	}
-	for _, importer := range pkg.Importers {
+	for _, importer := range pkg.Importers() {
 		if err := r.println(importer); err != nil {
 			return err
 		}
@@ -741,7 +741,7 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return nil
 }
 
-func (r *runner) getPackages(args []string) (*extract.Packages, error) {
+func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
 	meta, err := r.getMeta(args, 1)
 	if err != nil {
 		return nil, err
@@ -754,7 +754,7 @@ func (r *runner) getPackages(args []string) (*extract.Packages, error) {
 	if len(fileDescriptorSets) == 0 {
 		return nil, fmt.Errorf("no FileDescriptorSets returned")
 	}
-	return r.newGetter().GetPackages(fileDescriptorSets)
+	return r.newGetter().GetPackageSet(fileDescriptorSets)
 }
 
 func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {

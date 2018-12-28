@@ -45,7 +45,7 @@ func newGetter(options ...GetterOption) *getter {
 	return getter
 }
 
-func (g *getter) GetPackages(fileDescriptorSets []*descriptor.FileDescriptorSet) (*Packages, error) {
+func (g *getter) GetPackageSet(fileDescriptorSets []*descriptor.FileDescriptorSet) (*PackageSet, error) {
 	packageNameToFileNameToFileDescriptorProto, err := getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets)
 	if err != nil {
 		return nil, err
@@ -54,12 +54,12 @@ func (g *getter) GetPackages(fileDescriptorSets []*descriptor.FileDescriptorSet)
 	if err != nil {
 		return nil, err
 	}
-	packages := &Packages{
-		NameToPackage: make(map[string]*Package),
+	packageSet := &PackageSet{
+		nameToPackage: make(map[string]*Package),
 	}
 	for packageName := range packageNameToFileNameToFileDescriptorProto {
-		packages.NameToPackage[packageName] = &Package{
-			Name: packageName,
+		packageSet.nameToPackage[packageName] = &Package{
+			name: packageName,
 		}
 	}
 	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
@@ -70,17 +70,17 @@ func (g *getter) GetPackages(fileDescriptorSets []*descriptor.FileDescriptorSet)
 					return nil, fmt.Errorf("no package for dep %s", depFileName)
 				}
 				if depPackageName != packageName {
-					packages.NameToPackage[packageName].Deps = append(packages.NameToPackage[packageName].Deps, depPackageName)
-					packages.NameToPackage[depPackageName].Importers = append(packages.NameToPackage[depPackageName].Importers, packageName)
+					packageSet.nameToPackage[packageName].deps = append(packageSet.nameToPackage[packageName].deps, depPackageName)
+					packageSet.nameToPackage[depPackageName].importers = append(packageSet.nameToPackage[depPackageName].importers, packageName)
 				}
 			}
 		}
 	}
-	for _, pkg := range packages.NameToPackage {
-		pkg.Deps = strs.DedupeSort(pkg.Deps, nil)
-		pkg.Importers = strs.DedupeSort(pkg.Importers, nil)
+	for _, pkg := range packageSet.nameToPackage {
+		pkg.deps = strs.DedupeSort(pkg.deps, nil)
+		pkg.importers = strs.DedupeSort(pkg.importers, nil)
 	}
-	return packages, nil
+	return packageSet, nil
 }
 
 func (g *getter) GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error) {
