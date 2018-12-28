@@ -169,7 +169,13 @@ type CreateConfig struct {
 
 // LintConfig is the lint config.
 type LintConfig struct {
+	// Group is the specific group of linters to use.
+	// The default group is the "default" lint group, which is equal
+	// to the "uber" lint group.
+	// Setting this value will result in NoDefault being ignored.
+	Group string
 	// NoDefault is set to exclude the default set of linters.
+	// This value is ignored if Group is set.
 	NoDefault bool
 	// IncludeIDs are the list of linter IDs to use in addition to the defaults.
 	// Expected to be all uppercase.
@@ -226,6 +232,15 @@ type GenPlugin struct {
 	// The path to output to.
 	// Must be relative in a config file.
 	OutputPath OutputPath
+	// If set, the output path will be set to "$OUTPUT_PATH/$(basename $OUTPUT_PATH).$FILE_SUFFIX"
+	// Used for e.g. JAR generation for java or descriptor_set file name.
+	FileSuffix string
+	// Add the --include_imports flags to protoc.
+	// Only valid if Name is descriptor_set.
+	IncludeImports bool
+	// Add the --include_source_info flags to protoc.
+	// Only valid if Name is descriptor_set.
+	IncludeSourceInfo bool
 }
 
 // OutputPath is an output path.
@@ -256,6 +271,7 @@ type ExternalConfig struct {
 		} `json:"packages,omitempty" yaml:"packages,omitempty"`
 	} `json:"create,omitempty" yaml:"create,omitempty"`
 	Lint struct {
+		Group   string `json:"group,omitempty" yaml:"group,omitempty"`
 		Ignores []struct {
 			ID    string   `json:"id,omitempty" yaml:"id,omitempty"`
 			Files []string `json:"files,omitempty" yaml:"files,omitempty"`
@@ -272,11 +288,14 @@ type ExternalConfig struct {
 			ExtraModifiers map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`
 		} `json:"go_options,omitempty" yaml:"go_options,omitempty"`
 		Plugins []struct {
-			Name   string `json:"name,omitempty" yaml:"name,omitempty"`
-			Type   string `json:"type,omitempty" yaml:"type,omitempty"`
-			Flags  string `json:"flags,omitempty" yaml:"flags,omitempty"`
-			Output string `json:"output,omitempty" yaml:"output,omitempty"`
-			Path   string `json:"path,omitempty" yaml:"path,omitempty"`
+			Name              string `json:"name,omitempty" yaml:"name,omitempty"`
+			Type              string `json:"type,omitempty" yaml:"type,omitempty"`
+			Flags             string `json:"flags,omitempty" yaml:"flags,omitempty"`
+			Output            string `json:"output,omitempty" yaml:"output,omitempty"`
+			Path              string `json:"path,omitempty" yaml:"path,omitempty"`
+			FileSuffix        string `json:"file_suffix,omitempty" yaml:"file_suffix,omitempty"`
+			IncludeImports    bool   `json:"include_imports,omitempty" yaml:"include_imports,omitempty"`
+			IncludeSourceInfo bool   `json:"include_source_info,omitempty" yaml:"include_source_info,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"generate,omitempty" yaml:"generate,omitempty"`
 }

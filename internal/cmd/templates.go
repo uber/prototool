@@ -406,10 +406,46 @@ $ cat input.json | prototool grpc example \
 	lintCmdTemplate = &cmdTemplate{
 		Use:   "lint [dirOrFile]",
 		Short: "Lint proto files and compile with protoc to check for failures.",
-		Long:  `The default rule set follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. You can add or exclude lint rules in your configuration file. The default rule set is very strict and is meant to enforce consistent development patterns.`,
-		Args:  cobra.MaximumNArgs(1),
+		Long: `Lint rules can be set using the configuration file. See the configuration at https://github.com/uber/prototool/blob/dev/etc/config/example/prototool.yaml for all available options. There are two pre-configured groups of rules:
+
+google: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed.
+
+uber: This lint group follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. This is a very strict rule group and is meant to enforce consistent development patterns.
+
+Configuration of your group can be done by setting the "lint.group" option in your "prototool.yaml" file:
+
+lint:
+  group: google
+
+The "uber" lint group represents the default lint group, and will be used if no lint group is configured.
+
+Files must be valid Protobuf that can be compiled with protoc, so prior to linting, prototool lint will compile your using protoc.
+Note, however, this is very fast - for two files, compiling and linting only takes approximately
+3/100ths of a second:
+
+$ time prototool lint etc/style/uber
+
+real	0m0.037s
+user	0m0.026s
+sys	0m0.017s
+
+For all 694 Protobuf files currently in https://github.com/googleapis/googleapis, this takes approximately 3/4ths of a second:
+
+$ cat prototool.yaml
+protoc:
+  allow_unused_imports: true
+lint:
+  group: google
+
+$ time prototool lint .
+
+real	0m0.734s
+user	0m3.835s
+sys	0m0.924s`,
+
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Lint(args, flags.listAllLinters, flags.listLinters)
+			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
@@ -417,27 +453,11 @@ $ cat input.json | prototool grpc example \
 			flags.bindJSON(flagSet)
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
+			flags.bindListAllLintGroups(flagSet)
+			flags.bindListLintGroup(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
-		},
-	}
-
-	listAllLintGroupsCmdTemplate = &cmdTemplate{
-		Use:   "list-all-lint-groups",
-		Short: "List all the available lint groups.",
-		Args:  cobra.NoArgs,
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.ListAllLintGroups()
-		},
-	}
-
-	listLintGroupCmdTemplate = &cmdTemplate{
-		Use:   "list-lint-group group",
-		Short: "List the linters in the given lint group.",
-		Args:  cobra.ExactArgs(1),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.ListLintGroup(args[0])
 		},
 	}
 

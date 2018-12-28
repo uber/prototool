@@ -36,6 +36,13 @@ create:
 
 # Lint directives.
 lint:
+  # The lint group to use.
+  # The default group is the "default" lint group, which is equal to the "uber" lint group.
+  # Run prototool lint --list-all-lint-groups to see all available lint groups.
+  # Run prototool lint --list-lint-group GROUP to list the linters in the given lint group.
+  # Setting this value will result in lint.rules.no_default being ignored.
+  group: uber
+
   # Linter files to ignore.
   ignores:
     - id: RPC_NAMES_CAMEL_CASE
@@ -47,9 +54,12 @@ lint:
         - path/to/foo.proto
 
   # Linter rules.
-  # Run prototool list-all-linters to see all available linters.
+  # Run prototool lint --list-all-linters to see all available linters.
+  # Run prototool lint --list-linters to see the currently configured linters.
   rules:
     # Determines whether or not to include the default set of linters.
+    # This allows all linters to be turned off except those explicitly specified in add.
+    # This value is ignored if lint.group is set.
     no_default: true
 
     # The specific linters to add.
@@ -114,3 +124,23 @@ generate:
 
     - name: java
       output: ../../.gen/proto/java
+
+      # Optional file suffix for plugins that output a single file as opposed
+      # to writing a set of files to a directory. This is only valid in two
+      # known cases:
+      # - For the java plugin, set this to "jar" to produce jars
+      #   https://developers.google.com/protocol-buffers/docs/reference/java-generated#invocation
+      # - For the descriptor_set plugin, this is required as using descriptor_set
+      #   requires a file to be given instead of a directory.
+      file_suffix: jar
+
+      # descriptor_set is special, and uses the --descriptor_set_out flag on protoc.
+      # file_suffix is required, and the options include_imports and include_source_info
+      # can be optionally set to add the flags --include_imports and --include_source-info.
+      # The include_imports and include_source_info options are not valid for any
+      # other plugin name.
+    - name: descriptor_set
+      output: ../../.gen/proto/descriptor
+      file_suffix: bin
+      include_imports: true
+      include_source_info: true

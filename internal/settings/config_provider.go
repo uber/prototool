@@ -239,11 +239,25 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			relPath = plugin.Output
 			absPath = filepath.Clean(filepath.Join(dirPath, relPath))
 		}
+		if plugin.FileSuffix != "" && plugin.FileSuffix[0] == '.' {
+			return Config{}, fmt.Errorf("file_suffix begins with '.' but should not include the '.': %s", plugin.FileSuffix)
+		}
+		if plugin.Name != "descriptor_set" {
+			if plugin.IncludeImports {
+				return Config{}, fmt.Errorf("include_imports is only valid for the descriptor_set plugin but set on %q", plugin.Name)
+			}
+			if plugin.IncludeSourceInfo {
+				return Config{}, fmt.Errorf("include_source_info is only valid for the descriptor_set plugin but set on %q", plugin.Name)
+			}
+		}
 		genPlugins[i] = GenPlugin{
-			Name:  plugin.Name,
-			Path:  plugin.Path,
-			Type:  genPluginType,
-			Flags: plugin.Flags,
+			Name:              plugin.Name,
+			Path:              plugin.Path,
+			Type:              genPluginType,
+			Flags:             plugin.Flags,
+			FileSuffix:        plugin.FileSuffix,
+			IncludeImports:    plugin.IncludeImports,
+			IncludeSourceInfo: plugin.IncludeSourceInfo,
 			OutputPath: OutputPath{
 				RelPath: relPath,
 				AbsPath: absPath,
@@ -287,6 +301,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		Lint: LintConfig{
 			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
 			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 		},

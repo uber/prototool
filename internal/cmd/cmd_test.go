@@ -96,6 +96,13 @@ func TestCompile(t *testing.T) {
 	)
 	assertDoCompileFiles(
 		t,
+		false,
+		false,
+		`testdata/compile/recursive/one.proto:1:1:File recursively imports itself one.proto -> two.proto -> one.proto.`,
+		"testdata/compile/recursive/one.proto",
+	)
+	assertDoCompileFiles(
+		t,
 		true,
 		false,
 		``,
@@ -144,6 +151,18 @@ func TestLint(t *testing.T) {
 		true,
 		"",
 		"testdata/lint/version2",
+	)
+	assertDoLintFile(
+		t,
+		true,
+		"",
+		"../../etc/style/google",
+	)
+	assertDoLintFile(
+		t,
+		true,
+		"",
+		"../../etc/style/uber",
 	)
 	assertDoLintFile(
 		t,
@@ -624,10 +643,6 @@ func TestVersionJSON(t *testing.T) {
 	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
-func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, 0, "all\ndefault", "list-all-lint-groups")
-}
-
 func TestDescriptorProto(t *testing.T) {
 	assertExact(
 		t,
@@ -731,10 +746,20 @@ func TestServiceDescriptorProto(t *testing.T) {
 
 func TestListLinters(t *testing.T) {
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters")
+	assertLinters(t, lint.UberLinters, "lint", "--list-linters")
 }
 
 func TestListAllLinters(t *testing.T) {
 	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters")
+}
+
+func TestListAllLintGroups(t *testing.T) {
+	assertExact(t, 0, "google\nuber", "lint", "--list-all-lint-groups")
+}
+
+func TestListLintGroup(t *testing.T) {
+	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google")
+	assertLinters(t, lint.UberLinters, "lint", "--list-lint-group", "uber")
 }
 
 func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {

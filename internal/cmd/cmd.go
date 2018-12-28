@@ -125,8 +125,6 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 		rootCmd.AddCommand(descriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		rootCmd.AddCommand(fieldDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		rootCmd.AddCommand(jsonToBinaryCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(listAllLintGroupsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(listLintGroupCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		rootCmd.AddCommand(serviceDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		flags.bindPrintFields(rootCmd.PersistentFlags())
 	}
