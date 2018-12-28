@@ -189,7 +189,21 @@ func (c *compiler) ProtocCommands(protoSet *file.ProtoSet) ([]string, error) {
 func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 	genDirs := make(map[string]struct{})
 	for _, genPlugin := range protoSet.Config.Gen.Plugins {
-		genDirs[genPlugin.OutputPath.AbsPath] = struct{}{}
+		baseOutputPath := genPlugin.OutputPath.AbsPath
+		// If there is no single output file, protoc plugins take care of making
+		// sub-directories, so we only need to make the base directory.
+		// Otherwise, we need to make all sub-directories of the output file.
+		if genPlugin.FileSuffix == "" {
+			genDirs[baseOutputPath] = struct{}{}
+		} else {
+			for dirPath := range protoSet.DirPathToFiles {
+				relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
+				if err != nil {
+					return err
+				}
+				genDirs[filepath.Dir(filepath.Join(baseOutputPath, relOutputFilePath))] = struct{}{}
+			}
+		}
 	}
 	for genDir := range genDirs {
 		// we could choose a different permission set, but this seems reasonable
@@ -432,14 +446,38 @@ func getPluginFlagSet(protoSet *file.ProtoSet, dirPath string, genPlugin setting
 	if err != nil {
 		return nil, err
 	}
-	flagSet := []string{fmt.Sprintf("--%s_out=%s", genPlugin.Name, genPlugin.OutputPath.AbsPath)}
+	outputPath := genPlugin.OutputPath.AbsPath
+	if genPlugin.FileSuffix != "" {
+		relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
+		if err != nil {
+			return nil, err
+		}
+		outputPath = filepath.Join(outputPath, relOutputFilePath)
+	}
+	flagSet := []string{fmt.Sprintf("--%s_out=%s", genPlugin.Name, outputPath)}
 	if len(protoFlags) > 0 {
-		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, genPlugin.OutputPath.AbsPath)}
+		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, outputPath)}
 	}
 	if genPlugin.Path != "" {
 		flagSet = append(flagSet, fmt.Sprintf("--plugin=protoc-gen-%s=%s", genPlugin.Name, genPlugin.Path))
 	}
+	if genPlugin.IncludeImports {
+		flagSet = append(flagSet, "--include_imports")
+	}
+	if genPlugin.IncludeSourceInfo {
+		flagSet = append(flagSet, "--include_source_info")
+	}
 	return flagSet, nil
+}
+
+func getRelOutputFilePath(protoSet *file.ProtoSet, dirPath string, fileSuffix string) (string, error) {
+	relPath, err := filepath.Rel(protoSet.Config.DirPath, dirPath)
+	if err != nil {
+		// if we cannot find the relative path, we have a real problem
+		// this should never happen, but could in a bad case with links
+		return "", fmt.Errorf("could not find relative path for %q to %q, this is a system error, please file a bug at github.com/uber/prototool/issues/new: %v", dirPath, protoSet.Config.DirPath, err)
+	}
+	return filepath.Join(relPath, filepath.Base(relPath)+"."+fileSuffix), nil
 }
 
 // the return value corresponds to CodeGeneratorRequest.Parameter

@@ -153,7 +153,27 @@ protoc:
 {{.V}}      output: ../../.gen/proto/go
 
 {{.V}}    - name: java
-{{.V}}      output: ../../.gen/proto/java`))
+{{.V}}      output: ../../.gen/proto/java
+
+      # Optional file suffix for plugins that output a single file as opposed
+      # to writing a set of files to a directory. This is only valid in two
+      # known cases:
+      # - For the java plugin, set this to "jar" to produce jars
+      #   https://developers.google.com/protocol-buffers/docs/reference/java-generated#invocation
+      # - For the descriptor_set plugin, this is required as using descriptor_set
+      #   requires a file to be given instead of a directory.
+{{.V}}      file_suffix: jar
+
+      # descriptor_set is special, and uses the --descriptor_set_out flag on protoc.
+      # file_suffix is required, and the options include_imports and include_source_info
+      # can be optionally set to add the flags --include_imports and --include_source-info.
+      # The include_imports and include_source_info options are not valid for any
+      # other plugin name.
+{{.V}}    - name: descriptor_set
+{{.V}}      output: ../../.gen/proto/descriptor
+{{.V}}      file_suffix: bin
+{{.V}}      include_imports: true
+{{.V}}      include_source_info: true`))
 
 type tmplData struct {
 	V             string
