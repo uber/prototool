@@ -380,7 +380,11 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
-		`11:3:MESSAGE_FIELDS_NO_JSON_NAME`,
+		`11:3:MESSAGE_FIELDS_NO_JSON_NAME
+		12:12:MESSAGE_FIELDS_NO_JSON_NAME
+		13:3:MESSAGE_FIELDS_NO_JSON_NAME
+		15:5:MESSAGE_FIELDS_NO_JSON_NAME
+		16:5:MESSAGE_FIELDS_NO_JSON_NAME`,
 		"testdata/lint/nojsonname/foo.proto",
 	)
 

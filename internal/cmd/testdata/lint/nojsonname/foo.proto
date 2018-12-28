@@ -9,4 +9,10 @@ option java_package = "com.foo";
 
 message Foo {
   int64 one = 1 [json_name = "test"];
+  repeated int64 two = 2 [json_name = "test"];
+  map<int64, int64> three = 3 [json_name = "test"];
+  oneof oneof_foo {
+    int64 four = 4 [json_name = "test"];
+    int64 five = 5 [json_name = "test"];
+  }
 }
