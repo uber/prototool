@@ -62,6 +62,7 @@ var (
 		fileOptionsUnsetJavaMultipleFilesLinter,
 		fileOptionsUnsetJavaOuterClassnameLinter,
 		messageFieldsNotFloatsLinter,
+		messageFieldsNoJSONNameLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
 		messageFieldNamesLowercaseLinter,
 		messageNamesCamelCaseLinter,

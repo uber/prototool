@@ -377,6 +377,12 @@ func TestLint(t *testing.T) {
 		`5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
 		"testdata/lint/gopackagelongform/gopackagelongform.proto",
 	)
+	assertDoLintFile(
+		t,
+		false,
+		`11:3:MESSAGE_FIELDS_NO_JSON_NAME`,
+		"testdata/lint/nojsonname/foo.proto",
+	)
 
 	assertDoLintFile(
 		t,
