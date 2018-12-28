@@ -678,34 +678,6 @@ func TestInspectPackage(t *testing.T) {
 	assertExact(
 		t,
 		0,
-		`Name:  foo
-Deps:
-  - bar
-  - google.protobuf`,
-		"inspect", "package", "testdata/foo", "--name", "foo",
-	)
-	assertExact(
-		t,
-		0,
-		`Name:  bar
-Importers:
-  - foo`,
-		"inspect", "package", "testdata/foo", "--name", "bar",
-	)
-	assertExact(
-		t,
-		0,
-		`Name:  google.protobuf
-Importers:
-  - foo`,
-		"inspect", "package", "testdata/foo", "--name", "google.protobuf",
-	)
-}
-
-func TestInspectPackageJSON(t *testing.T) {
-	assertExact(
-		t,
-		0,
 		`{
   "name": "foo",
   "deps": [
@@ -713,7 +685,7 @@ func TestInspectPackageJSON(t *testing.T) {
     "google.protobuf"
   ]
 }`,
-		"inspect", "package", "testdata/foo", "--name", "foo", "--json",
+		"inspect", "package", "testdata/foo", "--name", "foo",
 	)
 	assertExact(
 		t,
@@ -724,7 +696,7 @@ func TestInspectPackageJSON(t *testing.T) {
     "foo"
   ]
 }`,
-		"inspect", "package", "testdata/foo", "--name", "bar", "--json",
+		"inspect", "package", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
@@ -735,7 +707,7 @@ func TestInspectPackageJSON(t *testing.T) {
     "foo"
   ]
 }`,
-		"inspect", "package", "testdata/foo", "--name", "google.protobuf", "--json",
+		"inspect", "package", "testdata/foo", "--name", "google.protobuf",
 	)
 }
 

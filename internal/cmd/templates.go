@@ -360,14 +360,13 @@ $ cat input.json | prototool grpc example \
 
 	inspectPackageCmdTemplate = &cmdTemplate{
 		Use:   "package [dirOrFile]",
-		Short: "Print the given package. Be sure to set the required flag name.",
+		Short: "Print the given package in JSON format. Be sure to set the required flag name.",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.InspectPackage(args, flags.name)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindConfigData(flagSet)
-			flags.bindJSON(flagSet)
 			flags.bindName(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)

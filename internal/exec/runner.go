@@ -688,42 +688,11 @@ func (r *runner) InspectPackage(args []string, name string) error {
 	if !ok {
 		return fmt.Errorf("package not found: %s", name)
 	}
-	if r.json {
-		data, err := json.MarshalIndent(pkg, "", "  ")
-		if err != nil {
-			return err
-		}
-		if err := r.println(string(data)); err != nil {
-			return err
-		}
-	} else {
-		tabWriter := newTabWriter(r.output)
-		if _, err := fmt.Fprintf(tabWriter, "Name:\t%s\n", pkg.Name); err != nil {
-			return err
-		}
-		if len(pkg.Deps) > 0 {
-			if _, err := fmt.Fprintf(tabWriter, "Deps:\n"); err != nil {
-				return err
-			}
-			for _, dep := range pkg.Deps {
-				if _, err := fmt.Fprintf(tabWriter, "\t- %s\n", dep); err != nil {
-					return err
-				}
-			}
-		}
-		if len(pkg.Importers) > 0 {
-			if _, err := fmt.Fprintf(tabWriter, "Importers:\n"); err != nil {
-				return err
-			}
-			for _, importer := range pkg.Importers {
-				if _, err := fmt.Fprintf(tabWriter, "\t- %s\n", importer); err != nil {
-					return err
-				}
-			}
-		}
-		return tabWriter.Flush()
+	data, err := json.MarshalIndent(pkg, "", "  ")
+	if err != nil {
+		return err
 	}
-	return nil
+	return r.println(string(data))
 }
 
 func (r *runner) InspectPackageDeps(args []string, name string) error {
