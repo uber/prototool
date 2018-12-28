@@ -232,6 +232,15 @@ type GenPlugin struct {
 	// The path to output to.
 	// Must be relative in a config file.
 	OutputPath OutputPath
+	// If set, the output path will be set to "$OUTPUT_PATH/$(basename $OUTPUT_PATH).$FILE_SUFFIX"
+	// Used for e.g. JAR generation for java or descriptor_set file name.
+	FileSuffix string
+	// Add the --include_imports flags to protoc.
+	// Only valid if Name is descriptor_set.
+	IncludeImports bool
+	// Add the --include_source_info flags to protoc.
+	// Only valid if Name is descriptor_set.
+	IncludeSourceInfo bool
 }
 
 // OutputPath is an output path.
@@ -279,11 +288,14 @@ type ExternalConfig struct {
 			ExtraModifiers map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`
 		} `json:"go_options,omitempty" yaml:"go_options,omitempty"`
 		Plugins []struct {
-			Name   string `json:"name,omitempty" yaml:"name,omitempty"`
-			Type   string `json:"type,omitempty" yaml:"type,omitempty"`
-			Flags  string `json:"flags,omitempty" yaml:"flags,omitempty"`
-			Output string `json:"output,omitempty" yaml:"output,omitempty"`
-			Path   string `json:"path,omitempty" yaml:"path,omitempty"`
+			Name              string `json:"name,omitempty" yaml:"name,omitempty"`
+			Type              string `json:"type,omitempty" yaml:"type,omitempty"`
+			Flags             string `json:"flags,omitempty" yaml:"flags,omitempty"`
+			Output            string `json:"output,omitempty" yaml:"output,omitempty"`
+			Path              string `json:"path,omitempty" yaml:"path,omitempty"`
+			FileSuffix        string `json:"file_suffix,omitempty" yaml:"file_suffix,omitempty"`
+			IncludeImports    bool   `json:"include_imports,omitempty" yaml:"include_imports,omitempty"`
+			IncludeSourceInfo bool   `json:"include_source_info,omitempty" yaml:"include_source_info,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"generate,omitempty" yaml:"generate,omitempty"`
 }
