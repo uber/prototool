@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -112,18 +112,19 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(lintCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(versionCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
+	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(inspectCmd)
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())
 
 	if develMode {
-		rootCmd.AddCommand(binaryToJSONCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		rootCmd.AddCommand(cleanCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(descriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 		rootCmd.AddCommand(downloadCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(fieldDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(jsonToBinaryCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(serviceDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 
 		// we may or may not want to expose these to users
 		// but will not build them into the binary for v1.0

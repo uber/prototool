@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,15 +53,14 @@ type Runner interface {
 	Files(args []string) error
 	Compile(args []string, dryRun bool) error
 	Gen(args []string, dryRun bool) error
-	DescriptorProto(args []string) error
-	FieldDescriptorProto(args []string) error
-	ServiceDescriptorProto(args []string) error
 	Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string) error
 	Format(args []string, overwrite, diffMode, lintMode, fix bool) error
-	BinaryToJSON(args []string) error
-	JSONToBinary(args []string) error
 	All(args []string, disableFormat, disableLint, fix bool) error
 	GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool) error
+	InspectPackages(args []string) error
+	InspectPackage(args []string, name string) error
+	InspectPackageDeps(args []string, name string) error
+	InspectPackageImporters(args []string, name string) error
 }
 
 // RunnerOption is an option for a new Runner.

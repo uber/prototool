@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/desc"
-	"github.com/uber/prototool/internal/extract"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -46,8 +45,6 @@ type handler struct {
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
 	headers        []string
-
-	getter extract.Getter
 }
 
 func newHandler(options ...HandlerOption) *handler {
@@ -63,10 +60,6 @@ func newHandler(options ...HandlerOption) *handler {
 	if handler.connectTimeout == 0 {
 		handler.connectTimeout = DefaultConnectTimeout
 	}
-	// TODO(pedge): composition
-	handler.getter = extract.NewGetter(
-		extract.GetterWithLogger(handler.logger),
-	)
 	return handler
 }
 
@@ -141,11 +134,11 @@ func (h *handler) getDescriptorSourceForMethod(fileDescriptorSets []*descriptor.
 	if err != nil {
 		return nil, err
 	}
-	service, err := h.getter.GetService(fileDescriptorSets, servicePath)
+	serviceInfo, err := getServiceInfo(fileDescriptorSets, servicePath)
 	if err != nil {
 		return nil, err
 	}
-	fileDescriptorSet, err := desc.SortFileDescriptorSet(service.FileDescriptorSet, service.FileDescriptorProto)
+	fileDescriptorSet, err := desc.SortFileDescriptorSet(serviceInfo.FileDescriptorSet, serviceInfo.FileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}
@@ -169,4 +162,71 @@ func decodeFunc(reader io.Reader) func(proto.Message) error {
 		}
 		return jsonpb.Unmarshal(bytes.NewReader(rawMessage), message)
 	}
+}
+
+type serviceInfo struct {
+	ServiceDescriptorProto *descriptor.ServiceDescriptorProto
+	FileDescriptorProto    *descriptor.FileDescriptorProto
+	FileDescriptorSet      *descriptor.FileDescriptorSet
+}
+
+func getServiceInfo(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*serviceInfo, error) {
+	if len(path) == 0 {
+		return nil, fmt.Errorf("empty path")
+	}
+	if path[0] == '.' {
+		path = path[1:]
+	}
+	var serviceDescriptorProto *descriptor.ServiceDescriptorProto
+	var fileDescriptorProto *descriptor.FileDescriptorProto
+	var fileDescriptorSet *descriptor.FileDescriptorSet
+	for _, iFileDescriptorSet := range fileDescriptorSets {
+		for _, iFileDescriptorProto := range iFileDescriptorSet.File {
+			iServiceDescriptorProto, err := findServiceDescriptorProto(path, iFileDescriptorProto)
+			if err != nil {
+				return nil, err
+			}
+			if iServiceDescriptorProto != nil {
+				if serviceDescriptorProto != nil {
+					return nil, fmt.Errorf("duplicate services for path %s", path)
+				}
+				serviceDescriptorProto = iServiceDescriptorProto
+				fileDescriptorProto = iFileDescriptorProto
+			}
+		}
+		// return first fileDescriptorSet that matches
+		// as opposed to duplicate check within fileDescriptorSet, we easily could
+		// have multiple fileDescriptorSets that match
+		if serviceDescriptorProto != nil {
+			fileDescriptorSet = iFileDescriptorSet
+			break
+		}
+	}
+	if serviceDescriptorProto == nil {
+		return nil, fmt.Errorf("no service for path %s", path)
+	}
+	return &serviceInfo{
+		ServiceDescriptorProto: serviceDescriptorProto,
+		FileDescriptorProto:    fileDescriptorProto,
+		FileDescriptorSet:      fileDescriptorSet,
+	}, nil
+}
+
+func findServiceDescriptorProto(path string, fileDescriptorProto *descriptor.FileDescriptorProto) (*descriptor.ServiceDescriptorProto, error) {
+	if fileDescriptorProto.GetPackage() == "" {
+		return nil, fmt.Errorf("no package on FileDescriptorProto")
+	}
+	if !strings.HasPrefix(path, fileDescriptorProto.GetPackage()) {
+		return nil, nil
+	}
+	var foundServiceDescriptorProto *descriptor.ServiceDescriptorProto
+	for _, serviceDescriptorProto := range fileDescriptorProto.GetService() {
+		if fileDescriptorProto.GetPackage()+"."+serviceDescriptorProto.GetName() == path {
+			if foundServiceDescriptorProto != nil {
+				return nil, fmt.Errorf("duplicate services for path %s", path)
+			}
+			foundServiceDescriptorProto = serviceDescriptorProto
+		}
+	}
+	return foundServiceDescriptorProto, nil
 }
