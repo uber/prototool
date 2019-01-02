@@ -1,5 +1,5 @@
-SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/)
-PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb)
+SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/ | grep -v \/gen\/uber\/proto\/reflect\/)
+PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb | grep -v \/gen\/uber\/proto\/reflect\/)
 BINS := ./cmd/prototool
 
 DOCKER_IMAGE := golang:1.11.4
@@ -69,7 +69,10 @@ example: install
 
 .PHONY: internalgen
 internalgen: install
+	rm -rf internal/cmd/testdata/grpc/gen
 	prototool generate internal/cmd/testdata/grpc
+	rm -rf internal/reflect/gen
+	prototool all internal/reflect
 	rm -f etc/config/example/prototool.yaml
 	prototool config init etc/config/example --uncomment
 

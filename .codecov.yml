@@ -16,3 +16,4 @@ ignore:
   - /example/gen/proto/go/foo
   - /example/gen/proto/go/sub
   - /internal/cmd/testdata/grpc/gen/grpcpb
+  - /internal/reflect/gen/uber/proto/reflect

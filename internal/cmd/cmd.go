@@ -118,7 +118,6 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	rootCmd.AddCommand(cacheCmd)
 	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
 	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	inspectCmd.AddCommand(inspectPackageCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(inspectCmd)

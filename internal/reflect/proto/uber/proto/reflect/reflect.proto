@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package uber.proto.reflect;
+
+option go_package = "reflectpb";
+option java_multiple_files = true;
+option java_outer_classname = "ReflectProto";
+option java_package = "com.uber.proto.reflect";
+
+// PackageSet is a set of Packages.
+message PackageSet {
+  // packages contains the set of Packages.
+  //
+  // These will all be unique, and can be referenced by their name field.
+  // These will also be sorted by name.
+  repeated Package packages = 1;
+}
+
+// Package describes a Protobuf package, constructed from a set of Protobuf
+// files that have the same "package" value.
+message Package {
+  // name is the fully-qualified name of the package.
+  //
+  // The package name can be thought of as the unique identifier for a
+  // Package message, and is used as a reference.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name.
+  string name = 1;
+  // dependency_names contains the names of this packages' dependencies.
+  //
+  // These will be sorted.
+  // If you have a set of Package messages, this will correspond to the name
+  // field of other Packages in the set.
+  repeated string dependency_names = 2;
+}

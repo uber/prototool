@@ -18,33 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package extract
+package reflect
 
 import (
 	"bytes"
 	"fmt"
+	"sort"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	reflectpb "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect"
 	"github.com/uber/prototool/internal/strs"
-	"go.uber.org/zap"
 )
 
-type getter struct {
-	logger *zap.Logger
-}
-
-func newGetter(options ...GetterOption) *getter {
-	getter := &getter{
-		logger: zap.NewNop(),
-	}
-	for _, option := range options {
-		option(getter)
-	}
-	return getter
-}
-
-func (g *getter) GetPackageSet(fileDescriptorSets []*descriptor.FileDescriptorSet) (*PackageSet, error) {
+// NewPackageSet returns a new valid PackageSet for the given
+// FileDescriptorSets.
+//
+// The FileDescriptorSets can have FileDescriptorProtos with the same name, but
+// they must be equal.
+func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectpb.PackageSet, error) {
 	packageNameToFileNameToFileDescriptorProto, err := getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets)
 	if err != nil {
 		return nil, err
@@ -53,12 +45,10 @@ func (g *getter) GetPackageSet(fileDescriptorSets []*descriptor.FileDescriptorSe
 	if err != nil {
 		return nil, err
 	}
-	packageSet := &PackageSet{
-		nameToPackage: make(map[string]*Package),
-	}
+	packageNameToPackage := make(map[string]*reflectpb.Package)
 	for packageName := range packageNameToFileNameToFileDescriptorProto {
-		packageSet.nameToPackage[packageName] = &Package{
-			name: packageName,
+		packageNameToPackage[packageName] = &reflectpb.Package{
+			Name: packageName,
 		}
 	}
 	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
@@ -69,16 +59,21 @@ func (g *getter) GetPackageSet(fileDescriptorSets []*descriptor.FileDescriptorSe
 					return nil, fmt.Errorf("no package for dep %s", depFileName)
 				}
 				if depPackageName != packageName {
-					packageSet.nameToPackage[packageName].deps = append(packageSet.nameToPackage[packageName].deps, depPackageName)
-					packageSet.nameToPackage[depPackageName].importers = append(packageSet.nameToPackage[depPackageName].importers, packageName)
+					packageNameToPackage[packageName].DependencyNames = append(packageNameToPackage[packageName].DependencyNames, depPackageName)
 				}
 			}
 		}
 	}
-	for _, pkg := range packageSet.nameToPackage {
-		pkg.deps = strs.DedupeSort(pkg.deps, nil)
-		pkg.importers = strs.DedupeSort(pkg.importers, nil)
+	for _, pkg := range packageNameToPackage {
+		pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
 	}
+	packageSet := &reflectpb.PackageSet{
+		Packages: make([]*reflectpb.Package, 0, len(packageNameToPackage)),
+	}
+	for _, pkg := range packageNameToPackage {
+		packageSet.Packages = append(packageSet.Packages, pkg)
+	}
+	sort.Sort(sortPackages(packageSet.Packages))
 	return packageSet, nil
 }
 
@@ -138,4 +133,21 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 		}
 	}
 	return fileNameToPackageName, nil
+}
+
+type sortPackages []*reflectpb.Package
+
+func (s sortPackages) Len() int          { return len(s) }
+func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }
+func (s sortPackages) Less(i int, j int) bool {
+	if s[i] == nil && s[j] == nil {
+		return false
+	}
+	if s[i] == nil && s[j] != nil {
+		return true
+	}
+	if s[i] != nil && s[j] == nil {
+		return false
+	}
+	return s[i].Name < s[j].Name
 }

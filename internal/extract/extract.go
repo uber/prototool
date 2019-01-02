@@ -18,138 +18,84 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Package extract is used to extract elements from FileDescriptorSets created
-// from internal/protoc, for use in json-to-binary and back conversion, and for
-// use for gRPC.
+// Package extract is used to extract elements from reflect PackageSets.
 package extract
 
 import (
-	"sort"
+	"fmt"
 
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"go.uber.org/zap"
+	reflectpb "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect"
 )
 
-// PackageSet is a set of extracted packages.
+// PackageSet is the Golang wrapper for the Protobuf PackageSet object.
 type PackageSet struct {
-	// Map from fully-qualified name to package.
-	// Fully-qualified name does not include prefix '.'.
-	nameToPackage map[string]*Package
+	protoMessage *reflectpb.PackageSet
+
+	packageNameToPackage map[string]*Package
 }
 
-// Packages returns the list of packages sorted by name.
-func (p *PackageSet) Packages() []*Package {
-	packages := make([]*Package, 0, len(p.nameToPackage))
-	for _, pkg := range p.nameToPackage {
-		packages = append(packages, pkg)
-	}
-	sort.Stable(sortPackages(packages))
-	return packages
+// ProtoMessage returns the underlying Protobuf messge.
+func (p *PackageSet) ProtoMessage() *reflectpb.PackageSet {
+	return p.protoMessage
 }
 
-// GetPackage returns the package for the fully-qualified name without
-// the prefix '.', if it exists.
-func (p *PackageSet) GetPackage(name string) (*Package, bool) {
-	pkg, ok := p.nameToPackage[name]
-	return pkg, ok
+// PackageNameToPackage returns a map from package name to Package.
+func (p *PackageSet) PackageNameToPackage() map[string]*Package {
+	return p.packageNameToPackage
 }
 
-// Package is an extracted package.
+// Package is the Golang wrapper for the Protobuf Package object.
 type Package struct {
-	// Fully-qualified name does not include prefix '.'.
-	name string
-	// The fully-qualified names of the direct dependencies.
-	// For recursive dependencies, look these names up in the Packages struct.
-	deps []string
-	// The fully-qualified names of the importers.
-	// For recursive importers, look these names up in the Packages struct.
-	importers []string
+	protoMessage *reflectpb.Package
+
+	packageSet                 *PackageSet
+	dependencyNameToDependency map[string]*Package
+	importerNameToImporter     map[string]*Package
 }
 
-// ExternalPackage is the external representation of a Package.
-type ExternalPackage struct {
-	Name      string   `json:"name,omitempty" yaml:"name,omitempty"`
-	Deps      []string `json:"deps,omitempty" yaml:"deps,omitempty"`
-	Importers []string `json:"importers,omitempty" yaml:"importers,omitempty"`
+// ProtoMessage returns the underlying Protobuf messge.
+func (p *Package) ProtoMessage() *reflectpb.Package {
+	return p.protoMessage
 }
 
-// Name returns the fully-qualified name.
-func (p *Package) Name() string {
-	return p.name
+// PackageSet returns the parent PackageSet.
+func (p *Package) PackageSet() *PackageSet {
+	return p.packageSet
 }
 
-// Deps returns the dependency package names.
-func (p *Package) Deps() []string {
-	return p.deps
+// DependencyNameToDependency returns the direct dependencies of the given Package.
+func (p *Package) DependencyNameToDependency() map[string]*Package {
+	return p.dependencyNameToDependency
 }
 
-// Importers returns the importer package names.
-func (p *Package) Importers() []string {
-	return p.importers
+// ImporterNameToImporter returns the direct importers of the given Package.
+func (p *Package) ImporterNameToImporter() map[string]*Package {
+	return p.importerNameToImporter
 }
 
-// ToExternalPackage converts a Package to an ExternalPackage.
-func (p *Package) ToExternalPackage() *ExternalPackage {
-	if p == nil {
-		return nil
+// NewPackageSet returns a new PackageSet for the given reflect PackageSet.
+func NewPackageSet(protoMessage *reflectpb.PackageSet) (*PackageSet, error) {
+	packageSet := &PackageSet{
+		protoMessage:         protoMessage,
+		packageNameToPackage: make(map[string]*Package),
 	}
-	return &ExternalPackage{
-		Name:      p.Name(),
-		Deps:      copyStringSlice(p.Deps()),
-		Importers: copyStringSlice(p.Importers()),
+	for _, pkg := range packageSet.protoMessage.Packages {
+		packageSet.packageNameToPackage[pkg.Name] = &Package{
+			protoMessage:               pkg,
+			packageSet:                 packageSet,
+			dependencyNameToDependency: make(map[string]*Package),
+			importerNameToImporter:     make(map[string]*Package),
+		}
 	}
-}
-
-// Getter extracts elements.
-//
-// Paths can begin with ".".
-// The first FileDescriptorSet with a match will be returned.
-type Getter interface {
-	// Get the package set.
-	GetPackageSet(fileDescriptorSets []*descriptor.FileDescriptorSet) (*PackageSet, error)
-}
-
-// GetterOption is an option for a new Getter.
-type GetterOption func(*getter)
-
-// GetterWithLogger returns a GetterOption that uses the given logger.
-//
-// The default is to use zap.NewNop().
-func GetterWithLogger(logger *zap.Logger) GetterOption {
-	return func(getter *getter) {
-		getter.logger = logger
+	for packageName, pkg := range packageSet.packageNameToPackage {
+		for _, dependencyName := range pkg.protoMessage.DependencyNames {
+			dependency, ok := packageSet.packageNameToPackage[dependencyName]
+			if !ok {
+				return nil, fmt.Errorf("no package for name %s", dependencyName)
+			}
+			pkg.dependencyNameToDependency[dependencyName] = dependency
+			dependency.importerNameToImporter[packageName] = pkg
+		}
 	}
-}
-
-// NewGetter returns a new Getter.
-func NewGetter(options ...GetterOption) Getter {
-	return newGetter(options...)
-}
-
-type sortPackages []*Package
-
-func (s sortPackages) Len() int          { return len(s) }
-func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }
-func (s sortPackages) Less(i int, j int) bool {
-	if s[i] == nil && s[j] == nil {
-		return false
-	}
-	if s[i] == nil && s[j] != nil {
-		return true
-	}
-	if s[i] != nil && s[j] == nil {
-		return false
-	}
-	return s[i].name < s[j].name
-}
-
-func copyStringSlice(s []string) []string {
-	if s == nil {
-		return nil
-	}
-	c := make([]string, len(s))
-	for i, e := range s {
-		c[i] = e
-	}
-	return c
+	return packageSet, nil
 }
