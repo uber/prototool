@@ -88,7 +88,9 @@ Artifacts are downloaded to the following directories based on flags and environ
 
 - If $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool will be deleted.
 - Otherwise, if on Linux, $HOME/.cache/prototool will be deleted, or on Darwin,
-  $HOME/Library/Caches/prototool will be deleted.`,
+  $HOME/Library/Caches/prototool will be deleted.
+  
+  This will not delete any custom caches created using the --cache-path option.`,
 		Args: cobra.NoArgs,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.CacheDelete()
