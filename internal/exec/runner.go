@@ -48,6 +48,7 @@ import (
 	"github.com/uber/prototool/internal/grpc"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/protoc"
+	"github.com/uber/prototool/internal/reflect"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
@@ -524,90 +525,23 @@ func (r *runner) InspectPackages(args []string) error {
 	if packageSet == nil {
 		return nil
 	}
-	for _, pkg := range packageSet.Packages() {
-		if r.json {
-			data, err := json.MarshalIndent(pkg.ToExternalPackage(), "", "  ")
-			if err != nil {
-				return err
-			}
-			if err := r.println(string(data)); err != nil {
-				return err
-			}
-		} else {
-			if err := r.println(pkg.Name()); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
-func (r *runner) InspectPackage(args []string, name string) error {
-	if name == "" {
-		return newExitErrorf(255, "must set name")
-	}
-	packageSet, err := r.getPackageSet(args)
-	if err != nil {
-		return err
-	}
-	if packageSet == nil {
-		return fmt.Errorf("package not found: %s", name)
-	}
-	pkg, ok := packageSet.GetPackage(name)
-	if !ok {
-		return fmt.Errorf("package not found: %s", name)
-	}
-	data, err := json.MarshalIndent(pkg.ToExternalPackage(), "", "  ")
-	if err != nil {
-		return err
-	}
-	return r.println(string(data))
+	return r.printPackageNames(packageSet.PackageNameToPackage())
 }
 
 func (r *runner) InspectPackageDeps(args []string, name string) error {
-	if name == "" {
-		return newExitErrorf(255, "must set name")
-	}
-	packageSet, err := r.getPackageSet(args)
+	pkg, err := r.getPackage(args, name)
 	if err != nil {
 		return err
 	}
-	if packageSet == nil {
-		return fmt.Errorf("package not found: %s", name)
-	}
-	pkg, ok := packageSet.GetPackage(name)
-	if !ok {
-		return fmt.Errorf("package not found: %s", name)
-	}
-	for _, dep := range pkg.Deps() {
-		if err := r.println(dep); err != nil {
-			return err
-		}
-	}
-	return nil
+	return r.printPackageNames(pkg.DependencyNameToDependency())
 }
 
 func (r *runner) InspectPackageImporters(args []string, name string) error {
-	if name == "" {
-		return newExitErrorf(255, "must set name")
-	}
-	packageSet, err := r.getPackageSet(args)
+	pkg, err := r.getPackage(args, name)
 	if err != nil {
 		return err
 	}
-	if packageSet == nil {
-		return fmt.Errorf("package not found: %s", name)
-	}
-	pkg, ok := packageSet.GetPackage(name)
-	if !ok {
-		return fmt.Errorf("package not found: %s", name)
-	}
-	for _, importer := range pkg.Importers() {
-		if err := r.println(importer); err != nil {
-			return err
-		}
-	}
-	return nil
+	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
 func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
@@ -623,7 +557,38 @@ func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
 	if len(fileDescriptorSets) == 0 {
 		return nil, fmt.Errorf("no FileDescriptorSets returned")
 	}
-	return r.newGetter().GetPackageSet(fileDescriptorSets)
+	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
+	if err != nil {
+		return nil, err
+	}
+	return extract.NewPackageSet(reflectPackageSet)
+}
+
+func (r *runner) getPackage(args []string, name string) (*extract.Package, error) {
+	if name == "" {
+		return nil, newExitErrorf(255, "must set name")
+	}
+	packageSet, err := r.getPackageSet(args)
+	if err != nil {
+		return nil, err
+	}
+	if packageSet == nil {
+		return nil, fmt.Errorf("package not found: %s", name)
+	}
+	pkg, ok := packageSet.PackageNameToPackage()[name]
+	if !ok {
+		return nil, fmt.Errorf("package not found: %s", name)
+	}
+	return pkg, nil
+}
+
+func (r *runner) printPackageNames(m map[string]*extract.Package) error {
+	for _, packageName := range extractSortPackageNames(m) {
+		if err := r.println(packageName); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {
@@ -712,12 +677,6 @@ func (r *runner) newTransformer(fix bool) format.Transformer {
 		transformerOptions = append(transformerOptions, format.TransformerWithFix())
 	}
 	return format.NewTransformer(transformerOptions...)
-}
-
-func (r *runner) newGetter() extract.Getter {
-	return extract.NewGetter(
-		extract.GetterWithLogger(r.logger),
-	)
 }
 
 func (r *runner) newCreateHandler(pkg string) create.Handler {
@@ -912,4 +871,15 @@ func moreThanOneSet(values ...bool) bool {
 		}
 	}
 	return numSet > 1
+}
+
+func extractSortPackageNames(m map[string]*extract.Package) []string {
+	s := make([]string, 0, len(m))
+	for key := range m {
+		if key != "" {
+			s = append(s, key)
+		}
+	}
+	sort.Strings(s)
+	return s
 }

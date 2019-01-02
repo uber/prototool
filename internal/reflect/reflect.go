@@ -31,59 +31,12 @@ import (
 	"github.com/uber/prototool/internal/strs"
 )
 
-// PackageSet is the Golang wrapper for the Protobuf PackageSet object.
-type PackageSet struct {
-	protoMessage *reflectpb.PackageSet
-
-	packageNameToPackage map[string]*Package
-}
-
-// ProtoMessage returns the underlying Protobuf messge.
-func (p *PackageSet) ProtoMessage() *reflectpb.PackageSet {
-	return p.protoMessage
-}
-
-// PackageNameToPackage returns a map from package name to Package.
-func (p *PackageSet) PackageNameToPackage() map[string]*Package {
-	return p.packageNameToPackage
-}
-
-// Package is the Golang wrapper for the Protobuf Package object.
-type Package struct {
-	protoMessage *reflectpb.Package
-
-	packageSet *PackageSet
-}
-
-// ProtoMessage returns the underlying Protobuf messge.
-func (p *Package) ProtoMessage() *reflectpb.Package {
-	return p.protoMessage
-}
-
-// PackageSet returns the parent PackageSet.
-func (p *Package) PackageSet() *PackageSet {
-	return p.packageSet
-}
-
-// DependencyNames returns the sorted list of dependencies.
-func (p *Package) DependencyNames() []string {
-	return nil
-}
-
 // NewPackageSet returns a new valid PackageSet for the given
 // FileDescriptorSets.
 //
 // The FileDescriptorSets can have FileDescriptorProtos with the same name, but
 // they must be equal.
-func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*PackageSet, error) {
-	protoMessage, err := newPackageSetProtoMessage(fileDescriptorSets...)
-	if err != nil {
-		return nil, err
-	}
-	return newPackageSetFromProtoMessage(protoMessage), nil
-}
-
-func newPackageSetProtoMessage(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectpb.PackageSet, error) {
+func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectpb.PackageSet, error) {
 	packageNameToFileNameToFileDescriptorProto, err := getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets)
 	if err != nil {
 		return nil, err
@@ -122,24 +75,6 @@ func newPackageSetProtoMessage(fileDescriptorSets ...*descriptor.FileDescriptorS
 	}
 	sort.Sort(sortPackages(packageSet.Packages))
 	return packageSet, nil
-}
-
-func newPackageSetFromProtoMessage(protoMessage *reflectpb.PackageSet) *PackageSet {
-	packageSet := &PackageSet{
-		protoMessage:         protoMessage,
-		packageNameToPackage: make(map[string]*Package),
-	}
-	for _, pkg := range packageSet.protoMessage.Packages {
-		packageSet.packageNameToPackage[pkg.Name] = newPackageFromProtoMessage(pkg, packageSet)
-	}
-	return packageSet
-}
-
-func newPackageFromProtoMessage(protoMessage *reflectpb.Package, packageSet *PackageSet) *Package {
-	return &Package{
-		protoMessage: protoMessage,
-		packageSet:   packageSet,
-	}
 }
 
 func getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets []*descriptor.FileDescriptorSet) (map[string]map[string]*descriptor.FileDescriptorProto, error) {
