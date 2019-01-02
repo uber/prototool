@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -132,6 +132,7 @@ func (s sortPackages) Len() int          { return len(s) }
 func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }
 func (s sortPackages) Less(i int, j int) bool {
 	if s[i] == nil && s[j] == nil {
+		return false
 	}
 	if s[i] == nil && s[j] != nil {
 		return true
