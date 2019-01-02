@@ -647,6 +647,116 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	).Invoke(fileDescriptorSets, address, method, reader, r.output)
 }
 
+func (r *runner) InspectPackages(args []string) error {
+	packageSet, err := r.getPackageSet(args)
+	if err != nil {
+		return err
+	}
+	if packageSet == nil {
+		return nil
+	}
+	for _, pkg := range packageSet.Packages() {
+		if r.json {
+			data, err := json.MarshalIndent(pkg.ToExternalPackage(), "", "  ")
+			if err != nil {
+				return err
+			}
+			if err := r.println(string(data)); err != nil {
+				return err
+			}
+		} else {
+			if err := r.println(pkg.Name()); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (r *runner) InspectPackage(args []string, name string) error {
+	if name == "" {
+		return newExitErrorf(255, "must set name")
+	}
+	packageSet, err := r.getPackageSet(args)
+	if err != nil {
+		return err
+	}
+	if packageSet == nil {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	pkg, ok := packageSet.GetPackage(name)
+	if !ok {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	data, err := json.MarshalIndent(pkg.ToExternalPackage(), "", "  ")
+	if err != nil {
+		return err
+	}
+	return r.println(string(data))
+}
+
+func (r *runner) InspectPackageDeps(args []string, name string) error {
+	if name == "" {
+		return newExitErrorf(255, "must set name")
+	}
+	packageSet, err := r.getPackageSet(args)
+	if err != nil {
+		return err
+	}
+	if packageSet == nil {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	pkg, ok := packageSet.GetPackage(name)
+	if !ok {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	for _, dep := range pkg.Deps() {
+		if err := r.println(dep); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *runner) InspectPackageImporters(args []string, name string) error {
+	if name == "" {
+		return newExitErrorf(255, "must set name")
+	}
+	packageSet, err := r.getPackageSet(args)
+	if err != nil {
+		return err
+	}
+	if packageSet == nil {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	pkg, ok := packageSet.GetPackage(name)
+	if !ok {
+		return fmt.Errorf("package not found: %s", name)
+	}
+	for _, importer := range pkg.Importers() {
+		if err := r.println(importer); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
+	meta, err := r.getMeta(args, 1)
+	if err != nil {
+		return nil, err
+	}
+	r.printAffectedFiles(meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	if err != nil {
+		return nil, err
+	}
+	if len(fileDescriptorSets) == 0 {
+		return nil, fmt.Errorf("no FileDescriptorSets returned")
+	}
+	return r.newGetter().GetPackageSet(fileDescriptorSets)
+}
+
 func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {
 	downloaderOptions := []protoc.DownloaderOption{
 		protoc.DownloaderWithLogger(r.logger),

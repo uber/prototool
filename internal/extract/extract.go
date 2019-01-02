@@ -24,9 +24,81 @@
 package extract
 
 import (
+	"sort"
+
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"go.uber.org/zap"
 )
+
+// PackageSet is a set of extracted packages.
+type PackageSet struct {
+	// Map from fully-qualified name to package.
+	// Fully-qualified name does not include prefix '.'.
+	nameToPackage map[string]*Package
+}
+
+// Packages returns the list of packages sorted by name.
+func (p *PackageSet) Packages() []*Package {
+	packages := make([]*Package, 0, len(p.nameToPackage))
+	for _, pkg := range p.nameToPackage {
+		packages = append(packages, pkg)
+	}
+	sort.Stable(sortPackages(packages))
+	return packages
+}
+
+// GetPackage returns the package for the fully-qualified name without
+// the prefix '.', if it exists.
+func (p *PackageSet) GetPackage(name string) (*Package, bool) {
+	pkg, ok := p.nameToPackage[name]
+	return pkg, ok
+}
+
+// Package is an extracted package.
+type Package struct {
+	// Fully-qualified name does not include prefix '.'.
+	name string
+	// The fully-qualified names of the direct dependencies.
+	// For recursive dependencies, look these names up in the Packages struct.
+	deps []string
+	// The fully-qualified names of the importers.
+	// For recursive importers, look these names up in the Packages struct.
+	importers []string
+}
+
+// ExternalPackage is the external representation of a Package.
+type ExternalPackage struct {
+	Name      string   `json:"name,omitempty" yaml:"name,omitempty"`
+	Deps      []string `json:"deps,omitempty" yaml:"deps,omitempty"`
+	Importers []string `json:"importers,omitempty" yaml:"importers,omitempty"`
+}
+
+// Name returns the fully-qualified name.
+func (p *Package) Name() string {
+	return p.name
+}
+
+// Deps returns the dependency package names.
+func (p *Package) Deps() []string {
+	return p.deps
+}
+
+// Importers returns the importer package names.
+func (p *Package) Importers() []string {
+	return p.importers
+}
+
+// ToExternalPackage converts a Package to an ExternalPackage.
+func (p *Package) ToExternalPackage() *ExternalPackage {
+	if p == nil {
+		return nil
+	}
+	return &ExternalPackage{
+		Name:      p.Name(),
+		Deps:      copyStringSlice(p.Deps()),
+		Importers: copyStringSlice(p.Importers()),
+	}
+}
 
 // Field is an extracted field.
 type Field struct {
@@ -61,6 +133,8 @@ type Service struct {
 // Paths can begin with ".".
 // The first FileDescriptorSet with a match will be returned.
 type Getter interface {
+	// Get the package set.
+	GetPackageSet(fileDescriptorSets []*descriptor.FileDescriptorSet) (*PackageSet, error)
 	// Get the field that matches the path.
 	// Return non-nil value, or error otherwise including if nothing found.
 	GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error)
@@ -87,4 +161,32 @@ func GetterWithLogger(logger *zap.Logger) GetterOption {
 // NewGetter returns a new Getter.
 func NewGetter(options ...GetterOption) Getter {
 	return newGetter(options...)
+}
+
+type sortPackages []*Package
+
+func (s sortPackages) Len() int          { return len(s) }
+func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }
+func (s sortPackages) Less(i int, j int) bool {
+	if s[i] == nil && s[j] == nil {
+		return false
+	}
+	if s[i] == nil && s[j] != nil {
+		return true
+	}
+	if s[i] != nil && s[j] == nil {
+		return false
+	}
+	return s[i].name < s[j].name
+}
+
+func copyStringSlice(s []string) []string {
+	if s == nil {
+		return nil
+	}
+	c := make([]string, len(s))
+	for i, e := range s {
+		c[i] = e
+	}
+	return c
 }

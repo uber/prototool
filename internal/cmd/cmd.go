@@ -112,6 +112,12 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(lintCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(versionCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
+	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(inspectCmd)
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())

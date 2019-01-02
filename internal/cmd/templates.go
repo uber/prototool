@@ -253,7 +253,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 
 	grpcCmdTemplate = &cmdTemplate{
 		Use:   "grpc [dirOrFile]",
-		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
+		Short: "Call a gRPC endpoint. Be sure to set the required flags address, method, and either data or stdin.",
 		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
 
 There is a full example for gRPC in the example directory of Prototool. Run "make init example" to make sure everything is installed and generated.
@@ -336,6 +336,70 @@ $ cat input.json | prototool grpc example \
 			flags.bindKeepaliveTime(flagSet)
 			flags.bindMethod(flagSet)
 			flags.bindStdin(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackagesCmdTemplate = &cmdTemplate{
+		Use:   "packages [dirOrFile]",
+		Short: "List all packages.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackages(args)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindConfigData(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageCmdTemplate = &cmdTemplate{
+		Use:   "package [dirOrFile]",
+		Short: "Print the given package in JSON format. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackage(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindConfigData(flagSet)
+			flags.bindName(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageDepsCmdTemplate = &cmdTemplate{
+		Use:   "package-deps [dirOrFile]",
+		Short: "Print the given package dependencies. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackageDeps(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindConfigData(flagSet)
+			flags.bindName(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageImportersCmdTemplate = &cmdTemplate{
+		Use:   "package-importers [dirOrFile]",
+		Short: "Print the given package importers. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackageImporters(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindConfigData(flagSet)
+			flags.bindName(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)

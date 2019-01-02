@@ -643,6 +643,124 @@ func TestVersionJSON(t *testing.T) {
 	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
+func TestInspectPackages(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`bar
+foo
+google.protobuf`,
+		"inspect", "packages", "testdata/foo",
+	)
+}
+
+func TestInspectPackagesJSON(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "bar",
+  "importers": [
+    "foo"
+  ]
+}
+{
+  "name": "foo",
+  "deps": [
+    "bar",
+    "google.protobuf"
+  ]
+}
+{
+  "name": "google.protobuf",
+  "importers": [
+    "foo"
+  ]
+}`,
+		"inspect", "packages", "testdata/foo", "--json",
+	)
+}
+
+func TestInspectPackage(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "foo",
+  "deps": [
+    "bar",
+    "google.protobuf"
+  ]
+}`,
+		"inspect", "package", "testdata/foo", "--name", "foo",
+	)
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "bar",
+  "importers": [
+    "foo"
+  ]
+}`,
+		"inspect", "package", "testdata/foo", "--name", "bar",
+	)
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "google.protobuf",
+  "importers": [
+    "foo"
+  ]
+}`,
+		"inspect", "package", "testdata/foo", "--name", "google.protobuf",
+	)
+}
+
+func TestInspectPackageDeps(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`bar
+google.protobuf`,
+		"inspect", "package-deps", "testdata/foo", "--name", "foo",
+	)
+	assertExact(
+		t,
+		0,
+		``,
+		"inspect", "package-deps", "testdata/foo", "--name", "bar",
+	)
+	assertExact(
+		t,
+		0,
+		``,
+		"inspect", "package-deps", "testdata/foo", "--name", "google.protobuf",
+	)
+}
+
+func TestInspectPackageImporters(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		``,
+		"inspect", "package-importers", "testdata/foo", "--name", "foo",
+	)
+	assertExact(
+		t,
+		0,
+		`foo`,
+		"inspect", "package-importers", "testdata/foo", "--name", "bar",
+	)
+	assertExact(
+		t,
+		0,
+		`foo`,
+		"inspect", "package-importers", "testdata/foo", "--name", "google.protobuf",
+	)
+}
+
 func TestDescriptorProto(t *testing.T) {
 	assertExact(
 		t,
