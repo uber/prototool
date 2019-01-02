@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -46,6 +46,7 @@ type flags struct {
 	listLintGroup     string
 	lintMode          bool
 	method            string
+	name              string
 	overwrite         bool
 	pkg               string
 	printFields       string
@@ -134,6 +135,10 @@ func (f *flags) bindListLintGroup(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindMethod(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.method, "method", "", "The GRPC method to call in the form package.Service/Method. This is required.")
+}
+
+func (f *flags) bindName(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.name, "name", "", "The package name. This is required.")
 }
 
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
