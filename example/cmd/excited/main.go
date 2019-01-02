@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/uber/prototool/example/gen/proto/go/foo"
+	foopb "github.com/uber/prototool/example/gen/proto/go/foo"
 	"google.golang.org/grpc"
 )
 
