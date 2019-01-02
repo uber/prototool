@@ -100,34 +100,6 @@ func (p *Package) ToExternalPackage() *ExternalPackage {
 	}
 }
 
-// Field is an extracted field.
-type Field struct {
-	*descriptor.FieldDescriptorProto
-
-	FullyQualifiedPath  string
-	DescriptorProto     *descriptor.DescriptorProto
-	FileDescriptorProto *descriptor.FileDescriptorProto
-	FileDescriptorSet   *descriptor.FileDescriptorSet
-}
-
-// Message is an extracted message.
-type Message struct {
-	*descriptor.DescriptorProto
-
-	FullyQualifiedPath  string
-	FileDescriptorProto *descriptor.FileDescriptorProto
-	FileDescriptorSet   *descriptor.FileDescriptorSet
-}
-
-// Service is an extracted service.
-type Service struct {
-	*descriptor.ServiceDescriptorProto
-
-	FullyQualifiedPath  string
-	FileDescriptorProto *descriptor.FileDescriptorProto
-	FileDescriptorSet   *descriptor.FileDescriptorSet
-}
-
 // Getter extracts elements.
 //
 // Paths can begin with ".".
@@ -135,15 +107,6 @@ type Service struct {
 type Getter interface {
 	// Get the package set.
 	GetPackageSet(fileDescriptorSets []*descriptor.FileDescriptorSet) (*PackageSet, error)
-	// Get the field that matches the path.
-	// Return non-nil value, or error otherwise including if nothing found.
-	GetField(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Field, error)
-	// Get the message that matches the path.
-	// Return non-nil value, or error otherwise including if nothing found.
-	GetMessage(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Message, error)
-	// Get the service that matches the path.
-	// Return non-nil value, or error otherwise including if nothing found.
-	GetService(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*Service, error)
 }
 
 // GetterOption is an option for a new Getter.

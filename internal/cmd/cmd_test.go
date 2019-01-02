@@ -452,11 +452,6 @@ func TestGoldenFormat(t *testing.T) {
 	assertGoldenFormat(t, false, true, "testdata/format-fix/foo.proto")
 }
 
-func TestJSONToBinaryToJSON(t *testing.T) {
-	t.Parallel()
-	assertJSONToBinaryToJSON(t, "testdata/foo/success.proto", "foo.Baz", `{"hello":100}`)
-}
-
 func TestCreate(t *testing.T) {
 	t.Parallel()
 	// package override with also matching shorter override "a"
@@ -761,107 +756,6 @@ func TestInspectPackageImporters(t *testing.T) {
 	)
 }
 
-func TestDescriptorProto(t *testing.T) {
-	assertExact(
-		t,
-		0,
-		`{
-  "name": "Baz",
-  "field": [
-    {
-      "name": "hello",
-      "number": 1,
-      "label": "LABEL_OPTIONAL",
-      "type": "TYPE_INT64",
-      "jsonName": "hello"
-    },
-    {
-      "name": "dep",
-      "number": 2,
-      "label": "LABEL_OPTIONAL",
-      "type": "TYPE_MESSAGE",
-      "typeName": ".bar.Dep",
-      "jsonName": "dep"
-    },
-    {
-      "name": "timestamp",
-      "number": 3,
-      "label": "LABEL_OPTIONAL",
-      "type": "TYPE_MESSAGE",
-      "typeName": ".google.protobuf.Timestamp",
-      "jsonName": "timestamp"
-    }
-  ]
-}`,
-		"descriptor-proto", "testdata/foo/success.proto", "foo.Baz",
-	)
-}
-
-func TestFieldDescriptorProto(t *testing.T) {
-	assertExact(
-		t,
-		0,
-		`{
-  "name": "dep",
-  "number": 2,
-  "label": "LABEL_OPTIONAL",
-  "type": "TYPE_MESSAGE",
-  "typeName": ".bar.Dep",
-  "jsonName": "dep"
-}`,
-		"field-descriptor-proto", "testdata/foo/success.proto", "foo.Baz.dep",
-	)
-}
-
-func TestServiceDescriptorProto(t *testing.T) {
-	assertExact(
-		t,
-		0,
-		`{
-  "name": "ExcitedService",
-  "method": [
-    {
-      "name": "Exclamation",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      }
-    },
-    {
-      "name": "ExclamationClientStream",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      },
-      "clientStreaming": true
-    },
-    {
-      "name": "ExclamationServerStream",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      },
-      "serverStreaming": true
-    },
-    {
-      "name": "ExclamationBidiStream",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      },
-      "clientStreaming": true,
-      "serverStreaming": true
-    }
-  ]
-}`,
-		"service-descriptor-proto", "testdata/grpc", "grpc.ExcitedService",
-	)
-}
-
 func TestListLinters(t *testing.T) {
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters")
 	assertLinters(t, lint.UberLinters, "lint", "--list-linters")
@@ -958,14 +852,6 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 	golden, err := ioutil.ReadFile(filePath + ".golden")
 	assert.NoError(t, err)
 	assert.Equal(t, strings.TrimSpace(string(golden)), output)
-}
-
-func assertJSONToBinaryToJSON(t *testing.T, filePath string, messagePath string, jsonData string) {
-	stdout, exitCode := testDo(t, "json-to-binary", filePath, messagePath, jsonData)
-	assert.Equal(t, 0, exitCode)
-	stdout, exitCode = testDo(t, "binary-to-json", filePath, messagePath, stdout)
-	assert.Equal(t, 0, exitCode)
-	assert.Equal(t, jsonData, stdout)
 }
 
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string) {

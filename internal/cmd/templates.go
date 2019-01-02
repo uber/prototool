@@ -56,18 +56,6 @@ var (
 		},
 	}
 
-	binaryToJSONCmdTemplate = &cmdTemplate{
-		Use:   "binary-to-json [dirOrFile] messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.RangeArgs(2, 3),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.BinaryToJSON(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindConfigData(flagSet)
-		},
-	}
-
 	cleanCmdTemplate = &cmdTemplate{
 		Use:   "clean",
 		Short: "Delete the cache.",
@@ -166,36 +154,12 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 	}
 
-	descriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "descriptor-proto [dirOrFile] messagePath",
-		Short: "Get the descriptor proto for the message path.",
-		Args:  cobra.MaximumNArgs(2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.DescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindConfigData(flagSet)
-		},
-	}
-
 	downloadCmdTemplate = &cmdTemplate{
 		Use:   "download",
 		Short: "Download the protobuf artifacts to a cache.",
 		Args:  cobra.NoArgs,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Download()
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindConfigData(flagSet)
-		},
-	}
-
-	fieldDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "field-descriptor-proto [dirOrFile] fieldPath",
-		Short: "Get the field descriptor proto for the field path.",
-		Args:  cobra.RangeArgs(1, 2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.FieldDescriptorProto(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindConfigData(flagSet)
@@ -419,18 +383,6 @@ $ cat input.json | prototool grpc example \
 		},
 	}
 
-	jsonToBinaryCmdTemplate = &cmdTemplate{
-		Use:   "json-to-binary [dirOrFile] messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.RangeArgs(2, 3),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.JSONToBinary(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindConfigData(flagSet)
-		},
-	}
-
 	lintCmdTemplate = &cmdTemplate{
 		Use:   "lint [dirOrFile]",
 		Short: "Lint proto files and compile with protoc to check for failures.",
@@ -485,18 +437,6 @@ sys	0m0.924s`,
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
-		},
-	}
-
-	serviceDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "service-descriptor-proto [dirOrFile] servicePath",
-		Short: "Get the service descriptor proto for the service path.",
-		Args:  cobra.RangeArgs(1, 2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.ServiceDescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindConfigData(flagSet)
 		},
 	}
 
