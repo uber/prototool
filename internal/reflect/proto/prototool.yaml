@@ -1,0 +1,9 @@
+protoc:
+  version: 3.6.1
+generate:
+  go_options:
+    import_path: github.com/uber/prototool/internal/reflect/proto
+  plugins:
+    - name: go
+      type: go
+      output: ../gen
