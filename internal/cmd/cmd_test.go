@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -452,11 +452,6 @@ func TestGoldenFormat(t *testing.T) {
 	assertGoldenFormat(t, false, true, "testdata/format-fix/foo.proto")
 }
 
-func TestJSONToBinaryToJSON(t *testing.T) {
-	t.Parallel()
-	assertJSONToBinaryToJSON(t, "testdata/foo/success.proto", "foo.Baz", `{"hello":100}`)
-}
-
 func TestCreate(t *testing.T) {
 	t.Parallel()
 	// package override with also matching shorter override "a"
@@ -643,104 +638,121 @@ func TestVersionJSON(t *testing.T) {
 	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
-func TestDescriptorProto(t *testing.T) {
+func TestInspectPackages(t *testing.T) {
 	assertExact(
 		t,
 		0,
-		`{
-  "name": "Baz",
-  "field": [
-    {
-      "name": "hello",
-      "number": 1,
-      "label": "LABEL_OPTIONAL",
-      "type": "TYPE_INT64",
-      "jsonName": "hello"
-    },
-    {
-      "name": "dep",
-      "number": 2,
-      "label": "LABEL_OPTIONAL",
-      "type": "TYPE_MESSAGE",
-      "typeName": ".bar.Dep",
-      "jsonName": "dep"
-    },
-    {
-      "name": "timestamp",
-      "number": 3,
-      "label": "LABEL_OPTIONAL",
-      "type": "TYPE_MESSAGE",
-      "typeName": ".google.protobuf.Timestamp",
-      "jsonName": "timestamp"
-    }
-  ]
-}`,
-		"descriptor-proto", "testdata/foo/success.proto", "foo.Baz",
+		`bar
+foo
+google.protobuf`,
+		"inspect", "packages", "testdata/foo",
 	)
 }
 
-func TestFieldDescriptorProto(t *testing.T) {
+func TestInspectPackagesJSON(t *testing.T) {
 	assertExact(
 		t,
 		0,
 		`{
-  "name": "dep",
-  "number": 2,
-  "label": "LABEL_OPTIONAL",
-  "type": "TYPE_MESSAGE",
-  "typeName": ".bar.Dep",
-  "jsonName": "dep"
+  "name": "bar",
+  "importers": [
+    "foo"
+  ]
+}
+{
+  "name": "foo",
+  "deps": [
+    "bar",
+    "google.protobuf"
+  ]
+}
+{
+  "name": "google.protobuf",
+  "importers": [
+    "foo"
+  ]
 }`,
-		"field-descriptor-proto", "testdata/foo/success.proto", "foo.Baz.dep",
+		"inspect", "packages", "testdata/foo", "--json",
 	)
 }
 
-func TestServiceDescriptorProto(t *testing.T) {
+func TestInspectPackage(t *testing.T) {
 	assertExact(
 		t,
 		0,
 		`{
-  "name": "ExcitedService",
-  "method": [
-    {
-      "name": "Exclamation",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      }
-    },
-    {
-      "name": "ExclamationClientStream",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      },
-      "clientStreaming": true
-    },
-    {
-      "name": "ExclamationServerStream",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      },
-      "serverStreaming": true
-    },
-    {
-      "name": "ExclamationBidiStream",
-      "inputType": ".grpc.ExclamationRequest",
-      "outputType": ".grpc.ExclamationResponse",
-      "options": {
-
-      },
-      "clientStreaming": true,
-      "serverStreaming": true
-    }
+  "name": "foo",
+  "deps": [
+    "bar",
+    "google.protobuf"
   ]
 }`,
-		"service-descriptor-proto", "testdata/grpc", "grpc.ExcitedService",
+		"inspect", "package", "testdata/foo", "--name", "foo",
+	)
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "bar",
+  "importers": [
+    "foo"
+  ]
+}`,
+		"inspect", "package", "testdata/foo", "--name", "bar",
+	)
+	assertExact(
+		t,
+		0,
+		`{
+  "name": "google.protobuf",
+  "importers": [
+    "foo"
+  ]
+}`,
+		"inspect", "package", "testdata/foo", "--name", "google.protobuf",
+	)
+}
+
+func TestInspectPackageDeps(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		`bar
+google.protobuf`,
+		"inspect", "package-deps", "testdata/foo", "--name", "foo",
+	)
+	assertExact(
+		t,
+		0,
+		``,
+		"inspect", "package-deps", "testdata/foo", "--name", "bar",
+	)
+	assertExact(
+		t,
+		0,
+		``,
+		"inspect", "package-deps", "testdata/foo", "--name", "google.protobuf",
+	)
+}
+
+func TestInspectPackageImporters(t *testing.T) {
+	assertExact(
+		t,
+		0,
+		``,
+		"inspect", "package-importers", "testdata/foo", "--name", "foo",
+	)
+	assertExact(
+		t,
+		0,
+		`foo`,
+		"inspect", "package-importers", "testdata/foo", "--name", "bar",
+	)
+	assertExact(
+		t,
+		0,
+		`foo`,
+		"inspect", "package-importers", "testdata/foo", "--name", "google.protobuf",
 	)
 }
 
@@ -840,14 +852,6 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 	golden, err := ioutil.ReadFile(filePath + ".golden")
 	assert.NoError(t, err)
 	assert.Equal(t, strings.TrimSpace(string(golden)), output)
-}
-
-func assertJSONToBinaryToJSON(t *testing.T, filePath string, messagePath string, jsonData string) {
-	stdout, exitCode := testDo(t, "json-to-binary", filePath, messagePath, jsonData)
-	assert.Equal(t, 0, exitCode)
-	stdout, exitCode = testDo(t, "binary-to-json", filePath, messagePath, stdout)
-	assert.Equal(t, 0, exitCode)
-	assert.Equal(t, jsonData, stdout)
 }
 
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string) {

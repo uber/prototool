@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,22 +51,6 @@ var (
 			flags.bindDisableLint(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindFix(flagSet)
-			flags.bindProtocURL(flagSet)
-			flags.bindProtocBinPath(flagSet)
-			flags.bindProtocWKTPath(flagSet)
-		},
-	}
-
-	binaryToJSONCmdTemplate = &cmdTemplate{
-		Use:   "binary-to-json [dirOrFile] messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.RangeArgs(2, 3),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.BinaryToJSON(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindCachePath(flagSet)
-			flags.bindConfigData(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
@@ -199,38 +183,6 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 	}
 
-	descriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "descriptor-proto [dirOrFile] messagePath",
-		Short: "Get the descriptor proto for the message path.",
-		Args:  cobra.MaximumNArgs(2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.DescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindCachePath(flagSet)
-			flags.bindConfigData(flagSet)
-			flags.bindProtocURL(flagSet)
-			flags.bindProtocBinPath(flagSet)
-			flags.bindProtocWKTPath(flagSet)
-		},
-	}
-
-	fieldDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "field-descriptor-proto [dirOrFile] fieldPath",
-		Short: "Get the field descriptor proto for the field path.",
-		Args:  cobra.RangeArgs(1, 2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.FieldDescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindCachePath(flagSet)
-			flags.bindConfigData(flagSet)
-			flags.bindProtocURL(flagSet)
-			flags.bindProtocBinPath(flagSet)
-			flags.bindProtocWKTPath(flagSet)
-		},
-	}
-
 	filesCmdTemplate = &cmdTemplate{
 		Use:   "files [dirOrFile]",
 		Short: "Print all files that match the input arguments.",
@@ -284,7 +236,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 
 	grpcCmdTemplate = &cmdTemplate{
 		Use:   "grpc [dirOrFile]",
-		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
+		Short: "Call a gRPC endpoint. Be sure to set the required flags address, method, and either data or stdin.",
 		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
 
 There is a full example for gRPC in the example directory of Prototool. Run "make init example" to make sure everything is installed and generated.
@@ -374,6 +326,74 @@ $ cat input.json | prototool grpc example \
 		},
 	}
 
+	inspectPackagesCmdTemplate = &cmdTemplate{
+		Use:   "packages [dirOrFile]",
+		Short: "List all packages.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackages(args)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageCmdTemplate = &cmdTemplate{
+		Use:   "package [dirOrFile]",
+		Short: "Print the given package in JSON format. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackage(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindName(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageDepsCmdTemplate = &cmdTemplate{
+		Use:   "package-deps [dirOrFile]",
+		Short: "Print the given package dependencies. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackageDeps(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindName(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageImportersCmdTemplate = &cmdTemplate{
+		Use:   "package-importers [dirOrFile]",
+		Short: "Print the given package importers. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackageImporters(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindName(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
 	configInitCmdTemplate = &cmdTemplate{
 		Use:   "init [dirPath]",
 		Short: "Generate an initial config file in the current or given directory.",
@@ -384,22 +404,6 @@ $ cat input.json | prototool grpc example \
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindUncomment(flagSet)
-		},
-	}
-
-	jsonToBinaryCmdTemplate = &cmdTemplate{
-		Use:   "json-to-binary [dirOrFile] messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.RangeArgs(2, 3),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.JSONToBinary(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindCachePath(flagSet)
-			flags.bindConfigData(flagSet)
-			flags.bindProtocURL(flagSet)
-			flags.bindProtocBinPath(flagSet)
-			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -455,22 +459,6 @@ sys	0m0.924s`,
 			flags.bindListLinters(flagSet)
 			flags.bindListAllLintGroups(flagSet)
 			flags.bindListLintGroup(flagSet)
-			flags.bindProtocURL(flagSet)
-			flags.bindProtocBinPath(flagSet)
-			flags.bindProtocWKTPath(flagSet)
-		},
-	}
-
-	serviceDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "service-descriptor-proto [dirOrFile] servicePath",
-		Short: "Get the service descriptor proto for the service path.",
-		Args:  cobra.RangeArgs(1, 2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.ServiceDescriptorProto(args)
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindCachePath(flagSet)
-			flags.bindConfigData(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
