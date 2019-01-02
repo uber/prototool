@@ -64,7 +64,9 @@ var (
 
 Artifacts are downloaded to the following directories based on flags and environment variables:
 
-- If --cache-path is set, then this directory will be used.
+- If --cache-path is set, then this directory will be used. The user is
+  expected to manually manage this directory, and the "delete" subcommand
+  will have no effect on it.
 - Otherwise, if $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool
   will be used.
 - Otherwise, if on Linux, $HOME/.cache/prototool will be used, or on Darwin,
