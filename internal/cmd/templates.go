@@ -83,7 +83,7 @@ Artifacts are downloaded to the following directories based on flags and environ
 
 	cacheDeleteCmdTemplate = &cmdTemplate{
 		Use:   "delete",
-		Short: "Delete all artifacts in the cache.",
+		Short: "Delete all artifacts in the default cache.",
 		Long: `The following directory will be deleted based on environment variables:
 
 - If $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool will be deleted.
