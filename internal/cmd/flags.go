@@ -62,7 +62,7 @@ func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindCachePath(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.cachePath, "cache-path", "", "The path to use for the cache, otherwise uses the default behavior.")
+	flagSet.StringVar(&f.cachePath, "cache-path", "", "The path to use for the cache, otherwise uses the default behavior. The user is expected to clean and manage this cache path. See prototool help cache update for more details.")
 }
 
 func (f *flags) bindCallTimeout(flagSet *pflag.FlagSet) {

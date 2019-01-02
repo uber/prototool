@@ -48,8 +48,8 @@ type Runner interface {
 	Init(args []string, uncomment bool) error
 	Create(args []string, pkg string) error
 	Version() error
-	Download() error
-	Clean() error
+	CacheUpdate() error
+	CacheDelete() error
 	Files(args []string) error
 	Compile(args []string, dryRun bool) error
 	Gen(args []string, dryRun bool) error

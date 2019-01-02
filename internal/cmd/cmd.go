@@ -107,11 +107,15 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	rootCmd.AddCommand(formatCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(generateCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(grpcCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	configCmd := &cobra.Command{Use: "config"}
+	configCmd := &cobra.Command{Use: "config", Short: "Interact with configuration files."}
 	configCmd.AddCommand(configInitCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(lintCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(versionCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	cacheCmd := &cobra.Command{Use: "cache", Short: "Interact with the cache."}
+	cacheCmd.AddCommand(cacheUpdateCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	cacheCmd.AddCommand(cacheDeleteCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(cacheCmd)
 	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
 	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd.AddCommand(inspectPackageCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
@@ -123,12 +127,6 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	flags.bindDebug(rootCmd.PersistentFlags())
 
 	if develMode {
-		rootCmd.AddCommand(cleanCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(downloadCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-
-		// we may or may not want to expose these to users
-		// but will not build them into the binary for v1.0
-		flags.bindCachePath(rootCmd.PersistentFlags())
 		flags.bindPrintFields(rootCmd.PersistentFlags())
 	}
 

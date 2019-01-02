@@ -462,35 +462,23 @@ The entire implementation is purposefully under the `internal` package to not ex
 
 *Question:* How do I download `protoc` ahead of time as part of a Docker build/CI pipeline?
 
-*Answer*: We used to have a command that did this, but removed it for simplicity and because the command as implemented did not properly
-read the configuration file to figure out what version of `protoc` to download. We may re-add this command in the future, however
-here is a technique to accomplish this, including as a `RUN` directive for Docker:
+*Answer*: `prototool cache update`.
+
+You can pass both `--cache-path` and `--config-data` flags to this command to customize the invocation.
 
 ```bash
-# the first rm -rf call is not needed if this is a RUN directive for Docker
-rm -rf /tmp/prototool-bootstrap && \
-  echo $'protoc\n  version: 3.6.1' > /tmp/prototool-bootstrap/prototool.yaml && \
-  echo 'syntax = "proto3";' > /tmp/prototool-bootstrap/tmp.proto && \
-  prototool compile /tmp/prototool-bootstrap && \
-  rm -rf /tmp/prototool-bootstrap
+# Basic invocation which will cache using the default behavior. See prototool help cache update for more details.
+prototool cache update
+# Cache to a specific directory path/to/cache
+prototool cache update --cache-path path/to/cache
+# Cache using custom configuration data instead of finding a prototool.yaml file using the file discovery mechanism
+prototool cache update --config-data '{"protoc":{"version":"3.6.1"}}'
 ```
 
-The better way to do this as part of a bash script would be to use `mktemp -d` i.e.:
-
-```bash
-#!/bin/bash
-
-set -euo pipefail
-
-TMPDIR="$(mktemp -d)"
-trap 'rm -rf "${TMPDIR}"' EXIT
-
-echo $'protoc\n  version: 3.6.1' > "${TMPDIR}/prototool.yaml"
-echo 'syntax = "proto3";' > "${TMPDIR}/tmp.proto"
-prototool compile "${TMPDIR}"
-```
-
-But for Darwin or Linux, the above should work.
+There is also a command `prototool cache delete` which will delete all cached assets of `prototool`,
+however this command does not accept the `--cache-path` flag - if you specify a custom directory, you
+should clean it up on your own, we don't want to effectively call `rm -rf DIR` via a `prototool` command
+on a location we don't know about.
 
 ##### Alpine Linux Issues
 
