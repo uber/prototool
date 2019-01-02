@@ -23,6 +23,7 @@ type PackageSet struct {
 	// packages contains the set of Packages.
 	//
 	// These will all be unique, and can be referenced by their name field.
+	// These will also be sorted by name.
 	Packages             []*Package `protobuf:"bytes,1,rep,name=packages,proto3" json:"packages,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
@@ -33,7 +34,7 @@ func (m *PackageSet) Reset()         { *m = PackageSet{} }
 func (m *PackageSet) String() string { return proto.CompactTextString(m) }
 func (*PackageSet) ProtoMessage()    {}
 func (*PackageSet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_834152692011e8d4, []int{0}
+	return fileDescriptor_reflect_226b6aeea8384819, []int{0}
 }
 func (m *PackageSet) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PackageSet.Unmarshal(m, b)
@@ -73,6 +74,7 @@ type Package struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// dependency_names contains the names of this packages' dependencies.
 	//
+	// These will be sorted.
 	// If you have a set of Package messages, this will correspond to the name
 	// field of other Packages in the set.
 	DependencyNames      []string `protobuf:"bytes,2,rep,name=dependency_names,json=dependencyNames,proto3" json:"dependency_names,omitempty"`
@@ -85,7 +87,7 @@ func (m *Package) Reset()         { *m = Package{} }
 func (m *Package) String() string { return proto.CompactTextString(m) }
 func (*Package) ProtoMessage()    {}
 func (*Package) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_834152692011e8d4, []int{1}
+	return fileDescriptor_reflect_226b6aeea8384819, []int{1}
 }
 func (m *Package) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Package.Unmarshal(m, b)
@@ -125,10 +127,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("uber/proto/reflect/reflect.proto", fileDescriptor_reflect_834152692011e8d4)
+	proto.RegisterFile("uber/proto/reflect/reflect.proto", fileDescriptor_reflect_226b6aeea8384819)
 }
 
-var fileDescriptor_reflect_834152692011e8d4 = []byte{
+var fileDescriptor_reflect_226b6aeea8384819 = []byte{
 	// 179 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x28, 0x4d, 0x4a, 0x2d,
 	0xd2, 0x2f, 0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x2f, 0x4a, 0x4d, 0xcb, 0x49, 0x4d, 0x2e, 0x81, 0xd1,
