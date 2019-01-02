@@ -7,4 +7,10 @@ option java_multiple_files = true;
 option java_outer_classname = "ReflectProto";
 option java_package = "com.uber.proto.reflect";
 
-message PackageSet {}
+// Package describes a Protobuf package, constructed from a set of Protobuf
+// files that have the same "package" value.
+message Package {
+  // name is the fully-qualified name of the package. This does not include
+  // the prefix '.' found in the traditional package fully-qualified name.
+  string name = 1;
+}

@@ -18,51 +18,64 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type PackageSet struct {
+// Package describes a Protobuf package, constructed from a set of Protobuf
+// files that have the same "package" value.
+type Package struct {
+	// name is the fully-qualified name of the package. This does not include
+	// the prefix '.' found in the traditional package fully-qualified name.
+	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *PackageSet) Reset()         { *m = PackageSet{} }
-func (m *PackageSet) String() string { return proto.CompactTextString(m) }
-func (*PackageSet) ProtoMessage()    {}
-func (*PackageSet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_676928d5c266b59c, []int{0}
+func (m *Package) Reset()         { *m = Package{} }
+func (m *Package) String() string { return proto.CompactTextString(m) }
+func (*Package) ProtoMessage()    {}
+func (*Package) Descriptor() ([]byte, []int) {
+	return fileDescriptor_reflect_3a13b01e2f0b953f, []int{0}
 }
-func (m *PackageSet) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PackageSet.Unmarshal(m, b)
+func (m *Package) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Package.Unmarshal(m, b)
 }
-func (m *PackageSet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PackageSet.Marshal(b, m, deterministic)
+func (m *Package) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Package.Marshal(b, m, deterministic)
 }
-func (dst *PackageSet) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PackageSet.Merge(dst, src)
+func (dst *Package) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Package.Merge(dst, src)
 }
-func (m *PackageSet) XXX_Size() int {
-	return xxx_messageInfo_PackageSet.Size(m)
+func (m *Package) XXX_Size() int {
+	return xxx_messageInfo_Package.Size(m)
 }
-func (m *PackageSet) XXX_DiscardUnknown() {
-	xxx_messageInfo_PackageSet.DiscardUnknown(m)
+func (m *Package) XXX_DiscardUnknown() {
+	xxx_messageInfo_Package.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PackageSet proto.InternalMessageInfo
+var xxx_messageInfo_Package proto.InternalMessageInfo
+
+func (m *Package) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
 
 func init() {
-	proto.RegisterType((*PackageSet)(nil), "uber.proto.reflect.PackageSet")
+	proto.RegisterType((*Package)(nil), "uber.proto.reflect.Package")
 }
 
 func init() {
-	proto.RegisterFile("uber/proto/reflect/reflect.proto", fileDescriptor_reflect_676928d5c266b59c)
+	proto.RegisterFile("uber/proto/reflect/reflect.proto", fileDescriptor_reflect_3a13b01e2f0b953f)
 }
 
-var fileDescriptor_reflect_676928d5c266b59c = []byte{
-	// 102 bytes of a gzipped FileDescriptorProto
+var fileDescriptor_reflect_3a13b01e2f0b953f = []byte{
+	// 116 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0x28, 0x4d, 0x4a, 0x2d,
 	0xd2, 0x2f, 0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x2f, 0x4a, 0x4d, 0xcb, 0x49, 0x4d, 0x2e, 0x81, 0xd1,
-	0x7a, 0x60, 0x51, 0x21, 0x21, 0x90, 0x0a, 0x08, 0x5b, 0x0f, 0x2a, 0xa3, 0xc4, 0xc3, 0xc5, 0x15,
-	0x90, 0x98, 0x9c, 0x9d, 0x98, 0x9e, 0x1a, 0x9c, 0x5a, 0xe2, 0x64, 0xcc, 0x25, 0x96, 0x9c, 0x9f,
-	0xab, 0x87, 0xa9, 0xce, 0x89, 0x27, 0x08, 0xc2, 0x08, 0x00, 0x89, 0x06, 0x30, 0x46, 0x71, 0x42,
-	0x25, 0x0a, 0x92, 0x92, 0xd8, 0xc0, 0x2a, 0x8d, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x9d, 0x3e,
-	0xea, 0xcc, 0x81, 0x00, 0x00, 0x00,
+	0x7a, 0x60, 0x51, 0x21, 0x21, 0x90, 0x0a, 0x08, 0x5b, 0x0f, 0x2a, 0xa3, 0x24, 0xcb, 0xc5, 0x1e,
+	0x90, 0x98, 0x9c, 0x9d, 0x98, 0x9e, 0x2a, 0x24, 0xc4, 0xc5, 0x92, 0x97, 0x98, 0x9b, 0x2a, 0xc1,
+	0xa8, 0xc0, 0xa8, 0xc1, 0x19, 0x04, 0x66, 0x3b, 0x19, 0x73, 0x89, 0x25, 0xe7, 0xe7, 0xea, 0x61,
+	0x6a, 0x74, 0xe2, 0x09, 0x82, 0x30, 0x02, 0x40, 0xa2, 0x01, 0x8c, 0x51, 0x9c, 0x50, 0x89, 0x82,
+	0xa4, 0x24, 0x36, 0xb0, 0x4a, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe9, 0xf9, 0x32, 0x98,
+	0x92, 0x00, 0x00, 0x00,
 }
