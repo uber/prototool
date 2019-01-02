@@ -141,7 +141,7 @@ func (d *downloader) WellKnownTypesIncludePath() (string, error) {
 }
 
 func (d *downloader) Delete() error {
-	basePath, err := d.getBasePathNoVersion()
+	basePath, err := d.getBasePathNoVersionOSARCH()
 	if err != nil {
 		return err
 	}
@@ -327,6 +327,26 @@ func (d *downloader) getBasePath() (string, error) {
 	return filepath.Join(basePathNoVersion, d.getBasePathVersionPart()), nil
 }
 
+func (d *downloader) getBasePathNoVersionOSARCH() (string, error) {
+	basePath := d.cachePath
+	var err error
+	if basePath == "" {
+		basePath, err = getDefaultBasePathNoOSARCH()
+		if err != nil {
+			return "", err
+		}
+	} else {
+		basePath, err = file.AbsClean(basePath)
+		if err != nil {
+			return "", err
+		}
+	}
+	if err := file.CheckAbs(basePath); err != nil {
+		return "", err
+	}
+	return basePath, nil
+}
+
 func (d *downloader) getBasePathNoVersion() (string, error) {
 	basePath := d.cachePath
 	var err error
@@ -362,13 +382,29 @@ func getDefaultBasePath() (string, error) {
 }
 
 func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(string) string) (string, error) {
+	basePathNoOSARCH, err := getDefaultBasePathInternalNoOSARCH(goos, goarch, getenvFunc)
+	if err != nil {
+		return "", err
+	}
 	unameS, unameM, err := getUnameSUnameMPaths(goos, goarch)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(basePathNoOSARCH, unameS, unameM), nil
+}
+
+func getDefaultBasePathNoOSARCH() (string, error) {
+	return getDefaultBasePathInternalNoOSARCH(runtime.GOOS, runtime.GOARCH, os.Getenv)
+}
+
+func getDefaultBasePathInternalNoOSARCH(goos string, goarch string, getenvFunc func(string) string) (string, error) {
+	unameS, _, err := getUnameSUnameMPaths(goos, goarch)
 	if err != nil {
 		return "", err
 	}
 	xdgCacheHome := getenvFunc("XDG_CACHE_HOME")
 	if xdgCacheHome != "" {
-		return filepath.Join(xdgCacheHome, "prototool", unameS, unameM), nil
+		return filepath.Join(xdgCacheHome, "prototool"), nil
 	}
 	home := getenvFunc("HOME")
 	if home == "" {
@@ -376,9 +412,9 @@ func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(stri
 	}
 	switch unameS {
 	case "Darwin":
-		return filepath.Join(home, "Library", "Caches", "prototool", unameS, unameM), nil
+		return filepath.Join(home, "Library", "Caches", "prototool"), nil
 	case "Linux":
-		return filepath.Join(home, ".cache", "prototool", unameS, unameM), nil
+		return filepath.Join(home, ".cache", "prototool"), nil
 	default:
 		return "", fmt.Errorf("invalid value for uname -s: %v", unameS)
 	}

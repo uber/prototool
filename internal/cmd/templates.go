@@ -45,6 +45,7 @@ var (
 			return runner.All(args, flags.disableFormat, flags.disableLint, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
@@ -56,12 +57,43 @@ var (
 		},
 	}
 
-	cleanCmdTemplate = &cmdTemplate{
-		Use:   "clean",
-		Short: "Delete the cache.",
-		Args:  cobra.NoArgs,
+	cacheUpdateCmdTemplate = &cmdTemplate{
+		Use:   "update",
+		Short: "Update the cache by downloading all artifacts.",
+		Long: `This will download artifacts to a cache directory before running any commands. Note that calling this command is not necessary, all artifacts are automatically downloaded when required by other commands. This just provides a mechanism to pre-cache artifacts during your build.
+
+Artifacts are downloaded to the following directories based on flags and environment variables:
+
+- If --cache-path is set, then this directory will be used. The user is
+  expected to manually manage this directory, and the "delete" subcommand
+  will have no effect on it.
+- Otherwise, if $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool
+  will be used.
+- Otherwise, if on Linux, $HOME/.cache/prototool will be used, or on Darwin,
+  $HOME/Library/Caches/prototool will be used.`,
+		Args: cobra.NoArgs,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Clean()
+			return runner.CacheUpdate()
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+		},
+	}
+
+	cacheDeleteCmdTemplate = &cmdTemplate{
+		Use:   "delete",
+		Short: "Delete all artifacts in the default cache.",
+		Long: `The following directory will be deleted based on environment variables:
+
+- If $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool will be deleted.
+- Otherwise, if on Linux, $HOME/.cache/prototool will be deleted, or on Darwin,
+  $HOME/Library/Caches/prototool will be deleted.
+
+  This will not delete any custom caches created using the --cache-path option.`,
+		Args: cobra.NoArgs,
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.CacheDelete()
 		},
 	}
 
@@ -74,6 +106,7 @@ var (
 			return runner.Compile(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
@@ -154,18 +187,6 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 	}
 
-	downloadCmdTemplate = &cmdTemplate{
-		Use:   "download",
-		Short: "Download the protobuf artifacts to a cache.",
-		Args:  cobra.NoArgs,
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Download()
-		},
-		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindConfigData(flagSet)
-		},
-	}
-
 	filesCmdTemplate = &cmdTemplate{
 		Use:   "files [dirOrFile]",
 		Short: "Print all files that match the input arguments.",
@@ -186,6 +207,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDiffMode(flagSet)
 			flags.bindJSON(flagSet)
@@ -206,6 +228,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.Gen(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
 			flags.bindJSON(flagSet)
@@ -291,6 +314,7 @@ $ cat input.json | prototool grpc example \
 			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindAddress(flagSet)
 			flags.bindCallTimeout(flagSet)
@@ -314,6 +338,7 @@ $ cat input.json | prototool grpc example \
 			return runner.InspectPackages(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
@@ -330,6 +355,7 @@ $ cat input.json | prototool grpc example \
 			return runner.InspectPackage(args, flags.name)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindName(flagSet)
 			flags.bindProtocURL(flagSet)
@@ -346,6 +372,7 @@ $ cat input.json | prototool grpc example \
 			return runner.InspectPackageDeps(args, flags.name)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindName(flagSet)
 			flags.bindProtocURL(flagSet)
@@ -362,6 +389,7 @@ $ cat input.json | prototool grpc example \
 			return runner.InspectPackageImporters(args, flags.name)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindName(flagSet)
 			flags.bindProtocURL(flagSet)
@@ -428,6 +456,7 @@ sys	0m0.924s`,
 			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindListAllLinters(flagSet)

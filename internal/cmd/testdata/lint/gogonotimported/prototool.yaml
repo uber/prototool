@@ -1,0 +1,4 @@
+lint:
+  rules:
+    add:
+      - GOGO_NOT_IMPORTED

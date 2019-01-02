@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package foo;
+
+option go_package = "foopb";
+option java_multiple_files = true;
+option java_outer_classname = "GogonotimportedProto";
+option java_package = "com.foo";
+
+import "gogo/gogo.proto";
+
+message Foo {
+  gogo.Gogo gogo = 1;
+}

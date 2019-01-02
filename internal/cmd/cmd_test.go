@@ -377,6 +377,23 @@ func TestLint(t *testing.T) {
 		`5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
 		"testdata/lint/gopackagelongform/gopackagelongform.proto",
 	)
+	assertDoLintFile(
+		t,
+		false,
+		`11:3:MESSAGE_FIELDS_NO_JSON_NAME
+		12:12:MESSAGE_FIELDS_NO_JSON_NAME
+		13:3:MESSAGE_FIELDS_NO_JSON_NAME
+		15:5:MESSAGE_FIELDS_NO_JSON_NAME
+		16:5:MESSAGE_FIELDS_NO_JSON_NAME`,
+		"testdata/lint/nojsonname/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`10:1:GOGO_NOT_IMPORTED`,
+		"testdata/lint/gogonotimported/gogonotimported.proto",
+	)
 
 	assertDoLintFile(
 		t,
@@ -1008,7 +1025,7 @@ func testDownload(t *testing.T) {
 	// download checks if protoc is already downloaded to the cache location
 	// if it is, then this is effectively a no-op
 	// if it isn't, then this downloads to the cache
-	stdout, exitCode := testDoInternal(nil, "download")
+	stdout, exitCode := testDoInternal(nil, "cache", "update")
 	require.Equal(t, 0, exitCode, "had non-zero exit code when downloading: %s", stdout)
 }
 
