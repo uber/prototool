@@ -12,6 +12,7 @@ message PackageSet {
   // packages contains the set of Packages.
   //
   // These will all be unique, and can be referenced by their name field.
+  // These will also be sorted by name.
   repeated Package packages = 1;
 }
 
@@ -28,6 +29,7 @@ message Package {
   string name = 1;
   // dependency_names contains the names of this packages' dependencies.
   //
+  // These will be sorted.
   // If you have a set of Package messages, this will correspond to the name
   // field of other Packages in the set.
   repeated string dependency_names = 2;
