@@ -1,0 +1,4 @@
+lint:
+  rules:
+    add:
+      - MESSAGE_FIELDS_NO_JSON_NAME
