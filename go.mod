@@ -1,6 +1,7 @@
 module github.com/uber/prototool
 
 require (
+	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/cpuguy83/go-md2man v1.0.8 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/proto v1.6.7
@@ -30,5 +31,5 @@ require (
 	golang.org/x/tools v0.0.0-20181218204010-d4971274fe38
 	google.golang.org/grpc v1.17.0
 	gopkg.in/yaml.v2 v2.2.2
-	honnef.co/go/tools v0.0.0-20180728063816-88497007e858
+	honnef.co/go/tools v0.0.0-20190103051756-51b3beccf3bd
 )

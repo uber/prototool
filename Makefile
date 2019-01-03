@@ -114,11 +114,6 @@ staticcheck:
 	@go install honnef.co/go/tools/cmd/staticcheck
 	staticcheck --tests=false $(PKGS)
 
-.PHONY: unused
-unused:
-	@go install honnef.co/go/tools/cmd/unused
-	unused --tests=false $(PKGS)
-
 .PHONY: checklicense
 checklicense: install
 	@go install go.uber.org/tools/update-license
@@ -130,9 +125,9 @@ checklicense: install
 	fi
 
 .PHONY: lint
-# TODO: re-add errcheck staticcheck unused when they are fixed for Golang modules
-#lint: checknodiffgenerated golint vet errcheck staticcheck unused checklicense
-lint: checknodiffgenerated golint vet checklicense
+# TODO: re-add errcheck when it fixed for Golang modules
+#lint: checknodiffgenerated golint vet errcheck staticcheck checklicense
+lint: checknodiffgenerated golint vet staticcheck checklicense
 
 .PHONY: test
 test:
