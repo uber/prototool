@@ -37,7 +37,6 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/create"
@@ -54,8 +53,6 @@ import (
 	"github.com/uber/prototool/internal/vars"
 	"go.uber.org/zap"
 )
-
-var jsonMarshaler = &jsonpb.Marshaler{Indent: "  "}
 
 type runner struct {
 	configProvider   settings.ConfigProvider
@@ -836,13 +833,6 @@ func (r *runner) println(s string) error {
 	}
 	_, err := fmt.Fprintln(r.output, s)
 	return err
-}
-
-func (r *runner) getInputData(arg string) ([]byte, error) {
-	if arg == "-" {
-		return ioutil.ReadAll(r.input)
-	}
-	return []byte(arg), nil
 }
 
 func (r *runner) getInputReader(data string, stdin bool) io.Reader {

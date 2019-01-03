@@ -56,7 +56,7 @@ var (
 	// protoc outputs both this line and fileNotFound, so we end up ignoring this one
 	// TODO figure out what the error is for errors in the import
 	importNotFoundRegexp              = regexp.MustCompile("^(.*): Import (.*) was not found or had errors.$")
-	noSyntaxSpecifiedRegexp           = regexp.MustCompile("No syntax specified for the proto file: (.*)\\. Please use")
+	noSyntaxSpecifiedRegexp           = regexp.MustCompile(`No syntax specified for the proto file: (.*)\. Please use`)
 	jsonCamelCaseRegexp               = regexp.MustCompile("^(.*): (The JSON camel-case name of field.*)$")
 	isNotDefinedRegexp                = regexp.MustCompile("^(.*): (.*) is not defined.$")
 	seemsToBeDefinedRegexp            = regexp.MustCompile(`^(.*): (".*" seems to be defined in ".*", which is not imported by ".*". To use it here, please add the necessary import.)$`)
