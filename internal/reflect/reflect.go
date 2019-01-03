@@ -58,42 +58,17 @@ func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflec
 	if err != nil {
 		return nil, err
 	}
-	fileNameToPackageName, err := getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto)
+	packageNameToPackage, err := getBasePackageNameToPackage(packageNameToFileNameToFileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}
-	packageNameToPackage := make(map[string]*reflectv1.Package)
-	for packageName := range packageNameToFileNameToFileDescriptorProto {
-		packageNameToPackage[packageName] = &reflectv1.Package{
-			Name: packageName,
-		}
+	if err := populateDependencies(packageNameToPackage, packageNameToFileNameToFileDescriptorProto); err != nil {
+		return nil, err
 	}
-	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
-		for _, fileDescriptorProto := range fileNameTofileDescriptorProto {
-			for _, depFileName := range fileDescriptorProto.GetDependency() {
-				depPackageName, ok := fileNameToPackageName[depFileName]
-				if !ok {
-					return nil, fmt.Errorf("no package for dep %s", depFileName)
-				}
-				if depPackageName != packageName {
-					packageNameToPackage[packageName].DependencyNames = append(packageNameToPackage[packageName].DependencyNames, depPackageName)
-				}
-			}
-		}
-	}
-	for _, pkg := range packageNameToPackage {
-		pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
-	}
-	packageSet := &reflectv1.PackageSet{
-		Packages: make([]*reflectv1.Package, 0, len(packageNameToPackage)),
-	}
-	for _, pkg := range packageNameToPackage {
-		packageSet.Packages = append(packageSet.Packages, pkg)
-	}
-	sort.Sort(sortPackages(packageSet.Packages))
-	return packageSet, nil
+	return getPackageSet(packageNameToPackage)
 }
 
+// helper for NewPackageSet
 func getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets []*descriptor.FileDescriptorSet) (map[string]map[string]*descriptor.FileDescriptorProto, error) {
 	packageNameToFileNameToFileDescriptorProto := make(map[string]map[string]*descriptor.FileDescriptorProto)
 	for _, fileDescriptorSet := range fileDescriptorSets {
@@ -135,6 +110,60 @@ func getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets []*descrip
 	return packageNameToFileNameToFileDescriptorProto, nil
 }
 
+// helper for NewPackageSet
+func getBasePackageNameToPackage(
+	packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto,
+) (map[string]*reflectv1.Package, error) {
+	packageNameToPackage := make(map[string]*reflectv1.Package)
+	for packageName := range packageNameToFileNameToFileDescriptorProto {
+		packageNameToPackage[packageName] = &reflectv1.Package{
+			Name: packageName,
+		}
+	}
+	return packageNameToPackage, nil
+}
+
+// helper for NewPackageSet
+func populateDependencies(
+	packageNameToPackage map[string]*reflectv1.Package,
+	packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto,
+) error {
+	fileNameToPackageName, err := getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto)
+	if err != nil {
+		return err
+	}
+	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
+		for _, fileDescriptorProto := range fileNameTofileDescriptorProto {
+			for _, depFileName := range fileDescriptorProto.GetDependency() {
+				depPackageName, ok := fileNameToPackageName[depFileName]
+				if !ok {
+					return fmt.Errorf("no package for dep %s", depFileName)
+				}
+				if depPackageName != packageName {
+					packageNameToPackage[packageName].DependencyNames = append(packageNameToPackage[packageName].DependencyNames, depPackageName)
+				}
+			}
+		}
+	}
+	for _, pkg := range packageNameToPackage {
+		pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
+	}
+	return nil
+}
+
+// helper for NewPackageSet
+func getPackageSet(packageNameToPackage map[string]*reflectv1.Package) (*reflectv1.PackageSet, error) {
+	packageSet := &reflectv1.PackageSet{
+		Packages: make([]*reflectv1.Package, 0, len(packageNameToPackage)),
+	}
+	for _, pkg := range packageNameToPackage {
+		packageSet.Packages = append(packageSet.Packages, pkg)
+	}
+	sort.Sort(sortPackages(packageSet.Packages))
+	return packageSet, nil
+}
+
+// helper for populateDependencies
 func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto) (map[string]string, error) {
 	fileNameToPackageName := make(map[string]string)
 	for packageName, fileNameToFileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
@@ -152,6 +181,7 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 	return fileNameToPackageName, nil
 }
 
+// helper for getPackageSet
 type sortPackages []*reflectv1.Package
 
 func (s sortPackages) Len() int          { return len(s) }
