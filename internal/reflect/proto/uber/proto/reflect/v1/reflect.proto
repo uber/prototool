@@ -113,34 +113,39 @@ message Message {
 
 // MessageField describes a Protobuf message field.
 message MessageField {
-  //  enum Type {
-  //    TYPE_INVALID = 0;
-  //    TYPE_DOUBLE = 1;
-  //    TYPE_FLOAT = 2;
-  //    TYPE_INT64 = 3;
-  //    TYPE_UINT64 = 4;
-  //    TYPE_INT32 = 5;
-  //    TYPE_FIXED64 = 6;
-  //    TYPE_FIXED32 = 7;
-  //    TYPE_BOOL = 8;
-  //    TYPE_STRING = 9;
-  //    TYPE_GROUP = 10;
-  //    TYPE_MESSAGE = 11;
-  //    TYPE_BYTES = 12;
-  //    TYPE_UINT32 = 13;
-  //    TYPE_ENUM = 14;
-  //    TYPE_SFIXED32 = 15;
-  //    TYPE_SFIXED64 = 16;
-  //    TYPE_SINT32 = 17;
-  //    TYPE_SINT64 = 18;
-  //  }
-  //  enum Label {
-  //    LABEL_INVALID = 0;
-  //    LABEL_OPTIONAL = 1;
-  //    LABEL_REQUIRED = 2;
-  //    LABEL_REPEATED = 3;
-  //  }
-
+  // Type is the type of the message field.
+  //
+  // The numbers match the FieldDescriptorProto.Type numbers.
+  enum Type {
+    TYPE_INVALID = 0;
+    TYPE_DOUBLE = 1;
+    TYPE_FLOAT = 2;
+    TYPE_INT64 = 3;
+    TYPE_UINT64 = 4;
+    TYPE_INT32 = 5;
+    TYPE_FIXED64 = 6;
+    TYPE_FIXED32 = 7;
+    TYPE_BOOL = 8;
+    TYPE_STRING = 9;
+    TYPE_GROUP = 10;
+    TYPE_MESSAGE = 11;
+    TYPE_BYTES = 12;
+    TYPE_UINT32 = 13;
+    TYPE_ENUM = 14;
+    TYPE_SFIXED32 = 15;
+    TYPE_SFIXED64 = 16;
+    TYPE_SINT32 = 17;
+    TYPE_SINT64 = 18;
+  }
+  // Label is the label of the message field.
+  //
+  // The numbers match the FieldDescriptorProto.Label numbers.
+  enum Label {
+    LABEL_INVALID = 0;
+    LABEL_OPTIONAL = 1;
+    LABEL_REQUIRED = 2;
+    LABEL_REPEATED = 3;
+  }
 }
 
 // Oneof describes a Protobuf oneof.
