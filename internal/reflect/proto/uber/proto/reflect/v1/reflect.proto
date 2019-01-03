@@ -75,10 +75,15 @@ message Package {
 
 // Enum describes a Protobuf enum.
 message Enum {
+  // name is the name of the enum.
+  //
+  // If this is a nested enum, this will not contain the name of the
+  // encapsulating message.
+  string name = 1;
   // enum_values contains the enum values.
   //
   // These will be sorted by number.
-  repeated EnumValue enum_values = 1;
+  repeated EnumValue enum_values = 2;
 }
 
 // EnumValue describes a Protobuf enum value.
@@ -91,19 +96,15 @@ message EnumValue {
 
 // Message describes a Protobuf message.
 message Message {
-  // name is the fully-qualified name of the message.
+  // name is the name of the message.
   //
-  // The message name can be thought of as the unique identifier for a
-  // Message message, and is used as a reference.
-  //
-  // This does not include the prefix '.' found in the traditional package
-  // fully-qualified name. If this is a nested message, the parent messages
-  // will be part of the name.
+  // If this is a nested message, this will not contain the name of the
+  // encapsulating message.
   string name = 1;
-  // fields contains the message fields.
+  // message_fields contains the message fields.
   //
   // This does not include any extended fields.
-  repeated MessageField fields = 2;
+  repeated MessageField message_fields = 2;
   // oneof contains the oneofs.
   repeated Oneof oneofs = 3;
   // nested_message contains the messages directly nested on this message.
@@ -151,7 +152,6 @@ message MessageField {
     TYPE_SINT32 = 17;
     TYPE_SINT64 = 18;
   }
-
   // name is the name of the message field.
   string name = 1;
   // number is the number of the message field.
@@ -170,10 +170,42 @@ message MessageField {
 }
 
 // Oneof describes a Protobuf oneof.
-message Oneof {}
+message Oneof {
+  // name is the name of the oneof.
+  string name = 1;
+  // field_numbers are the field numbers in the encapsulating type that make up
+  // this oneof.
+  repeated int32 field_numbers = 2;
+}
 
 // Service describes a Protobuf service.
-message Service {}
+message Service {
+  // name is the name of the service.
+  string name = 1;
+  // service_methods are the service methods.
+  repeated ServiceMethod service_methods = 2;
+}
 
 // ServiceMethod describes a Protobuf service method.
-message ServiceMethod {}
+message ServiceMethod {
+  // name is the name of the service method.
+  string name = 1;
+  // request_type_name is the fully-qualified name of request message type.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name. If this is a nested message, the parent messages
+  // will be part of the name.
+  string request_type_name = 2;
+  // response_type_name is the fully-qualified name of response message type.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name. If this is a nested message, the parent messages
+  // will be part of the name.
+  string response_type_name = 3;
+  // client_streaming representing whether this is a client-side streaming
+  // method
+  bool client_streaming = 4;
+  // server_streaming representing whether this is a server-side streaming
+  // method
+  bool server_streaming = 5;
+}
