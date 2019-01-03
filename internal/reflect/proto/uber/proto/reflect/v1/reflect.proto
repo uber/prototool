@@ -104,16 +104,29 @@ message Message {
   //
   // This does not include any extended fields.
   repeated MessageField fields = 2;
+  // oneof contains the oneofs.
+  repeated Oneof oneofs = 3;
   // nested_message contains the messages directly nested on this message.
   repeated Message nested_messages = 4;
   // nested_enums contains the enums directed nested on this message.
   repeated Enum nested_enums = 5;
-  // oneof contains the oneofs.
-  repeated Oneof oneofs = 6;
 }
 
 // MessageField describes a Protobuf message field.
 message MessageField {
+  // Label is the label of the message field.
+  //
+  // The numbers match the FieldDescriptorProto.Label numbers.
+  //
+  // Note that a map field will come up as repeated, with type TYPE_MESSAGE,
+  // and the type_name will be *Entry. We may parse this from FieldDescriptorProtos
+  // in the future and add a LABEL_MAP.
+  enum Label {
+    LABEL_INVALID = 0;
+    LABEL_OPTIONAL = 1;
+    LABEL_REQUIRED = 2;
+    LABEL_REPEATED = 3;
+  }
   // Type is the type of the message field.
   //
   // The numbers match the FieldDescriptorProto.Type numbers.
@@ -138,19 +151,22 @@ message MessageField {
     TYPE_SINT32 = 17;
     TYPE_SINT64 = 18;
   }
-  // Label is the label of the message field.
+
+  // name is the name of the message field.
+  string name = 1;
+  // number is the number of the message field.
+  int32 number = 2;
+  // label is the label of the message field.
+  Label label = 3;
+  // type is the type of the message field.
+  Type type = 4;
+  // type_name is the fully-qualified name of the type for message and enum
+  // fields.
   //
-  // The numbers match the FieldDescriptorProto.Label numbers.
-  //
-  // Note that a map field will come up as repeated, with type TYPE_MESSAGE,
-  // and the type_name will be *Entry. We may parse this from FieldDescriptorProtos
-  // in the future and add a LABEL_MAP.
-  enum Label {
-    LABEL_INVALID = 0;
-    LABEL_OPTIONAL = 1;
-    LABEL_REQUIRED = 2;
-    LABEL_REPEATED = 3;
-  }
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name. If this is a nested message, the parent messages
+  // will be part of the name.
+  string type_name = 5;
 }
 
 // Oneof describes a Protobuf oneof.
