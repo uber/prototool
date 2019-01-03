@@ -25,11 +25,25 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 	"github.com/uber/prototool/internal/strs"
 )
+
+var jsonMarshaler = &jsonpb.Marshaler{Indent: "  "}
+
+func printJSON(fileDescriptorSets []*descriptor.FileDescriptorSet) error {
+	for _, fileDescriptorSet := range fileDescriptorSets {
+		s, err := jsonMarshaler.MarshalToString(fileDescriptorSet)
+		if err != nil {
+			return err
+		}
+		fmt.Println(s)
+	}
+	return nil
+}
 
 // NewPackageSet returns a new valid PackageSet for the given
 // FileDescriptorSets.
@@ -37,6 +51,9 @@ import (
 // The FileDescriptorSets can have FileDescriptorProtos with the same name, but
 // they must be equal.
 func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectv1.PackageSet, error) {
+	if err := printJSON(fileDescriptorSets); err != nil {
+		return nil, err
+	}
 	packageNameToFileNameToFileDescriptorProto, err := getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets)
 	if err != nil {
 		return nil, err

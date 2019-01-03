@@ -16,6 +16,7 @@ syntax = "proto3";
 // - Message field default values.
 // - Message field oneof indexes.
 // - Message field JSON names.
+// - Anything to do with extensions.
 //
 // Excluded items that should not be relevant at a package level:
 //
@@ -100,9 +101,9 @@ message Message {
   // will be part of the name.
   string name = 1;
   // fields contains the message fields.
+  //
+  // This does not include any extended fields.
   repeated MessageField fields = 2;
-  // extension_fields contains the message fields from extensions.
-  repeated MessageField extension_fields = 3;
   // nested_message contains the messages directly nested on this message.
   repeated Message nested_messages = 4;
   // nested_enums contains the enums directed nested on this message.
@@ -140,6 +141,10 @@ message MessageField {
   // Label is the label of the message field.
   //
   // The numbers match the FieldDescriptorProto.Label numbers.
+  //
+  // Note that a map field will come up as repeated, with type TYPE_MESSAGE,
+  // and the type_name will be *Entry. We may parse this from FieldDescriptorProtos
+  // in the future and add a LABEL_MAP.
   enum Label {
     LABEL_INVALID = 0;
     LABEL_OPTIONAL = 1;
