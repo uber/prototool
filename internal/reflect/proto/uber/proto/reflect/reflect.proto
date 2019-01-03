@@ -1,5 +1,28 @@
 syntax = "proto3";
 
+// Package uber.proto.reflect contains structures to represent information
+// about Protobuf definitions on a per-package basis. This differs from
+// the structures in descriptor.proto which represent Protobuf definitions
+// on a per-file basis.
+//
+// This package does not represent all information about a Protobuf package
+// at this time, be added in the future.
+//
+// A non-comprehensive list of excluded items:
+//
+// - Source code information.
+// - All options.
+// - Reserved ranges and names.
+// - Message field default values.
+// - Message field oneof indexes.
+// - Message field JSON names.
+//
+// Excluded items that should not be relevant at a package level:
+//
+// - Public vs non-public dependencies are all grouped into the same list.
+// - Syntax information.
+// - Fields vs extenstions.
+// - Extension ranges.
 package uber.proto.reflect;
 
 option go_package = "reflectpb";
@@ -33,4 +56,98 @@ message Package {
   // If you have a set of Package messages, this will correspond to the name
   // field of other Packages in the set.
   repeated string dependency_names = 2;
+  // enums contains the top-level enums within this package.
+  //
+  // These will be sorted by name.
+  // Nested enums will be within Messages.
+  repeated Enum enums = 3;
+  // messages contains the top-level messages within this package.
+  //
+  // These will be sorted by name.
+  // Nested messages will be within Messages.
+  repeated Message messages = 4;
+  // services contains the services within this package.
+  //
+  // These will be sorted by name.
+  repeated Service services = 5;
 }
+
+// Enum describes a Protobuf enum.
+message Enum {
+  // enum_values contains the enum values.
+  //
+  // These will be sorted by number.
+  repeated EnumValue enum_values = 1;
+}
+
+// Enum describes a Protobuf enum value.
+message EnumValue {
+  // name contains the value name.
+  string name = 1;
+  // number contains the value number.
+  int32 number = 2;
+}
+
+// Message describes a Protobuf message.
+message Message {
+  // name is the fully-qualified name of the message.
+  //
+  // The message name can be thought of as the unique identifier for a
+  // Message message, and is used as a reference.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name. If this is a nested message, the parent messages
+  // will be part of the name.
+  string name = 1;
+  // fields contains the message fields.
+  repeated MessageField fields = 2;
+  // extension_fields contains the message fields from extensions.
+  repeated MessageField extension_fields = 3;
+  // nested_message contains the messages directly nested on this message.
+  repeated Message nested_messages = 4;
+  // nested_enums contains the enums directed nested on this message.
+  repeated Enum nested_enums = 5;
+  // oneof contains the oneofs.
+  repeated Oneof oneofs = 6;
+}
+
+// MessageField describes a Protobuf message field.
+message MessageField {
+  //  enum Type {
+  //    TYPE_INVALID = 0;
+  //    TYPE_DOUBLE = 1;
+  //    TYPE_FLOAT = 2;
+  //    TYPE_INT64 = 3;
+  //    TYPE_UINT64 = 4;
+  //    TYPE_INT32 = 5;
+  //    TYPE_FIXED64 = 6;
+  //    TYPE_FIXED32 = 7;
+  //    TYPE_BOOL = 8;
+  //    TYPE_STRING = 9;
+  //    TYPE_GROUP = 10;
+  //    TYPE_MESSAGE = 11;
+  //    TYPE_BYTES = 12;
+  //    TYPE_UINT32 = 13;
+  //    TYPE_ENUM = 14;
+  //    TYPE_SFIXED32 = 15;
+  //    TYPE_SFIXED64 = 16;
+  //    TYPE_SINT32 = 17;
+  //    TYPE_SINT64 = 18;
+  //  }
+  //  enum Label {
+  //    LABEL_INVALID = 0;
+  //    LABEL_OPTIONAL = 1;
+  //    LABEL_REQUIRED = 2;
+  //    LABEL_REPEATED = 3;
+  //  }
+
+}
+
+// Oneof describes a Protobuf oneof.
+message Oneof {}
+
+// Service describes a Protobuf service.
+message Service {}
+
+// ServiceMethod describes a Protobuf service method.
+message ServiceMethod {}
