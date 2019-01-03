@@ -132,9 +132,6 @@ func (v *mainVisitor) VisitImport(element *proto.Import) {
 func (v *mainVisitor) VisitNormalField(element *proto.NormalField) {
 	v.haveHitNonComment = true
 	prefix := ""
-	if element.Repeated {
-		prefix = "repeated "
-	}
 	if v.isProto2 {
 		// technically these are only set if the file is proto2
 		// but doing this just to make sure
@@ -143,6 +140,9 @@ func (v *mainVisitor) VisitNormalField(element *proto.NormalField) {
 		} else {
 			prefix = "optional "
 		}
+	}
+	if element.Repeated {
+		prefix = "repeated "
 	}
 	v.PField(prefix, element.Type, element.Field)
 }
