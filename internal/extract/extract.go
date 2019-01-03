@@ -24,18 +24,18 @@ package extract
 import (
 	"fmt"
 
-	reflectpb "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect"
+	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 )
 
 // PackageSet is the Golang wrapper for the Protobuf PackageSet object.
 type PackageSet struct {
-	protoMessage *reflectpb.PackageSet
+	protoMessage *reflectv1.PackageSet
 
 	packageNameToPackage map[string]*Package
 }
 
 // ProtoMessage returns the underlying Protobuf messge.
-func (p *PackageSet) ProtoMessage() *reflectpb.PackageSet {
+func (p *PackageSet) ProtoMessage() *reflectv1.PackageSet {
 	return p.protoMessage
 }
 
@@ -46,7 +46,7 @@ func (p *PackageSet) PackageNameToPackage() map[string]*Package {
 
 // Package is the Golang wrapper for the Protobuf Package object.
 type Package struct {
-	protoMessage *reflectpb.Package
+	protoMessage *reflectv1.Package
 
 	packageSet                 *PackageSet
 	dependencyNameToDependency map[string]*Package
@@ -54,7 +54,7 @@ type Package struct {
 }
 
 // ProtoMessage returns the underlying Protobuf messge.
-func (p *Package) ProtoMessage() *reflectpb.Package {
+func (p *Package) ProtoMessage() *reflectv1.Package {
 	return p.protoMessage
 }
 
@@ -74,7 +74,7 @@ func (p *Package) ImporterNameToImporter() map[string]*Package {
 }
 
 // NewPackageSet returns a new PackageSet for the given reflect PackageSet.
-func NewPackageSet(protoMessage *reflectpb.PackageSet) (*PackageSet, error) {
+func NewPackageSet(protoMessage *reflectv1.PackageSet) (*PackageSet, error) {
 	packageSet := &PackageSet{
 		protoMessage:         protoMessage,
 		packageNameToPackage: make(map[string]*Package),

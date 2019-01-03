@@ -27,7 +27,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	reflectpb "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect"
+	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 	"github.com/uber/prototool/internal/strs"
 )
 
@@ -36,7 +36,7 @@ import (
 //
 // The FileDescriptorSets can have FileDescriptorProtos with the same name, but
 // they must be equal.
-func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectpb.PackageSet, error) {
+func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectv1.PackageSet, error) {
 	packageNameToFileNameToFileDescriptorProto, err := getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets)
 	if err != nil {
 		return nil, err
@@ -45,9 +45,9 @@ func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflec
 	if err != nil {
 		return nil, err
 	}
-	packageNameToPackage := make(map[string]*reflectpb.Package)
+	packageNameToPackage := make(map[string]*reflectv1.Package)
 	for packageName := range packageNameToFileNameToFileDescriptorProto {
-		packageNameToPackage[packageName] = &reflectpb.Package{
+		packageNameToPackage[packageName] = &reflectv1.Package{
 			Name: packageName,
 		}
 	}
@@ -67,8 +67,8 @@ func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflec
 	for _, pkg := range packageNameToPackage {
 		pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
 	}
-	packageSet := &reflectpb.PackageSet{
-		Packages: make([]*reflectpb.Package, 0, len(packageNameToPackage)),
+	packageSet := &reflectv1.PackageSet{
+		Packages: make([]*reflectv1.Package, 0, len(packageNameToPackage)),
 	}
 	for _, pkg := range packageNameToPackage {
 		packageSet.Packages = append(packageSet.Packages, pkg)
@@ -135,7 +135,7 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 	return fileNameToPackageName, nil
 }
 
-type sortPackages []*reflectpb.Package
+type sortPackages []*reflectv1.Package
 
 func (s sortPackages) Len() int          { return len(s) }
 func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }

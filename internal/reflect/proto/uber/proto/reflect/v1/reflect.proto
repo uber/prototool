@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-// Package uber.proto.reflect contains structures to represent information
+// Package uber.proto.reflect.v1 contains structures to represent information
 // about Protobuf definitions on a per-package basis. This differs from
 // the structures in descriptor.proto which represent Protobuf definitions
 // on a per-file basis.
@@ -23,12 +23,12 @@ syntax = "proto3";
 // - Syntax information.
 // - Fields vs extenstions.
 // - Extension ranges.
-package uber.proto.reflect;
+package uber.proto.reflect.v1;
 
-option go_package = "reflectpb";
+option go_package = "reflectv1";
 option java_multiple_files = true;
 option java_outer_classname = "ReflectProto";
-option java_package = "com.uber.proto.reflect";
+option java_package = "com.uber.proto.reflect.v1";
 
 // PackageSet is a set of Packages.
 message PackageSet {
@@ -80,7 +80,7 @@ message Enum {
   repeated EnumValue enum_values = 1;
 }
 
-// Enum describes a Protobuf enum value.
+// EnumValue describes a Protobuf enum value.
 message EnumValue {
   // name contains the value name.
   string name = 1;
