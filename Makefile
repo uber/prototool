@@ -72,7 +72,7 @@ internalgen: install
 	rm -rf internal/cmd/testdata/grpc/gen
 	prototool generate internal/cmd/testdata/grpc
 	rm -rf internal/reflect/gen
-	prototool all internal/reflect
+	prototool all internal/reflect/proto
 	rm -f etc/config/example/prototool.yaml
 	prototool config init etc/config/example --uncomment
 

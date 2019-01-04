@@ -105,8 +105,8 @@ message Message {
   //
   // This does not include any extended fields.
   repeated MessageField message_fields = 2;
-  // oneof contains the oneofs.
-  repeated Oneof oneofs = 3;
+  // message_oneofs contains the oneofs.
+  repeated MessageOneof message_oneofs = 3;
   // nested_message contains the messages directly nested on this message.
   repeated Message nested_messages = 4;
   // nested_enums contains the enums directed nested on this message.
@@ -169,12 +169,12 @@ message MessageField {
   string type_name = 5;
 }
 
-// Oneof describes a Protobuf oneof.
-message Oneof {
-  // name is the name of the oneof.
+// MessageOneof describes a Protobuf message oneof.
+message MessageOneof {
+  // name is the name of the message oneof.
   string name = 1;
   // field_numbers are the field numbers in the encapsulating type that make up
-  // this oneof.
+  // this message oneof.
   repeated int32 field_numbers = 2;
 }
 

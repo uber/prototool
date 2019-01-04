@@ -144,7 +144,9 @@ func populateDependencies(
 		}
 	}
 	for _, pkg := range packageNameToPackage {
-		pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
+		if pkg.DependencyNames != nil {
+			pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
+		}
 	}
 	return nil
 }
@@ -159,7 +161,9 @@ func populateEnums(
 		if err != nil {
 			return err
 		}
-		pkg.Enums = append(pkg.Enums, enums...)
+		if len(enums) > 0 {
+			pkg.Enums = append(pkg.Enums, enums...)
+		}
 	}
 	sort.Slice(pkg.Enums, func(i int, j int) bool { return pkg.Enums[i].Name < pkg.Enums[j].Name })
 	return nil
@@ -175,7 +179,9 @@ func populateMessages(
 		if err != nil {
 			return err
 		}
-		pkg.Messages = append(pkg.Messages, messages...)
+		if len(messages) > 0 {
+			pkg.Messages = append(pkg.Messages, messages...)
+		}
 	}
 	sort.Slice(pkg.Messages, func(i int, j int) bool { return pkg.Messages[i].Name < pkg.Messages[j].Name })
 	return nil
@@ -191,7 +197,9 @@ func populateServices(
 		if err != nil {
 			return err
 		}
-		pkg.Services = append(pkg.Services, services...)
+		if len(services) > 0 {
+			pkg.Services = append(pkg.Services, services...)
+		}
 	}
 	sort.Slice(pkg.Services, func(i int, j int) bool { return pkg.Services[i].Name < pkg.Services[j].Name })
 	return nil
@@ -228,6 +236,9 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 }
 
 func getEnums(enumDescriptorProtos []*descriptor.EnumDescriptorProto) ([]*reflectv1.Enum, error) {
+	if len(enumDescriptorProtos) == 0 {
+		return nil, nil
+	}
 	enums := make([]*reflectv1.Enum, 0, len(enumDescriptorProtos))
 	for _, enumDescriptorProto := range enumDescriptorProtos {
 		enum, err := newEnum(enumDescriptorProto)
@@ -255,6 +266,9 @@ func newEnum(enumDescriptorProto *descriptor.EnumDescriptorProto) (*reflectv1.En
 }
 
 func getMessages(descriptorProtos []*descriptor.DescriptorProto) ([]*reflectv1.Message, error) {
+	if len(descriptorProtos) == 0 {
+		return nil, nil
+	}
 	messages := make([]*reflectv1.Message, 0, len(descriptorProtos))
 	for _, descriptorProto := range descriptorProtos {
 		message, err := newMessage(descriptorProto)
@@ -268,13 +282,37 @@ func getMessages(descriptorProtos []*descriptor.DescriptorProto) ([]*reflectv1.M
 }
 
 func newMessage(descriptorProto *descriptor.DescriptorProto) (*reflectv1.Message, error) {
+	nestedMessages, err := getMessages(descriptorProto.GetNestedType())
+	if err != nil {
+		return nil, err
+	}
+	nestedEnums, err := getEnums(descriptorProto.GetEnumType())
+	if err != nil {
+		return nil, err
+	}
 	message := &reflectv1.Message{
-		Name: descriptorProto.GetName(),
+		Name:           descriptorProto.GetName(),
+		NestedMessages: nestedMessages,
+		NestedEnums:    nestedEnums,
+	}
+	nameToMessageOneof := make(map[string]*reflectv1.MessageOneof, len(descriptorProto.GetOneofDecl()))
+	for _, oneofDescriptorProto := range descriptorProto.GetOneofDecl() {
+		nameToMessageOneof[oneofDescriptorProto.GetName()] = &reflectv1.MessageOneof{
+			Name: oneofDescriptorProto.GetName(),
+		}
+	}
+	for _, fieldDescriptorProto := range descriptorProto.GetField() {
+		message.MessageFields = append(message.MessageFields, &reflectv1.MessageField{
+			Name: fieldDescriptorProto.GetName(),
+		})
 	}
 	return message, nil
 }
 
 func getServices(serviceDescriptorProtos []*descriptor.ServiceDescriptorProto) ([]*reflectv1.Service, error) {
+	if len(serviceDescriptorProtos) == 0 {
+		return nil, nil
+	}
 	services := make([]*reflectv1.Service, 0, len(serviceDescriptorProtos))
 	for _, serviceDescriptorProto := range serviceDescriptorProtos {
 		service, err := newService(serviceDescriptorProto)
