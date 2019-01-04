@@ -19,12 +19,10 @@ require (
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
 	github.com/stretchr/testify v1.2.2
-	github.com/wadey/gocovmerge v0.0.0-20160331181800-b5bfa59ec0ad
 	go.uber.org/atomic v1.3.2 // indirect
 	go.uber.org/multierr v1.1.0
 	go.uber.org/tools v0.0.0-20170523140223-ce2550dad714
 	go.uber.org/zap v1.9.1
-	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1
 	golang.org/x/net v0.0.0-20181220203305-927f97764cc3
 	golang.org/x/tools v0.0.0-20190103205943-8a6051197512
 	google.golang.org/grpc v1.17.0
