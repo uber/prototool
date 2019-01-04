@@ -1,5 +1,6 @@
 branches:
   only:
+    - dev
     - master
 language: go
 go:
