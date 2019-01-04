@@ -6,3 +6,76 @@ option go_package = "foov1";
 option java_multiple_files = true;
 option java_outer_classname = "OneProto";
 option java_package = "com.uber.proto.foo.v1";
+
+import "uber/proto/bar/v1/one.proto";
+import "uber/proto/bar/v1/two.proto";
+import "uber/proto/foo/v1/two.proto";
+
+message OneFoo {
+  int64 one = 1;
+  string two = 2;
+  OneBar one_bar = 3;
+}
+
+message OneBar {
+  int64 one = 1;
+  string two = 2;
+}
+
+message OneBaz {
+  OneFoo one_foo = 1;
+  OneBar one_bar = 2;
+  TwoFoo two_foo = 3;
+  TwoBar two_bar = 4;
+}
+
+message OneBat {
+  bar.v1.OneFoo one_foo = 1;
+  bar.v1.OneBar one_bar = 2;
+  uber.proto.bar.v1.TwoFoo two_foo = 3;
+  uber.proto.bar.v1.TwoBar two_bar = 4;
+}
+
+enum Enum {
+  ENUM_INVALID = 0;
+  ENUM_FOO = 1;
+  ENUM_BAR = 2;
+}
+
+message Simple {
+  message Nested {
+    int64 one = 1;
+    string two = 2;
+  }
+  enum NestedEnum {
+    NESTED_ENUM_INVALID = 0;
+    NESTED_ENUM_FOO = 1;
+    NESTED_ENUM_BAR = 2;
+  }
+
+  int64 one = 1;
+  string two = 2;
+  repeated int64 three = 3;
+  map<int64, string> four = 4;
+}
+
+message FooRequest {
+  int64 one = 1;
+}
+
+message FooResponse {
+  int64 one = 1;
+}
+
+message BarRequest {
+  int64 one = 1;
+}
+
+message BarResponse {
+  int64 one = 1;
+}
+
+service SomeAPI {
+  rpc Foo(FooRequest) returns (FooResponse);
+  rpc Bar(BarRequest) returns (BarResponse);
+}
