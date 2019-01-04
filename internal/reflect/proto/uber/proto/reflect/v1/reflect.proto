@@ -182,6 +182,8 @@ message MessageOneof {
   string name = 1;
   // field_numbers are the field numbers in the encapsulating type that make up
   // this message oneof.
+  //
+  // This will ber sorted.
   repeated int32 field_numbers = 2;
 }
 
@@ -190,6 +192,8 @@ message Service {
   // name is the name of the service.
   string name = 1;
   // service_methods are the service methods.
+  //
+  // These will be sorted by name.
   repeated ServiceMethod service_methods = 2;
 }
 

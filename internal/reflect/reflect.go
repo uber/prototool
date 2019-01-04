@@ -144,7 +144,7 @@ func populateDependencies(
 		}
 	}
 	for _, pkg := range packageNameToPackage {
-		if pkg.DependencyNames != nil {
+		if len(pkg.DependencyNames) != 0 {
 			pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
 		}
 	}
@@ -207,6 +207,9 @@ func populateServices(
 
 // helper for NewPackageSet
 func getPackageSet(packageNameToPackage map[string]*reflectv1.Package) (*reflectv1.PackageSet, error) {
+	if len(packageNameToPackage) == 0 {
+		return &reflectv1.PackageSet{}, nil
+	}
 	packageSet := &reflectv1.PackageSet{
 		Packages: make([]*reflectv1.Package, 0, len(packageNameToPackage)),
 	}
@@ -302,11 +305,32 @@ func newMessage(descriptorProto *descriptor.DescriptorProto) (*reflectv1.Message
 		}
 	}
 	for _, fieldDescriptorProto := range descriptorProto.GetField() {
+		typeName := fieldDescriptorProto.GetTypeName()
+		if typeName != "" {
+			typeName, err = verifyFullyQualifiedNameAndStrip(typeName)
+			if err != nil {
+				return nil, err
+			}
+		}
 		message.MessageFields = append(message.MessageFields, &reflectv1.MessageField{
-			Name: fieldDescriptorProto.GetName(),
+			Name:   fieldDescriptorProto.GetName(),
+			Number: fieldDescriptorProto.GetNumber(),
+			// TODO: this is technically unsafe since we're just working on the assumption
+			// that the numbers match up...which they do, but this isn't future proof
+			// however, the values for descriptor.proto have not changed since proto1
+			// which isn't even OSS, so we're probably fine for 10-20 years
+			Type:     reflectv1.MessageField_Type(fieldDescriptorProto.GetType()),
+			Label:    reflectv1.MessageField_Label(fieldDescriptorProto.GetLabel()),
+			TypeName: typeName,
 		})
+		if fieldDescriptorProto.OneofIndex != nil {
+			// TODO: super unsafe
+			messageOneof := nameToMessageOneof[descriptorProto.GetOneofDecl()[fieldDescriptorProto.GetOneofIndex()].GetName()]
+			messageOneof.FieldNumbers = append(messageOneof.FieldNumbers, fieldDescriptorProto.GetNumber())
+		}
 	}
 	for _, messageOneof := range nameToMessageOneof {
+		sort.Slice(messageOneof.FieldNumbers, func(i int, j int) bool { return messageOneof.FieldNumbers[i] < messageOneof.FieldNumbers[j] })
 		message.MessageOneofs = append(message.MessageOneofs, messageOneof)
 	}
 	sort.Slice(message.MessageFields, func(i int, j int) bool { return message.MessageFields[i].Number < message.MessageFields[j].Number })
