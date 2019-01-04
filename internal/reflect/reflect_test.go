@@ -38,7 +38,7 @@ import (
 var jsonMarshaler = &jsonpb.Marshaler{Indent: "  "}
 
 func TestBasic(t *testing.T) {
-	fileDescriptorSets := testGetFileDescriptorSets(t, "testdata/one")
+	fileDescriptorSets := testGetFileDescriptorSets(t, "../cmd/testdata/reflect/one")
 	packageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
 	require.NoError(t, err)
 	testPrintPackageSetJSON(t, packageSet)
