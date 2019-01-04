@@ -56,6 +56,9 @@ func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflec
 		if err := populateEnums(pkg, fileNameToFileDescriptorProto); err != nil {
 			return nil, err
 		}
+		if err := populateMessages(pkg, fileNameToFileDescriptorProto); err != nil {
+			return nil, err
+		}
 		if err := populateServices(pkg, fileNameToFileDescriptorProto); err != nil {
 			return nil, err
 		}
@@ -156,9 +159,25 @@ func populateEnums(
 		if err != nil {
 			return err
 		}
-		pkg.Enums = enums
+		pkg.Enums = append(pkg.Enums, enums...)
 	}
 	sort.Slice(pkg.Enums, func(i int, j int) bool { return pkg.Enums[i].Name < pkg.Enums[j].Name })
+	return nil
+}
+
+// helper for NewPackageSet
+func populateMessages(
+	pkg *reflectv1.Package,
+	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
+) error {
+	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
+		messages, err := getMessages(fileDescriptorProto.GetMessageType())
+		if err != nil {
+			return err
+		}
+		pkg.Messages = append(pkg.Messages, messages...)
+	}
+	sort.Slice(pkg.Messages, func(i int, j int) bool { return pkg.Messages[i].Name < pkg.Messages[j].Name })
 	return nil
 }
 
@@ -172,7 +191,7 @@ func populateServices(
 		if err != nil {
 			return err
 		}
-		pkg.Services = services
+		pkg.Services = append(pkg.Services, services...)
 	}
 	sort.Slice(pkg.Services, func(i int, j int) bool { return pkg.Services[i].Name < pkg.Services[j].Name })
 	return nil
@@ -233,6 +252,26 @@ func newEnum(enumDescriptorProto *descriptor.EnumDescriptorProto) (*reflectv1.En
 	}
 	sort.Slice(enum.EnumValues, func(i int, j int) bool { return enum.EnumValues[i].Number < enum.EnumValues[j].Number })
 	return enum, nil
+}
+
+func getMessages(descriptorProtos []*descriptor.DescriptorProto) ([]*reflectv1.Message, error) {
+	messages := make([]*reflectv1.Message, 0, len(descriptorProtos))
+	for _, descriptorProto := range descriptorProtos {
+		message, err := newMessage(descriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		messages = append(messages, message)
+	}
+	sort.Slice(messages, func(i int, j int) bool { return messages[i].Name < messages[j].Name })
+	return messages, nil
+}
+
+func newMessage(descriptorProto *descriptor.DescriptorProto) (*reflectv1.Message, error) {
+	message := &reflectv1.Message{
+		Name: descriptorProto.GetName(),
+	}
+	return message, nil
 }
 
 func getServices(serviceDescriptorProtos []*descriptor.ServiceDescriptorProto) ([]*reflectv1.Service, error) {
