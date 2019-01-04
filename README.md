@@ -486,7 +486,7 @@ on a location we don't know about.
 
 *Answer:* `apk add libc6-compat`
 
-`protoc` is not statically compiled, and adding this packages fixes the problem.
+`protoc` is not statically compiled, and adding this package fixes the problem.
 
 ##### Managing External Plugins/Docker
 
