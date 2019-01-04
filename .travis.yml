@@ -7,7 +7,6 @@ go:
   - "1.11.x"
 cache:
   directories:
-    - $HOME/.cache/go-build
     - $GOPATH/pkg/mod
 script:
   - make checknodiffgenerated
