@@ -10,4 +10,6 @@ cache:
     - $HOME/.cache/go-build
     - $GOPATH/pkg/mod
 script:
-  - make ci
+  - make checknodiffgenerated
+  - make -j 8 golint vet errcheck staticcheck checklicense cover
+  - make codecov

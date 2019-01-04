@@ -21,9 +21,6 @@ export PATH := $(GOBIN):$(PATH)
 .PHONY: all
 all: lint cover
 
-.PHONY: ci
-ci: lint codecov
-
 .PHONY: init
 init:
 	go mod download
@@ -142,7 +139,7 @@ cover:
 	go tool cover -func=$(TMP_ETC)/coverage.txt | grep total
 
 .PHONY: codecov
-codecov: cover
+codecov:
 	bash <(curl -s https://codecov.io/bash) -c -f $(TMP_ETC)/coverage.txt
 
 .PHONY: releasegen
