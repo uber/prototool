@@ -21,7 +21,7 @@
 package lint
 
 import (
-	"fmt"
+	"strings"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
@@ -30,10 +30,10 @@ import (
 var fieldsNotReservedLinter = NewLinter(
 	"FIELDS_NOT_RESERVED",
 	`Verifies that no message or enum has a reserved field.`,
-	checkMessageFieldsNoReservedValues,
+	checkFieldsNotReserved,
 )
 
-func checkMessageFieldsNoReservedValues(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkFieldsNotReserved(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
 	return runVisitor(fieldsNotReservedVisitor{baseAddVisitor: newBaseAddVisitor(add), outerNameStack: make([]string, 0)}, descriptors)
 }
 
@@ -46,7 +46,7 @@ func (v fieldsNotReservedVisitor) VisitMessage(message *proto.Message) {
 	// Push name on stack.
 	v.outerNameStack = append(
 		v.outerNameStack,
-		fmt.Sprintf("Message: %q", message.Name),
+		message.Name,
 	)
 	for _, element := range message.Elements {
 		element.Accept(v)
@@ -59,7 +59,7 @@ func (v fieldsNotReservedVisitor) VisitEnum(enum *proto.Enum) {
 	// Push name on stack.
 	v.outerNameStack = append(
 		v.outerNameStack,
-		fmt.Sprintf("Enum: %q", enum.Name),
+		enum.Name,
 	)
 	for _, element := range enum.Elements {
 		element.Accept(v)
@@ -69,10 +69,6 @@ func (v fieldsNotReservedVisitor) VisitEnum(enum *proto.Enum) {
 }
 
 func (v fieldsNotReservedVisitor) VisitReserved(reserved *proto.Reserved) {
-	var outerName string
-	if len(v.outerNameStack) > 0 {
-		outerName = v.outerNameStack[len(v.outerNameStack)-1]
-	}
 	var reservedType string
 	// A reserved can't have both ranges and field names in the same
 	// field.
@@ -81,5 +77,5 @@ func (v fieldsNotReservedVisitor) VisitReserved(reserved *proto.Reserved) {
 	} else {
 		reservedType = "field names"
 	}
-	v.AddFailuref(reserved.Position, `%s cannot have "reserved" %s.`, outerName, reservedType)
+	v.AddFailuref(reserved.Position, `%q cannot have reserved %s, use the deprecated field option instead.`, strings.Join(v.outerNameStack, "."), reservedType)
 }

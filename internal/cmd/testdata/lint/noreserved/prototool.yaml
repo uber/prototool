@@ -1,4 +1,4 @@
 lint:
   rules:
-      add:
-            - FIELDS_NOT_RESERVED
+    add:
+      - FIELDS_NOT_RESERVED
