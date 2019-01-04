@@ -46,6 +46,7 @@ var (
 		enumZeroValuesInvalidExceptMessageLinter,
 		enumsHaveCommentsLinter,
 		enumsNoAllowAliasLinter,
+		fieldsNotReservedLinter,
 		fileOptionsEqualGoPackageLastTwoSuffixLinter,
 		fileOptionsEqualGoPackagePbSuffixLinter,
 		fileOptionsEqualJavaMultipleFilesTrueLinter,

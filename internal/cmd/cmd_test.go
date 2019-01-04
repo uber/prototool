@@ -391,6 +391,17 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`11:3:FIELDS_NOT_RESERVED
+                 12:3:FIELDS_NOT_RESERVED
+                 14:5:FIELDS_NOT_RESERVED
+                 15:5:FIELDS_NOT_RESERVED
+                 20:5:FIELDS_NOT_RESERVED`,
+		"testdata/lint/noreserved/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`10:1:GOGO_NOT_IMPORTED`,
 		"testdata/lint/gogonotimported/gogonotimported.proto",
 	)
