@@ -152,13 +152,11 @@ func populateEnums(
 	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
 ) error {
 	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
-		for _, enumDescriptorProto := range fileDescriptorProto.GetEnumType() {
-			enum, err := newEnum(enumDescriptorProto)
-			if err != nil {
-				return err
-			}
-			pkg.Enums = append(pkg.Enums, enum)
+		enums, err := getEnums(fileDescriptorProto.GetEnumType())
+		if err != nil {
+			return err
 		}
+		pkg.Enums = enums
 	}
 	sort.Slice(pkg.Enums, func(i int, j int) bool { return pkg.Enums[i].Name < pkg.Enums[j].Name })
 	return nil
@@ -170,13 +168,11 @@ func populateServices(
 	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
 ) error {
 	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
-		for _, serviceDescriptorProto := range fileDescriptorProto.GetService() {
-			service, err := newService(serviceDescriptorProto)
-			if err != nil {
-				return err
-			}
-			pkg.Services = append(pkg.Services, service)
+		services, err := getServices(fileDescriptorProto.GetService())
+		if err != nil {
+			return err
 		}
+		pkg.Services = services
 	}
 	sort.Slice(pkg.Services, func(i int, j int) bool { return pkg.Services[i].Name < pkg.Services[j].Name })
 	return nil
@@ -212,6 +208,19 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 	return fileNameToPackageName, nil
 }
 
+func getEnums(enumDescriptorProtos []*descriptor.EnumDescriptorProto) ([]*reflectv1.Enum, error) {
+	enums := make([]*reflectv1.Enum, 0, len(enumDescriptorProtos))
+	for _, enumDescriptorProto := range enumDescriptorProtos {
+		enum, err := newEnum(enumDescriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		enums = append(enums, enum)
+	}
+	sort.Slice(enums, func(i int, j int) bool { return enums[i].Name < enums[j].Name })
+	return enums, nil
+}
+
 func newEnum(enumDescriptorProto *descriptor.EnumDescriptorProto) (*reflectv1.Enum, error) {
 	enum := &reflectv1.Enum{
 		Name: enumDescriptorProto.GetName(),
@@ -224,6 +233,19 @@ func newEnum(enumDescriptorProto *descriptor.EnumDescriptorProto) (*reflectv1.En
 	}
 	sort.Slice(enum.EnumValues, func(i int, j int) bool { return enum.EnumValues[i].Number < enum.EnumValues[j].Number })
 	return enum, nil
+}
+
+func getServices(serviceDescriptorProtos []*descriptor.ServiceDescriptorProto) ([]*reflectv1.Service, error) {
+	services := make([]*reflectv1.Service, 0, len(serviceDescriptorProtos))
+	for _, serviceDescriptorProto := range serviceDescriptorProtos {
+		service, err := newService(serviceDescriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		services = append(services, service)
+	}
+	sort.Slice(services, func(i int, j int) bool { return services[i].Name < services[j].Name })
+	return services, nil
 }
 
 func newService(serviceDescriptorProto *descriptor.ServiceDescriptorProto) (*reflectv1.Service, error) {
