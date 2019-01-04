@@ -209,8 +209,10 @@ func newEnum(protoMessage *reflectv1.Enum, encapsulatingFullyQualifiedName strin
 
 func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName string) *Message {
 	message := &Message{
-		protoMessage:       protoMessage,
-		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+		protoMessage:               protoMessage,
+		fullyQualifiedName:         getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+		nestedEnumNameToEnum:       make(map[string]*Enum),
+		nestedMessageNameToMessage: make(map[string]*Message),
 	}
 	for _, nestedEnum := range protoMessage.NestedEnums {
 		message.nestedEnumNameToEnum[nestedEnum.Name] = newEnum(nestedEnum, message.fullyQualifiedName)
