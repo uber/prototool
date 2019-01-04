@@ -12,6 +12,7 @@ TMP_BASE := .tmp
 TMP := $(TMP_BASE)/$(UNAME_OS)/$(UNAME_ARCH)
 TMP_LIB := $(TMP)/lib
 TMP_BIN = $(TMP)/bin
+TMP_COVER := $(TMP)/cover
 
 unexport GOPATH
 export GO111MODULE := on
@@ -134,15 +135,15 @@ test:
 .PHONY: cover
 cover:
 	@go install golang.org/x/tools/cmd/cover
-	@go install github.com/wadey/gocovmerge
-	./etc/bin/cover.sh $(PKGS)
-	go tool cover -html=coverage.txt -o cover.html
-	go tool cover -func=coverage.txt | grep total
+	@rm -rf $(TMP_COVER)
+	@mkdir -p $(TMP_COVER)
+	go test -race -coverprofile=$(TMP_COVER)/coverage.txt -coverpkg=$(shell echo $(PKGS) | tr ' ' ',') $(PKGS)
+	go tool cover -html=$(TMP_COVER)/coverage.txt -o $(TMP_COVER)/coverage.html
+	go tool cover -func=$(TMP_COVER)/coverage.txt | grep total
 
 .PHONY: codecov
-codecov: SHELL := /bin/bash
 codecov: cover
-	bash <(curl -s https://codecov.io/bash) -c -f coverage.txt
+	bash <(curl -s https://codecov.io/bash) -c -f $(TMP_COVER)/coverage.txt
 
 .PHONY: releasegen
 releasegen: internalgen

@@ -5,9 +5,6 @@
 /example/gen/proto/descriptor
 /example/gen/proto/java
 /cmd/prototool/prototool
-/cover
-/cover.html
-/coverage.txt
 /internal/cmd/gen-prototool-bash-completion/gen-prototool-bash-completion
 /internal/cmd/gen-prototool-zsh-completion/gen-prototool-zsh-completion
 /internal/cmd/gen-prototool-manpages/gen-prototool-manpages
