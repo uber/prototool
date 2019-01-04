@@ -63,6 +63,8 @@ var (
 		fileOptionsUnsetJavaMultipleFilesLinter,
 		fileOptionsUnsetJavaOuterClassnameLinter,
 		gogoNotImportedLinter,
+		importsNotPublicLinter,
+		importsNotWeakLinter,
 		messageFieldsNotFloatsLinter,
 		messageFieldsNoJSONNameLinter,
 		messageFieldNamesLowerSnakeCaseLinter,

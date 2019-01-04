@@ -409,6 +409,20 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`10:1:IMPORTS_NOT_PUBLIC`,
+		"testdata/lint/importsnotpublic/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`10:1:IMPORTS_NOT_WEAK`,
+		"testdata/lint/importsnotweak/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`16:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE
 		16:3:ENUM_ZERO_VALUES_INVALID_EXCEPT_MESSAGE
 		17:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE

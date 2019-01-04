@@ -1,0 +1,4 @@
+lint:
+  rules:
+    add:
+      - IMPORTS_NOT_PUBLIC
