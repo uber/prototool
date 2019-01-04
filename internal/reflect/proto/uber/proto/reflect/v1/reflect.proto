@@ -1,0 +1,222 @@
+syntax = "proto3";
+
+// Package uber.proto.reflect.v1 contains structures to represent information
+// about Protobuf definitions on a per-package basis. This differs from
+// the structures in descriptor.proto which represent Protobuf definitions
+// on a per-file basis.
+//
+// This package does not represent all information about a Protobuf package
+// at this time, be added in the future.
+//
+// A non-comprehensive list of excluded items:
+//
+// - Source code information.
+// - All options.
+// - Reserved ranges and names.
+// - Message field default values.
+// - Message field oneof indexes.
+// - Message field JSON names.
+// - Anything to do with extensions.
+//
+// Excluded items that should not be relevant at a package level:
+//
+// - Public vs non-public dependencies are all grouped into the same list.
+// - Syntax information.
+// - Fields vs extenstions.
+// - Extension ranges.
+package uber.proto.reflect.v1;
+
+option go_package = "reflectv1";
+option java_multiple_files = true;
+option java_outer_classname = "ReflectProto";
+option java_package = "com.uber.proto.reflect.v1";
+
+// PackageSet is a set of Packages.
+message PackageSet {
+  // packages contains the set of Packages.
+  //
+  // These will all be unique, and can be referenced by their name field.
+  // These will also be sorted by name.
+  repeated Package packages = 1;
+}
+
+// Package describes a Protobuf package, constructed from a set of Protobuf
+// files that have the same "package" value.
+message Package {
+  // name is the fully-qualified name of the package.
+  //
+  // The package name can be thought of as the unique identifier for a
+  // Package message, and is used as a reference.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name.
+  string name = 1;
+  // dependency_names contains the names of this packages' dependencies.
+  //
+  // These will be sorted.
+  // If you have a set of Package messages, this will correspond to the name
+  // field of other Packages in the set.
+  repeated string dependency_names = 2;
+  // enums contains the top-level enums within this package.
+  //
+  // These will be sorted by name.
+  // Nested enums will be within Messages.
+  repeated Enum enums = 3;
+  // messages contains the top-level messages within this package.
+  //
+  // These will be sorted by name.
+  // Nested messages will be within Messages.
+  repeated Message messages = 4;
+  // services contains the services within this package.
+  //
+  // These will be sorted by name.
+  repeated Service services = 5;
+}
+
+// Enum describes a Protobuf enum.
+message Enum {
+  // name is the name of the enum.
+  //
+  // If this is a nested enum, this will not contain the name of the
+  // encapsulating message.
+  string name = 1;
+  // enum_values contains the enum values.
+  //
+  // These will be sorted by number.
+  repeated EnumValue enum_values = 2;
+}
+
+// EnumValue describes a Protobuf enum value.
+message EnumValue {
+  // name contains the value name.
+  string name = 1;
+  // number contains the value number.
+  int32 number = 2;
+}
+
+// Message describes a Protobuf message.
+message Message {
+  // name is the name of the message.
+  //
+  // If this is a nested message, this will not contain the name of the
+  // encapsulating message.
+  string name = 1;
+  // message_fields contains the message fields.
+  //
+  // This does not include any extended fields.
+  // These will be sorted by number.
+  repeated MessageField message_fields = 2;
+  // message_oneofs contains the oneofs.
+  //
+  // These will be sorted by name.
+  repeated MessageOneof message_oneofs = 3;
+  // nested_message contains the messages directly nested on this message.
+  //
+  // These will be sorted by name.
+  repeated Message nested_messages = 4;
+  // nested_enums contains the enums directed nested on this message.
+  //
+  // These will be sorted by name.
+  repeated Enum nested_enums = 5;
+}
+
+// MessageField describes a Protobuf message field.
+message MessageField {
+  // Label is the label of the message field.
+  //
+  // The numbers match the FieldDescriptorProto.Label numbers.
+  //
+  // Note that a map field will come up as repeated, with type TYPE_MESSAGE,
+  // and the type_name will be *Entry. We may parse this from FieldDescriptorProtos
+  // in the future and add a LABEL_MAP.
+  enum Label {
+    LABEL_INVALID = 0;
+    LABEL_OPTIONAL = 1;
+    LABEL_REQUIRED = 2;
+    LABEL_REPEATED = 3;
+  }
+  // Type is the type of the message field.
+  //
+  // The numbers match the FieldDescriptorProto.Type numbers.
+  enum Type {
+    TYPE_INVALID = 0;
+    TYPE_DOUBLE = 1;
+    TYPE_FLOAT = 2;
+    TYPE_INT64 = 3;
+    TYPE_UINT64 = 4;
+    TYPE_INT32 = 5;
+    TYPE_FIXED64 = 6;
+    TYPE_FIXED32 = 7;
+    TYPE_BOOL = 8;
+    TYPE_STRING = 9;
+    TYPE_GROUP = 10;
+    TYPE_MESSAGE = 11;
+    TYPE_BYTES = 12;
+    TYPE_UINT32 = 13;
+    TYPE_ENUM = 14;
+    TYPE_SFIXED32 = 15;
+    TYPE_SFIXED64 = 16;
+    TYPE_SINT32 = 17;
+    TYPE_SINT64 = 18;
+  }
+  // name is the name of the message field.
+  string name = 1;
+  // number is the number of the message field.
+  int32 number = 2;
+  // label is the label of the message field.
+  Label label = 3;
+  // type is the type of the message field.
+  Type type = 4;
+  // type_name is the fully-qualified name of the type for message and enum
+  // fields.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name. If this is a nested message, the parent messages
+  // will be part of the name.
+  string type_name = 5;
+}
+
+// MessageOneof describes a Protobuf message oneof.
+message MessageOneof {
+  // name is the name of the message oneof.
+  string name = 1;
+  // field_numbers are the field numbers in the encapsulating type that make up
+  // this message oneof.
+  //
+  // This will be sorted.
+  repeated int32 field_numbers = 2;
+}
+
+// Service describes a Protobuf service.
+message Service {
+  // name is the name of the service.
+  string name = 1;
+  // service_methods are the service methods.
+  //
+  // These will be sorted by name.
+  repeated ServiceMethod service_methods = 2;
+}
+
+// ServiceMethod describes a Protobuf service method.
+message ServiceMethod {
+  // name is the name of the service method.
+  string name = 1;
+  // request_type_name is the fully-qualified name of request message type.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name. If this is a nested message, the parent messages
+  // will be part of the name.
+  string request_type_name = 2;
+  // response_type_name is the fully-qualified name of response message type.
+  //
+  // This does not include the prefix '.' found in the traditional package
+  // fully-qualified name. If this is a nested message, the parent messages
+  // will be part of the name.
+  string response_type_name = 3;
+  // client_streaming representing whether this is a client-side streaming
+  // method
+  bool client_streaming = 4;
+  // server_streaming representing whether this is a server-side streaming
+  // method
+  bool server_streaming = 5;
+}

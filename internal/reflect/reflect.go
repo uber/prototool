@@ -27,7 +27,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	reflectpb "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect"
+	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 	"github.com/uber/prototool/internal/strs"
 )
 
@@ -36,47 +36,37 @@ import (
 //
 // The FileDescriptorSets can have FileDescriptorProtos with the same name, but
 // they must be equal.
-func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectpb.PackageSet, error) {
+func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectv1.PackageSet, error) {
 	packageNameToFileNameToFileDescriptorProto, err := getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets)
 	if err != nil {
 		return nil, err
 	}
-	fileNameToPackageName, err := getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto)
+	packageNameToPackage, err := getBasePackageNameToPackage(packageNameToFileNameToFileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}
-	packageNameToPackage := make(map[string]*reflectpb.Package)
-	for packageName := range packageNameToFileNameToFileDescriptorProto {
-		packageNameToPackage[packageName] = &reflectpb.Package{
-			Name: packageName,
+	if err := populateDependencies(packageNameToPackage, packageNameToFileNameToFileDescriptorProto); err != nil {
+		return nil, err
+	}
+	for packageName, fileNameToFileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
+		pkg, ok := packageNameToPackage[packageName]
+		if !ok {
+			return nil, fmt.Errorf("no package for name %s", packageName)
+		}
+		if err := populateEnums(pkg, fileNameToFileDescriptorProto); err != nil {
+			return nil, err
+		}
+		if err := populateMessages(pkg, fileNameToFileDescriptorProto); err != nil {
+			return nil, err
+		}
+		if err := populateServices(pkg, fileNameToFileDescriptorProto); err != nil {
+			return nil, err
 		}
 	}
-	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
-		for _, fileDescriptorProto := range fileNameTofileDescriptorProto {
-			for _, depFileName := range fileDescriptorProto.GetDependency() {
-				depPackageName, ok := fileNameToPackageName[depFileName]
-				if !ok {
-					return nil, fmt.Errorf("no package for dep %s", depFileName)
-				}
-				if depPackageName != packageName {
-					packageNameToPackage[packageName].DependencyNames = append(packageNameToPackage[packageName].DependencyNames, depPackageName)
-				}
-			}
-		}
-	}
-	for _, pkg := range packageNameToPackage {
-		pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
-	}
-	packageSet := &reflectpb.PackageSet{
-		Packages: make([]*reflectpb.Package, 0, len(packageNameToPackage)),
-	}
-	for _, pkg := range packageNameToPackage {
-		packageSet.Packages = append(packageSet.Packages, pkg)
-	}
-	sort.Sort(sortPackages(packageSet.Packages))
-	return packageSet, nil
+	return getPackageSet(packageNameToPackage)
 }
 
+// helper for NewPackageSet
 func getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets []*descriptor.FileDescriptorSet) (map[string]map[string]*descriptor.FileDescriptorProto, error) {
 	packageNameToFileNameToFileDescriptorProto := make(map[string]map[string]*descriptor.FileDescriptorProto)
 	for _, fileDescriptorSet := range fileDescriptorSets {
@@ -118,6 +108,119 @@ func getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets []*descrip
 	return packageNameToFileNameToFileDescriptorProto, nil
 }
 
+// helper for NewPackageSet
+func getBasePackageNameToPackage(
+	packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto,
+) (map[string]*reflectv1.Package, error) {
+	packageNameToPackage := make(map[string]*reflectv1.Package)
+	for packageName := range packageNameToFileNameToFileDescriptorProto {
+		packageNameToPackage[packageName] = &reflectv1.Package{
+			Name: packageName,
+		}
+	}
+	return packageNameToPackage, nil
+}
+
+// helper for NewPackageSet
+func populateDependencies(
+	packageNameToPackage map[string]*reflectv1.Package,
+	packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto,
+) error {
+	fileNameToPackageName, err := getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto)
+	if err != nil {
+		return err
+	}
+	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
+		for _, fileDescriptorProto := range fileNameTofileDescriptorProto {
+			for _, depFileName := range fileDescriptorProto.GetDependency() {
+				depPackageName, ok := fileNameToPackageName[depFileName]
+				if !ok {
+					return fmt.Errorf("no package for dep %s", depFileName)
+				}
+				if depPackageName != packageName {
+					packageNameToPackage[packageName].DependencyNames = append(packageNameToPackage[packageName].DependencyNames, depPackageName)
+				}
+			}
+		}
+	}
+	for _, pkg := range packageNameToPackage {
+		if len(pkg.DependencyNames) != 0 {
+			pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
+		}
+	}
+	return nil
+}
+
+// helper for NewPackageSet
+func populateEnums(
+	pkg *reflectv1.Package,
+	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
+) error {
+	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
+		enums, err := getEnums(fileDescriptorProto.GetEnumType())
+		if err != nil {
+			return err
+		}
+		if len(enums) > 0 {
+			pkg.Enums = append(pkg.Enums, enums...)
+		}
+	}
+	sort.Slice(pkg.Enums, func(i int, j int) bool { return pkg.Enums[i].Name < pkg.Enums[j].Name })
+	return nil
+}
+
+// helper for NewPackageSet
+func populateMessages(
+	pkg *reflectv1.Package,
+	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
+) error {
+	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
+		messages, err := getMessages(fileDescriptorProto.GetMessageType())
+		if err != nil {
+			return err
+		}
+		if len(messages) > 0 {
+			pkg.Messages = append(pkg.Messages, messages...)
+		}
+	}
+	sort.Slice(pkg.Messages, func(i int, j int) bool { return pkg.Messages[i].Name < pkg.Messages[j].Name })
+	return nil
+}
+
+// helper for NewPackageSet
+func populateServices(
+	pkg *reflectv1.Package,
+	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
+) error {
+	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
+		services, err := getServices(fileDescriptorProto.GetService())
+		if err != nil {
+			return err
+		}
+		if len(services) > 0 {
+			pkg.Services = append(pkg.Services, services...)
+		}
+	}
+	sort.Slice(pkg.Services, func(i int, j int) bool { return pkg.Services[i].Name < pkg.Services[j].Name })
+	return nil
+}
+
+// helper for NewPackageSet
+func getPackageSet(packageNameToPackage map[string]*reflectv1.Package) (*reflectv1.PackageSet, error) {
+	if len(packageNameToPackage) == 0 {
+		return &reflectv1.PackageSet{}, nil
+	}
+	packageSet := &reflectv1.PackageSet{
+		Packages: make([]*reflectv1.Package, 0, len(packageNameToPackage)),
+	}
+	for _, pkg := range packageNameToPackage {
+		packageSet.Packages = append(packageSet.Packages, pkg)
+	}
+	sort.Slice(packageSet.Packages, func(i int, j int) bool { return packageSet.Packages[i].Name < packageSet.Packages[j].Name })
+	return packageSet, nil
+}
+
+// helper for populateDependencies
 func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto) (map[string]string, error) {
 	fileNameToPackageName := make(map[string]string)
 	for packageName, fileNameToFileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
@@ -135,19 +238,161 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 	return fileNameToPackageName, nil
 }
 
-type sortPackages []*reflectpb.Package
+func getEnums(enumDescriptorProtos []*descriptor.EnumDescriptorProto) ([]*reflectv1.Enum, error) {
+	if len(enumDescriptorProtos) == 0 {
+		return nil, nil
+	}
+	enums := make([]*reflectv1.Enum, 0, len(enumDescriptorProtos))
+	for _, enumDescriptorProto := range enumDescriptorProtos {
+		enum, err := newEnum(enumDescriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		enums = append(enums, enum)
+	}
+	sort.Slice(enums, func(i int, j int) bool { return enums[i].Name < enums[j].Name })
+	return enums, nil
+}
 
-func (s sortPackages) Len() int          { return len(s) }
-func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }
-func (s sortPackages) Less(i int, j int) bool {
-	if s[i] == nil && s[j] == nil {
-		return false
+func newEnum(enumDescriptorProto *descriptor.EnumDescriptorProto) (*reflectv1.Enum, error) {
+	enum := &reflectv1.Enum{
+		Name: enumDescriptorProto.GetName(),
 	}
-	if s[i] == nil && s[j] != nil {
-		return true
+	for _, enumValueDescriptorProto := range enumDescriptorProto.GetValue() {
+		enum.EnumValues = append(enum.EnumValues, &reflectv1.EnumValue{
+			Name:   enumValueDescriptorProto.GetName(),
+			Number: enumValueDescriptorProto.GetNumber(),
+		})
 	}
-	if s[i] != nil && s[j] == nil {
-		return false
+	sort.Slice(enum.EnumValues, func(i int, j int) bool { return enum.EnumValues[i].Number < enum.EnumValues[j].Number })
+	return enum, nil
+}
+
+func getMessages(descriptorProtos []*descriptor.DescriptorProto) ([]*reflectv1.Message, error) {
+	if len(descriptorProtos) == 0 {
+		return nil, nil
 	}
-	return s[i].Name < s[j].Name
+	messages := make([]*reflectv1.Message, 0, len(descriptorProtos))
+	for _, descriptorProto := range descriptorProtos {
+		message, err := newMessage(descriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		messages = append(messages, message)
+	}
+	sort.Slice(messages, func(i int, j int) bool { return messages[i].Name < messages[j].Name })
+	return messages, nil
+}
+
+func newMessage(descriptorProto *descriptor.DescriptorProto) (*reflectv1.Message, error) {
+	nestedMessages, err := getMessages(descriptorProto.GetNestedType())
+	if err != nil {
+		return nil, err
+	}
+	nestedEnums, err := getEnums(descriptorProto.GetEnumType())
+	if err != nil {
+		return nil, err
+	}
+	message := &reflectv1.Message{
+		Name:           descriptorProto.GetName(),
+		NestedMessages: nestedMessages,
+		NestedEnums:    nestedEnums,
+	}
+	nameToMessageOneof := make(map[string]*reflectv1.MessageOneof, len(descriptorProto.GetOneofDecl()))
+	for _, oneofDescriptorProto := range descriptorProto.GetOneofDecl() {
+		nameToMessageOneof[oneofDescriptorProto.GetName()] = &reflectv1.MessageOneof{
+			Name: oneofDescriptorProto.GetName(),
+		}
+	}
+	for _, fieldDescriptorProto := range descriptorProto.GetField() {
+		typeName := fieldDescriptorProto.GetTypeName()
+		if typeName != "" {
+			typeName, err = verifyFullyQualifiedNameAndStrip(typeName)
+			if err != nil {
+				return nil, err
+			}
+		}
+		message.MessageFields = append(message.MessageFields, &reflectv1.MessageField{
+			Name:   fieldDescriptorProto.GetName(),
+			Number: fieldDescriptorProto.GetNumber(),
+			// TODO: this is technically unsafe since we're just working on the assumption
+			// that the numbers match up...which they do, but this isn't future proof
+			// however, the values for descriptor.proto have not changed since proto1
+			// which isn't even OSS, so we're probably fine for 10-20 years
+			Type:     reflectv1.MessageField_Type(fieldDescriptorProto.GetType()),
+			Label:    reflectv1.MessageField_Label(fieldDescriptorProto.GetLabel()),
+			TypeName: typeName,
+		})
+		if fieldDescriptorProto.OneofIndex != nil {
+			// TODO: super unsafe
+			messageOneof := nameToMessageOneof[descriptorProto.GetOneofDecl()[fieldDescriptorProto.GetOneofIndex()].GetName()]
+			messageOneof.FieldNumbers = append(messageOneof.FieldNumbers, fieldDescriptorProto.GetNumber())
+		}
+	}
+	for _, messageOneof := range nameToMessageOneof {
+		sort.Slice(messageOneof.FieldNumbers, func(i int, j int) bool { return messageOneof.FieldNumbers[i] < messageOneof.FieldNumbers[j] })
+		message.MessageOneofs = append(message.MessageOneofs, messageOneof)
+	}
+	sort.Slice(message.MessageFields, func(i int, j int) bool { return message.MessageFields[i].Number < message.MessageFields[j].Number })
+	sort.Slice(message.MessageOneofs, func(i int, j int) bool { return message.MessageOneofs[i].Name < message.MessageOneofs[j].Name })
+	return message, nil
+}
+
+func getServices(serviceDescriptorProtos []*descriptor.ServiceDescriptorProto) ([]*reflectv1.Service, error) {
+	if len(serviceDescriptorProtos) == 0 {
+		return nil, nil
+	}
+	services := make([]*reflectv1.Service, 0, len(serviceDescriptorProtos))
+	for _, serviceDescriptorProto := range serviceDescriptorProtos {
+		service, err := newService(serviceDescriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		services = append(services, service)
+	}
+	sort.Slice(services, func(i int, j int) bool { return services[i].Name < services[j].Name })
+	return services, nil
+}
+
+func newService(serviceDescriptorProto *descriptor.ServiceDescriptorProto) (*reflectv1.Service, error) {
+	service := &reflectv1.Service{
+		Name: serviceDescriptorProto.GetName(),
+	}
+	for _, methodDescriptorProto := range serviceDescriptorProto.GetMethod() {
+		serviceMethod, err := newServiceMethod(methodDescriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		service.ServiceMethods = append(service.ServiceMethods, serviceMethod)
+	}
+	sort.Slice(service.ServiceMethods, func(i int, j int) bool { return service.ServiceMethods[i].Name < service.ServiceMethods[j].Name })
+	return service, nil
+}
+
+func newServiceMethod(methodDescriptorProto *descriptor.MethodDescriptorProto) (*reflectv1.ServiceMethod, error) {
+	requestTypeName, err := verifyFullyQualifiedNameAndStrip(methodDescriptorProto.GetInputType())
+	if err != nil {
+		return nil, err
+	}
+	responseTypeName, err := verifyFullyQualifiedNameAndStrip(methodDescriptorProto.GetOutputType())
+	if err != nil {
+		return nil, err
+	}
+	return &reflectv1.ServiceMethod{
+		Name:             methodDescriptorProto.GetName(),
+		RequestTypeName:  requestTypeName,
+		ResponseTypeName: responseTypeName,
+		ClientStreaming:  methodDescriptorProto.GetClientStreaming(),
+		ServerStreaming:  methodDescriptorProto.GetServerStreaming(),
+	}, nil
+}
+
+func verifyFullyQualifiedNameAndStrip(s string) (string, error) {
+	if s == "" {
+		return "", fmt.Errorf("name empty")
+	}
+	if s[0] != '.' {
+		return "", fmt.Errorf("%s does not start with '.'", s)
+	}
+	return s[1:], nil
 }
