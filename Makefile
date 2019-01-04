@@ -125,9 +125,7 @@ checklicense: install
 	fi
 
 .PHONY: lint
-# TODO: re-add errcheck when it fixed for Golang modules
-#lint: checknodiffgenerated golint vet errcheck staticcheck checklicense
-lint: checknodiffgenerated golint vet staticcheck checklicense
+lint: checknodiffgenerated golint vet errcheck staticcheck checklicense
 
 .PHONY: test
 test:

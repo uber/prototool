@@ -32,5 +32,4 @@ import (
 	_ "golang.org/x/lint"                  // tool
 	_ "golang.org/x/tools/cmd/cover"       // tool
 	_ "honnef.co/go/tools/cmd/staticcheck" // tool
-	_ "honnef.co/go/tools/cmd/unused"      // tool
 )
