@@ -51,11 +51,19 @@ type Package struct {
 	packageSet                 *PackageSet
 	dependencyNameToDependency map[string]*Package
 	importerNameToImporter     map[string]*Package
+	enumNameToEnum             map[string]*Enum
+	messageNameToMessage       map[string]*Message
+	serviceNameToService       map[string]*Service
 }
 
 // ProtoMessage returns the underlying Protobuf messge.
 func (p *Package) ProtoMessage() *reflectv1.Package {
 	return p.protoMessage
+}
+
+// FullyQualifiedName returns the fully-qualified name.
+func (p *Package) FullyQualifiedName() string {
+	return p.protoMessage.Name
 }
 
 // PackageSet returns the parent PackageSet.
@@ -73,6 +81,84 @@ func (p *Package) ImporterNameToImporter() map[string]*Package {
 	return p.importerNameToImporter
 }
 
+// EnumNameToEnum returns the nested enums of the given Package.
+func (p *Package) EnumNameToEnum() map[string]*Enum {
+	return p.enumNameToEnum
+}
+
+// MessageNameToMessage returns the nested messages of the given Package.
+func (p *Package) MessageNameToMessage() map[string]*Message {
+	return p.messageNameToMessage
+}
+
+// ServiceNameToService returns the nested services of the given Package.
+func (p *Package) ServiceNameToService() map[string]*Service {
+	return p.serviceNameToService
+}
+
+// Enum is the Golang wrapper for the Protobuf Enum object.
+type Enum struct {
+	protoMessage *reflectv1.Enum
+
+	fullyQualifiedName string
+}
+
+// ProtoMessage returns the underlying Protobuf messge.
+func (e *Enum) ProtoMessage() *reflectv1.Enum {
+	return e.protoMessage
+}
+
+// FullyQualifiedName returns the fully-qualified name.
+func (e *Enum) FullyQualifiedName() string {
+	return e.fullyQualifiedName
+}
+
+// Message is the Golang wrapper for the Protobuf Message object.
+type Message struct {
+	protoMessage *reflectv1.Message
+
+	fullyQualifiedName         string
+	nestedEnumNameToEnum       map[string]*Enum
+	nestedMessageNameToMessage map[string]*Message
+}
+
+// ProtoMessage returns the underlying Protobuf messge.
+func (m *Message) ProtoMessage() *reflectv1.Message {
+	return m.protoMessage
+}
+
+// FullyQualifiedName returns the fully-qualified name.
+func (m *Message) FullyQualifiedName() string {
+	return m.fullyQualifiedName
+}
+
+// NestedEnumNameToEnum returns the nested enums of the given Message.
+func (m *Message) NestedEnumNameToEnum() map[string]*Enum {
+	return m.nestedEnumNameToEnum
+}
+
+// NestedMessageNameToMessage returns the nested messages of the given Message.
+func (m *Message) NestedMessageNameToMessage() map[string]*Message {
+	return m.nestedMessageNameToMessage
+}
+
+// Service is the Golang wrapper for the Protobuf Service object.
+type Service struct {
+	protoMessage *reflectv1.Service
+
+	fullyQualifiedName string
+}
+
+// ProtoMessage returns the underlying Protobuf messge.
+func (s *Service) ProtoMessage() *reflectv1.Service {
+	return s.protoMessage
+}
+
+// FullyQualifiedName returns the fully-qualified name.
+func (s *Service) FullyQualifiedName() string {
+	return s.fullyQualifiedName
+}
+
 // NewPackageSet returns a new PackageSet for the given reflect PackageSet.
 func NewPackageSet(protoMessage *reflectv1.PackageSet) (*PackageSet, error) {
 	packageSet := &PackageSet{
@@ -85,6 +171,9 @@ func NewPackageSet(protoMessage *reflectv1.PackageSet) (*PackageSet, error) {
 			packageSet:                 packageSet,
 			dependencyNameToDependency: make(map[string]*Package),
 			importerNameToImporter:     make(map[string]*Package),
+			enumNameToEnum:             make(map[string]*Enum),
+			messageNameToMessage:       make(map[string]*Message),
+			serviceNameToService:       make(map[string]*Service),
 		}
 	}
 	for packageName, pkg := range packageSet.packageNameToPackage {
@@ -97,5 +186,51 @@ func NewPackageSet(protoMessage *reflectv1.PackageSet) (*PackageSet, error) {
 			dependency.importerNameToImporter[packageName] = pkg
 		}
 	}
+	for packageName, pkg := range packageSet.packageNameToPackage {
+		for _, enum := range pkg.protoMessage.Enums {
+			pkg.enumNameToEnum[enum.Name] = newEnum(enum, packageName)
+		}
+		for _, message := range pkg.protoMessage.Messages {
+			pkg.messageNameToMessage[message.Name] = newMessage(message, packageName)
+		}
+		for _, service := range pkg.protoMessage.Services {
+			pkg.serviceNameToService[service.Name] = newService(service, packageName)
+		}
+	}
 	return packageSet, nil
+}
+
+func newEnum(protoMessage *reflectv1.Enum, encapsulatingFullyQualifiedName string) *Enum {
+	return &Enum{
+		protoMessage:       protoMessage,
+		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+	}
+}
+
+func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName string) *Message {
+	message := &Message{
+		protoMessage:       protoMessage,
+		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+	}
+	for _, nestedEnum := range protoMessage.NestedEnums {
+		message.nestedEnumNameToEnum[nestedEnum.Name] = newEnum(nestedEnum, message.fullyQualifiedName)
+	}
+	for _, nestedMessage := range protoMessage.NestedMessages {
+		message.nestedMessageNameToMessage[nestedMessage.Name] = newMessage(nestedMessage, message.fullyQualifiedName)
+	}
+	return message
+}
+
+func newService(protoMessage *reflectv1.Service, encapsulatingFullyQualifiedName string) *Service {
+	return &Service{
+		protoMessage:       protoMessage,
+		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+	}
+}
+
+func getFullyQualifiedName(encapsulatingFullyQualifiedName string, name string) string {
+	if encapsulatingFullyQualifiedName == "" {
+		return name
+	}
+	return encapsulatingFullyQualifiedName + "." + name
 }
