@@ -10,19 +10,16 @@ UNAME_ARCH := $(shell uname -m)
 
 TMP_BASE := .tmp
 TMP := $(TMP_BASE)/$(UNAME_OS)/$(UNAME_ARCH)
-TMP_LIB := $(TMP)/lib
 TMP_BIN = $(TMP)/bin
+TMP_ETC := $(TMP)/etc
+TMP_LIB := $(TMP)/lib
 
-unexport GOPATH
 export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
 export PATH := $(GOBIN):$(PATH)
 
 .PHONY: all
 all: lint cover
-
-.PHONY: ci
-ci: lint codecov
 
 .PHONY: init
 init:
@@ -59,11 +56,12 @@ golden: install
 .PHONY: example
 example: install
 	@go install github.com/golang/protobuf/protoc-gen-go
+	@mkdir -p $(TMP_ETC)
 	rm -rf example/gen
 	prototool all example/idl/uber
 	go build ./example/gen/proto/go/foo
 	go build ./example/gen/proto/go/sub
-	go build ./example/cmd/excited/main.go
+	go build -o $(TMP_ETC)/excited ./example/cmd/excited/main.go
 	prototool lint etc/style/google
 	prototool lint etc/style/uber
 
@@ -134,15 +132,15 @@ test:
 .PHONY: cover
 cover:
 	@go install golang.org/x/tools/cmd/cover
-	@go install github.com/wadey/gocovmerge
-	./etc/bin/cover.sh $(PKGS)
-	go tool cover -html=coverage.txt -o cover.html
-	go tool cover -func=coverage.txt | grep total
+	@mkdir -p $(TMP_ETC)
+	@rm -f $(TMP_ETC)/coverage.txt $(TMP_ETC)/coverage.html
+	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=$(shell echo $(PKGS) | tr ' ' ',') $(PKGS)
+	go tool cover -html=$(TMP_ETC)/coverage.txt -o $(TMP_ETC)/coverage.html
+	go tool cover -func=$(TMP_ETC)/coverage.txt | grep total
 
 .PHONY: codecov
-codecov: SHELL := /bin/bash
-codecov: cover
-	bash <(curl -s https://codecov.io/bash) -c -f coverage.txt
+codecov:
+	bash <(curl -s https://codecov.io/bash) -c -f $(TMP_ETC)/coverage.txt
 
 .PHONY: releasegen
 releasegen: internalgen

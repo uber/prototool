@@ -1,5 +1,14 @@
+branches:
+  only:
+    - dev
+    - master
 language: go
 go:
   - "1.11.x"
+cache:
+  directories:
+    - $GOPATH/pkg/mod
 script:
-  - make ci
+  - make checknodiffgenerated
+  - make -j 8 golint vet errcheck staticcheck checklicense cover
+  - make codecov
