@@ -7,7 +7,7 @@ require (
 	github.com/emicklei/proto v1.6.7
 	github.com/fullstorydev/grpcurl v1.1.0
 	github.com/gofrs/flock v0.7.0
-	github.com/golang/lint v0.0.0-20171212024629-883fe33ffc43
+	github.com/golang/lint v0.0.0-20181217174547-8f45f776aaf1
 	github.com/golang/protobuf v1.2.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jhump/protoreflect v1.1.0
@@ -25,10 +25,8 @@ require (
 	go.uber.org/tools v0.0.0-20170523140223-ce2550dad714
 	go.uber.org/zap v1.9.1
 	golang.org/x/lint v0.0.0-20181217174547-8f45f776aaf1
-	golang.org/x/net v0.0.0-20181217023233-e147a9138326
-	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f // indirect
-	golang.org/x/sys v0.0.0-20181218192612-074acd46bca6 // indirect
-	golang.org/x/tools v0.0.0-20181218204010-d4971274fe38
+	golang.org/x/net v0.0.0-20181220203305-927f97764cc3
+	golang.org/x/tools v0.0.0-20190103205943-8a6051197512
 	google.golang.org/grpc v1.17.0
 	gopkg.in/yaml.v2 v2.2.2
 	honnef.co/go/tools v0.0.0-20190103051756-51b3beccf3bd
