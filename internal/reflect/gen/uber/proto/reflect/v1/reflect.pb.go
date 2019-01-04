@@ -78,7 +78,7 @@ func (x MessageField_Label) String() string {
 	return proto.EnumName(MessageField_Label_name, int32(x))
 }
 func (MessageField_Label) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{5, 0}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{5, 0}
 }
 
 // Type is the type of the message field.
@@ -155,7 +155,7 @@ func (x MessageField_Type) String() string {
 	return proto.EnumName(MessageField_Type_name, int32(x))
 }
 func (MessageField_Type) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{5, 1}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{5, 1}
 }
 
 // PackageSet is a set of Packages.
@@ -174,7 +174,7 @@ func (m *PackageSet) Reset()         { *m = PackageSet{} }
 func (m *PackageSet) String() string { return proto.CompactTextString(m) }
 func (*PackageSet) ProtoMessage()    {}
 func (*PackageSet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{0}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{0}
 }
 func (m *PackageSet) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PackageSet.Unmarshal(m, b)
@@ -241,7 +241,7 @@ func (m *Package) Reset()         { *m = Package{} }
 func (m *Package) String() string { return proto.CompactTextString(m) }
 func (*Package) ProtoMessage()    {}
 func (*Package) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{1}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{1}
 }
 func (m *Package) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Package.Unmarshal(m, b)
@@ -316,7 +316,7 @@ func (m *Enum) Reset()         { *m = Enum{} }
 func (m *Enum) String() string { return proto.CompactTextString(m) }
 func (*Enum) ProtoMessage()    {}
 func (*Enum) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{2}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{2}
 }
 func (m *Enum) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Enum.Unmarshal(m, b)
@@ -365,7 +365,7 @@ func (m *EnumValue) Reset()         { *m = EnumValue{} }
 func (m *EnumValue) String() string { return proto.CompactTextString(m) }
 func (*EnumValue) ProtoMessage()    {}
 func (*EnumValue) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{3}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{3}
 }
 func (m *EnumValue) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EnumValue.Unmarshal(m, b)
@@ -409,12 +409,19 @@ type Message struct {
 	// message_fields contains the message fields.
 	//
 	// This does not include any extended fields.
+	// These will be sorted by number.
 	MessageFields []*MessageField `protobuf:"bytes,2,rep,name=message_fields,json=messageFields,proto3" json:"message_fields,omitempty"`
 	// message_oneofs contains the oneofs.
+	//
+	// These will be sorted by name.
 	MessageOneofs []*MessageOneof `protobuf:"bytes,3,rep,name=message_oneofs,json=messageOneofs,proto3" json:"message_oneofs,omitempty"`
 	// nested_message contains the messages directly nested on this message.
+	//
+	// These will be sorted by name.
 	NestedMessages []*Message `protobuf:"bytes,4,rep,name=nested_messages,json=nestedMessages,proto3" json:"nested_messages,omitempty"`
 	// nested_enums contains the enums directed nested on this message.
+	//
+	// These will be sorted by name.
 	NestedEnums          []*Enum  `protobuf:"bytes,5,rep,name=nested_enums,json=nestedEnums,proto3" json:"nested_enums,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -425,7 +432,7 @@ func (m *Message) Reset()         { *m = Message{} }
 func (m *Message) String() string { return proto.CompactTextString(m) }
 func (*Message) ProtoMessage()    {}
 func (*Message) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{4}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{4}
 }
 func (m *Message) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Message.Unmarshal(m, b)
@@ -506,7 +513,7 @@ func (m *MessageField) Reset()         { *m = MessageField{} }
 func (m *MessageField) String() string { return proto.CompactTextString(m) }
 func (*MessageField) ProtoMessage()    {}
 func (*MessageField) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{5}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{5}
 }
 func (m *MessageField) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MessageField.Unmarshal(m, b)
@@ -577,7 +584,7 @@ func (m *MessageOneof) Reset()         { *m = MessageOneof{} }
 func (m *MessageOneof) String() string { return proto.CompactTextString(m) }
 func (*MessageOneof) ProtoMessage()    {}
 func (*MessageOneof) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{6}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{6}
 }
 func (m *MessageOneof) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_MessageOneof.Unmarshal(m, b)
@@ -626,7 +633,7 @@ func (m *Service) Reset()         { *m = Service{} }
 func (m *Service) String() string { return proto.CompactTextString(m) }
 func (*Service) ProtoMessage()    {}
 func (*Service) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{7}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{7}
 }
 func (m *Service) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Service.Unmarshal(m, b)
@@ -691,7 +698,7 @@ func (m *ServiceMethod) Reset()         { *m = ServiceMethod{} }
 func (m *ServiceMethod) String() string { return proto.CompactTextString(m) }
 func (*ServiceMethod) ProtoMessage()    {}
 func (*ServiceMethod) Descriptor() ([]byte, []int) {
-	return fileDescriptor_reflect_7966a1d3d6161e58, []int{8}
+	return fileDescriptor_reflect_47ddac44717ce269, []int{8}
 }
 func (m *ServiceMethod) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServiceMethod.Unmarshal(m, b)
@@ -761,10 +768,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("uber/proto/reflect/v1/reflect.proto", fileDescriptor_reflect_7966a1d3d6161e58)
+	proto.RegisterFile("uber/proto/reflect/v1/reflect.proto", fileDescriptor_reflect_47ddac44717ce269)
 }
 
-var fileDescriptor_reflect_7966a1d3d6161e58 = []byte{
+var fileDescriptor_reflect_47ddac44717ce269 = []byte{
 	// 800 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xdf, 0x8f, 0xea, 0x44,
 	0x14, 0xb6, 0xd0, 0xee, 0x2e, 0x87, 0x5f, 0xb3, 0x93, 0x68, 0x6a, 0x6e, 0x62, 0x48, 0xd7, 0x07,

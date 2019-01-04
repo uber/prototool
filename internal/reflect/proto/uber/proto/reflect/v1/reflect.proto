@@ -104,12 +104,19 @@ message Message {
   // message_fields contains the message fields.
   //
   // This does not include any extended fields.
+  // These will be sorted by number.
   repeated MessageField message_fields = 2;
   // message_oneofs contains the oneofs.
+  //
+  // These will be sorted by name.
   repeated MessageOneof message_oneofs = 3;
   // nested_message contains the messages directly nested on this message.
+  //
+  // These will be sorted by name.
   repeated Message nested_messages = 4;
   // nested_enums contains the enums directed nested on this message.
+  //
+  // These will be sorted by name.
   repeated Enum nested_enums = 5;
 }
 

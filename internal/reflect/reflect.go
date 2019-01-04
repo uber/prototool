@@ -306,6 +306,11 @@ func newMessage(descriptorProto *descriptor.DescriptorProto) (*reflectv1.Message
 			Name: fieldDescriptorProto.GetName(),
 		})
 	}
+	for _, messageOneof := range nameToMessageOneof {
+		message.MessageOneofs = append(message.MessageOneofs, messageOneof)
+	}
+	sort.Slice(message.MessageFields, func(i int, j int) bool { return message.MessageFields[i].Number < message.MessageFields[j].Number })
+	sort.Slice(message.MessageOneofs, func(i int, j int) bool { return message.MessageOneofs[i].Name < message.MessageOneofs[j].Name })
 	return message, nil
 }
 

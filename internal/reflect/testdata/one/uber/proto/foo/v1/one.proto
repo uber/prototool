@@ -57,6 +57,10 @@ message Simple {
   string two = 2;
   repeated int64 three = 3;
   map<int64, string> four = 4;
+  oneof test_oneof {
+    int64 five = 5;
+    OneBat one_bat = 6;
+  }
 }
 
 message FooRequest {
