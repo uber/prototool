@@ -11,7 +11,7 @@ require (
 	github.com/golang/protobuf v1.2.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jhump/protoreflect v1.1.0
-	github.com/kisielk/errcheck v1.1.0
+	github.com/kisielk/errcheck v1.2.0
 	github.com/mitchellh/go-wordwrap v1.0.0
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
