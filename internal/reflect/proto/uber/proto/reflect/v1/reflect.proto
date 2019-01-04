@@ -183,7 +183,7 @@ message MessageOneof {
   // field_numbers are the field numbers in the encapsulating type that make up
   // this message oneof.
   //
-  // This will ber sorted.
+  // This will be sorted.
   repeated int32 field_numbers = 2;
 }
 
