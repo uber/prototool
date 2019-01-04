@@ -135,6 +135,27 @@ func populateDependencies(
 }
 
 // helper for NewPackageSet
+func populateEnums(
+	packageNameToPackage map[string]*reflectv1.Package,
+	packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto,
+) error {
+	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
+		pkg := packageNameToPackage[packageName]
+		for _, fileDescriptorProto := range fileNameTofileDescriptorProto {
+			for _, enumDescriptorProto := range fileDescriptorProto.GetEnumType() {
+				enum, err := newEnum(enumDescriptorProto)
+				if err != nil {
+					return err
+				}
+				pkg.Enums = append(pkg.Enums, enum)
+			}
+		}
+	}
+	// TODO(sort)
+	return nil
+}
+
+// helper for NewPackageSet
 func getPackageSet(packageNameToPackage map[string]*reflectv1.Package) (*reflectv1.PackageSet, error) {
 	packageSet := &reflectv1.PackageSet{
 		Packages: make([]*reflectv1.Package, 0, len(packageNameToPackage)),
@@ -162,6 +183,12 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 		}
 	}
 	return fileNameToPackageName, nil
+}
+
+// helper for populateEnums
+func newEnum(enumDescriptorProto *descriptor.EnumDescriptorProto) (*reflectv1.Enum, error) {
+	// TODO
+	return nil, nil
 }
 
 // helper for getPackageSet
