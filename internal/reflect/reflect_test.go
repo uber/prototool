@@ -18,21 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package reflect_test
+package reflect
 
 import (
 	"testing"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/require"
-	"github.com/uber/prototool/internal/reflect"
 	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 	ptesting "github.com/uber/prototool/internal/testing"
 )
 
 func TestBasic(t *testing.T) {
 	fileDescriptorSets := ptesting.RequireGetFileDescriptorSets(t, "../cmd/testdata/reflect", "../cmd/testdata/reflect/one")
-	packageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
+	packageSet, err := NewPackageSet(fileDescriptorSets...)
 	require.NoError(t, err)
 	ptesting.RequirePrintPackageSetJSON(t, packageSet)
 }
