@@ -14,7 +14,6 @@ TMP_LIB := $(TMP)/lib
 TMP_BIN = $(TMP)/bin
 TMP_COVER := $(TMP)/cover
 
-unexport GOPATH
 export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
 export PATH := $(GOBIN):$(PATH)
