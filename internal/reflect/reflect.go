@@ -48,6 +48,18 @@ func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflec
 	if err := populateDependencies(packageNameToPackage, packageNameToFileNameToFileDescriptorProto); err != nil {
 		return nil, err
 	}
+	for packageName, fileNameToFileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
+		pkg, ok := packageNameToPackage[packageName]
+		if !ok {
+			return nil, fmt.Errorf("no package for name %s", packageName)
+		}
+		if err := populateEnums(pkg, fileNameToFileDescriptorProto); err != nil {
+			return nil, err
+		}
+		if err := populateServices(pkg, fileNameToFileDescriptorProto); err != nil {
+			return nil, err
+		}
+	}
 	return getPackageSet(packageNameToPackage)
 }
 
@@ -136,22 +148,37 @@ func populateDependencies(
 
 // helper for NewPackageSet
 func populateEnums(
-	packageNameToPackage map[string]*reflectv1.Package,
-	packageNameToFileNameToFileDescriptorProto map[string]map[string]*descriptor.FileDescriptorProto,
+	pkg *reflectv1.Package,
+	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
 ) error {
-	for packageName, fileNameTofileDescriptorProto := range packageNameToFileNameToFileDescriptorProto {
-		pkg := packageNameToPackage[packageName]
-		for _, fileDescriptorProto := range fileNameTofileDescriptorProto {
-			for _, enumDescriptorProto := range fileDescriptorProto.GetEnumType() {
-				enum, err := newEnum(enumDescriptorProto)
-				if err != nil {
-					return err
-				}
-				pkg.Enums = append(pkg.Enums, enum)
+	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
+		for _, enumDescriptorProto := range fileDescriptorProto.GetEnumType() {
+			enum, err := newEnum(enumDescriptorProto)
+			if err != nil {
+				return err
 			}
+			pkg.Enums = append(pkg.Enums, enum)
 		}
 	}
-	// TODO(sort)
+	sort.Slice(pkg.Enums, func(i int, j int) bool { return pkg.Enums[i].Name < pkg.Enums[j].Name })
+	return nil
+}
+
+// helper for NewPackageSet
+func populateServices(
+	pkg *reflectv1.Package,
+	fileNameToFileDescriptorProto map[string]*descriptor.FileDescriptorProto,
+) error {
+	for _, fileDescriptorProto := range fileNameToFileDescriptorProto {
+		for _, serviceDescriptorProto := range fileDescriptorProto.GetService() {
+			service, err := newService(serviceDescriptorProto)
+			if err != nil {
+				return err
+			}
+			pkg.Services = append(pkg.Services, service)
+		}
+	}
+	sort.Slice(pkg.Services, func(i int, j int) bool { return pkg.Services[i].Name < pkg.Services[j].Name })
 	return nil
 }
 
@@ -163,7 +190,7 @@ func getPackageSet(packageNameToPackage map[string]*reflectv1.Package) (*reflect
 	for _, pkg := range packageNameToPackage {
 		packageSet.Packages = append(packageSet.Packages, pkg)
 	}
-	sort.Sort(sortPackages(packageSet.Packages))
+	sort.Slice(packageSet.Packages, func(i int, j int) bool { return packageSet.Packages[i].Name < packageSet.Packages[j].Name })
 	return packageSet, nil
 }
 
@@ -185,26 +212,59 @@ func getFileNameToPackageName(packageNameToFileNameToFileDescriptorProto map[str
 	return fileNameToPackageName, nil
 }
 
-// helper for populateEnums
 func newEnum(enumDescriptorProto *descriptor.EnumDescriptorProto) (*reflectv1.Enum, error) {
-	// TODO
-	return nil, nil
+	enum := &reflectv1.Enum{
+		Name: enumDescriptorProto.GetName(),
+	}
+	for _, enumValueDescriptorProto := range enumDescriptorProto.GetValue() {
+		enum.EnumValues = append(enum.EnumValues, &reflectv1.EnumValue{
+			Name:   enumValueDescriptorProto.GetName(),
+			Number: enumValueDescriptorProto.GetNumber(),
+		})
+	}
+	sort.Slice(enum.EnumValues, func(i int, j int) bool { return enum.EnumValues[i].Number < enum.EnumValues[j].Number })
+	return enum, nil
 }
 
-// helper for getPackageSet
-type sortPackages []*reflectv1.Package
+func newService(serviceDescriptorProto *descriptor.ServiceDescriptorProto) (*reflectv1.Service, error) {
+	service := &reflectv1.Service{
+		Name: serviceDescriptorProto.GetName(),
+	}
+	for _, methodDescriptorProto := range serviceDescriptorProto.GetMethod() {
+		serviceMethod, err := newServiceMethod(methodDescriptorProto)
+		if err != nil {
+			return nil, err
+		}
+		service.ServiceMethods = append(service.ServiceMethods, serviceMethod)
+	}
+	sort.Slice(service.ServiceMethods, func(i int, j int) bool { return service.ServiceMethods[i].Name < service.ServiceMethods[j].Name })
+	return service, nil
+}
 
-func (s sortPackages) Len() int          { return len(s) }
-func (s sortPackages) Swap(i int, j int) { s[i], s[j] = s[j], s[i] }
-func (s sortPackages) Less(i int, j int) bool {
-	if s[i] == nil && s[j] == nil {
-		return false
+func newServiceMethod(methodDescriptorProto *descriptor.MethodDescriptorProto) (*reflectv1.ServiceMethod, error) {
+	requestTypeName, err := verifyFullyQualifiedNameAndStrip(methodDescriptorProto.GetInputType())
+	if err != nil {
+		return nil, err
 	}
-	if s[i] == nil && s[j] != nil {
-		return true
+	responseTypeName, err := verifyFullyQualifiedNameAndStrip(methodDescriptorProto.GetOutputType())
+	if err != nil {
+		return nil, err
 	}
-	if s[i] != nil && s[j] == nil {
-		return false
+	return &reflectv1.ServiceMethod{
+		Name:             methodDescriptorProto.GetName(),
+		RequestTypeName:  requestTypeName,
+		ResponseTypeName: responseTypeName,
+		ClientStreaming:  methodDescriptorProto.GetClientStreaming(),
+		ServerStreaming:  methodDescriptorProto.GetServerStreaming(),
+	}, nil
+}
+
+func verifyFullyQualifiedNameAndStrip(s string) (string, error) {
+	if s == "" {
+		return "", fmt.Errorf("name empty")
 	}
-	return s[i].Name < s[j].Name
+	if s[0] != '.' {
+		return "", fmt.Errorf("%s does not start with '.'", s)
+	}
+	return s[1:], nil
 }
