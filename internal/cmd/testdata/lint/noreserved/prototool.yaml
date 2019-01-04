@@ -1,0 +1,4 @@
+lint:
+  rules:
+    add:
+      - FIELDS_NOT_RESERVED

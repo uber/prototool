@@ -27,7 +27,7 @@ import (
 
 var messageFieldsNoJSONNameLinter = NewLinter(
 	"MESSAGE_FIELDS_NO_JSON_NAME",
-	`Verifies that no message field has the the "json_name" option set.`,
+	`Verifies that no message field has the "json_name" option set.`,
 	checkMessageFieldsNoJSONName,
 )
 
