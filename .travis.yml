@@ -7,7 +7,11 @@ go:
   - "1.11.x"
 cache:
   directories:
-    - $GOCACHE
+    - $HOME/.cache/go-build
     - $GOPATH/pkg/mod
 script:
+  - export GO111MODULE=on
+  - unset GOPATH
+  - echo $GO111MODULE
+  - echo $GOPATH
   - make ci
