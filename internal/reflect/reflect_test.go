@@ -21,81 +21,32 @@
 package reflect_test
 
 import (
-	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/stretchr/testify/require"
-	"github.com/uber/prototool/internal/file"
-	"github.com/uber/prototool/internal/protoc"
 	"github.com/uber/prototool/internal/reflect"
 	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
-	"go.uber.org/multierr"
+	ptesting "github.com/uber/prototool/internal/testing"
 )
 
-var jsonMarshaler = &jsonpb.Marshaler{Indent: "  "}
-
 func TestBasic(t *testing.T) {
-	fileDescriptorSets := testGetFileDescriptorSets(t, "../cmd/testdata/reflect/one")
+	fileDescriptorSets := ptesting.RequireGetFileDescriptorSets(t, "../cmd/testdata/reflect", "../cmd/testdata/reflect/one")
 	packageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
 	require.NoError(t, err)
-	testPrintPackageSetJSON(t, packageSet)
+	ptesting.RequirePrintPackageSetJSON(t, packageSet)
 }
 
-func testGetFileDescriptorSets(t *testing.T, dirPath string) []*descriptor.FileDescriptorSet {
-	fileDescriptorSets, err := getFileDescriptorSets(".", dirPath)
+func testUnmarshalPackageSet(t *testing.T, s string) *reflectv1.PackageSet {
+	packageSet, err := unmarshalPackageSet(s)
 	require.NoError(t, err)
-	require.NotEmpty(t, fileDescriptorSets)
-	return fileDescriptorSets
+	return packageSet
 }
 
-func testPrintFileDescriptorSetsJSON(t *testing.T, fileDescriptorSets []*descriptor.FileDescriptorSet) {
-	require.NoError(t, printFileDescriptorSetsJSON(fileDescriptorSets))
-}
-
-func testPrintPackageSetJSON(t *testing.T, packageSet *reflectv1.PackageSet) {
-	require.NoError(t, printPackageSetJSON(packageSet))
-}
-
-func getFileDescriptorSets(workDirPath string, dirPath string) ([]*descriptor.FileDescriptorSet, error) {
-	protoSet, err := file.NewProtoSetProvider().GetForDir(workDirPath, dirPath)
-	if err != nil {
+func unmarshalPackageSet(s string) (*reflectv1.PackageSet, error) {
+	packageSet := &reflectv1.PackageSet{}
+	if err := jsonpb.UnmarshalString(s, packageSet); err != nil {
 		return nil, err
 	}
-	compileResult, err := protoc.NewCompiler(
-		protoc.CompilerWithFileDescriptorSet(),
-	).Compile(protoSet)
-	if err != nil {
-		return nil, err
-	}
-	if len(compileResult.Failures) > 0 {
-		var err error
-		for _, failure := range compileResult.Failures {
-			err = multierr.Append(err, errors.New(failure.String()))
-		}
-		return nil, err
-	}
-	return compileResult.FileDescriptorSets, nil
-}
-
-func printFileDescriptorSetsJSON(fileDescriptorSets []*descriptor.FileDescriptorSet) error {
-	for _, fileDescriptorSet := range fileDescriptorSets {
-		s, err := jsonMarshaler.MarshalToString(fileDescriptorSet)
-		if err != nil {
-			return err
-		}
-		fmt.Println(s)
-	}
-	return nil
-}
-
-func printPackageSetJSON(packageSet *reflectv1.PackageSet) error {
-	s, err := jsonMarshaler.MarshalToString(packageSet)
-	if err != nil {
-		return err
-	}
-	fmt.Println(s)
-	return nil
+	return packageSet, nil
 }
