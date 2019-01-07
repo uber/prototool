@@ -128,6 +128,7 @@ type Message struct {
 	fullyQualifiedName         string
 	nestedEnumNameToEnum       map[string]*Enum
 	nestedMessageNameToMessage map[string]*Message
+	fieldNameToField           map[string]*MessageField
 }
 
 // ProtoMessage returns the underlying Protobuf messge.
@@ -148,6 +149,21 @@ func (m *Message) NestedEnumNameToEnum() map[string]*Enum {
 // NestedMessageNameToMessage returns the nested messages of the given Message.
 func (m *Message) NestedMessageNameToMessage() map[string]*Message {
 	return m.nestedMessageNameToMessage
+}
+
+// FieldNameToField returns the fields of the given Message.
+func (m *Message) FieldNameToField() map[string]*MessageField {
+	return m.fieldNameToField
+}
+
+// MessageField is the Golang wrapper for the Protobuf MessageField object.
+type MessageField struct {
+	protoMessage *reflectv1.MessageField
+}
+
+// ProtoMessage returns the underlying Protobuf messge.
+func (m *MessageField) ProtoMessage() *reflectv1.MessageField {
+	return m.protoMessage
 }
 
 // Service is the Golang wrapper for the Protobuf Service object.
@@ -230,6 +246,7 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		fullyQualifiedName:         getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
 		nestedEnumNameToEnum:       make(map[string]*Enum),
 		nestedMessageNameToMessage: make(map[string]*Message),
+		fieldNameToField:           make(map[string]*MessageField),
 	}
 	for _, nestedEnum := range protoMessage.NestedEnums {
 		message.nestedEnumNameToEnum[nestedEnum.Name] = newEnum(nestedEnum, message.fullyQualifiedName)
@@ -237,7 +254,16 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 	for _, nestedMessage := range protoMessage.NestedMessages {
 		message.nestedMessageNameToMessage[nestedMessage.Name] = newMessage(nestedMessage, message.fullyQualifiedName)
 	}
+	for _, field := range protoMessage.MessageFields {
+		message.fieldNameToField[field.Name] = newMessageField(field)
+	}
 	return message
+}
+
+func newMessageField(protoMessage *reflectv1.MessageField) *MessageField {
+	return &MessageField{
+		protoMessage: protoMessage,
+	}
 }
 
 func newService(protoMessage *reflectv1.Service, encapsulatingFullyQualifiedName string) *Service {

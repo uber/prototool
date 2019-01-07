@@ -1,23 +1,3 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 package breaking
 
 import (
@@ -30,9 +10,16 @@ func checkMessageFieldsNotDeleted(addFailure func(*text.Failure), from *extract.
 }
 
 func checkMessageFieldsNotDeletedMessage(addFailure func(*text.Failure), from *extract.Message, to *extract.Message) error {
+	fromFieldNameToField := from.FieldNameToField()
+	toFieldNameToField := to.FieldNameToField()
+	for fieldName := range fromFieldNameToField {
+		if _, ok := toFieldNameToField[fieldName]; !ok {
+			addFailure(newMessageFieldsNotDeletedFailure(from.FullyQualifiedName(), fieldName))
+		}
+	}
 	return nil
 }
 
 func newMessageFieldsNotDeletedFailure(messageName string, fieldName string) *text.Failure {
-	return newTextFailuref(`Message field %q  on message %q was deleted.`, fieldName, messageName)
+	return newTextFailuref(`Message field %q on message %q was deleted.`, fieldName, messageName)
 }
