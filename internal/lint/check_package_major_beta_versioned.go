@@ -30,7 +30,7 @@ import (
 
 var packageMajorBetaVersionedLinter = NewLinter(
 	"PACKAGE_MAJOR_BETA_VERSIONED",
-	`Verifies that the package is of the form "package.vMAJORVERSION" or "package.VMAJORVERSIONbetaBETAVERSION" with versions >=1.`,
+	`Verifies that the package is of the form "package.vMAJORVERSION" or "package.vMAJORVERSIONbetaBETAVERSION" with versions >=1.`,
 	checkPackageMajorBetaVersioned,
 )
 
