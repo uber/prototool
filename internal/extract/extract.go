@@ -24,6 +24,7 @@ package extract
 import (
 	"fmt"
 
+	"github.com/uber/prototool/internal/protostrs"
 	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 )
 
@@ -42,6 +43,13 @@ func (p *PackageSet) ProtoMessage() *reflectv1.PackageSet {
 // PackageNameToPackage returns a map from package name to Package.
 func (p *PackageSet) PackageNameToPackage() map[string]*Package {
 	return p.packageNameToPackage
+}
+
+// WithoutBeta makes a copy of the PackageSet without any beta packages.
+//
+// Note that field type names may still refer to beta packages.
+func (p *PackageSet) WithoutBeta() (*PackageSet, error) {
+	return newPackageSet(p.protoMessage, true)
 }
 
 // Package is the Golang wrapper for the Protobuf Package object.
@@ -161,25 +169,34 @@ func (s *Service) FullyQualifiedName() string {
 
 // NewPackageSet returns a new PackageSet for the given reflect PackageSet.
 func NewPackageSet(protoMessage *reflectv1.PackageSet) (*PackageSet, error) {
+	return newPackageSet(protoMessage, false)
+}
+
+func newPackageSet(protoMessage *reflectv1.PackageSet, withoutBeta bool) (*PackageSet, error) {
 	packageSet := &PackageSet{
 		protoMessage:         protoMessage,
 		packageNameToPackage: make(map[string]*Package),
 	}
 	for _, pkg := range packageSet.protoMessage.Packages {
-		packageSet.packageNameToPackage[pkg.Name] = &Package{
-			protoMessage:               pkg,
-			packageSet:                 packageSet,
-			dependencyNameToDependency: make(map[string]*Package),
-			importerNameToImporter:     make(map[string]*Package),
-			enumNameToEnum:             make(map[string]*Enum),
-			messageNameToMessage:       make(map[string]*Message),
-			serviceNameToService:       make(map[string]*Service),
+		if !ignorePackage(withoutBeta, pkg.Name) {
+			packageSet.packageNameToPackage[pkg.Name] = &Package{
+				protoMessage:               pkg,
+				packageSet:                 packageSet,
+				dependencyNameToDependency: make(map[string]*Package),
+				importerNameToImporter:     make(map[string]*Package),
+				enumNameToEnum:             make(map[string]*Enum),
+				messageNameToMessage:       make(map[string]*Message),
+				serviceNameToService:       make(map[string]*Service),
+			}
 		}
 	}
 	for packageName, pkg := range packageSet.packageNameToPackage {
 		for _, dependencyName := range pkg.protoMessage.DependencyNames {
 			dependency, ok := packageSet.packageNameToPackage[dependencyName]
 			if !ok {
+				if ignorePackage(withoutBeta, dependencyName) {
+					continue
+				}
 				return nil, fmt.Errorf("no package for name %s", dependencyName)
 			}
 			pkg.dependencyNameToDependency[dependencyName] = dependency
@@ -235,4 +252,14 @@ func getFullyQualifiedName(encapsulatingFullyQualifiedName string, name string) 
 		return name
 	}
 	return encapsulatingFullyQualifiedName + "." + name
+}
+
+func ignorePackage(withoutBeta bool, packageName string) bool {
+	// if we are not ignoring beta packages, do not ignore
+	if !withoutBeta {
+		return false
+	}
+	// betaVersion is 0 if we can't parse this into a beta package
+	_, betaVersion, _ := protostrs.MajorBetaVersion(packageName)
+	return betaVersion > 0
 }

@@ -27,8 +27,9 @@ import (
 )
 
 type runner struct {
-	logger   *zap.Logger
-	checkers []Checker
+	logger      *zap.Logger
+	includeBeta bool
+	checkers    []Checker
 }
 
 func newRunner(options ...RunnerOption) *runner {
@@ -43,6 +44,17 @@ func newRunner(options ...RunnerOption) *runner {
 }
 
 func (r *runner) Run(from *extract.PackageSet, to *extract.PackageSet) ([]*text.Failure, error) {
+	var err error
+	if !r.includeBeta {
+		from, err = from.WithoutBeta()
+		if err != nil {
+			return nil, err
+		}
+		to, err = from.WithoutBeta()
+		if err != nil {
+			return nil, err
+		}
+	}
 	var failures []*text.Failure
 	for _, checker := range r.checkers {
 		var checkerFailures []*text.Failure

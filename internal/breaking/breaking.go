@@ -30,6 +30,11 @@ var (
 	// AllCheckers are all known Checkers.
 	AllCheckers = []Checker{
 		Checker{
+			ID:      "PACKAGESS_NOT_DELETED",
+			Purpose: "Checks that no packages have been deleted.",
+			Check:   checkPackagesNotDeleted,
+		},
+		Checker{
 			ID:      "MESSAGES_NOT_DELETED",
 			Purpose: "Checks that no messages have been deleted.",
 			Check:   checkMessagesNotDeleted,
@@ -77,6 +82,15 @@ type RunnerOption func(*runner)
 func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 	return func(runner *runner) {
 		runner.logger = logger
+	}
+}
+
+// RunnerWithIncludeBeta returns a RunnerOption that includes beta packages.
+//
+// The default is to ignore beta packages.
+func RunnerWithIncludeBeta(logger *zap.Logger) RunnerOption {
+	return func(runner *runner) {
+		runner.includeBeta = true
 	}
 }
 
