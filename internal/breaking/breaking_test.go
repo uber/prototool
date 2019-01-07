@@ -31,7 +31,12 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	testRun(t, "one")
+	testRun(
+		t,
+		"one",
+		newMessagesNotDeletedFailure("Two"),
+		newPackagesNotDeletedFailure("bar.v1"),
+	)
 }
 
 func testRun(t *testing.T, subDirPath string, expectedFailures ...*text.Failure) {
@@ -39,6 +44,9 @@ func testRun(t *testing.T, subDirPath string, expectedFailures ...*text.Failure)
 	require.NoError(t, err)
 	failures, err := NewRunner().Run(fromPackageSet, toPackageSet)
 	require.NoError(t, err)
+	for _, failure := range failures {
+		failure.LintID = ""
+	}
 	text.SortFailures(failures)
 	text.SortFailures(expectedFailures)
 	require.Equal(t, expectedFailures, failures)

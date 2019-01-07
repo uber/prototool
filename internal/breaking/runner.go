@@ -50,7 +50,7 @@ func (r *runner) Run(from *extract.PackageSet, to *extract.PackageSet) ([]*text.
 		if err != nil {
 			return nil, err
 		}
-		to, err = from.WithoutBeta()
+		to, err = to.WithoutBeta()
 		if err != nil {
 			return nil, err
 		}

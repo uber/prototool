@@ -30,24 +30,14 @@ var (
 	// AllCheckers are all known Checkers.
 	AllCheckers = []Checker{
 		Checker{
-			ID:      "PACKAGESS_NOT_DELETED",
-			Purpose: "Checks that no packages have been deleted.",
-			Check:   checkPackagesNotDeleted,
-		},
-		Checker{
 			ID:      "MESSAGES_NOT_DELETED",
 			Purpose: "Checks that no messages have been deleted.",
 			Check:   checkMessagesNotDeleted,
 		},
 		Checker{
-			ID:      "MESSAGE_FIELDS_NOT_DELETED",
-			Purpose: "Checks that no message fields have been deleted. We require fields to be deprecated instead of deleted and added to the reserved list.",
-			Check:   checkMessageFieldsNotDeleted,
-		},
-		Checker{
-			ID:      "MESSAGE_FIELDS_HAVE_SAME_TYPE",
-			Purpose: "Checks that message fields have the same type.",
-			Check:   checkMessageFieldsHaveSameType,
+			ID:      "PACKAGES_NOT_DELETED",
+			Purpose: "Checks that no packages have been deleted.",
+			Check:   checkPackagesNotDeleted,
 		},
 	}
 )
