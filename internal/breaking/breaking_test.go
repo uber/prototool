@@ -37,10 +37,6 @@ func TestRun(t *testing.T) {
 		newMessageFieldsNotDeletedFailure("foo.v1.Three", 2),
 		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree", 2),
 		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree.NestedNestedThree", 2),
-		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
-		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
-		newMessagesNotDeletedFailure("foo.v1.Two"),
-		newPackagesNotDeletedFailure("bar.v1"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four", 1, "int64", "int32"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 1, "int64", "int32"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 1, "int64", "int32"),
@@ -61,6 +57,10 @@ func TestRun(t *testing.T) {
 		newMessageFieldsSameTypeFailure("foo.v1.Four.SevenEntry", 1, "int64", "int32"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.SevenEntry", 1, "int64", "int32"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour.SevenEntry", 1, "int64", "int32"),
+		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
+		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
+		newMessagesNotDeletedFailure("foo.v1.Two"),
+		newPackagesNotDeletedFailure("bar.v1"),
 	)
 }
 
