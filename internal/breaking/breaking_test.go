@@ -47,6 +47,8 @@ func TestRun(t *testing.T) {
 		newMessageFieldsSameTypeFailure("foo.v1.Four", 2, "string", "bytes"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 2, "string", "bytes"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 2, "string", "bytes"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 3, "foo.v1.Four.NestedFour", "foo.v1.One"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 3, "foo.v1.Four.NestedFour.NestedNestedFour", "foo.v1.One"),
 	)
 }
 

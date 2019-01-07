@@ -36,9 +36,9 @@ message Four {
     }
     int32 one = 1;
     bytes two = 2;
-    NestedNestedFour three = 3;
+    One three = 3;
   }
   int32 one = 1;
   bytes two = 2;
-  NestedFour three = 3;
+  One three = 3;
 }

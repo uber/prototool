@@ -21,8 +21,12 @@
 package breaking
 
 import (
+	"fmt"
+
 	"github.com/uber/prototool/internal/extract"
 	"github.com/uber/prototool/internal/text"
+
+	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 )
 
 func checkMessageFieldsSameType(addFailure func(*text.Failure), from *extract.PackageSet, to *extract.PackageSet) error {
@@ -43,6 +47,21 @@ func checkMessageFieldsSameTypeMessageField(addFailure func(*text.Failure), from
 			return err
 		}
 		addFailure(newMessageFieldsSameTypeFailure(from.Message().FullyQualifiedName(), from.ProtoMessage().Number, fromTypeString, toTypeString))
+		return nil
+	}
+	switch fromType {
+	case reflectv1.MessageField_TYPE_ENUM, reflectv1.MessageField_TYPE_GROUP, reflectv1.MessageField_TYPE_MESSAGE:
+		fromTypeName := from.ProtoMessage().TypeName
+		toTypeName := to.ProtoMessage().TypeName
+		if fromTypeName == "" {
+			return fmt.Errorf("fromTypeName empty")
+		}
+		if toTypeName == "" {
+			return fmt.Errorf("toTypeName empty")
+		}
+		if fromTypeName != toTypeName {
+			addFailure(newMessageFieldsSameTypeFailure(from.Message().FullyQualifiedName(), from.ProtoMessage().Number, fromTypeName, toTypeName))
+		}
 	}
 	return nil
 }
