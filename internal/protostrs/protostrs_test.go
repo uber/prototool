@@ -63,6 +63,8 @@ func TestMajorBetaVersion(t *testing.T) {
 	testMajorBetaVersionValid(t, "foo.bar.v1", 1, 0)
 	testMajorBetaVersionValid(t, "foo.bar.v18", 18, 0)
 	testMajorBetaVersionValid(t, "foo.bar.v180", 180, 0)
+	testMajorBetaVersionInvalid(t, "")
+	testMajorBetaVersionInvalid(t, "foo.v")
 	testMajorBetaVersionInvalid(t, "foo.v0")
 	testMajorBetaVersionInvalid(t, "foo.barv1")
 	testMajorBetaVersionInvalid(t, "barv1")
@@ -84,9 +86,11 @@ func TestMajorBetaVersion(t *testing.T) {
 	testMajorBetaVersionInvalid(t, "foo.barvbeta1")
 	testMajorBetaVersionInvalid(t, "barvbeta1")
 	testMajorBetaVersionInvalid(t, "vbeta1")
-	testMajorBetaVersionInvalid(t, "foo.bar.v-1beta1")
+	testMajorBetaVersionInvalid(t, "foo.bar.v1beta-1")
+	testMajorBetaVersionInvalid(t, "foo.bar.v-1beta-1")
 	testMajorBetaVersionInvalid(t, "foo.v1beta")
 	testMajorBetaVersionInvalid(t, "foo.beta1")
+	testMajorBetaVersionInvalid(t, "foo.v1beta1beta1")
 }
 
 func testMajorBetaVersionValid(t *testing.T, packageName string, expectedMajorBetaVersion uint64, expectedBetaVersion uint64) {
