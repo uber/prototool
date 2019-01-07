@@ -40,6 +40,11 @@ var (
 			Check:   checkMessageFieldsNotDeleted,
 		},
 		Checker{
+			ID:      "MESSAGE_FIELDS_SAME_TYPE",
+			Purpose: "Checks that message fields have the same type.",
+			Check:   checkMessageFieldsSameType,
+		},
+		Checker{
 			ID:      "PACKAGES_NOT_DELETED",
 			Purpose: "Checks that no packages have been deleted.",
 			Check:   checkPackagesNotDeleted,

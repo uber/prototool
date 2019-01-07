@@ -25,21 +25,28 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-func checkMessageFieldsNotDeleted(addFailure func(*text.Failure), from *extract.PackageSet, to *extract.PackageSet) error {
-	return forEachMessagePair(addFailure, from, to, checkMessageFieldsNotDeletedMessage)
+func checkMessageFieldsSameType(addFailure func(*text.Failure), from *extract.PackageSet, to *extract.PackageSet) error {
+	return forEachMessageFieldPair(addFailure, from, to, checkMessageFieldsSameTypeMessageField)
 }
 
-func checkMessageFieldsNotDeletedMessage(addFailure func(*text.Failure), from *extract.Message, to *extract.Message) error {
-	fromFieldNumberToField := from.FieldNumberToField()
-	toFieldNumberToField := to.FieldNumberToField()
-	for fieldNumber := range fromFieldNumberToField {
-		if _, ok := toFieldNumberToField[fieldNumber]; !ok {
-			addFailure(newMessageFieldsNotDeletedFailure(from.FullyQualifiedName(), fieldNumber))
+func checkMessageFieldsSameTypeMessageField(addFailure func(*text.Failure), from *extract.MessageField, to *extract.MessageField) error {
+	fromType := from.ProtoMessage().Type
+	toType := to.ProtoMessage().Type
+	// TODO: message type name
+	if fromType != toType {
+		fromTypeString, err := getMessageFieldTypeString(fromType)
+		if err != nil {
+			return err
 		}
+		toTypeString, err := getMessageFieldTypeString(toType)
+		if err != nil {
+			return err
+		}
+		addFailure(newMessageFieldsSameTypeFailure(from.Message().FullyQualifiedName(), from.ProtoMessage().Number, fromTypeString, toTypeString))
 	}
 	return nil
 }
 
-func newMessageFieldsNotDeletedFailure(messageName string, fieldNumber int32) *text.Failure {
-	return newTextFailuref(`Message field "%d" on message %q was deleted.`, fieldNumber, messageName)
+func newMessageFieldsSameTypeFailure(messageName string, fieldNumber int32, fromTypeString string, toTypeString string) *text.Failure {
+	return newTextFailuref(`Message field "%d" on message %q changed type from %q to %q.`, fieldNumber, messageName, fromTypeString, toTypeString)
 }

@@ -41,6 +41,12 @@ func TestRun(t *testing.T) {
 		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
 		newMessagesNotDeletedFailure("foo.v1.Two"),
 		newPackagesNotDeletedFailure("bar.v1"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 2, "string", "bytes"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 2, "string", "bytes"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 2, "string", "bytes"),
 	)
 }
 

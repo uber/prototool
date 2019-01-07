@@ -31,3 +31,18 @@ message Three {
   string two = 2;
   NestedThree three = 3;
 }
+
+message Four {
+  message NestedFour {
+    message NestedNestedFour {
+      int64 one = 1;
+      string two = 2;
+    }
+    int64 one = 1;
+    string two = 2;
+    NestedNestedFour three = 3;
+  }
+  int64 one = 1;
+  string two = 2;
+  NestedFour three = 3;
+}

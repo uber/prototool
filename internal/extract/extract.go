@@ -35,7 +35,7 @@ type PackageSet struct {
 	packageNameToPackage map[string]*Package
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (p *PackageSet) ProtoMessage() *reflectv1.PackageSet {
 	return p.protoMessage
 }
@@ -64,7 +64,7 @@ type Package struct {
 	serviceNameToService       map[string]*Service
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (p *Package) ProtoMessage() *reflectv1.Package {
 	return p.protoMessage
 }
@@ -111,7 +111,7 @@ type Enum struct {
 	fullyQualifiedName string
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (e *Enum) ProtoMessage() *reflectv1.Enum {
 	return e.protoMessage
 }
@@ -132,7 +132,7 @@ type Message struct {
 	fieldNumberToField         map[int32]*MessageField
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (m *Message) ProtoMessage() *reflectv1.Message {
 	return m.protoMessage
 }
@@ -165,11 +165,18 @@ func (m *Message) FieldNumberToField() map[int32]*MessageField {
 // MessageField is the Golang wrapper for the Protobuf MessageField object.
 type MessageField struct {
 	protoMessage *reflectv1.MessageField
+
+	message *Message
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (m *MessageField) ProtoMessage() *reflectv1.MessageField {
 	return m.protoMessage
+}
+
+// Message returns the parent Message.
+func (m *MessageField) Message() *Message {
+	return m.message
 }
 
 // Service is the Golang wrapper for the Protobuf Service object.
@@ -179,7 +186,7 @@ type Service struct {
 	fullyQualifiedName string
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (s *Service) ProtoMessage() *reflectv1.Service {
 	return s.protoMessage
 }
@@ -262,16 +269,17 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		message.nestedMessageNameToMessage[nestedMessage.Name] = newMessage(nestedMessage, message.fullyQualifiedName)
 	}
 	for _, field := range protoMessage.MessageFields {
-		messageField := newMessageField(field)
+		messageField := newMessageField(field, message)
 		message.fieldNameToField[field.Name] = messageField
 		message.fieldNumberToField[field.Number] = messageField
 	}
 	return message
 }
 
-func newMessageField(protoMessage *reflectv1.MessageField) *MessageField {
+func newMessageField(protoMessage *reflectv1.MessageField, message *Message) *MessageField {
 	return &MessageField{
 		protoMessage: protoMessage,
+		message:      message,
 	}
 }
 
