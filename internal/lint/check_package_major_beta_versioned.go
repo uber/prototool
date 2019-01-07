@@ -28,30 +28,30 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var packageMajorVersionedLinter = NewLinter(
-	"PACKAGE_MAJOR_VERSIONED",
-	`Verifies that the package is of the form "package.vMAJORVERSION".`,
-	checkPackageMajorVersioned,
+var packageMajorBetaVersionedLinter = NewLinter(
+	"PACKAGE_MAJOR_BETA_VERSIONED",
+	`Verifies that the package is of the form "package.vMAJORVERSION" or "package.vMAJORVERSIONbetaBETAVERSION" with versions >=1.`,
+	checkPackageMajorBetaVersioned,
 )
 
-func checkPackageMajorVersioned(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
-	return runVisitor(&packageMajorVersionedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkPackageMajorBetaVersioned(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+	return runVisitor(&packageMajorBetaVersionedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
-type packageMajorVersionedVisitor struct {
+type packageMajorBetaVersionedVisitor struct {
 	baseAddVisitor
 
 	filename string
 	pkg      *proto.Package
 }
 
-func (v *packageMajorVersionedVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *packageMajorBetaVersionedVisitor) OnStart(descriptor *proto.Proto) error {
 	v.filename = descriptor.Filename
 	v.pkg = nil
 	return nil
 }
 
-func (v *packageMajorVersionedVisitor) VisitPackage(pkg *proto.Package) {
+func (v *packageMajorBetaVersionedVisitor) VisitPackage(pkg *proto.Package) {
 	if v.pkg != nil {
 		v.AddFailuref(pkg.Position, "multiple package declarations, first was %v", v.pkg)
 		return
@@ -59,13 +59,13 @@ func (v *packageMajorVersionedVisitor) VisitPackage(pkg *proto.Package) {
 	v.pkg = pkg
 }
 
-func (v *packageMajorVersionedVisitor) Finally() error {
+func (v *packageMajorBetaVersionedVisitor) Finally() error {
 	if v.pkg == nil {
 		v.AddFailuref(scanner.Position{Filename: v.filename}, "No package declaration found.")
 		return nil
 	}
-	if _, ok := protostrs.MajorVersion(v.pkg.Name); !ok {
-		v.AddFailuref(v.pkg.Position, `Package should be of the form "package.vMAJORVERSION" but was %q.`, v.pkg.Name)
+	if _, _, ok := protostrs.MajorBetaVersion(v.pkg.Name); !ok {
+		v.AddFailuref(v.pkg.Position, `Package should be of the form "package.vMAJORVERSION" or "packagevMAJORVERSIONbetaBETAVERSION" with versions >=1 but was %q.`, v.pkg.Name)
 	}
 	return nil
 }

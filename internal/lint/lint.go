@@ -76,7 +76,7 @@ var (
 		oneofNamesLowerSnakeCaseLinter,
 		packageIsDeclaredLinter,
 		packageLowerSnakeCaseLinter,
-		packageMajorVersionedLinter,
+		packageMajorBetaVersionedLinter,
 		packagesSameInDirLinter,
 		rpcsHaveCommentsLinter,
 		rpcNamesCamelCaseLinter,

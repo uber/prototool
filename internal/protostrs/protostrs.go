@@ -85,31 +85,62 @@ func JavaPackage(packageName string) string {
 	return "com." + packageName
 }
 
-// MajorVersion extracts the major version number from the package name, if
-// present. A package must be of the form "foo.vMAJORVERSION". Returns the
-// version and true if the package is of this form, 0 and false otherwise.
-func MajorVersion(packageName string) (uint64, bool) {
+// MajorBetaVersion extracts the major and beta version number from the package
+// name, if present. A package must be of the form "foo.vMAJORVERSION" or
+// "foo.vMAJORVERSIONbetaBETAVERSION" . Returns the major version, beta version
+// and true if the package is of this form, 0 and false otherwise. If there is
+// no beta version, 0 is returned. Valid versions are >=1.
+func MajorBetaVersion(packageName string) (uint64, uint64, bool) {
 	if packageName == "" {
-		return 0, false
+		return 0, 0, false
 	}
 	split := strings.Split(packageName, ".")
 	// A package named "vX" should not count as it is just a single package name,
 	// not a package name and a version.
 	if len(split) < 2 {
-		return 0, false
+		return 0, 0, false
 	}
+
 	versionPart := split[len(split)-1]
 	// Must be 'v' along with at least one number.
 	if len(versionPart) < 2 {
-		return 0, false
+		return 0, 0, false
 	}
 	if versionPart[0] != 'v' {
-		return 0, false
+		return 0, 0, false
 	}
+
 	versionString := versionPart[1:]
-	version, err := strconv.ParseUint(versionString, 10, 64)
-	if err != nil {
-		return 0, false
+	versionStringSplit := strings.Split(versionString, "beta")
+	switch len(versionStringSplit) {
+	case 1:
+		version, err := strconv.ParseUint(versionString, 10, 64)
+		if err != nil {
+			return 0, 0, false
+		}
+		if version == 0 {
+			return 0, 0, false
+		}
+		return version, 0, true
+	case 2:
+		majorVersionString := versionStringSplit[0]
+		betaVersionString := versionStringSplit[1]
+		if majorVersionString == "" || betaVersionString == "" {
+			return 0, 0, false
+		}
+		majorVersion, err := strconv.ParseUint(majorVersionString, 10, 64)
+		if err != nil {
+			return 0, 0, false
+		}
+		betaVersion, err := strconv.ParseUint(betaVersionString, 10, 64)
+		if err != nil {
+			return 0, 0, false
+		}
+		if majorVersion == 0 || betaVersion == 0 {
+			return 0, 0, false
+		}
+		return majorVersion, betaVersion, true
+	default:
+		return 0, 0, false
 	}
-	return version, true
 }
