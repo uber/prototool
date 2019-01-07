@@ -30,14 +30,14 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-func TestCheck(t *testing.T) {
-	testCheck(t, "one")
+func TestRun(t *testing.T) {
+	testRun(t, "one")
 }
 
-func testCheck(t *testing.T, subDirPath string, expectedFailures ...*text.Failure) {
+func testRun(t *testing.T, subDirPath string, expectedFailures ...*text.Failure) {
 	fromPackageSet, toPackageSet, err := getPackageSets(subDirPath)
 	require.NoError(t, err)
-	failures, err := Check(fromPackageSet, toPackageSet)
+	failures, err := NewRunner().Run(fromPackageSet, toPackageSet)
 	require.NoError(t, err)
 	text.SortFailures(failures)
 	text.SortFailures(expectedFailures)
