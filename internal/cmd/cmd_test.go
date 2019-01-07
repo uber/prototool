@@ -423,6 +423,13 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`3:1:PACKAGE_MAJOR_BETA_VERSIONED`,
+		"testdata/lint/majorbetaversioned/foo/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`16:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE
 		16:3:ENUM_ZERO_VALUES_INVALID_EXCEPT_MESSAGE
 		17:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE
