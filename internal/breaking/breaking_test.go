@@ -34,7 +34,7 @@ func TestRun(t *testing.T) {
 	testRun(
 		t,
 		"one",
-		newMessagesNotDeletedFailure("Two"),
+		newMessagesNotDeletedFailure("foo.v1.Two"),
 		newPackagesNotDeletedFailure("bar.v1"),
 	)
 }
