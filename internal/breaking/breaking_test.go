@@ -55,6 +55,12 @@ func TestRun(t *testing.T) {
 		newMessageFieldsSameTypeFailure("foo.v1.Four", 5, "enum", "double"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 5, "enum", "double"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 5, "enum", "double"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 6, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 6, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 6, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.SevenEntry", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.SevenEntry", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour.SevenEntry", 1, "int64", "int32"),
 	)
 }
 

@@ -57,16 +57,22 @@ message Four {
       string two = 2;
       EnumOne four = 4;
       EnumThree five = 5;
+      repeated int64 six = 6;
+      map<int64, string> seven = 7;
     }
     int64 one = 1;
     string two = 2;
     NestedNestedFour three = 3;
     EnumOne four = 4;
     EnumThree five = 5;
+    repeated int64 six = 6;
+    map<int64, string> seven = 7;
   }
   int64 one = 1;
   string two = 2;
   NestedFour three = 3;
   EnumOne four = 4;
   EnumThree five = 5;
+  repeated int64 six = 6;
+  map<int64, string> seven = 7;
 }

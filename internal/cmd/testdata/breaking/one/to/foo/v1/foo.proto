@@ -47,16 +47,22 @@ message Four {
       bytes two = 2;
       EnumThree four = 4;
       double five = 5;
+      repeated int32 six = 6;
+      map<int32, string> seven = 7;
     }
     int32 one = 1;
     bytes two = 2;
     One three = 3;
     EnumThree four = 4;
     double five = 5;
+    repeated int32 six = 6;
+    map<int32, string> seven = 7;
   }
   int32 one = 1;
   bytes two = 2;
   One three = 3;
   EnumThree four = 4;
   double five = 5;
+  repeated int32 six = 6;
+  map<int32, string> seven = 7;
 }
