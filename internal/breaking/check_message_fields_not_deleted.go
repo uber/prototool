@@ -30,16 +30,16 @@ func checkMessageFieldsNotDeleted(addFailure func(*text.Failure), from *extract.
 }
 
 func checkMessageFieldsNotDeletedMessage(addFailure func(*text.Failure), from *extract.Message, to *extract.Message) error {
-	fromFieldNameToField := from.FieldNameToField()
-	toFieldNameToField := to.FieldNameToField()
-	for fieldName := range fromFieldNameToField {
-		if _, ok := toFieldNameToField[fieldName]; !ok {
-			addFailure(newMessageFieldsNotDeletedFailure(from.FullyQualifiedName(), fieldName))
+	fromFieldNumberToField := from.FieldNumberToField()
+	toFieldNumberToField := to.FieldNumberToField()
+	for fieldNumber := range fromFieldNumberToField {
+		if _, ok := toFieldNumberToField[fieldNumber]; !ok {
+			addFailure(newMessageFieldsNotDeletedFailure(from.FullyQualifiedName(), fieldNumber))
 		}
 	}
 	return nil
 }
 
-func newMessageFieldsNotDeletedFailure(messageName string, fieldName string) *text.Failure {
-	return newTextFailuref(`Message field %q on message %q was deleted.`, fieldName, messageName)
+func newMessageFieldsNotDeletedFailure(messageName string, fieldNumber int32) *text.Failure {
+	return newTextFailuref(`Message field %q on message %q was deleted.`, fieldNumber, messageName)
 }

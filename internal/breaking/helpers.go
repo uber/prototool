@@ -92,6 +92,35 @@ func forEachMessagePairRec(
 	return nil
 }
 
+func forEachMessageFieldPair(
+	addFailure func(*text.Failure),
+	from *extract.PackageSet,
+	to *extract.PackageSet,
+	f func(
+		func(*text.Failure),
+		*extract.MessageField,
+		*extract.MessageField,
+	) error,
+) error {
+	return forEachMessagePair(
+		addFailure,
+		from,
+		to,
+		func(addFailure func(*text.Failure), fromMessage *extract.Message, toMessage *extract.Message) error {
+			fromFieldNumberToField := fromMessage.FieldNumberToField()
+			toFieldNumberToField := toMessage.FieldNumberToField()
+			for fromFieldNumber, fromField := range fromFieldNumberToField {
+				if toField, ok := toFieldNumberToField[fromFieldNumber]; ok {
+					if err := f(addFailure, fromField, toField); err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		},
+	)
+}
+
 func joinFullyQualifiedName(fullyQualifiedName string, name string) string {
 	if fullyQualifiedName == "" {
 		return name

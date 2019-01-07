@@ -34,9 +34,9 @@ func TestRun(t *testing.T) {
 	testRun(
 		t,
 		"one",
-		newMessageFieldsNotDeletedFailure("foo.v1.Three", "two"),
-		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree", "two"),
-		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree.NestedNestedThree", "two"),
+		newMessageFieldsNotDeletedFailure("foo.v1.Three", 2),
+		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree", 2),
+		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree.NestedNestedThree", 2),
 		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
 		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
 		newMessagesNotDeletedFailure("foo.v1.Two"),

@@ -17,10 +17,13 @@ message Three {
   message NestedThree {
     message NestedNestedThree {
       int64 one = 1;
+      string two = 4;
     }
     int64 one = 1;
     NestedNestedThree three = 3;
+    string two = 4;
   }
   int64 one = 1;
   NestedThree three = 3;
+  string two = 4;
 }

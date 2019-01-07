@@ -129,6 +129,7 @@ type Message struct {
 	nestedEnumNameToEnum       map[string]*Enum
 	nestedMessageNameToMessage map[string]*Message
 	fieldNameToField           map[string]*MessageField
+	fieldNumberToField         map[int32]*MessageField
 }
 
 // ProtoMessage returns the underlying Protobuf messge.
@@ -154,6 +155,11 @@ func (m *Message) NestedMessageNameToMessage() map[string]*Message {
 // FieldNameToField returns the fields of the given Message.
 func (m *Message) FieldNameToField() map[string]*MessageField {
 	return m.fieldNameToField
+}
+
+// FieldNumberToField returns the fields of the given Message.
+func (m *Message) FieldNumberToField() map[int32]*MessageField {
+	return m.fieldNumberToField
 }
 
 // MessageField is the Golang wrapper for the Protobuf MessageField object.
@@ -247,6 +253,7 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		nestedEnumNameToEnum:       make(map[string]*Enum),
 		nestedMessageNameToMessage: make(map[string]*Message),
 		fieldNameToField:           make(map[string]*MessageField),
+		fieldNumberToField:         make(map[int32]*MessageField),
 	}
 	for _, nestedEnum := range protoMessage.NestedEnums {
 		message.nestedEnumNameToEnum[nestedEnum.Name] = newEnum(nestedEnum, message.fullyQualifiedName)
@@ -255,7 +262,9 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		message.nestedMessageNameToMessage[nestedMessage.Name] = newMessage(nestedMessage, message.fullyQualifiedName)
 	}
 	for _, field := range protoMessage.MessageFields {
-		message.fieldNameToField[field.Name] = newMessageField(field)
+		messageField := newMessageField(field)
+		message.fieldNameToField[field.Name] = messageField
+		message.fieldNumberToField[field.Number] = messageField
 	}
 	return message
 }
