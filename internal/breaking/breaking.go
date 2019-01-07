@@ -35,6 +35,11 @@ var (
 			Check:   checkMessagesNotDeleted,
 		},
 		Checker{
+			ID:      "MESSAGE_FIELDS_NOT_DELETED",
+			Purpose: "Checks that no message fields have been deleted.",
+			Check:   checkMessageFieldsNotDeleted,
+		},
+		Checker{
 			ID:      "PACKAGES_NOT_DELETED",
 			Purpose: "Checks that no packages have been deleted.",
 			Check:   checkPackagesNotDeleted,
