@@ -146,10 +146,56 @@ var (
 		wktDirectlyImportedLinter,
 	}
 
+	// Uber2Linters is the slice of linters for the uber2 lint group.
+	Uber2Linters = []Linter{
+		commentsNoCStyleLinter,
+		enumFieldNamesUpperSnakeCaseLinter,
+		enumFieldPrefixesExceptMessageLinter,
+		enumNamesCamelCaseLinter,
+		enumNamesCapitalizedLinter,
+		enumZeroValuesInvalidExceptMessageLinter,
+		enumsNoAllowAliasLinter,
+		fieldsNotReservedLinter,
+		fileOptionsEqualGoPackageLastTwoSuffixLinter,
+		fileOptionsEqualJavaMultipleFilesTrueLinter,
+		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
+		fileOptionsEqualJavaPackageComPrefixLinter,
+		fileOptionsGoPackageNotLongFormLinter,
+		fileOptionsGoPackageSameInDirLinter,
+		fileOptionsJavaMultipleFilesSameInDirLinter,
+		fileOptionsJavaPackageSameInDirLinter,
+		fileOptionsRequireGoPackageLinter,
+		fileOptionsRequireJavaMultipleFilesLinter,
+		fileOptionsRequireJavaOuterClassnameLinter,
+		fileOptionsRequireJavaPackageLinter,
+		gogoNotImportedLinter,
+		importsNotPublicLinter,
+		importsNotWeakLinter,
+		messageFieldNamesLowerSnakeCaseLinter,
+		messageFieldsNoJSONNameLinter,
+		messageNamesCamelCaseLinter,
+		messageNamesCapitalizedLinter,
+		oneofNamesLowerSnakeCaseLinter,
+		packageIsDeclaredLinter,
+		packageLowerSnakeCaseLinter,
+		packageMajorBetaVersionedLinter,
+		packagesSameInDirLinter,
+		rpcNamesCamelCaseLinter,
+		rpcNamesCapitalizedLinter,
+		requestResponseNamesMatchRPCLinter,
+		requestResponseTypesInSameFileLinter,
+		requestResponseTypesUniqueLinter,
+		serviceNamesCamelCaseLinter,
+		serviceNamesCapitalizedLinter,
+		syntaxProto3Linter,
+		wktDirectlyImportedLinter,
+	}
+
 	// GroupToLinters is the map from linter group to the corresponding slice of linters.
 	GroupToLinters = map[string][]Linter{
 		"google": GoogleLinters,
 		"uber":   UberLinters,
+		"uber2":  Uber2Linters,
 	}
 )
 
