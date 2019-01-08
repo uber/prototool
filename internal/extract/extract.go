@@ -109,6 +109,8 @@ type Enum struct {
 	protoMessage *reflectv1.Enum
 
 	fullyQualifiedName string
+	valueNameToValue   map[string]*EnumValue
+	valueNumberToValue map[int32]*EnumValue
 }
 
 // ProtoMessage returns the underlying Protobuf message.
@@ -119,6 +121,33 @@ func (e *Enum) ProtoMessage() *reflectv1.Enum {
 // FullyQualifiedName returns the fully-qualified name.
 func (e *Enum) FullyQualifiedName() string {
 	return e.fullyQualifiedName
+}
+
+// ValueNameToValue returns the values of the given Enum.
+func (e *Enum) ValueNameToValue() map[string]*EnumValue {
+	return e.valueNameToValue
+}
+
+// ValueNumberToValue returns the values of the given Enum.
+func (e *Enum) ValueNumberToValue() map[int32]*EnumValue {
+	return e.valueNumberToValue
+}
+
+// EnumValue is the Golang wrapper for the Protobuf EnumValue object.
+type EnumValue struct {
+	protoMessage *reflectv1.EnumValue
+
+	enum *Enum
+}
+
+// ProtoMessage returns the underlying Protobuf enum.
+func (m *EnumValue) ProtoMessage() *reflectv1.EnumValue {
+	return m.protoMessage
+}
+
+// Enum returns the parent Enum.
+func (m *EnumValue) Enum() *Enum {
+	return m.enum
 }
 
 // Message is the Golang wrapper for the Protobuf Message object.
@@ -247,9 +276,24 @@ func newPackageSet(protoMessage *reflectv1.PackageSet, withoutBeta bool) (*Packa
 }
 
 func newEnum(protoMessage *reflectv1.Enum, encapsulatingFullyQualifiedName string) *Enum {
-	return &Enum{
+	enum := &Enum{
 		protoMessage:       protoMessage,
 		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+		valueNameToValue:   make(map[string]*EnumValue),
+		valueNumberToValue: make(map[int32]*EnumValue),
+	}
+	for _, value := range protoMessage.EnumValues {
+		enumValue := newEnumValue(value, enum)
+		enum.valueNameToValue[value.Name] = enumValue
+		enum.valueNumberToValue[value.Number] = enumValue
+	}
+	return enum
+}
+
+func newEnumValue(protoMessage *reflectv1.EnumValue, enum *Enum) *EnumValue {
+	return &EnumValue{
+		protoMessage: protoMessage,
+		enum:         enum,
 	}
 }
 
