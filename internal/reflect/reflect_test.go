@@ -504,7 +504,7 @@ func TestOne(t *testing.T) {
 }
 
 func testNewPackageSet(t *testing.T, subDirPath string, packageSetJSON string) {
-	fileDescriptorSets := ptesting.RequireGetFileDescriptorSets(t, "../cmd/testdata/reflect", "../cmd/testdata/reflect/"+subDirPath)
+	fileDescriptorSets := ptesting.RequireGetFileDescriptorSets(t, ".", "testdata/"+subDirPath)
 	packageSet, err := NewPackageSet(fileDescriptorSets...)
 	require.NoError(t, err)
 	// It's much easier to edit JSON than the actual Golang structs all the type

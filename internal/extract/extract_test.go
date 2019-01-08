@@ -44,7 +44,7 @@ func requireGetPackageSet(t *testing.T, subDirPath string) *PackageSet {
 }
 
 func getPackageSet(subDirPath string) (*PackageSet, error) {
-	fileDescriptorSets, err := ptesting.GetFileDescriptorSets("../cmd/testdata/reflect", "../cmd/testdata/reflect/"+subDirPath)
+	fileDescriptorSets, err := ptesting.GetFileDescriptorSets("../reflect", "../reflect/testdata/"+subDirPath)
 	if err != nil {
 		return nil, err
 	}
