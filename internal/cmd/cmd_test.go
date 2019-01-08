@@ -430,6 +430,14 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`17:3:MESSAGE_FIELDS_NOT_FLOATS
+		18:3:MESSAGE_FIELDS_NOT_FLOATS`,
+		"testdata/lint/floats/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`16:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE
 		16:3:ENUM_ZERO_VALUES_INVALID_EXCEPT_MESSAGE
 		17:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE

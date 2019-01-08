@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/file"
@@ -173,6 +174,7 @@ var (
 		importsNotWeakLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
 		messageFieldsNoJSONNameLinter,
+		messageFieldsNotFloatsLinter,
 		messageNamesCamelCaseLinter,
 		messageNamesCapitalizedLinter,
 		oneofNamesLowerSnakeCaseLinter,
@@ -389,4 +391,17 @@ func shouldIgnore(linter Linter, descriptor *proto.Proto, ignoreIDToFilePaths ma
 		}
 	}
 	return false, nil
+}
+
+func isSuppressed(comment *proto.Comment, annotation string) bool {
+	if comment == nil {
+		return false
+	}
+	annotation = "@suppresswarnings " + annotation
+	for _, line := range comment.Lines {
+		if strings.Contains(line, annotation) {
+			return true
+		}
+	}
+	return false
 }
