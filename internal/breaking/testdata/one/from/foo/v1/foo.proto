@@ -154,3 +154,7 @@ message Eight {
     bytes three = 3;
   }
 }
+
+service OneAPI {}
+
+service TwoAPI {}

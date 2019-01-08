@@ -123,3 +123,5 @@ message Eight {
   string two = 2;
   bytes three = 3;
 }
+
+service OneAPI {}

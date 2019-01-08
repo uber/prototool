@@ -80,6 +80,7 @@ func TestRun(t *testing.T) {
 		newMessageOneofsNotDeletedFailure("foo.v1.Eight", "test"),
 		newMessageOneofsNotDeletedFailure("foo.v1.Eight.NestedEight", "test"),
 		newMessageOneofsNotDeletedFailure("foo.v1.Eight.NestedEight.NestedNestedEight", "test"),
+		newServicesNotDeletedFailure("foo.v1.TwoAPI"),
 	)
 }
 

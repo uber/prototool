@@ -72,6 +72,11 @@ var (
 			Purpose: "Checks that no packages have been deleted.",
 			Check:   checkPackagesNotDeleted,
 		},
+		Checker{
+			ID:      "SERVICES_NOT_DELETED",
+			Purpose: "Checks that no services have been deleted.",
+			Check:   checkServicesNotDeleted,
+		},
 	}
 )
 
