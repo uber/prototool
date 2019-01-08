@@ -43,6 +43,11 @@ var (
 			Check:   checkEnumValuesNotDeleted,
 		},
 		Checker{
+			ID:      "ENUM_VALUES_SAME_NAME",
+			Purpose: "Checks that enum values have the same name.",
+			Check:   checkEnumValuesSameName,
+		},
+		Checker{
 			ID:      "MESSAGES_NOT_DELETED",
 			Purpose: "Checks that no messages have been deleted.",
 			Check:   checkMessagesNotDeleted,

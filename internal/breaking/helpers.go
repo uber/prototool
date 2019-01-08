@@ -171,6 +171,35 @@ func forEachEnumPairInternal(
 	return nil
 }
 
+func forEachEnumValuePair(
+	addFailure func(*text.Failure),
+	from *extract.PackageSet,
+	to *extract.PackageSet,
+	f func(
+		func(*text.Failure),
+		*extract.EnumValue,
+		*extract.EnumValue,
+	) error,
+) error {
+	return forEachEnumPair(
+		addFailure,
+		from,
+		to,
+		func(addFailure func(*text.Failure), fromEnum *extract.Enum, toEnum *extract.Enum) error {
+			fromValueNumberToValue := fromEnum.ValueNumberToValue()
+			toValueNumberToValue := toEnum.ValueNumberToValue()
+			for fromValueNumber, fromValue := range fromValueNumberToValue {
+				if toValue, ok := toValueNumberToValue[fromValueNumber]; ok {
+					if err := f(addFailure, fromValue, toValue); err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		},
+	)
+}
+
 func forEachServicePair(
 	addFailure func(*text.Failure),
 	from *extract.PackageSet,

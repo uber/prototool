@@ -86,7 +86,7 @@ message Six {
 
 enum EnumSeven {
   ENUM_SEVEN_INVALID = 0;
-  ENUM_SEVEN_ONE = 1;
+  ENUM_SEVEN_TWO = 1;
 }
 
 message Seven {
@@ -94,17 +94,17 @@ message Seven {
     message NestedNestedSeven {
       enum EnumSeven {
         ENUM_SEVEN_INVALID = 0;
-        ENUM_SEVEN_ONE = 1;
+        ENUM_SEVEN_TWO = 1;
       }
     }
     enum EnumSeven {
       ENUM_SEVEN_INVALID = 0;
-      ENUM_SEVEN_ONE = 1;
+      ENUM_SEVEN_TWO = 1;
     }
   }
   enum EnumSeven {
     ENUM_SEVEN_INVALID = 0;
-    ENUM_SEVEN_ONE = 1;
+    ENUM_SEVEN_TWO = 1;
   }
 }
 
