@@ -38,6 +38,11 @@ var (
 			Check:   checkEnumsNotDeleted,
 		},
 		Checker{
+			ID:      "ENUM_VALUES_NOT_DELETED",
+			Purpose: "Checks that no enum values have been deleted.",
+			Check:   checkEnumValuesNotDeleted,
+		},
+		Checker{
 			ID:      "MESSAGES_NOT_DELETED",
 			Purpose: "Checks that no messages have been deleted.",
 			Check:   checkMessagesNotDeleted,

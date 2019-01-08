@@ -73,6 +73,10 @@ func TestRun(t *testing.T) {
 		newEnumsNotDeletedFailure("foo.v1.Six.NestedSix.Foo"),
 		newEnumsNotDeletedFailure("foo.v1.Six.NestedSix.NestedNestedSix.Foo"),
 		newMessagesNotDeletedFailure("foo.v1.Six.NestedSix.NestedNestedSixDelete"),
+		newEnumValuesNotDeletedFailure("foo.v1.EnumSeven", 2),
+		newEnumValuesNotDeletedFailure("foo.v1.Seven.EnumSeven", 2),
+		newEnumValuesNotDeletedFailure("foo.v1.Seven.NestedSeven.EnumSeven", 2),
+		newEnumValuesNotDeletedFailure("foo.v1.Seven.NestedSeven.NestedNestedSeven.EnumSeven", 2),
 	)
 }
 

@@ -83,3 +83,27 @@ message Six {
     }
   }
 }
+
+enum EnumSeven {
+  ENUM_SEVEN_INVALID = 0;
+  ENUM_SEVEN_ONE = 1;
+}
+
+message Seven {
+  message NestedSeven {
+    message NestedNestedSeven {
+      enum EnumSeven {
+        ENUM_SEVEN_INVALID = 0;
+        ENUM_SEVEN_ONE = 1;
+      }
+    }
+    enum EnumSeven {
+      ENUM_SEVEN_INVALID = 0;
+      ENUM_SEVEN_ONE = 1;
+    }
+  }
+  enum EnumSeven {
+    ENUM_SEVEN_INVALID = 0;
+    ENUM_SEVEN_ONE = 1;
+  }
+}
