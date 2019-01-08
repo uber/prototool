@@ -93,9 +93,24 @@ var (
 			Check:   checkServiceMethodsNotDeleted,
 		},
 		Checker{
+			ID:      "SERVICE_METHODS_SAME_CLIENT_STREAMING",
+			Purpose: "Checks that service methods have the same client streaming.",
+			Check:   checkServiceMethodsSameClientStreaming,
+		},
+		Checker{
 			ID:      "SERVICE_METHODS_SAME_REQUEST_TYPE",
 			Purpose: "Checks that service methods have the same request type.",
 			Check:   checkServiceMethodsSameRequestType,
+		},
+		Checker{
+			ID:      "SERVICE_METHODS_SAME_RESPONSE_TYPE",
+			Purpose: "Checks that service methods have the same response type.",
+			Check:   checkServiceMethodsSameResponseType,
+		},
+		Checker{
+			ID:      "SERVICE_METHODS_SAME_SERVER_STREAMING",
+			Purpose: "Checks that service methods have the same server streaming.",
+			Check:   checkServiceMethodsSameServerStreaming,
 		},
 	}
 )

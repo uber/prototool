@@ -144,4 +144,24 @@ message OneOneResponse {}
 
 service ThreeAPI {
   rpc ThreeOne(OneOneRequest) returns (OneOneResponse);
+  rpc ThreeTwo(ThreeTwoRequest) returns (ThreeTwoResponse);
+  rpc ThreeThree(stream ThreeThreeRequest) returns (ThreeThreeResponse);
+  rpc ThreeFour(ThreeFourRequest) returns (ThreeFourResponse);
+  rpc ThreeFive(ThreeFiveRequest) returns (stream ThreeFiveResponse);
 }
+
+message ThreeTwoRequest {}
+
+message ThreeTwoResponse {}
+
+message ThreeThreeRequest {}
+
+message ThreeThreeResponse {}
+
+message ThreeFourRequest {}
+
+message ThreeFourResponse {}
+
+message ThreeFiveRequest {}
+
+message ThreeFiveResponse {}

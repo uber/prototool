@@ -92,8 +92,13 @@ func TestRun(t *testing.T) {
 		newMessageFieldsSameNameFailure("foo.v1.Nine.NestedNine", 1, "one", "two"),
 		newMessageFieldsSameNameFailure("foo.v1.Nine.NestedNine.NestedNestedNine", 1, "one", "two"),
 		newServiceMethodsSameRequestTypeFailure("foo.v1.ThreeAPI", "ThreeOne", "foo.v1.ThreeOneRequest", "foo.v1.OneOneRequest"),
+		newServiceMethodsSameResponseTypeFailure("foo.v1.ThreeAPI", "ThreeOne", "foo.v1.ThreeOneResponse", "foo.v1.OneOneResponse"),
 		newMessagesNotDeletedFailure("foo.v1.ThreeOneRequest"),
 		newMessagesNotDeletedFailure("foo.v1.ThreeOneResponse"),
+		newServiceMethodsSameClientStreamingFailure("foo.v1.ThreeAPI", "ThreeTwo", true),
+		newServiceMethodsSameClientStreamingFailure("foo.v1.ThreeAPI", "ThreeThree", false),
+		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFour", true),
+		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFive", false),
 	)
 }
 

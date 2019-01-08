@@ -182,8 +182,28 @@ service TwoAPI {}
 
 service ThreeAPI {
   rpc ThreeOne(ThreeOneRequest) returns (ThreeOneResponse);
+  rpc ThreeTwo(stream ThreeTwoRequest) returns (ThreeTwoResponse);
+  rpc ThreeThree(ThreeThreeRequest) returns (ThreeThreeResponse);
+  rpc ThreeFour(ThreeFourRequest) returns (stream ThreeFourResponse);
+  rpc ThreeFive(ThreeFiveRequest) returns (ThreeFiveResponse);
 }
 
 message ThreeOneRequest {}
 
 message ThreeOneResponse {}
+
+message ThreeTwoRequest {}
+
+message ThreeTwoResponse {}
+
+message ThreeThreeRequest {}
+
+message ThreeThreeResponse {}
+
+message ThreeFourRequest {}
+
+message ThreeFourResponse {}
+
+message ThreeFiveRequest {}
+
+message ThreeFiveResponse {}
