@@ -26,25 +26,40 @@ import (
 	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 )
 
-var messageFieldTypeToString = map[int32]string{
-	1:  "double",
-	2:  "float",
-	3:  "int64",
-	4:  "uint64",
-	5:  "int32",
-	6:  "fixed64",
-	7:  "fixed32",
-	8:  "bool",
-	9:  "string",
-	10: "group",
-	11: "message",
-	12: "bytes",
-	13: "uint32",
-	14: "enum",
-	15: "sfixed32",
-	16: "sfixed64",
-	17: "sint32",
-	18: "sint64",
+var (
+	messageFieldLabelToString = map[int32]string{
+		1: "optional",
+		2: "required",
+		3: "repeated",
+	}
+	messageFieldTypeToString = map[int32]string{
+		1:  "double",
+		2:  "float",
+		3:  "int64",
+		4:  "uint64",
+		5:  "int32",
+		6:  "fixed64",
+		7:  "fixed32",
+		8:  "bool",
+		9:  "string",
+		10: "group",
+		11: "message",
+		12: "bytes",
+		13: "uint32",
+		14: "enum",
+		15: "sfixed32",
+		16: "sfixed64",
+		17: "sint32",
+		18: "sint64",
+	}
+)
+
+func getMessageFieldLabelString(messageFieldLabel reflectv1.MessageField_Label) (string, error) {
+	s, ok := messageFieldLabelToString[int32(messageFieldLabel)]
+	if !ok {
+		return "", fmt.Errorf("unknown MessageField.Label: %d", messageFieldLabel)
+	}
+	return s, nil
 }
 
 func getMessageFieldTypeString(messageFieldType reflectv1.MessageField_Type) (string, error) {

@@ -34,6 +34,10 @@ func TestRun(t *testing.T) {
 	testRun(
 		t,
 		"one",
+		newPackagesNotDeletedFailure("bar.v1"),
+		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
+		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
+		newMessagesNotDeletedFailure("foo.v1.Two"),
 		newMessageFieldsNotDeletedFailure("foo.v1.Three", 2),
 		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree", 2),
 		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree.NestedNestedThree", 2),
@@ -57,10 +61,13 @@ func TestRun(t *testing.T) {
 		newMessageFieldsSameTypeFailure("foo.v1.Four.SevenEntry", 1, "int64", "int32"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.SevenEntry", 1, "int64", "int32"),
 		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour.SevenEntry", 1, "int64", "int32"),
-		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
-		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
-		newMessagesNotDeletedFailure("foo.v1.Two"),
-		newPackagesNotDeletedFailure("bar.v1"),
+		newMessagesNotDeletedFailure("foo.v1.Five.FourEntry"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 1, "optional", "repeated"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 2, "optional", "repeated"),
+		newMessageFieldsSameTypeFailure("foo.v1.Five", 2, "string", "message"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 3, "repeated", "optional"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 4, "repeated", "optional"),
+		newMessageFieldsSameTypeFailure("foo.v1.Five", 4, "message", "int64"),
 	)
 }
 

@@ -46,6 +46,7 @@ message Four {
       int32 one = 1;
       bytes two = 2;
       EnumThree four = 4;
+      // @suppresswarnings floats
       double five = 5;
       repeated int32 six = 6;
       map<int32, string> seven = 7;
@@ -54,6 +55,7 @@ message Four {
     bytes two = 2;
     One three = 3;
     EnumThree four = 4;
+    // @suppresswarnings floats
     double five = 5;
     repeated int32 six = 6;
     map<int32, string> seven = 7;
@@ -62,7 +64,15 @@ message Four {
   bytes two = 2;
   One three = 3;
   EnumThree four = 4;
+  // @suppresswarnings floats
   double five = 5;
   repeated int32 six = 6;
   map<int32, string> seven = 7;
+}
+
+message Five {
+  repeated int64 one = 1;
+  map<string, int64> two = 2;
+  int64 three = 3;
+  int64 four = 4;
 }

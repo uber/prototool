@@ -40,6 +40,11 @@ var (
 			Check:   checkMessageFieldsNotDeleted,
 		},
 		Checker{
+			ID:      "MESSAGE_FIELDS_SAME_LABEL",
+			Purpose: "Checks that message fields have the same label.",
+			Check:   checkMessageFieldsSameLabel,
+		},
+		Checker{
 			ID:      "MESSAGE_FIELDS_SAME_TYPE",
 			Purpose: "Checks that message fields have the same type.",
 			Check:   checkMessageFieldsSameType,

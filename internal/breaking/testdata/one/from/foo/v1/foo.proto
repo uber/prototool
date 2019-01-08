@@ -76,3 +76,10 @@ message Four {
   repeated int64 six = 6;
   map<int64, string> seven = 7;
 }
+
+message Five {
+  int64 one = 1;
+  string two = 2;
+  repeated int64 three = 3;
+  map<int64, string> four = 4;
+}
