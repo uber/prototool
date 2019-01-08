@@ -171,6 +171,35 @@ func forEachEnumPairInternal(
 	return nil
 }
 
+func forEachServicePair(
+	addFailure func(*text.Failure),
+	from *extract.PackageSet,
+	to *extract.PackageSet,
+	f func(
+		func(*text.Failure),
+		*extract.Service,
+		*extract.Service,
+	) error,
+) error {
+	return forEachPackagePair(
+		addFailure,
+		from,
+		to,
+		func(addFailure func(*text.Failure), fromPackage *extract.Package, toPackage *extract.Package) error {
+			fromServiceNameToService := fromPackage.ServiceNameToService()
+			toServiceNameToService := toPackage.ServiceNameToService()
+			for fromServiceName, fromService := range fromServiceNameToService {
+				if toService, ok := toServiceNameToService[fromServiceName]; ok {
+					if err := f(addFailure, fromService, toService); err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		},
+	)
+}
+
 func joinFullyQualifiedName(fullyQualifiedName string, name string) string {
 	if fullyQualifiedName == "" {
 		return name
