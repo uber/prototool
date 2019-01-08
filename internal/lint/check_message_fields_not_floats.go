@@ -21,13 +21,17 @@
 package lint
 
 import (
+	"fmt"
+
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
 
+const messageFieldsNotFloatsSuppressableAnnotation = "floats"
+
 var messageFieldsNotFloatsLinter = NewLinter(
 	"MESSAGE_FIELDS_NOT_FLOATS",
-	"Verifies that all message fields are not floats or doubles.",
+	fmt.Sprintf(`Suppressable with "@suppresswarnings %s". Verifies that all message fields are not floats or doubles.`, messageFieldsNotFloatsSuppressableAnnotation),
 	checkMessageFieldsNotFloats,
 )
 
@@ -66,6 +70,9 @@ func (v messageFieldsNotFloatsVisitor) VisitMapField(field *proto.MapField) {
 func (v messageFieldsNotFloatsVisitor) checkNotFloat(field *proto.Field) {
 	switch field.Type {
 	case "double", "float":
-		v.AddFailuref(field.Position, "Field %q is a float and floating point types are not allowed, consider using an int64 while representing your value in micros or nanos.", field.Name)
+		if isSuppressed(field.Comment, messageFieldsNotFloatsSuppressableAnnotation) {
+			return
+		}
+		v.AddFailuref(field.Position, `Field %q is a float and floating point types should generally not be used, consider using an int64 while representing your value in micros or nanos. This can be suppressed by adding "@suppresswarnings %s" to the field comment.`, field.Name, messageFieldsNotFloatsSuppressableAnnotation)
 	}
 }
