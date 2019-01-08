@@ -236,6 +236,7 @@ type Service struct {
 	protoMessage *reflectv1.Service
 
 	fullyQualifiedName string
+	methodNameToMethod map[string]*ServiceMethod
 }
 
 // ProtoMessage returns the underlying Protobuf message.
@@ -246,6 +247,28 @@ func (s *Service) ProtoMessage() *reflectv1.Service {
 // FullyQualifiedName returns the fully-qualified name.
 func (s *Service) FullyQualifiedName() string {
 	return s.fullyQualifiedName
+}
+
+// MethodNameToMethod returns the methods of the given Service.
+func (s *Service) MethodNameToMethod() map[string]*ServiceMethod {
+	return s.methodNameToMethod
+}
+
+// ServiceMethod is the Golang wrapper for the Protobuf ServiceMethod object.
+type ServiceMethod struct {
+	protoMessage *reflectv1.ServiceMethod
+
+	service *Service
+}
+
+// ProtoMessage returns the underlying Protobuf service.
+func (m *ServiceMethod) ProtoMessage() *reflectv1.ServiceMethod {
+	return m.protoMessage
+}
+
+// Service returns the parent Service.
+func (m *ServiceMethod) Service() *Service {
+	return m.service
 }
 
 // NewPackageSet returns a new PackageSet for the given reflect PackageSet.
@@ -363,9 +386,22 @@ func newMessageOneof(protoMessage *reflectv1.MessageOneof, message *Message) *Me
 }
 
 func newService(protoMessage *reflectv1.Service, encapsulatingFullyQualifiedName string) *Service {
-	return &Service{
+	service := &Service{
 		protoMessage:       protoMessage,
 		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+		methodNameToMethod: make(map[string]*ServiceMethod),
+	}
+	for _, method := range protoMessage.ServiceMethods {
+		serviceMethod := newServiceMethod(method, service)
+		service.methodNameToMethod[method.Name] = serviceMethod
+	}
+	return service
+}
+
+func newServiceMethod(protoMessage *reflectv1.ServiceMethod, service *Service) *ServiceMethod {
+	return &ServiceMethod{
+		protoMessage: protoMessage,
+		service:      service,
 	}
 }
 
