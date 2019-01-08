@@ -132,3 +132,25 @@ message Seven {
     ENUM_SEVEN_TWO = 2;
   }
 }
+
+message Eight {
+  message NestedEight {
+    message NestedNestedEight {
+      int64 one = 1;
+      oneof test {
+        string two = 2;
+        bytes three = 3;
+      }
+    }
+    int64 one = 1;
+    oneof test {
+      string two = 2;
+      bytes three = 3;
+    }
+  }
+  int64 one = 1;
+  oneof test {
+    string two = 2;
+    bytes three = 3;
+  }
+}

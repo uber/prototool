@@ -77,6 +77,9 @@ func TestRun(t *testing.T) {
 		newEnumValuesNotDeletedFailure("foo.v1.Seven.EnumSeven", 2),
 		newEnumValuesNotDeletedFailure("foo.v1.Seven.NestedSeven.EnumSeven", 2),
 		newEnumValuesNotDeletedFailure("foo.v1.Seven.NestedSeven.NestedNestedSeven.EnumSeven", 2),
+		newMessageOneofsNotDeletedFailure("foo.v1.Eight", "test"),
+		newMessageOneofsNotDeletedFailure("foo.v1.Eight.NestedEight", "test"),
+		newMessageOneofsNotDeletedFailure("foo.v1.Eight.NestedEight.NestedNestedEight", "test"),
 	)
 }
 

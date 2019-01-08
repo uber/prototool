@@ -107,3 +107,19 @@ message Seven {
     ENUM_SEVEN_ONE = 1;
   }
 }
+
+message Eight {
+  message NestedEight {
+    message NestedNestedEight {
+      int64 one = 1;
+      string two = 2;
+      bytes three = 3;
+    }
+    int64 one = 1;
+    string two = 2;
+    bytes three = 3;
+  }
+  int64 one = 1;
+  string two = 2;
+  bytes three = 3;
+}

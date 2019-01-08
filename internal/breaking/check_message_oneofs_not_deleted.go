@@ -41,5 +41,5 @@ func checkMessageOneofsNotDeletedMessage(addFailure func(*text.Failure), from *e
 }
 
 func newMessageOneofsNotDeletedFailure(messageName string, oneofName string) *text.Failure {
-	return newTextFailuref(`Message oneof "%q" on message %q was deleted.`, oneofName, messageName)
+	return newTextFailuref(`Message oneof %q on message %q was deleted.`, oneofName, messageName)
 }
