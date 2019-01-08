@@ -24,6 +24,7 @@ package extract
 import (
 	"fmt"
 
+	"github.com/uber/prototool/internal/protostrs"
 	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 )
 
@@ -34,7 +35,7 @@ type PackageSet struct {
 	packageNameToPackage map[string]*Package
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (p *PackageSet) ProtoMessage() *reflectv1.PackageSet {
 	return p.protoMessage
 }
@@ -42,6 +43,13 @@ func (p *PackageSet) ProtoMessage() *reflectv1.PackageSet {
 // PackageNameToPackage returns a map from package name to Package.
 func (p *PackageSet) PackageNameToPackage() map[string]*Package {
 	return p.packageNameToPackage
+}
+
+// WithoutBeta makes a copy of the PackageSet without any beta packages.
+//
+// Note that field type names may still refer to beta packages.
+func (p *PackageSet) WithoutBeta() (*PackageSet, error) {
+	return newPackageSet(p.protoMessage, true)
 }
 
 // Package is the Golang wrapper for the Protobuf Package object.
@@ -56,7 +64,7 @@ type Package struct {
 	serviceNameToService       map[string]*Service
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (p *Package) ProtoMessage() *reflectv1.Package {
 	return p.protoMessage
 }
@@ -101,9 +109,11 @@ type Enum struct {
 	protoMessage *reflectv1.Enum
 
 	fullyQualifiedName string
+	valueNameToValue   map[string]*EnumValue
+	valueNumberToValue map[int32]*EnumValue
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (e *Enum) ProtoMessage() *reflectv1.Enum {
 	return e.protoMessage
 }
@@ -113,6 +123,33 @@ func (e *Enum) FullyQualifiedName() string {
 	return e.fullyQualifiedName
 }
 
+// ValueNameToValue returns the values of the given Enum.
+func (e *Enum) ValueNameToValue() map[string]*EnumValue {
+	return e.valueNameToValue
+}
+
+// ValueNumberToValue returns the values of the given Enum.
+func (e *Enum) ValueNumberToValue() map[int32]*EnumValue {
+	return e.valueNumberToValue
+}
+
+// EnumValue is the Golang wrapper for the Protobuf EnumValue object.
+type EnumValue struct {
+	protoMessage *reflectv1.EnumValue
+
+	enum *Enum
+}
+
+// ProtoMessage returns the underlying Protobuf enum.
+func (m *EnumValue) ProtoMessage() *reflectv1.EnumValue {
+	return m.protoMessage
+}
+
+// Enum returns the parent Enum.
+func (m *EnumValue) Enum() *Enum {
+	return m.enum
+}
+
 // Message is the Golang wrapper for the Protobuf Message object.
 type Message struct {
 	protoMessage *reflectv1.Message
@@ -120,9 +157,12 @@ type Message struct {
 	fullyQualifiedName         string
 	nestedEnumNameToEnum       map[string]*Enum
 	nestedMessageNameToMessage map[string]*Message
+	fieldNameToField           map[string]*MessageField
+	fieldNumberToField         map[int32]*MessageField
+	oneofNameToOneof           map[string]*MessageOneof
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (m *Message) ProtoMessage() *reflectv1.Message {
 	return m.protoMessage
 }
@@ -142,14 +182,64 @@ func (m *Message) NestedMessageNameToMessage() map[string]*Message {
 	return m.nestedMessageNameToMessage
 }
 
+// FieldNameToField returns the fields of the given Message.
+func (m *Message) FieldNameToField() map[string]*MessageField {
+	return m.fieldNameToField
+}
+
+// FieldNumberToField returns the fields of the given Message.
+func (m *Message) FieldNumberToField() map[int32]*MessageField {
+	return m.fieldNumberToField
+}
+
+// OneofNameToOneof returns the oneofs of the given Message.
+func (m *Message) OneofNameToOneof() map[string]*MessageOneof {
+	return m.oneofNameToOneof
+}
+
+// MessageField is the Golang wrapper for the Protobuf MessageField object.
+type MessageField struct {
+	protoMessage *reflectv1.MessageField
+
+	message *Message
+}
+
+// ProtoMessage returns the underlying Protobuf message.
+func (m *MessageField) ProtoMessage() *reflectv1.MessageField {
+	return m.protoMessage
+}
+
+// Message returns the parent Message.
+func (m *MessageField) Message() *Message {
+	return m.message
+}
+
+// MessageOneof is the Golang wrapper for the Protobuf MessageOneof object.
+type MessageOneof struct {
+	protoMessage *reflectv1.MessageOneof
+
+	message *Message
+}
+
+// ProtoMessage returns the underlying Protobuf message.
+func (m *MessageOneof) ProtoMessage() *reflectv1.MessageOneof {
+	return m.protoMessage
+}
+
+// Message returns the parent Message.
+func (m *MessageOneof) Message() *Message {
+	return m.message
+}
+
 // Service is the Golang wrapper for the Protobuf Service object.
 type Service struct {
 	protoMessage *reflectv1.Service
 
 	fullyQualifiedName string
+	methodNameToMethod map[string]*ServiceMethod
 }
 
-// ProtoMessage returns the underlying Protobuf messge.
+// ProtoMessage returns the underlying Protobuf message.
 func (s *Service) ProtoMessage() *reflectv1.Service {
 	return s.protoMessage
 }
@@ -159,27 +249,58 @@ func (s *Service) FullyQualifiedName() string {
 	return s.fullyQualifiedName
 }
 
+// MethodNameToMethod returns the methods of the given Service.
+func (s *Service) MethodNameToMethod() map[string]*ServiceMethod {
+	return s.methodNameToMethod
+}
+
+// ServiceMethod is the Golang wrapper for the Protobuf ServiceMethod object.
+type ServiceMethod struct {
+	protoMessage *reflectv1.ServiceMethod
+
+	service *Service
+}
+
+// ProtoMessage returns the underlying Protobuf service.
+func (m *ServiceMethod) ProtoMessage() *reflectv1.ServiceMethod {
+	return m.protoMessage
+}
+
+// Service returns the parent Service.
+func (m *ServiceMethod) Service() *Service {
+	return m.service
+}
+
 // NewPackageSet returns a new PackageSet for the given reflect PackageSet.
 func NewPackageSet(protoMessage *reflectv1.PackageSet) (*PackageSet, error) {
+	return newPackageSet(protoMessage, false)
+}
+
+func newPackageSet(protoMessage *reflectv1.PackageSet, withoutBeta bool) (*PackageSet, error) {
 	packageSet := &PackageSet{
 		protoMessage:         protoMessage,
 		packageNameToPackage: make(map[string]*Package),
 	}
 	for _, pkg := range packageSet.protoMessage.Packages {
-		packageSet.packageNameToPackage[pkg.Name] = &Package{
-			protoMessage:               pkg,
-			packageSet:                 packageSet,
-			dependencyNameToDependency: make(map[string]*Package),
-			importerNameToImporter:     make(map[string]*Package),
-			enumNameToEnum:             make(map[string]*Enum),
-			messageNameToMessage:       make(map[string]*Message),
-			serviceNameToService:       make(map[string]*Service),
+		if !ignorePackage(withoutBeta, pkg.Name) {
+			packageSet.packageNameToPackage[pkg.Name] = &Package{
+				protoMessage:               pkg,
+				packageSet:                 packageSet,
+				dependencyNameToDependency: make(map[string]*Package),
+				importerNameToImporter:     make(map[string]*Package),
+				enumNameToEnum:             make(map[string]*Enum),
+				messageNameToMessage:       make(map[string]*Message),
+				serviceNameToService:       make(map[string]*Service),
+			}
 		}
 	}
 	for packageName, pkg := range packageSet.packageNameToPackage {
 		for _, dependencyName := range pkg.protoMessage.DependencyNames {
 			dependency, ok := packageSet.packageNameToPackage[dependencyName]
 			if !ok {
+				if ignorePackage(withoutBeta, dependencyName) {
+					continue
+				}
 				return nil, fmt.Errorf("no package for name %s", dependencyName)
 			}
 			pkg.dependencyNameToDependency[dependencyName] = dependency
@@ -201,9 +322,24 @@ func NewPackageSet(protoMessage *reflectv1.PackageSet) (*PackageSet, error) {
 }
 
 func newEnum(protoMessage *reflectv1.Enum, encapsulatingFullyQualifiedName string) *Enum {
-	return &Enum{
+	enum := &Enum{
 		protoMessage:       protoMessage,
 		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+		valueNameToValue:   make(map[string]*EnumValue),
+		valueNumberToValue: make(map[int32]*EnumValue),
+	}
+	for _, value := range protoMessage.EnumValues {
+		enumValue := newEnumValue(value, enum)
+		enum.valueNameToValue[value.Name] = enumValue
+		enum.valueNumberToValue[value.Number] = enumValue
+	}
+	return enum
+}
+
+func newEnumValue(protoMessage *reflectv1.EnumValue, enum *Enum) *EnumValue {
+	return &EnumValue{
+		protoMessage: protoMessage,
+		enum:         enum,
 	}
 }
 
@@ -213,6 +349,9 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		fullyQualifiedName:         getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
 		nestedEnumNameToEnum:       make(map[string]*Enum),
 		nestedMessageNameToMessage: make(map[string]*Message),
+		fieldNameToField:           make(map[string]*MessageField),
+		fieldNumberToField:         make(map[int32]*MessageField),
+		oneofNameToOneof:           make(map[string]*MessageOneof),
 	}
 	for _, nestedEnum := range protoMessage.NestedEnums {
 		message.nestedEnumNameToEnum[nestedEnum.Name] = newEnum(nestedEnum, message.fullyQualifiedName)
@@ -220,13 +359,49 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 	for _, nestedMessage := range protoMessage.NestedMessages {
 		message.nestedMessageNameToMessage[nestedMessage.Name] = newMessage(nestedMessage, message.fullyQualifiedName)
 	}
+	for _, field := range protoMessage.MessageFields {
+		messageField := newMessageField(field, message)
+		message.fieldNameToField[field.Name] = messageField
+		message.fieldNumberToField[field.Number] = messageField
+	}
+	for _, oneof := range protoMessage.MessageOneofs {
+		messageOneof := newMessageOneof(oneof, message)
+		message.oneofNameToOneof[oneof.Name] = messageOneof
+	}
 	return message
 }
 
+func newMessageField(protoMessage *reflectv1.MessageField, message *Message) *MessageField {
+	return &MessageField{
+		protoMessage: protoMessage,
+		message:      message,
+	}
+}
+
+func newMessageOneof(protoMessage *reflectv1.MessageOneof, message *Message) *MessageOneof {
+	return &MessageOneof{
+		protoMessage: protoMessage,
+		message:      message,
+	}
+}
+
 func newService(protoMessage *reflectv1.Service, encapsulatingFullyQualifiedName string) *Service {
-	return &Service{
+	service := &Service{
 		protoMessage:       protoMessage,
 		fullyQualifiedName: getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
+		methodNameToMethod: make(map[string]*ServiceMethod),
+	}
+	for _, method := range protoMessage.ServiceMethods {
+		serviceMethod := newServiceMethod(method, service)
+		service.methodNameToMethod[method.Name] = serviceMethod
+	}
+	return service
+}
+
+func newServiceMethod(protoMessage *reflectv1.ServiceMethod, service *Service) *ServiceMethod {
+	return &ServiceMethod{
+		protoMessage: protoMessage,
+		service:      service,
 	}
 }
 
@@ -235,4 +410,14 @@ func getFullyQualifiedName(encapsulatingFullyQualifiedName string, name string) 
 		return name
 	}
 	return encapsulatingFullyQualifiedName + "." + name
+}
+
+func ignorePackage(withoutBeta bool, packageName string) bool {
+	// if we are not ignoring beta packages, do not ignore
+	if !withoutBeta {
+		return false
+	}
+	// betaVersion is 0 if we can't parse this into a beta package
+	_, betaVersion, _ := protostrs.MajorBetaVersion(packageName)
+	return betaVersion > 0
 }

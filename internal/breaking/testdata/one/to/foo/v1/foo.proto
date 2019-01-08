@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo.v1";
+
+enum EnumOne {
+  ENUM_ONE_INVALID = 0;
+  ENUM_ONE_ONE = 1;
+  ENUM_ONE_TWO = 2;
+}
+
+enum EnumThree {
+  ENUM_THREE_INVALID = 0;
+  ENUM_THREE_ONE = 1;
+  ENUM_THREE_TWO = 2;
+}
+
+message One {
+  message NestedOne {
+    message NestedNestedOne{}
+  }
+}
+
+message Three {
+  message NestedThree {
+    message NestedNestedThree {
+      int64 one = 1;
+      string two = 4;
+    }
+    int64 one = 1;
+    NestedNestedThree three = 3;
+    string two = 4;
+  }
+  int64 one = 1;
+  NestedThree three = 3;
+  string two = 4;
+}
+
+message Four {
+  message NestedFour {
+    message NestedNestedFour {
+      int32 one = 1;
+      bytes two = 2;
+      EnumThree four = 4;
+      // @suppresswarnings floats
+      double five = 5;
+      repeated int32 six = 6;
+      map<int32, string> seven = 7;
+    }
+    int32 one = 1;
+    bytes two = 2;
+    One three = 3;
+    EnumThree four = 4;
+    // @suppresswarnings floats
+    double five = 5;
+    repeated int32 six = 6;
+    map<int32, string> seven = 7;
+  }
+  int32 one = 1;
+  bytes two = 2;
+  One three = 3;
+  EnumThree four = 4;
+  // @suppresswarnings floats
+  double five = 5;
+  repeated int32 six = 6;
+  map<int32, string> seven = 7;
+}
+
+message Five {
+  repeated int64 one = 1;
+  map<string, int64> two = 2;
+  int64 three = 3;
+  int64 four = 4;
+}
+
+message Six {
+  message NestedSix {
+    message NestedNestedSix {
+    }
+  }
+}
+
+enum EnumSeven {
+  ENUM_SEVEN_INVALID = 0;
+  ENUM_SEVEN_TWO = 1;
+}
+
+message Seven {
+  message NestedSeven {
+    message NestedNestedSeven {
+      enum EnumSeven {
+        ENUM_SEVEN_INVALID = 0;
+        ENUM_SEVEN_TWO = 1;
+      }
+    }
+    enum EnumSeven {
+      ENUM_SEVEN_INVALID = 0;
+      ENUM_SEVEN_TWO = 1;
+    }
+  }
+  enum EnumSeven {
+    ENUM_SEVEN_INVALID = 0;
+    ENUM_SEVEN_TWO = 1;
+  }
+}
+
+message Eight {
+  message NestedEight {
+    message NestedNestedEight {
+      int64 one = 1;
+      string two = 2;
+      bytes three = 3;
+    }
+    int64 one = 1;
+    string two = 2;
+    bytes three = 3;
+  }
+  int64 one = 1;
+  string two = 2;
+  bytes three = 3;
+}
+
+message Nine {
+  message NestedNine {
+    message NestedNestedNine {
+      int64 two = 1;
+    }
+    int64 two = 1;
+  }
+  int64 two = 1;
+}
+
+message Ten {
+  message NestedTen {
+    message NestedNestedTen {
+      int64 one = 1;
+      oneof test {
+        string two = 2;
+      }
+      bytes three = 3;
+    }
+    int64 one = 1;
+    oneof test {
+      string two = 2;
+    }
+    bytes three = 3;
+  }
+  int64 one = 1;
+  oneof test {
+    string two = 2;
+  }
+  bytes three = 3;
+}
+
+service OneAPI {
+  rpc OneOne(OneOneRequest) returns (OneOneResponse);
+}
+
+message OneOneRequest {}
+
+message OneOneResponse {}
+
+service ThreeAPI {
+  rpc ThreeOne(OneOneRequest) returns (OneOneResponse);
+  rpc ThreeTwo(ThreeTwoRequest) returns (ThreeTwoResponse);
+  rpc ThreeThree(stream ThreeThreeRequest) returns (ThreeThreeResponse);
+  rpc ThreeFour(ThreeFourRequest) returns (ThreeFourResponse);
+  rpc ThreeFive(ThreeFiveRequest) returns (stream ThreeFiveResponse);
+}
+
+message ThreeTwoRequest {}
+
+message ThreeTwoResponse {}
+
+message ThreeThreeRequest {}
+
+message ThreeThreeResponse {}
+
+message ThreeFourRequest {}
+
+message ThreeFourResponse {}
+
+message ThreeFiveRequest {}
+
+message ThreeFiveResponse {}
