@@ -156,7 +156,7 @@ func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 // RunnerWithIncludeBeta returns a RunnerOption that includes beta packages.
 //
 // The default is to ignore beta packages.
-func RunnerWithIncludeBeta(logger *zap.Logger) RunnerOption {
+func RunnerWithIncludeBeta() RunnerOption {
 	return func(runner *runner) {
 		runner.includeBeta = true
 	}
