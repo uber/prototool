@@ -229,6 +229,35 @@ func forEachServicePair(
 	)
 }
 
+func forEachServiceMethodPair(
+	addFailure func(*text.Failure),
+	from *extract.PackageSet,
+	to *extract.PackageSet,
+	f func(
+		func(*text.Failure),
+		*extract.ServiceMethod,
+		*extract.ServiceMethod,
+	) error,
+) error {
+	return forEachServicePair(
+		addFailure,
+		from,
+		to,
+		func(addFailure func(*text.Failure), fromService *extract.Service, toService *extract.Service) error {
+			fromMethodNameToMethod := fromService.MethodNameToMethod()
+			toMethodNameToMethod := toService.MethodNameToMethod()
+			for fromMethodName, fromMethod := range fromMethodNameToMethod {
+				if toMethod, ok := toMethodNameToMethod[fromMethodName]; ok {
+					if err := f(addFailure, fromMethod, toMethod); err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		},
+	)
+}
+
 func joinFullyQualifiedName(fullyQualifiedName string, name string) string {
 	if fullyQualifiedName == "" {
 		return name

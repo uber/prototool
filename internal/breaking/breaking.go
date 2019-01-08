@@ -92,6 +92,11 @@ var (
 			Purpose: "Checks that no service methods have been deleted.",
 			Check:   checkServiceMethodsNotDeleted,
 		},
+		Checker{
+			ID:      "SERVICE_METHODS_SAME_REQUEST_TYPE",
+			Purpose: "Checks that service methods have the same request type.",
+			Check:   checkServiceMethodsSameRequestType,
+		},
 	}
 )
 

@@ -179,3 +179,11 @@ message OneTwoRequest {}
 message OneTwoResponse {}
 
 service TwoAPI {}
+
+service ThreeAPI {
+  rpc ThreeOne(ThreeOneRequest) returns (ThreeOneResponse);
+}
+
+message ThreeOneRequest {}
+
+message ThreeOneResponse {}

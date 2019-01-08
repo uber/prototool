@@ -141,3 +141,7 @@ service OneAPI {
 message OneOneRequest {}
 
 message OneOneResponse {}
+
+service ThreeAPI {
+  rpc ThreeOne(OneOneRequest) returns (OneOneResponse);
+}

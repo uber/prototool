@@ -1,2 +1,6 @@
 lint:
   group: uber2
+  rules:
+    remove:
+      - REQUEST_RESPONSE_NAMES_MATCH_RPC
+      - REQUEST_RESPONSE_TYPES_UNIQUE
