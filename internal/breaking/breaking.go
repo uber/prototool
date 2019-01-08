@@ -77,6 +77,11 @@ var (
 			Purpose: "Checks that no services have been deleted.",
 			Check:   checkServicesNotDeleted,
 		},
+		Checker{
+			ID:      "SERVICE_METHODS_NOT_DELETED",
+			Purpose: "Checks that no service methods have been deleted.",
+			Check:   checkServiceMethodsNotDeleted,
+		},
 	}
 )
 
