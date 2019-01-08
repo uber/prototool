@@ -78,6 +78,11 @@ var (
 			Check:   checkMessageOneofsNotDeleted,
 		},
 		Checker{
+			ID:      "MESSAGE_ONEOFS_FIELDS_NOT_REMOVED",
+			Purpose: "Checks that no message oneofs have fields removed.",
+			Check:   checkMessageOneofsFieldsNotRemoved,
+		},
+		Checker{
 			ID:      "PACKAGES_NOT_DELETED",
 			Purpose: "Checks that no packages have been deleted.",
 			Check:   checkPackagesNotDeleted,

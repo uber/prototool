@@ -121,6 +121,35 @@ func forEachMessageFieldPair(
 	)
 }
 
+func forEachMessageOneofPair(
+	addFailure func(*text.Failure),
+	from *extract.PackageSet,
+	to *extract.PackageSet,
+	f func(
+		func(*text.Failure),
+		*extract.MessageOneof,
+		*extract.MessageOneof,
+	) error,
+) error {
+	return forEachMessagePair(
+		addFailure,
+		from,
+		to,
+		func(addFailure func(*text.Failure), fromMessage *extract.Message, toMessage *extract.Message) error {
+			fromOneofNameToOneof := fromMessage.OneofNameToOneof()
+			toOneofNameToOneof := toMessage.OneofNameToOneof()
+			for fromOneofName, fromOneof := range fromOneofNameToOneof {
+				if toOneof, ok := toOneofNameToOneof[fromOneofName]; ok {
+					if err := f(addFailure, fromOneof, toOneof); err != nil {
+						return err
+					}
+				}
+			}
+			return nil
+		},
+	)
+}
+
 func forEachEnumPair(
 	addFailure func(*text.Failure),
 	from *extract.PackageSet,

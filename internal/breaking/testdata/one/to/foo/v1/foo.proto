@@ -134,6 +134,28 @@ message Nine {
   int64 two = 1;
 }
 
+message Ten {
+  message NestedTen {
+    message NestedNestedTen {
+      int64 one = 1;
+      oneof test {
+        string two = 2;
+      }
+      bytes three = 3;
+    }
+    int64 one = 1;
+    oneof test {
+      string two = 2;
+    }
+    bytes three = 3;
+  }
+  int64 one = 1;
+  oneof test {
+    string two = 2;
+  }
+  bytes three = 3;
+}
+
 service OneAPI {
   rpc OneOne(OneOneRequest) returns (OneOneResponse);
 }
