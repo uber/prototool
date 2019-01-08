@@ -159,6 +159,7 @@ type Message struct {
 	nestedMessageNameToMessage map[string]*Message
 	fieldNameToField           map[string]*MessageField
 	fieldNumberToField         map[int32]*MessageField
+	oneofNameToOneof           map[string]*MessageOneof
 }
 
 // ProtoMessage returns the underlying Protobuf message.
@@ -191,6 +192,11 @@ func (m *Message) FieldNumberToField() map[int32]*MessageField {
 	return m.fieldNumberToField
 }
 
+// OneofNameToOneof returns the oneofs of the given Message.
+func (m *Message) OneofNameToOneof() map[string]*MessageOneof {
+	return m.oneofNameToOneof
+}
+
 // MessageField is the Golang wrapper for the Protobuf MessageField object.
 type MessageField struct {
 	protoMessage *reflectv1.MessageField
@@ -205,6 +211,23 @@ func (m *MessageField) ProtoMessage() *reflectv1.MessageField {
 
 // Message returns the parent Message.
 func (m *MessageField) Message() *Message {
+	return m.message
+}
+
+// MessageOneof is the Golang wrapper for the Protobuf MessageOneof object.
+type MessageOneof struct {
+	protoMessage *reflectv1.MessageOneof
+
+	message *Message
+}
+
+// ProtoMessage returns the underlying Protobuf message.
+func (m *MessageOneof) ProtoMessage() *reflectv1.MessageOneof {
+	return m.protoMessage
+}
+
+// Message returns the parent Message.
+func (m *MessageOneof) Message() *Message {
 	return m.message
 }
 
@@ -305,6 +328,7 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		nestedMessageNameToMessage: make(map[string]*Message),
 		fieldNameToField:           make(map[string]*MessageField),
 		fieldNumberToField:         make(map[int32]*MessageField),
+		oneofNameToOneof:           make(map[string]*MessageOneof),
 	}
 	for _, nestedEnum := range protoMessage.NestedEnums {
 		message.nestedEnumNameToEnum[nestedEnum.Name] = newEnum(nestedEnum, message.fullyQualifiedName)
@@ -317,11 +341,22 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		message.fieldNameToField[field.Name] = messageField
 		message.fieldNumberToField[field.Number] = messageField
 	}
+	for _, oneof := range protoMessage.MessageOneofs {
+		messageOneof := newMessageOneof(oneof, message)
+		message.oneofNameToOneof[oneof.Name] = messageOneof
+	}
 	return message
 }
 
 func newMessageField(protoMessage *reflectv1.MessageField, message *Message) *MessageField {
 	return &MessageField{
+		protoMessage: protoMessage,
+		message:      message,
+	}
+}
+
+func newMessageOneof(protoMessage *reflectv1.MessageOneof, message *Message) *MessageOneof {
+	return &MessageOneof{
 		protoMessage: protoMessage,
 		message:      message,
 	}
