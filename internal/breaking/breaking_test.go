@@ -78,7 +78,7 @@ func testRun(t *testing.T, subDirPath string, expectedFailures ...*text.Failure)
 }
 
 func getPackageSets(subDirPath string) (*extract.PackageSet, *extract.PackageSet, error) {
-	fromFileDescriptorSets, err := ptesting.GetFileDescriptorSets("../cmd/testdata/breaking", "../cmd/testdata/breaking/"+subDirPath+"/from")
+	fromFileDescriptorSets, err := ptesting.GetFileDescriptorSets(".", "testdata/"+subDirPath+"/from")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -90,7 +90,7 @@ func getPackageSets(subDirPath string) (*extract.PackageSet, *extract.PackageSet
 	if err != nil {
 		return nil, nil, err
 	}
-	toFileDescriptorSets, err := ptesting.GetFileDescriptorSets("../cmd/testdata/breaking", "../cmd/testdata/breaking/"+subDirPath+"/to")
+	toFileDescriptorSets, err := ptesting.GetFileDescriptorSets(".", "testdata/"+subDirPath+"/to")
 	if err != nil {
 		return nil, nil, err
 	}
