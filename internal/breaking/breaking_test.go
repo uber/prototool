@@ -84,6 +84,9 @@ func TestRun(t *testing.T) {
 		newServiceMethodsNotDeletedFailure("foo.v1.OneAPI", "OneTwo"),
 		newMessagesNotDeletedFailure("foo.v1.OneTwoRequest"),
 		newMessagesNotDeletedFailure("foo.v1.OneTwoResponse"),
+		newMessageFieldsSameNameFailure("foo.v1.Nine", 1, "one", "two"),
+		newMessageFieldsSameNameFailure("foo.v1.Nine.NestedNine", 1, "one", "two"),
+		newMessageFieldsSameNameFailure("foo.v1.Nine.NestedNine.NestedNestedNine", 1, "one", "two"),
 	)
 }
 

@@ -58,6 +58,11 @@ var (
 			Check:   checkMessageFieldsSameLabel,
 		},
 		Checker{
+			ID:      "MESSAGE_FIELDS_SAME_NAME",
+			Purpose: "Checks that message fields have the same name.",
+			Check:   checkMessageFieldsSameName,
+		},
+		Checker{
 			ID:      "MESSAGE_FIELDS_SAME_TYPE",
 			Purpose: "Checks that message fields have the same type.",
 			Check:   checkMessageFieldsSameType,

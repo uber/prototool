@@ -124,6 +124,16 @@ message Eight {
   bytes three = 3;
 }
 
+message Nine {
+  message NestedNine {
+    message NestedNestedNine {
+      int64 two = 1;
+    }
+    int64 two = 1;
+  }
+  int64 two = 1;
+}
+
 service OneAPI {
   rpc OneOne(OneOneRequest) returns (OneOneResponse);
 }
