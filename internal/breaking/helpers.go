@@ -121,6 +121,56 @@ func forEachMessageFieldPair(
 	)
 }
 
+func forEachEnumPair(
+	addFailure func(*text.Failure),
+	from *extract.PackageSet,
+	to *extract.PackageSet,
+	f func(
+		func(*text.Failure),
+		*extract.Enum,
+		*extract.Enum,
+	) error,
+) error {
+	if err := forEachPackagePair(
+		addFailure,
+		from,
+		to,
+		func(addFailure func(*text.Failure), fromPackage *extract.Package, toPackage *extract.Package) error {
+			return forEachEnumPairInternal(addFailure, fromPackage.EnumNameToEnum(), toPackage.EnumNameToEnum(), f)
+		},
+	); err != nil {
+		return err
+	}
+	return forEachMessagePair(
+		addFailure,
+		from,
+		to,
+		func(addFailure func(*text.Failure), fromMessage *extract.Message, toMessage *extract.Message) error {
+			return forEachEnumPairInternal(addFailure, fromMessage.NestedEnumNameToEnum(), toMessage.NestedEnumNameToEnum(), f)
+		},
+	)
+}
+
+func forEachEnumPairInternal(
+	addFailure func(*text.Failure),
+	fromEnumNameToEnum map[string]*extract.Enum,
+	toEnumNameToEnum map[string]*extract.Enum,
+	f func(
+		func(*text.Failure),
+		*extract.Enum,
+		*extract.Enum,
+	) error,
+) error {
+	for fromEnumName, fromEnum := range fromEnumNameToEnum {
+		if toEnum, ok := toEnumNameToEnum[fromEnumName]; ok {
+			if err := f(addFailure, fromEnum, toEnum); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func joinFullyQualifiedName(fullyQualifiedName string, name string) string {
 	if fullyQualifiedName == "" {
 		return name
