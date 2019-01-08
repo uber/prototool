@@ -287,13 +287,6 @@ func forEachServiceMethodPair(
 	)
 }
 
-func joinFullyQualifiedName(fullyQualifiedName string, name string) string {
-	if fullyQualifiedName == "" {
-		return name
-	}
-	return fullyQualifiedName + "." + name
-}
-
 func newTextFailuref(format string, args ...interface{}) *text.Failure {
 	return &text.Failure{
 		Message: fmt.Sprintf(format, args...),
