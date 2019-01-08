@@ -76,3 +76,10 @@ message Five {
   int64 three = 3;
   int64 four = 4;
 }
+
+message Six {
+  message NestedSix {
+    message NestedNestedSix {
+    }
+  }
+}

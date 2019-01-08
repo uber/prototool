@@ -68,6 +68,11 @@ func TestRun(t *testing.T) {
 		newMessageFieldsSameLabelFailure("foo.v1.Five", 3, "repeated", "optional"),
 		newMessageFieldsSameLabelFailure("foo.v1.Five", 4, "repeated", "optional"),
 		newMessageFieldsSameTypeFailure("foo.v1.Five", 4, "message", "int64"),
+		newEnumsNotDeletedFailure("foo.v1.EnumTwo"),
+		newEnumsNotDeletedFailure("foo.v1.Six.Foo"),
+		newEnumsNotDeletedFailure("foo.v1.Six.NestedSix.Foo"),
+		newEnumsNotDeletedFailure("foo.v1.Six.NestedSix.NestedNestedSix.Foo"),
+		newMessagesNotDeletedFailure("foo.v1.Six.NestedSix.NestedNestedSixDelete"),
 	)
 }
 

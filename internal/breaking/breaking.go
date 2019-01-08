@@ -28,7 +28,15 @@ import (
 
 var (
 	// AllCheckers are all known Checkers.
+	//
+	// Purposely not configurable - there are some dependencies between linters, for example if a message is deleted,
+	// ENUMS_NOT_DELETED will not print out any nested enums that were deleted.
 	AllCheckers = []Checker{
+		Checker{
+			ID:      "ENUMS_NOT_DELETED",
+			Purpose: "Checks that no enums have been deleted.",
+			Check:   checkEnumsNotDeleted,
+		},
 		Checker{
 			ID:      "MESSAGES_NOT_DELETED",
 			Purpose: "Checks that no messages have been deleted.",
@@ -96,15 +104,6 @@ func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 func RunnerWithIncludeBeta(logger *zap.Logger) RunnerOption {
 	return func(runner *runner) {
 		runner.includeBeta = true
-	}
-}
-
-// RunnerWithCheckers returns a RunnerOption that uses the given checkers.
-//
-// The default is to use AllCheckers.
-func RunnerWithCheckers(checkers ...Checker) RunnerOption {
-	return func(runner *runner) {
-		runner.checkers = checkers
 	}
 }
 

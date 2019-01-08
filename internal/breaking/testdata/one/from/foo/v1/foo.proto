@@ -83,3 +83,24 @@ message Five {
   repeated int64 three = 3;
   map<int64, string> four = 4;
 }
+
+message Six {
+  message NestedSix {
+    message NestedNestedSix {
+      enum Foo {
+        FOO_INVALID = 0;
+      }
+    }
+    message NestedNestedSixDelete {
+      enum Foo {
+        FOO_INVALID = 0;
+      }
+    }
+    enum Foo {
+      FOO_INVALID = 0;
+    }
+  }
+  enum Foo {
+    FOO_INVALID = 0;
+  }
+}
