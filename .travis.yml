@@ -3,4 +3,4 @@ go:
   - "1.11.x"
 script:
   - make all
-  - make codecov
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then make codecov; fi
