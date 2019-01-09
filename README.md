@@ -463,7 +463,7 @@ major version, with some exceptions:
 - The output of the formatter may change between minor versions. This has not happened yet, but we may change the format in the future to
   reflect things such as max line lengths.
 - The breaking change detector may have additional checks added between minor versions, and therefore a change that might not have been
-  breaking previously might be become a breaking change.
+  breaking previously might become a breaking change.
 
 ## Development
 
