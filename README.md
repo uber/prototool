@@ -32,6 +32,7 @@ Prototool accomplishes this by downloading and calling `protoc` on the fly for y
   * [gRPC Example](#grpc-example)
   * [Tips and Tricks](#tips-and-tricks)
   * [Vim Integration](#vim-integration)
+  * [Stability](#stability)
   * [Development](#development)
   * [FAQ](#faq)
     * [Pre-Cache Protoc](#pre-cache-protoc)
@@ -453,6 +454,16 @@ nnoremap <silent> <leader>c :call PrototoolCreateToggle()<CR>
 ```
 
 Editor integration is a key goal of Prototool. We've demonstrated support internally for Intellij, and hope that we have integration for more editors in the future.
+
+## Stability
+
+Prototool is generally available, and conforms to [SemVer](https://semver.org), so Prototool will not have any breaking changes on a given
+major version, with some exceptions:
+
+- The output of the formatter may change between minor versions. This has not happened yet, but we may change the format in the future to
+  reflect things such as max line lengths.
+- The breaking change detector may have additional checks added between minor versions, and therefore a change that might not have been
+  breaking previously might be become a breaking change.
 
 ## Development
 
