@@ -40,6 +40,7 @@ type flags struct {
 	gitBranch         string
 	gitTag            string
 	headers           []string
+	includeBeta       bool
 	keepaliveTime     string
 	json              bool
 	listAllLinters    bool
@@ -113,6 +114,10 @@ func (f *flags) bindGitTag(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 	flagSet.StringSliceVarP(&f.headers, "header", "H", []string{}, "Additional request headers in 'name:value' format.")
+}
+
+func (f *flags) bindIncludeBeta(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.includeBeta, "include-beta", false, "Include beta packages in breaking change detection.")
 }
 
 func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {

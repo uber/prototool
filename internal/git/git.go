@@ -36,8 +36,8 @@ import (
 //
 // It is safe to os.RemoveAll this directory.
 //
-// If branch is not empty, this specific branch will be cloned.
-func TemporaryClone(dirPath string, branch string) (string, error) {
+// If branchOrTag is not empty, this specific branch or tag will be cloned.
+func TemporaryClone(dirPath string, branchOrTag string) (string, error) {
 	absDirPath, err := file.AbsClean(dirPath)
 	if err != nil {
 		return "", err
@@ -54,8 +54,8 @@ func TemporaryClone(dirPath string, branch string) (string, error) {
 		return "", err
 	}
 	args := []string{"clone", "--depth", "1"}
-	if branch != "" {
-		args = append(args, "--branch", branch)
+	if branchOrTag != "" {
+		args = append(args, "--branch", branchOrTag)
 	}
 	args = append(args, fmt.Sprintf("file://%s", absDirPath), cloneDirPath)
 	output, err := exec.Command("git", args...).CombinedOutput()

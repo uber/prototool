@@ -73,6 +73,7 @@ The input directory must be relative.`,
 			flags.bindGitBranch(flagSet)
 			flags.bindGitTag(flagSet)
 			flags.bindJSON(flagSet)
+			flags.bindIncludeBeta(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
