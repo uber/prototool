@@ -57,6 +57,28 @@ var (
 		},
 	}
 
+	breakCheckCmdTemplate = &cmdTemplate{
+		Use:   "check [dir]",
+		Short: "Check for breaking changes.",
+		Long: `This command must be run from the root of a git repository.
+
+The input directory must be relative.`,
+		Args: cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.BreakCheck(args, flags.gitBranch, flags.gitTag)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindGitBranch(flagSet)
+			flags.bindGitTag(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
 	cacheUpdateCmdTemplate = &cmdTemplate{
 		Use:   "update",
 		Short: "Update the cache by downloading all artifacts.",

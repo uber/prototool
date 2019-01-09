@@ -541,6 +541,10 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
+func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string) error {
+	return nil
+}
+
 func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
 	meta, err := r.getMeta(args)
 	if err != nil {
