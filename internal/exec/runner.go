@@ -38,12 +38,14 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	"github.com/uber/prototool/internal/breaking"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/create"
 	"github.com/uber/prototool/internal/diff"
 	"github.com/uber/prototool/internal/extract"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/format"
+	"github.com/uber/prototool/internal/git"
 	"github.com/uber/prototool/internal/grpc"
 	"github.com/uber/prototool/internal/lint"
 	"github.com/uber/prototool/internal/protoc"
@@ -95,6 +97,24 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	}
 	runner.protoSetProvider = file.NewProtoSetProvider(protoSetProviderOptions...)
 	return runner
+}
+
+func (r *runner) cloneForWorkDirPath(workDirPath string) *runner {
+	return &runner{
+		configProvider:   r.configProvider,
+		protoSetProvider: r.protoSetProvider,
+		workDirPath:      workDirPath,
+		input:            r.input,
+		output:           r.output,
+		logger:           r.logger,
+		cachePath:        r.cachePath,
+		configData:       r.configData,
+		protocBinPath:    r.protocBinPath,
+		protocWKTPath:    r.protocWKTPath,
+		protocURL:        r.protocURL,
+		printFields:      r.printFields,
+		json:             r.json,
+	}
 }
 
 func (r *runner) Version() error {
@@ -541,6 +561,69 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
+func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, includeBeta bool) error {
+	if moreThanOneSet(gitBranch != "", gitTag != "") {
+		return newExitErrorf(255, "can only set one of git-branch, git-tag")
+	}
+	branchOrTag := gitBranch
+	if branchOrTag == "" {
+		branchOrTag = gitTag
+	}
+
+	relDirPath := "."
+	// we check length 0 or 1 in cmd, similar to other commands
+	if len(args) == 1 {
+		relDirPath = args[0]
+	}
+	if filepath.IsAbs(relDirPath) {
+		return fmt.Errorf("input argument must be relative directory path: %s", relDirPath)
+	}
+
+	absDirPath, err := file.AbsClean(relDirPath)
+	if err != nil {
+		return err
+	}
+	absWorkDirPath, err := file.AbsClean(r.workDirPath)
+	if err != nil {
+		return err
+	}
+	if !strings.HasPrefix(absDirPath, absWorkDirPath) {
+		return fmt.Errorf("input directory must be within working directory: %s", relDirPath)
+	}
+
+	toPackageSet, err := r.getPackageSetForRelDirPath(relDirPath)
+	if err != nil {
+		return err
+	}
+
+	// this will purposefully fail if we are not at a git repository
+	cloneDirPath, err := git.TemporaryClone(r.logger, r.workDirPath, branchOrTag)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		r.logger.Sugar().Debugf("removing %s", cloneDirPath)
+		_ = os.RemoveAll(cloneDirPath)
+	}()
+
+	fromPackageSet, err := r.cloneForWorkDirPath(cloneDirPath).getPackageSetForRelDirPath(relDirPath)
+	if err != nil {
+		return err
+	}
+
+	failures, err := r.newBreakingRunner(includeBeta).Run(fromPackageSet, toPackageSet)
+	if err != nil {
+		return err
+	}
+	if len(failures) > 0 {
+		if err := r.printFailuresForPrintFields("message", "", nil, failures...); err != nil {
+			return err
+		}
+		return newExitErrorf(255, "")
+	}
+	return nil
+}
+
 func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
 	meta, err := r.getMeta(args)
 	if err != nil {
@@ -586,6 +669,29 @@ func (r *runner) printPackageNames(m map[string]*extract.Package) error {
 		}
 	}
 	return nil
+}
+
+// we require a relative path (or no path) to be passed
+// this is largely because getMeta has special handling for "."
+func (r *runner) getPackageSetForRelDirPath(relDirPath string) (*extract.PackageSet, error) {
+	dirPath := r.workDirPath
+	if relDirPath != "" && relDirPath != "." {
+		dirPath = filepath.Join(dirPath, relDirPath)
+	}
+	return r.getPackageSet([]string{dirPath})
+}
+
+func (r *runner) newBreakingRunner(includeBeta bool) breaking.Runner {
+	runnerOptions := []breaking.RunnerOption{
+		breaking.RunnerWithLogger(r.logger),
+	}
+	if includeBeta {
+		runnerOptions = append(
+			runnerOptions,
+			breaking.RunnerWithIncludeBeta(),
+		)
+	}
+	return breaking.NewRunner(runnerOptions...)
 }
 
 func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error) {
@@ -759,15 +865,20 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 // as an error with a non-zero exit code, seems inconsistent, this needs refactoring
 
 // filename is optional
+// meta is optional
 // if set, it will update the Failures to have this filename
 // will be sorted
 func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Failure) error {
+	return r.printFailuresForPrintFields(r.printFields, filename, meta, failures...)
+}
+
+func (r *runner) printFailuresForPrintFields(printFields string, filename string, meta *meta, failures ...*text.Failure) error {
 	for _, failure := range failures {
 		if filename != "" {
 			failure.Filename = filename
 		}
 	}
-	failureFields, err := text.ParseColonSeparatedFailureFields(r.printFields)
+	failureFields, err := text.ParseColonSeparatedFailureFields(printFields)
 	if err != nil {
 		return err
 	}
@@ -775,21 +886,25 @@ func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Fa
 	bufWriter := bufio.NewWriter(r.output)
 	for _, failure := range failures {
 		shouldPrint := false
-		if meta.SingleFilename == "" || meta.SingleFilename == failure.Filename {
-			shouldPrint = true
-		} else if meta.SingleFilename != "" {
-			// TODO: the compiler may not return the rel path due to logic in bestFilePath
-			absSingleFilename, err := file.AbsClean(meta.SingleFilename)
-			if err != nil {
-				return err
-			}
-			absFailureFilename, err := file.AbsClean(failure.Filename)
-			if err != nil {
-				return err
-			}
-			if absSingleFilename == absFailureFilename {
+		if meta != nil {
+			if meta.SingleFilename == "" || meta.SingleFilename == failure.Filename {
 				shouldPrint = true
+			} else if meta.SingleFilename != "" {
+				// TODO: the compiler may not return the rel path due to logic in bestFilePath
+				absSingleFilename, err := file.AbsClean(meta.SingleFilename)
+				if err != nil {
+					return err
+				}
+				absFailureFilename, err := file.AbsClean(failure.Filename)
+				if err != nil {
+					return err
+				}
+				if absSingleFilename == absFailureFilename {
+					shouldPrint = true
+				}
 			}
+		} else {
+			shouldPrint = true
 		}
 		if shouldPrint {
 			if r.json {

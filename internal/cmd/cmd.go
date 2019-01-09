@@ -121,6 +121,9 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(inspectCmd)
+	breakCmd := &cobra.Command{Use: "break", Short: "Top-level command for breaking change commands."}
+	breakCmd.AddCommand(breakCheckCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(breakCmd)
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())

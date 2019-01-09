@@ -37,7 +37,10 @@ type flags struct {
 	disableLint       bool
 	dryRun            bool
 	fix               bool
+	gitBranch         string
+	gitTag            string
 	headers           []string
+	includeBeta       bool
 	keepaliveTime     string
 	json              bool
 	listAllLinters    bool
@@ -101,8 +104,20 @@ func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.dryRun, "dry-run", false, "Print the protoc commands that would have been run without actually running them.")
 }
 
+func (f *flags) bindGitBranch(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.gitBranch, "git-branch", "", "The git branch to check against. The default is the default branch.")
+}
+
+func (f *flags) bindGitTag(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.gitTag, "git-tag", "", "The git tag to check against. The default is to not use tags and use the default branch.")
+}
+
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 	flagSet.StringSliceVarP(&f.headers, "header", "H", []string{}, "Additional request headers in 'name:value' format.")
+}
+
+func (f *flags) bindIncludeBeta(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.includeBeta, "include-beta", false, "Include beta packages in breaking change detection.")
 }
 
 func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
