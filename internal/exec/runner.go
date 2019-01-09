@@ -616,7 +616,7 @@ func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, incl
 		return err
 	}
 	if len(failures) > 0 {
-		if err := r.printFailures("", nil, failures...); err != nil {
+		if err := r.printFailuresForPrintFields("message", "", nil, failures...); err != nil {
 			return err
 		}
 		return newExitErrorf(255, "")
@@ -869,12 +869,16 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 // if set, it will update the Failures to have this filename
 // will be sorted
 func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Failure) error {
+	return r.printFailuresForPrintFields(r.printFields, filename, meta, failures...)
+}
+
+func (r *runner) printFailuresForPrintFields(printFields string, filename string, meta *meta, failures ...*text.Failure) error {
 	for _, failure := range failures {
 		if filename != "" {
 			failure.Filename = filename
 		}
 	}
-	failureFields, err := text.ParseColonSeparatedFailureFields(r.printFields)
+	failureFields, err := text.ParseColonSeparatedFailureFields(printFields)
 	if err != nil {
 		return err
 	}
