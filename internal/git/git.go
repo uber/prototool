@@ -30,6 +30,7 @@ import (
 	"strings"
 
 	"github.com/uber/prototool/internal/file"
+	"go.uber.org/zap"
 )
 
 // TemporaryClone clones the git directory at the given dirPath into a temporary directory
@@ -37,7 +38,7 @@ import (
 // It is safe to os.RemoveAll this directory.
 //
 // If branchOrTag is not empty, this specific branch or tag will be cloned.
-func TemporaryClone(dirPath string, branchOrTag string) (string, error) {
+func TemporaryClone(logger *zap.Logger, dirPath string, branchOrTag string) (string, error) {
 	absDirPath, err := file.AbsClean(dirPath)
 	if err != nil {
 		return "", err
@@ -58,6 +59,7 @@ func TemporaryClone(dirPath string, branchOrTag string) (string, error) {
 		args = append(args, "--branch", branchOrTag)
 	}
 	args = append(args, fmt.Sprintf("file://%s", absDirPath), cloneDirPath)
+	logger.Sugar().Debugf("git %s", strings.Join(args, " "))
 	output, err := exec.Command("git", args...).CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("git %s had error: %s", strings.Join(args, " "), string(output))

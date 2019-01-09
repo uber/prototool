@@ -65,7 +65,7 @@ var (
 The input directory must be relative.`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.BreakCheck(args, flags.gitBranch, flags.gitTag)
+			return runner.BreakCheck(args, flags.gitBranch, flags.gitTag, flags.includeBeta)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)

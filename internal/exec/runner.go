@@ -597,11 +597,12 @@ func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, incl
 	}
 
 	// this will purposefully fail if we are not at a git repository
-	cloneDirPath, err := git.TemporaryClone(r.workDirPath, branchOrTag)
+	cloneDirPath, err := git.TemporaryClone(r.logger, r.workDirPath, branchOrTag)
 	if err != nil {
 		return err
 	}
 	defer func() {
+		r.logger.Sugar().Debugf("removing %s", cloneDirPath)
 		_ = os.RemoveAll(cloneDirPath)
 	}()
 
