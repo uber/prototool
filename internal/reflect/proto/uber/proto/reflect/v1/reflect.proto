@@ -26,6 +26,7 @@ syntax = "proto3";
 // - Extension ranges.
 package uber.proto.reflect.v1;
 
+option csharp_namespace = "Uber.Proto.Reflect.V1";
 option go_package = "reflectv1";
 option java_multiple_files = true;
 option java_outer_classname = "ReflectProto";

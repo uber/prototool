@@ -26,6 +26,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestCSharpNamespace(t *testing.T) {
+	assert.Equal(t, "", CSharpNamespace(""))
+	assert.Equal(t, "Foo", CSharpNamespace("foo"))
+	assert.Equal(t, "Foo.Bar", CSharpNamespace("foo.bar"))
+	assert.Equal(t, "Foo.BAr", CSharpNamespace("foo.bAr"))
+	assert.Equal(t, "Foo.Bar.V1", CSharpNamespace("foo.bar.v1"))
+	assert.Equal(t, "Foo.Bar.V1betaa1", CSharpNamespace("foo.bar.v1betaa1"))
+	assert.Equal(t, "Foo.Bar.V1Beta1", CSharpNamespace("foo.bar.v1beta1"))
+}
+
 func TestGoPackage(t *testing.T) {
 	assert.Equal(t, "", GoPackage(""))
 	assert.Equal(t, "foopb", GoPackage("foo"))
