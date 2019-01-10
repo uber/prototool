@@ -8,3 +8,5 @@ option java_outer_classname = "FooProto";
 option java_package = "com.foo";
 
 service HelloService {}
+
+service Hello {}
