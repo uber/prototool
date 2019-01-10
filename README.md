@@ -177,6 +177,12 @@ Lint rules can be set using the configuration file. See the configuration at [et
 - `uber2`: This lint group is the v2 of the `uber` lint group, and makes some modifcations to more closely follow the Google Cloud APIs file
   structure, as well as adding even more rules to enforce more consistent development patterns. This lint group is under development.
 
+To see the differences between lint groups, use the `--diff-lint-groups` flag:
+
+```
+prototool lint --diff-lint-groups google,uber
+```
+
 Configuration of your group can be done by setting the `lint.group` option in your `prototool.yaml` file:
 
 ```yaml
