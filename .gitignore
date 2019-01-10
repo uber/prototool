@@ -2,8 +2,7 @@
 /.idea
 /.tmp
 /brew
-/example/gen/proto/descriptor
-/example/gen/proto/java
+/example/gen/java
 /cmd/prototool/prototool
 /internal/cmd/gen-prototool-bash-completion/gen-prototool-bash-completion
 /internal/cmd/gen-prototool-zsh-completion/gen-prototool-zsh-completion

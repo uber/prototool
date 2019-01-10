@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-package foo;
+package uber.foo.v1;
 
-option go_package = "foopb";
+option csharp_namespace = "Uber.Foo.V1";
+option go_package = "foov1";
 option java_multiple_files = true;
 option java_outer_classname = "FooProto";
-option java_package = "com.foo";
+option java_package = "com.uber.foo.v1";
 
-import "foo/dep.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "sub/sub.proto";
+import "uber/bar/v1/bar.proto";
 
 // Hello is a hello.
 enum Hello {
@@ -26,11 +26,11 @@ message Foo {
   message Bar {
     // Baz is a baz.
     enum Baz {
-      FOO_BAR_BAZ_INVALID = 0;
+      BAZ_INVALID = 0;
     }
     // Bat is a bat.
     enum Bat {
-      FOO_BAR_BAT_INVALID = 0;
+      BAT_INVALID = 0;
     }
     Baz baz = 1;
     Bat bat = 2;
@@ -46,8 +46,8 @@ enum Bar {
 // Barr is a barr.
 message Barr {
   int64 hello = 1;
-  foo.Dep dep = 2;
-  google.protobuf.Timestamp timestamp = 3;
+  google.protobuf.Timestamp barr_time = 2;
+  bar.v1.Hello bar_hello = 3;
 }
 
 // Another is another message.
@@ -63,33 +63,32 @@ message Another {
     string eight = 8;
   }
   repeated Another nine = 9;
-  google.protobuf.Duration duration = 10;
+  google.protobuf.Duration another_duration = 10;
 }
 
 // HasWKT has Well-Known Types.
 message HasWKT {
-  google.protobuf.Duration duration = 1;
+  google.protobuf.Duration wkt_duration = 1;
 }
 
 // Bazz is a bazzzz.
 message Bazz {}
 
-// BarRequest is a bar request.
 message BarRequest {
   int64 id = 1;
 }
 
-// FooResponse is an foo response.
-message FooResponse {
-  foo.Dep dep = 1;
-}
+message BarResponse {}
 
-// HelloService is a service.
-service HelloService {
+message FooRequest {}
+
+message FooResponse {}
+
+service HelloAPI {
   // Foo does a foo.
-  rpc Foo(sub.Dep) returns (FooResponse);
+  rpc Foo(FooRequest) returns (FooResponse);
   // Bar does a bar.
-  rpc Bar(BarRequest) returns (foo.Dep);
+  rpc Bar(BarRequest) returns (BarResponse);
 }
 
 message ExclamationRequest {
@@ -100,8 +99,8 @@ message ExclamationResponse {
   string value = 1;
 }
 
-// ExcitedService is a service with exciting transformations.
-service ExcitedService {
+// ExcitedAPI is a service with exciting transformations.
+service ExcitedAPI {
   // Exclamation adds an exclamation to the request value.
   rpc Exclamation(ExclamationRequest) returns (ExclamationResponse);
   // ExclamationClientStream adds an exclamation to the combined request values.

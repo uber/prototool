@@ -13,7 +13,7 @@ coverage:
         target: 50%
 ignore:
   - /example/cmd/excited
-  - /example/gen/proto/go/foo
-  - /example/gen/proto/go/sub
+  - /example/gen/go/uber/foo/v1
+  - /example/gen/go/uber/bar/v1
   - /internal/cmd/testdata/grpc/gen/grpcpb
   - /internal/reflect/gen/uber/proto/reflect/v1

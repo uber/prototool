@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package uber.bar.v1;
+
+option csharp_namespace = "Uber.Bar.V1";
+option go_package = "barv1";
+option java_multiple_files = true;
+option java_outer_classname = "BarProto";
+option java_package = "com.uber.bar.v1";
+
+message Hello {
+  int64 hello = 1;
+}
