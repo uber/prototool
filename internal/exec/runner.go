@@ -376,7 +376,7 @@ func (r *runner) diffLintGroups(groups string) error {
 	return nil
 }
 
-func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fix bool) error {
+func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fixFlag bool) error {
 	if moreThanOneSet(overwrite, diffMode, lintMode) {
 		return newExitErrorf(255, "can only set one of overwrite, diff, lint")
 	}
@@ -388,10 +388,10 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fix bool) 
 	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, fix, meta)
+	return r.format(overwrite, diffMode, lintMode, getFormatFixValue(fixFlag, meta), meta)
 }
 
-func (r *runner) format(overwrite, diffMode, lintMode, fix bool, meta *meta) error {
+func (r *runner) format(overwrite, diffMode, lintMode bool, fix int, meta *meta) error {
 	success := true
 	for _, protoFiles := range meta.ProtoSet.DirPathToFiles {
 		for _, protoFile := range protoFiles {
@@ -413,7 +413,7 @@ func (r *runner) format(overwrite, diffMode, lintMode, fix bool, meta *meta) err
 // return true if there was no unexpected diff and we should exit with 0
 // return false if we should exit with non-zero
 // if false and nil error, we will return an ExitError outside of this function
-func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix bool, meta *meta, protoFile *file.ProtoFile) (bool, error) {
+func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix int, meta *meta, protoFile *file.ProtoFile) (bool, error) {
 	absSingleFilename, err := file.AbsClean(meta.SingleFilename)
 	if err != nil {
 		return false, err
@@ -469,7 +469,7 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix bo
 	return true, nil
 }
 
-func (r *runner) All(args []string, disableFormat, disableLint, fix bool) error {
+func (r *runner) All(args []string, disableFormat, disableLint, fixFlag bool) error {
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
@@ -479,7 +479,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, fix bool) error 
 		return err
 	}
 	if !disableFormat {
-		if err := r.format(true, false, false, fix, meta); err != nil {
+		if err := r.format(true, false, false, getFormatFixValue(fixFlag, meta), meta); err != nil {
 			return err
 		}
 	}
@@ -798,10 +798,10 @@ func (r *runner) newLintRunner() lint.Runner {
 	)
 }
 
-func (r *runner) newTransformer(fix bool) format.Transformer {
+func (r *runner) newTransformer(fix int) format.Transformer {
 	transformerOptions := []format.TransformerOption{format.TransformerWithLogger(r.logger)}
-	if fix {
-		transformerOptions = append(transformerOptions, format.TransformerWithFix())
+	if fix != format.FixNone {
+		transformerOptions = append(transformerOptions, format.TransformerWithFix(fix))
 	}
 	return format.NewTransformer(transformerOptions...)
 }
@@ -1000,6 +1000,16 @@ func moreThanOneSet(values ...bool) bool {
 		}
 	}
 	return numSet > 1
+}
+
+func getFormatFixValue(fixFlag bool, meta *meta) int {
+	if !fixFlag {
+		return format.FixNone
+	}
+	if meta.ProtoSet.Config.Lint.Group == "uber2" {
+		return format.FixV2
+	}
+	return format.FixV1
 }
 
 func extractSortPackageNames(m map[string]*extract.Package) []string {

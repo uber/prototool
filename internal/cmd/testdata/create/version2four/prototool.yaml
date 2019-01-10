@@ -1,0 +1,6 @@
+lint:
+  group: uber2
+create:
+  packages:
+    - directory: .
+      name: foo.v1

@@ -22,9 +22,14 @@ package create
 
 import "go.uber.org/zap"
 
-// DefaultPackage is the default package to use in lieu of one being able to be
-// derived.
-const DefaultPackage = "uber.prototool.generated"
+const (
+	// DefaultPackage is the default package to use in lieu of one being able
+	// to be derived.
+	DefaultPackage = "uber.prototool.generated"
+	// DefaultPackageV2 is the default package to use in lieu of one being able
+	// to be derived if the lint group is "uber2".
+	DefaultPackageV2 = "uber.prototool.generated.v1"
+)
 
 // Handler handles creation of Protobuf files from a template.
 type Handler interface {

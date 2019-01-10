@@ -52,11 +52,16 @@ func TestGoPackage(t *testing.T) {
 	assert.Equal(t, "barpb", GoPackage("foo.bar"))
 }
 
-func TestGoPackageLastTwo(t *testing.T) {
-	assert.Equal(t, "", GoPackageLastTwo(""))
-	assert.Equal(t, "foo", GoPackageLastTwo("foo"))
-	assert.Equal(t, "foobar", GoPackageLastTwo("foo.bar"))
-	assert.Equal(t, "foobar", GoPackageLastTwo("first.foo.bar"))
+func TestGoPackageV2(t *testing.T) {
+	assert.Equal(t, "", GoPackageV2(""))
+	assert.Equal(t, "foopb", GoPackageV2("foo"))
+	assert.Equal(t, "barpb", GoPackageV2("foo.bar"))
+	assert.Equal(t, "barpb", GoPackageV2("first.foo.bar"))
+	assert.Equal(t, "barv1", GoPackageV2("foo.bar.v1"))
+	assert.Equal(t, "barv1", GoPackageV2("first.foo.bar.v1"))
+	assert.Equal(t, "barv1beta1", GoPackageV2("foo.bar.v1beta1"))
+	assert.Equal(t, "barv1beta1", GoPackageV2("first.foo.bar.v1beta1"))
+	assert.Equal(t, "v1betaa1pb", GoPackageV2("foo.bar.v1betaa1"))
 }
 
 func TestJavaOuterClassname(t *testing.T) {

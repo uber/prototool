@@ -32,12 +32,13 @@ import (
 
 type transformer struct {
 	logger *zap.Logger
-	fix    bool
+	fix    int
 }
 
 func newTransformer(options ...TransformerOption) *transformer {
 	transformer := &transformer{
 		logger: zap.NewNop(),
+		fix:    FixNone,
 	}
 	for _, option := range options {
 		option(transformer)
@@ -46,6 +47,9 @@ func newTransformer(options ...TransformerOption) *transformer {
 }
 
 func (t *transformer) Transform(filename string, data []byte) ([]byte, []*text.Failure, error) {
+	if err := checkFix(t.fix); err != nil {
+		return nil, nil, err
+	}
 	descriptor, err := proto.NewParser(bytes.NewReader(data)).Parse()
 	if err != nil {
 		return nil, nil, err
@@ -87,4 +91,13 @@ func (t *transformer) Transform(filename string, data []byte) ([]byte, []*text.F
 		return []byte(s + "\n"), failures, nil
 	}
 	return nil, failures, nil
+}
+
+func checkFix(fix int) error {
+	switch fix {
+	case FixNone, FixV1, FixV2:
+		return nil
+	default:
+		return fmt.Errorf("unknown format fix value: %d", fix)
+	}
 }

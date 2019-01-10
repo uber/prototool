@@ -25,6 +25,15 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	// FixNone says to not do fixing.
+	FixNone = 0
+	// FixV1 says to do V1 fixing.
+	FixV1 = 1
+	// FixV2 says to do V2 fixing.
+	FixV2 = 2
+)
+
 // Transformer transforms an input file into an output file.
 type Transformer interface {
 	// Transform transforms the data.
@@ -48,10 +57,10 @@ func TransformerWithLogger(logger *zap.Logger) TransformerOption {
 }
 
 // TransformerWithFix returns a TransformerOption that will update the file options
-// go_package, java_package to match the package per the guidelines of the style guide.
-func TransformerWithFix() TransformerOption {
+// to match the package per the guidelines of the style guide.
+func TransformerWithFix(fix int) TransformerOption {
 	return func(transformer *transformer) {
-		transformer.fix = true
+		transformer.fix = fix
 	}
 }
 

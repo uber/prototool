@@ -538,6 +538,7 @@ func TestGoldenFormat(t *testing.T) {
 	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/foo.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/foo_proto2.proto")
 	assertGoldenFormat(t, false, true, "testdata/format-fix/foo.proto")
+	assertGoldenFormat(t, false, true, "testdata/format-fix-v2/foo.proto")
 }
 
 func TestCreate(t *testing.T) {
@@ -647,6 +648,224 @@ option go_package = "foopb";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
 option java_package = "com.foo";`,
+	)
+}
+
+func TestCreateV2(t *testing.T) {
+	t.Parallel()
+	// package override with also matching shorter override "a"
+	// make sure uses "a/b"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/a/b/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo.bar;
+
+option csharp_namespace = "Foo.Bar";
+option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo.bar";
+option objc_class_prefix = "FBX";
+option php_namespace = "Foo\\Bar";`,
+	)
+	// create same file again but do not remove, should fail
+	assertDoCreateFile(
+		t,
+		false, // do not expect success
+		false, // do not remove
+		"testdata/create/version2one/a/b/bar/baz.proto",
+		"",
+		``,
+	)
+	// use the --package flag
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/a/b/bar/baz.proto",
+		"bat", // --package value
+		`syntax = "proto3";
+
+package bat;
+
+option csharp_namespace = "Bat";
+option go_package = "batpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.bat";
+option objc_class_prefix = "BXX";
+option php_namespace = "Bat";`,
+	)
+	// package override but a shorter one "a"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/a/c/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foobar.c.bar;
+
+option csharp_namespace = "Foobar.C.Bar";
+option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foobar.c.bar";
+option objc_class_prefix = "FCB";
+option php_namespace = "Foobar\\C\\Bar";`,
+	)
+	// no package override, do default b.c.bar
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/b/c/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package b.c.bar;
+
+option csharp_namespace = "B.C.Bar";
+option go_package = "barpb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.b.c.bar";
+option objc_class_prefix = "BCB";
+option php_namespace = "B\\C\\Bar";`,
+	)
+	// in dir with prototool.yaml with override
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2two/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo;
+
+option csharp_namespace = "Foo";
+option go_package = "foopb";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo";`,
+	)
+}
+
+func TestCreateV2MajorBetaVersion(t *testing.T) {
+	t.Parallel()
+	// package override with also matching shorter override "a"
+	// make sure uses "a/b"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2three/a/b/bar/v1/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo.bar.v1;
+
+option csharp_namespace = "Foo.Bar.V1";
+option go_package = "barv1";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo.bar.v1";
+option objc_class_prefix = "FBX";
+option php_namespace = "Foo\\Bar\\V1";`,
+	)
+	// create same file again but do not remove, should fail
+	assertDoCreateFile(
+		t,
+		false, // do not expect success
+		false, // do not remove
+		"testdata/create/version2three/a/b/bar/v1/baz.proto",
+		"",
+		``,
+	)
+	// package override but a shorter one "a"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2three/a/c/bar/v1/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foobar.c.bar.v1;
+
+option csharp_namespace = "Foobar.C.Bar.V1";
+option go_package = "barv1";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foobar.c.bar.v1";
+option objc_class_prefix = "FCB";
+option php_namespace = "Foobar\\C\\Bar\\V1";`,
+	)
+	// no package override, do default b.c.bar
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2three/b/c/bar/v1beta1/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package b.c.bar.v1beta1;
+
+option csharp_namespace = "B.C.Bar.V1Beta1";
+option go_package = "barv1beta1";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.b.c.bar.v1beta1";
+option objc_class_prefix = "BCB";
+option php_namespace = "B\\C\\Bar\\V1Beta1";`,
+	)
+	// in dir with prototool.yaml, use default package
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2three/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package uber.prototool.generated.v1;
+
+option csharp_namespace = "Uber.Prototool.Generated.V1";
+option go_package = "generatedv1";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.uber.prototool.generated.v1";
+option objc_class_prefix = "UPG";
+option php_namespace = "Uber\\Prototool\\Generated\\V1";`,
+	)
+	// in dir with prototool.yaml with override
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2four/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";`,
 	)
 }
 
