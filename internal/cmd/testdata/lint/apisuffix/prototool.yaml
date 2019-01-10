@@ -1,0 +1,4 @@
+lint:
+  rules:
+    add:
+      - SERVICE_NAMES_API_SUFFIX
