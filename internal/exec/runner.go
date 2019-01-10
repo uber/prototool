@@ -272,9 +272,9 @@ func (r *runner) printCommands(doGen bool, protoSet *file.ProtoSet) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string) error {
-	if moreThanOneSet(listAllLinters, listLinters, listAllLintGroups, listLintGroup != "") {
-		return newExitErrorf(255, "can only set one of list-all-linters, list-linters, list-all-lint-groups, list-lint-group")
+func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string) error {
+	if moreThanOneSet(listAllLinters, listLinters, listAllLintGroups, listLintGroup != "", diffLintGroups != "") {
+		return newExitErrorf(255, "can only set one of list-all-linters, list-linters, list-all-lint-groups, list-lint-group, diff-lint-groups")
 	}
 	if listAllLinters {
 		return r.listAllLinters()
@@ -287,6 +287,9 @@ func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, list
 	}
 	if listLintGroup != "" {
 		return r.listLintGroup(listLintGroup)
+	}
+	if diffLintGroups != "" {
+		return r.diffLintGroups(diffLintGroups)
 	}
 	meta, err := r.getMeta(args)
 	if err != nil {
@@ -346,6 +349,27 @@ func (r *runner) listAllLintGroups() error {
 	sort.Strings(groups)
 	for _, group := range groups {
 		if err := r.println(group); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *runner) diffLintGroups(groups string) error {
+	split := strings.Split(groups, ",")
+	if len(split) != 2 {
+		return fmt.Errorf("argument to --diff-lint-groups must be two lint groups separated by '.', for example google,uber")
+	}
+	firstLinterIDs, err := getLinterIDs(split[0])
+	if err != nil {
+		return err
+	}
+	secondLinterIDs, err := getLinterIDs(split[1])
+	if err != nil {
+		return err
+	}
+	for _, s := range diffMaps(firstLinterIDs, secondLinterIDs) {
+		if err := r.println(s); err != nil {
 			return err
 		}
 	}
@@ -983,6 +1007,34 @@ func extractSortPackageNames(m map[string]*extract.Package) []string {
 	for key := range m {
 		if key != "" {
 			s = append(s, key)
+		}
+	}
+	sort.Strings(s)
+	return s
+}
+
+func getLinterIDs(group string) (map[string]struct{}, error) {
+	linters, ok := lint.GroupToLinters[strings.ToLower(group)]
+	if !ok {
+		return nil, newExitErrorf(255, "unknown lint group: %s", strings.ToLower(group))
+	}
+	m := make(map[string]struct{})
+	for _, linter := range linters {
+		m[linter.ID()] = struct{}{}
+	}
+	return m, nil
+}
+
+func diffMaps(one map[string]struct{}, two map[string]struct{}) []string {
+	var s []string
+	for key := range one {
+		if _, ok := two[key]; !ok {
+			s = append(s, "< "+key)
+		}
+	}
+	for key := range two {
+		if _, ok := one[key]; !ok {
+			s = append(s, "> "+key)
 		}
 	}
 	sort.Strings(s)
