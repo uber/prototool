@@ -402,6 +402,14 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`10:1:SERVICE_NAMES_API_SUFFIX
+		12:1:SERVICE_NAMES_API_SUFFIX`,
+		"testdata/lint/apisuffix/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`10:1:GOGO_NOT_IMPORTED`,
 		"testdata/lint/gogonotimported/gogonotimported.proto",
 	)
