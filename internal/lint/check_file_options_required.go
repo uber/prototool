@@ -27,6 +27,12 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var fileOptionsRequireCSharpNamespaceLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_CSHARP_NAMESPACE",
+	`Verifies that the file option "csharp_namespace" is set.`,
+	newCheckFileOptionsRequire("csharp_namespace"),
+)
+
 var fileOptionsRequireGoPackageLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_GO_PACKAGE",
 	`Verifies that the file option "go_package" is set.`,

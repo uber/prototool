@@ -33,6 +33,23 @@ import (
 	"github.com/uber/prototool/internal/strs"
 )
 
+// CSharpNamespace returns the value for the file option "csharp_namespace"
+// given a package name. It will capitalize each part of the package name
+// taking special care for beta packages.
+func CSharpNamespace(packageName string) string {
+	if packageName == "" {
+		return ""
+	}
+	// strings.Title would just work across the split but we need to take
+	// care of beta packages
+	majorVersion, betaVersion, ok := MajorBetaVersion(packageName)
+	if !ok || majorVersion == 0 || betaVersion == 0 {
+		return strings.Title(packageName)
+	}
+	split := strings.Split(packageName, ".")
+	return strings.Title(strings.Join(split[:len(split)-1], ".")) + ".V" + strconv.Itoa(int(majorVersion)) + "Beta" + strconv.Itoa(int(betaVersion))
+}
+
 // GoPackage returns the value for the file option "go_package" given
 // a package name. This will be equal to the last value of the package
 // separated by "."s, followed by "pb". If packageName is empty,

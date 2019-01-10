@@ -28,6 +28,14 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var fileOptionsEqualCSharpNamespaceCapitalizedLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_CSHARP_NAMESPACE_CAPITALIZED",
+	`Verifies that the file option "csharp_namespace" is the capitalized version of the package.`,
+	newCheckFileOptionsEqual("csharp_namespace", func(_ *proto.Proto, pkg *proto.Package) string {
+		return protostrs.CSharpNamespace(pkg.Name)
+	}),
+)
+
 var fileOptionsEqualGoPackagePbSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX",
 	`Verifies that the file option "go_package" is equal to $(basename PACKAGE)pb.`,

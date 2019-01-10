@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package foo.v1;
 
+option csharp_namespace = "Foo.V1";
 option go_package = "foov1";
 option java_multiple_files = true;
 option java_outer_classname = "FooProto";
@@ -23,7 +24,6 @@ message Foo {
   string bar_id = 5;
 }
 
-
 // Bar is a bar that a Foo can talk to.
 message Bar {
   // Type is the type of Bar.
@@ -33,7 +33,6 @@ message Bar {
     TYPE_REMOTE_CONTROL = 2;
     TYPE_FAN = 3;
   }
-
   Type type = 1;
   string id = 2;
   repeated string planet_ids = 3;

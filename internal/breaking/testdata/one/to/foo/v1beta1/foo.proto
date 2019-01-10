@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package foo.v1beta1;
 
+option csharp_namespace = "Foo.V1Beta1";
 option go_package = "foov1beta1";
 option java_multiple_files = true;
 option java_outer_classname = "FooProto";

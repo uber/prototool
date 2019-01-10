@@ -29,6 +29,12 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var fileOptionsCSharpNamespaceSameInDirLinter = NewLinter(
+	"FILE_OPTIONS_CSHARP_NAMESPACE_SAME_IN_DIR",
+	`Verifies that the file option "csharp_namespace" of all files in a directory are the same.`,
+	newCheckFileOptionsSameInDir("csharp_namespace"),
+)
+
 var fileOptionsGoPackageSameInDirLinter = NewLinter(
 	"FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR",
 	`Verifies that the file option "go_package" of all files in a directory are the same.`,

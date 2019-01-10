@@ -438,8 +438,8 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
-		`17:3:MESSAGE_FIELDS_NOT_FLOATS
-		18:3:MESSAGE_FIELDS_NOT_FLOATS`,
+		`18:3:MESSAGE_FIELDS_NOT_FLOATS
+		19:3:MESSAGE_FIELDS_NOT_FLOATS`,
 		"testdata/lint/floats/foo/v1/foo.proto",
 	)
 
