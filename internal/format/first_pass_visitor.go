@@ -88,7 +88,7 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 			if v.csharpNamespaceOption == nil {
 				v.csharpNamespaceOption = &proto.Option{Name: "csharp_namespace"}
 			}
-			if v.objcClassPrefixOption != nil {
+			if v.objcClassPrefixOption == nil {
 				v.objcClassPrefixOption = &proto.Option{Name: "objc_class_prefix"}
 			}
 			if v.phpNamespaceOption == nil {

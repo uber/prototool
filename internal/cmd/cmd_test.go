@@ -538,6 +538,7 @@ func TestGoldenFormat(t *testing.T) {
 	assertGoldenFormat(t, false, false, "testdata/format/proto3/foo/foo.proto")
 	assertGoldenFormat(t, false, false, "testdata/format/proto2/foo/foo_proto2.proto")
 	assertGoldenFormat(t, false, true, "testdata/format-fix/foo.proto")
+	assertGoldenFormat(t, false, true, "testdata/format-fix-v2/foo.proto")
 }
 
 func TestCreate(t *testing.T) {
