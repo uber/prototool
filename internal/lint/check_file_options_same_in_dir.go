@@ -53,6 +53,12 @@ var fileOptionsJavaPackageSameInDirLinter = NewLinter(
 	newCheckFileOptionsSameInDir("java_package"),
 )
 
+var fileOptionsPHPNamespaceSameInDirLinter = NewLinter(
+	"FILE_OPTIONS_PHP_NAMESPACE_SAME_IN_DIR",
+	`Verifies that the file option "php_namespace" of all files in a directory are the same.`,
+	newCheckFileOptionsSameInDir("php_namespace"),
+)
+
 func newCheckFileOptionsSameInDir(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
 	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
 		visitor := &fileOptionsSameInDirVisitor{

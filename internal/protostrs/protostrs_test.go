@@ -36,6 +36,16 @@ func TestCSharpNamespace(t *testing.T) {
 	assert.Equal(t, "Foo.Bar.V1Beta1", CSharpNamespace("foo.bar.v1beta1"))
 }
 
+func TestPHPNamespace(t *testing.T) {
+	assert.Equal(t, ``, PHPNamespace(""))
+	assert.Equal(t, `Foo`, PHPNamespace("foo"))
+	assert.Equal(t, `Foo\\Bar`, PHPNamespace("foo.bar"))
+	assert.Equal(t, `Foo\\BAr`, PHPNamespace("foo.bAr"))
+	assert.Equal(t, `Foo\\Bar\\V1`, PHPNamespace("foo.bar.v1"))
+	assert.Equal(t, `Foo\\Bar\\V1betaa1`, PHPNamespace("foo.bar.v1betaa1"))
+	assert.Equal(t, `Foo\\Bar\\V1Beta1`, PHPNamespace("foo.bar.v1beta1"))
+}
+
 func TestGoPackage(t *testing.T) {
 	assert.Equal(t, "", GoPackage(""))
 	assert.Equal(t, "foopb", GoPackage("foo"))

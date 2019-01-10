@@ -76,6 +76,14 @@ var fileOptionsEqualJavaPackageComPrefixLinter = NewLinter(
 	}),
 )
 
+var fileOptionsEqualPHPNamespaceCapitalizedLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_PHP_NAMESPACE_CAPITALIZED",
+	`Verifies that the file option "php_namespace" is the capitalized version of the package.`,
+	newCheckFileOptionsEqual("php_namespace", func(_ *proto.Proto, pkg *proto.Package) string {
+		return protostrs.PHPNamespace(pkg.Name)
+	}),
+)
+
 func newCheckFileOptionsEqual(fileOption string, expectedValueFunc func(*proto.Proto, *proto.Package) string) func(func(*text.Failure), string, []*proto.Proto) error {
 	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
 		return runVisitor(&fileOptionsEqualVisitor{

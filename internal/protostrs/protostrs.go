@@ -50,6 +50,13 @@ func CSharpNamespace(packageName string) string {
 	return strings.Title(strings.Join(split[:len(split)-1], ".")) + ".V" + strconv.Itoa(int(majorVersion)) + "Beta" + strconv.Itoa(int(betaVersion))
 }
 
+// PHPNamespace returns the value for the file option "php_namespace"
+// given a package name. It will capitalize each part of the package name
+// taking special care for beta packages.
+func PHPNamespace(packageName string) string {
+	return strings.Replace(CSharpNamespace(packageName), ".", `\\`, -1)
+}
+
 // GoPackage returns the value for the file option "go_package" given
 // a package name. This will be equal to the last value of the package
 // separated by "."s, followed by "pb". If packageName is empty,

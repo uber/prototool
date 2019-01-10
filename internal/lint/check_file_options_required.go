@@ -57,6 +57,12 @@ var fileOptionsRequireJavaPackageLinter = NewLinter(
 	newCheckFileOptionsRequire("java_package"),
 )
 
+var fileOptionsRequirePHPNamespaceLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_PHP_NAMESPACE",
+	`Verifies that the file option "php_namespace" is set.`,
+	newCheckFileOptionsRequire("php_namespace"),
+)
+
 func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
 	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
 		return runVisitor(&fileOptionsRequireVisitor{
