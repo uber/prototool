@@ -35,7 +35,7 @@ var (
 		"internal",  // Golang
 		"public",    // Java, C++, others
 		"private",   // Java, C++, others
-		"protected", // Java, others
+		"protected", // Java, C++, others
 		"std",       // C++ (causes a problem with the std package)
 	}
 
