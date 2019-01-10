@@ -419,8 +419,7 @@ Prototool is meant to help enforce a consistent development style for Protobuf, 
 
 This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). It should be similarly easy to add support for Syntastic, Neomake, etc.
 
-The Vim integration will currently provide lint errors, optionally regenerate all the stubs, and optionally format your files on save. It
-will also optionally create new files from a template when opened.
+The Vim integration will currently compile, provide lint errors, do generation of your stubs, and format your files on save. It will also optionally create new files from a template when opened.
 
 The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using [vim-plug](https://github.com/junegunn/vim-plug), copy/paste the following into your vimrc and you should be good to go. If you are using [Vundle](https://github.com/VundleVim/Vundle.vim), just replace `Plug` with `Vundle` below.
 
@@ -438,15 +437,15 @@ Plug 'w0rp/ale'
 Plug 'uber/prototool', { 'rtp':'vim/prototool' }
 
 " We recommend setting just this for Golang, as well as the necessary set for proto.
+" Note the 'prototool' linter is still available, but deprecated in favor of individual linters.
+" Use the 'prototool-compile' linter to just compile, 'prototool-lint' to compile and lint,
+" 'prototool-all' to compile, do generation of your stubs, and then lint.
 let g:ale_linters = {
 \   'go': ['golint'],
-\   'proto': ['prototool'],
+\   'proto': ['prototool-lint'],
 \}
 " We recommend you set this.
 let g:ale_lint_on_text_changed = 'never'
-" Set to 'lint' to not do code generation.
-" Set to 'compile' to not do linting either and just compile without code generation.
-"let g:ale_proto_prototool_command = 'compile'
 
 " We generally have <leader> mapped to ",", uncomment this to set leader.
 "let mapleader=","
@@ -463,6 +462,19 @@ nnoremap <silent> <leader>c :call PrototoolCreateToggle()<CR>
 "call PrototoolFormatFixEnable()
 " Uncomment this to disable creating Protobuf files from a template by default.
 "call PrototoolCreateDisable()
+```
+
+The recommended setup in short:
+
+```vim
+Plug 'w0rp/ale'
+Plug 'uber/prototool', { 'rtp':'vim/prototool' }
+let g:ale_linters = {
+\   'go': ['golint'],
+\   'proto': ['prototool-lint'],
+\}
+let g:ale_lint_on_text_changed = 'never'
+call PrototoolFormatFixEnable()
 ```
 
 Editor integration is a key goal of Prototool. We've demonstrated support internally for Intellij, and hope that we have integration for more editors in the future.

@@ -1,4 +1,6 @@
-" Description: run the prototool linter
+" Description: run prototool
+"
+" Deprecated: use prototool-compile, prototool-lint, or prototool-all instead
 
 call ale#Set('proto_prototool_command', 'all')
 
