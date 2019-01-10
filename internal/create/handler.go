@@ -141,7 +141,7 @@ func (h *handler) create(filePath string) error {
 			&tmplData{
 				Pkg:                pkg,
 				CSharpNamespace:    protostrs.CSharpNamespace(pkg),
-				GoPkg:              protostrs.GoPackageLastTwo(pkg),
+				GoPkg:              protostrs.GoPackageV2(pkg),
 				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
 				JavaPkg:            protostrs.JavaPackage(pkg),
 				OBJCClassPrefix:    protostrs.OBJCClassPrefix(pkg),

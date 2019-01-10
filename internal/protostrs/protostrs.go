@@ -69,19 +69,17 @@ func GoPackage(packageName string) string {
 	return split[len(split)-1] + "pb"
 }
 
-// GoPackageLastTwo returns the value for the file option "go_package" given
+// GoPackageV2 returns the value for the file option "go_package" given
 // a package name. This will be equal to the last two values of the package
-// separated by "."s. If packageName is empty, this will return an empty string.
-// If packageName has only one value when separated by "."s, this will be that
-// value.
-func GoPackageLastTwo(packageName string) string {
+// separated by "."s if the package is a MajorBetaPackage, or GoPackage otherwise.
+func GoPackageV2(packageName string) string {
 	if packageName == "" {
 		return ""
 	}
-	split := strings.Split(packageName, ".")
-	if len(split) == 1 {
-		return split[0]
+	if _, _, ok := MajorBetaVersion(packageName); !ok {
+		return GoPackage(packageName)
 	}
+	split := strings.Split(packageName, ".")
 	return split[len(split)-2] + split[len(split)-1]
 }
 

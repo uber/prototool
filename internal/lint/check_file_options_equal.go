@@ -44,11 +44,11 @@ var fileOptionsEqualGoPackagePbSuffixLinter = NewLinter(
 	}),
 )
 
-var fileOptionsEqualGoPackageLastTwoSuffixLinter = NewLinter(
-	"FILE_OPTIONS_EQUAL_GO_PACKAGE_LAST_TWO_SUFFIX",
+var fileOptionsEqualGoPackageV2SuffixLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_GO_PACKAGE_V2_SUFFIX",
 	`Verifies that the file option "go_package" is equal to the last two values of the package separated by "."s, or just the package name if there are no "."s.`,
 	newCheckFileOptionsEqual("go_package", func(_ *proto.Proto, pkg *proto.Package) string {
-		return protostrs.GoPackageLastTwo(pkg.Name)
+		return protostrs.GoPackageV2(pkg.Name)
 	}),
 )
 
