@@ -127,11 +127,15 @@ func (h *handler) checkFilePath(filePath string) error {
 }
 
 func (h *handler) create(filePath string) error {
-	pkg, err := h.getPkg(filePath)
+	isV2, err := h.isV2(filePath)
 	if err != nil {
 		return err
 	}
-	isV2, err := h.isV2(filePath)
+	defaultPackage := DefaultPackage
+	if isV2 {
+		defaultPackage = DefaultPackageV2
+	}
+	pkg, err := h.getPkg(filePath, defaultPackage)
 	if err != nil {
 		return err
 	}
@@ -184,7 +188,7 @@ func (h *handler) isV2(filePath string) (bool, error) {
 	return strings.ToLower(config.Lint.Group) == "uber2", nil
 }
 
-func (h *handler) getPkg(filePath string) (string, error) {
+func (h *handler) getPkg(filePath string, defaultPackage string) (string, error) {
 	if h.pkg != "" {
 		return h.pkg, nil
 	}
@@ -199,7 +203,7 @@ func (h *handler) getPkg(filePath string) (string, error) {
 	}
 	// no config file found, can't compute package
 	if config.DirPath == "" {
-		return DefaultPackage, nil
+		return defaultPackage, nil
 	}
 	// we need to get all the matching directories and then choose the longest
 	// ie if you have a, a/b, we choose a/b
@@ -223,7 +227,7 @@ func (h *handler) getPkg(filePath string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return getPkgFromRel(rel, longestBasePkg), nil
+		return getPkgFromRel(rel, longestBasePkg, defaultPackage), nil
 	}
 
 	// no package mapping found, do default logic
@@ -231,19 +235,19 @@ func (h *handler) getPkg(filePath string) (string, error) {
 	// TODO: cannot do rel right away because it will do ../.. if necessary
 	// strings.HasPrefix is not OS independent however
 	if !strings.HasPrefix(absDirPath, config.DirPath) {
-		return DefaultPackage, nil
+		return defaultPackage, nil
 	}
 	rel, err := filepath.Rel(config.DirPath, absDirPath)
 	if err != nil {
 		return "", err
 	}
-	return getPkgFromRel(rel, ""), nil
+	return getPkgFromRel(rel, "", defaultPackage), nil
 }
 
-func getPkgFromRel(rel string, basePkg string) string {
+func getPkgFromRel(rel string, basePkg string, defaultPackage string) string {
 	if rel == "." {
 		if basePkg == "" {
-			return DefaultPackage
+			return defaultPackage
 		}
 		return basePkg
 	}

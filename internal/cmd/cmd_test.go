@@ -845,7 +845,7 @@ option java_multiple_files = true;
 option java_outer_classname = "BazProto";
 option java_package = "com.uber.prototool.generated.v1";
 option objc_class_prefix = "UPG";
-option php_namespace = "Uber\\Prototool\\Generated.V1";`,
+option php_namespace = "Uber\\Prototool\\Generated\\V1";`,
 	)
 	// in dir with prototool.yaml with override
 	assertDoCreateFile(
