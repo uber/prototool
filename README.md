@@ -197,10 +197,16 @@ to the element comment. The following lint rules can be suppressed:
 | Lint Rule                   | Containing Lint Groups   | Suppressing Annotation   |
 |-----------------------------|--------------------------|--------------------------|
 | `MESSAGE_FIELDS_NOT_FLOATS` | `uber2`                  | `floats`                 |
+| `PACKAGE_NO_KEYWORDS`       | `uber2`                  | `keywords`               |
 
 As an example:
 
 ```
+// This contains the "public". keyword.
+//
+// @suppresswarnings keywords
+package foo.public.bar;
+
 // Hello is a field where we understand the concerns with using doubles but require them.
 //
 // @suppresswarnings floats
@@ -464,6 +470,8 @@ major version, with some exceptions:
   reflect things such as max line lengths.
 - The breaking change detector may have additional checks added between minor versions, and therefore a change that might not have been
   breaking previously might become a breaking change.
+- The `PACKAGE_NO_KEYWORDS` linter on the `uber2` lint group may have additional keywords added. This can be suppressed by adding
+  `@suppresswarnings keywords` to the package comment.
 
 ## Development
 

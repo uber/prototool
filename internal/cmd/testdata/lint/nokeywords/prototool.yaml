@@ -1,0 +1,4 @@
+lint:
+  rules:
+    add:
+      - PACKAGE_NO_KEYWORDS
