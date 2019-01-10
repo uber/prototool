@@ -98,7 +98,13 @@ func (h *handler) checkFilePath(filePath string) error {
 		return fmt.Errorf("%q is not a directory somehow", dirPath)
 	}
 	if _, err := os.Stat(filePath); err == nil {
-		return fmt.Errorf("%q already exists", filePath)
+		data, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			return err
+		}
+		if len(data) > 0 {
+			return fmt.Errorf("%q already exists", filePath)
+		}
 	}
 	return nil
 }
