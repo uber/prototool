@@ -92,6 +92,8 @@ var (
 		serviceNamesCapitalizedLinter,
 		syntaxProto3Linter,
 		wktDirectlyImportedLinter,
+		wktDurationSuffixLinter,
+		wktTimestampSuffixLinter,
 	}
 
 	// DefaultLinters is the slice of default Linters.
@@ -195,6 +197,8 @@ var (
 		serviceNamesCapitalizedLinter,
 		syntaxProto3Linter,
 		wktDirectlyImportedLinter,
+		wktDurationSuffixLinter,
+		wktTimestampSuffixLinter,
 	}
 
 	// GroupToLinters is the map from linter group to the corresponding slice of linters.
