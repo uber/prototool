@@ -36,6 +36,16 @@ func TestCSharpNamespace(t *testing.T) {
 	assert.Equal(t, "Foo.Bar.V1Beta1", CSharpNamespace("foo.bar.v1beta1"))
 }
 
+func TestPHPNamespace(t *testing.T) {
+	assert.Equal(t, ``, PHPNamespace(""))
+	assert.Equal(t, `Foo`, PHPNamespace("foo"))
+	assert.Equal(t, `Foo\\Bar`, PHPNamespace("foo.bar"))
+	assert.Equal(t, `Foo\\BAr`, PHPNamespace("foo.bAr"))
+	assert.Equal(t, `Foo\\Bar\\V1`, PHPNamespace("foo.bar.v1"))
+	assert.Equal(t, `Foo\\Bar\\V1betaa1`, PHPNamespace("foo.bar.v1betaa1"))
+	assert.Equal(t, `Foo\\Bar\\V1Beta1`, PHPNamespace("foo.bar.v1beta1"))
+}
+
 func TestGoPackage(t *testing.T) {
 	assert.Equal(t, "", GoPackage(""))
 	assert.Equal(t, "foopb", GoPackage("foo"))
@@ -66,6 +76,23 @@ func TestJavaPackage(t *testing.T) {
 	assert.Equal(t, "", JavaPackage(""))
 	assert.Equal(t, "com.foo", JavaPackage("foo"))
 	assert.Equal(t, "com.foo.bar", JavaPackage("foo.bar"))
+}
+
+func TestOBJCClassPrefix(t *testing.T) {
+	assert.Equal(t, "", OBJCClassPrefix(""))
+	assert.Equal(t, "FXX", OBJCClassPrefix("foo"))
+	assert.Equal(t, "FBX", OBJCClassPrefix("foo.bar"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("foo.bar.baz"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("foo.bar.baz.v1"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("foo.bar.baz.v1beta1"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("Foo.bAr.baz"))
+	assert.Equal(t, "FBBV", OBJCClassPrefix("foo.bar.baz.v1betaa1"))
+	assert.Equal(t, "GPP", OBJCClassPrefix("goo.par.paz"))
+	assert.Equal(t, "GPP", OBJCClassPrefix("goo.par.paz.v1"))
+	assert.Equal(t, "GPP", OBJCClassPrefix("goo.par.paz.v1beta1"))
+	assert.Equal(t, "GPX", OBJCClassPrefix("goo.par.baz"))
+	assert.Equal(t, "GPX", OBJCClassPrefix("goo.par.baz.v1"))
+	assert.Equal(t, "GPX", OBJCClassPrefix("goo.par.baz.v1beta1"))
 }
 
 func TestMajorBetaVersion(t *testing.T) {

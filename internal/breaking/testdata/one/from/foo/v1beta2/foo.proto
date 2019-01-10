@@ -7,6 +7,8 @@ option go_package = "foov1beta2";
 option java_multiple_files = true;
 option java_outer_classname = "FooProto";
 option java_package = "com.foo.v1beta2";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1Beta2";
 
 enum EnumOne {
   ENUM_ONE_INVALID = 0;

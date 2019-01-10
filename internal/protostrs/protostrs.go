@@ -50,6 +50,13 @@ func CSharpNamespace(packageName string) string {
 	return strings.Title(strings.Join(split[:len(split)-1], ".")) + ".V" + strconv.Itoa(int(majorVersion)) + "Beta" + strconv.Itoa(int(betaVersion))
 }
 
+// PHPNamespace returns the value for the file option "php_namespace"
+// given a package name. It will capitalize each part of the package name
+// taking special care for beta packages.
+func PHPNamespace(packageName string) string {
+	return strings.Replace(CSharpNamespace(packageName), ".", `\\`, -1)
+}
+
 // GoPackage returns the value for the file option "go_package" given
 // a package name. This will be equal to the last value of the package
 // separated by "."s, followed by "pb". If packageName is empty,
@@ -100,6 +107,51 @@ func JavaPackage(packageName string) string {
 		return ""
 	}
 	return "com." + packageName
+}
+
+// OBJCClassPrefix returns the value for the file option "objc_class_prefix"
+// given a package name. It takes the first letter of each package part
+// and capitalizes it, then concatenates these. If the length is 2, an "X"
+// is added. If the length is 1, "XX" is added. If the length is 0, this
+// returns empty. If the name is "GPB", this returns "GPX". The version part
+// is dropped before all operations.
+func OBJCClassPrefix(packageName string) string {
+	if packageName == "" {
+		return ""
+	}
+	split := strings.Split(packageName, ".")
+	if _, _, ok := MajorBetaVersion(packageName); ok {
+		// this is guaranteed to still have something since
+		// len(split) must be >=3.
+		split = split[:len(split)-1]
+	}
+	// just for safety
+	if len(split) == 0 {
+		return ""
+	}
+	s := ""
+	for _, element := range split {
+		// just for safety
+		if element != "" {
+			s = s + strings.ToUpper(element[0:1])
+		}
+	}
+	switch len(s) {
+	case 0:
+		// just for safety
+		return ""
+	case 1:
+		return s + "XX"
+	case 2:
+		return s + "X"
+	case 3:
+		if s == "GPB" {
+			return "GPX"
+		}
+		return s
+	default:
+		return s
+	}
 }
 
 // MajorBetaVersion extracts the major and beta version number from the package

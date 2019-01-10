@@ -31,6 +31,8 @@ option go_package = "reflectv1";
 option java_multiple_files = true;
 option java_outer_classname = "ReflectProto";
 option java_package = "com.uber.proto.reflect.v1";
+option objc_class_prefix = "UPR";
+option php_namespace = "Uber\\Proto\\Reflect\\V1";
 
 // PackageSet is a set of Packages.
 message PackageSet {
