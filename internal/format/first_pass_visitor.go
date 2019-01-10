@@ -41,14 +41,17 @@ type firstPassVisitor struct {
 	haveHitNonComment bool
 
 	filename                 string
-	fix                      bool
+	fix                      int
 	goPackageOption          *proto.Option
 	javaMultipleFilesOption  *proto.Option
 	javaOuterClassnameOption *proto.Option
 	javaPackageOption        *proto.Option
+	csharpNamespaceOption    *proto.Option
+	objcClassPrefixOption    *proto.Option
+	phpNamespaceOption       *proto.Option
 }
 
-func newFirstPassVisitor(filename string, fix bool) *firstPassVisitor {
+func newFirstPassVisitor(filename string, fix int) *firstPassVisitor {
 	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix}
 }
 
@@ -68,7 +71,7 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		v.PWithInlineComment(v.Package.InlineComment, `package `, v.Package.Name, `;`)
 		v.P()
 	}
-	if v.fix && v.Package != nil {
+	if v.fix != FixNone && v.Package != nil {
 		if v.goPackageOption == nil {
 			v.goPackageOption = &proto.Option{Name: "go_package"}
 		}
@@ -81,9 +84,27 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		if v.javaPackageOption == nil {
 			v.javaPackageOption = &proto.Option{Name: "java_package"}
 		}
-		v.goPackageOption.Constant = proto.Literal{
-			Source:   protostrs.GoPackage(v.Package.Name),
-			IsString: true,
+		if v.fix == FixV2 {
+			if v.csharpNamespaceOption == nil {
+				v.csharpNamespaceOption = &proto.Option{Name: "csharp_namespace"}
+			}
+			if v.objcClassPrefixOption != nil {
+				v.objcClassPrefixOption = &proto.Option{Name: "objc_class_prefix"}
+			}
+			if v.phpNamespaceOption == nil {
+				v.phpNamespaceOption = &proto.Option{Name: "php_namespace"}
+			}
+		}
+		if v.fix == FixV2 {
+			v.goPackageOption.Constant = proto.Literal{
+				Source:   protostrs.GoPackageV2(v.Package.Name),
+				IsString: true,
+			}
+		} else {
+			v.goPackageOption.Constant = proto.Literal{
+				Source:   protostrs.GoPackage(v.Package.Name),
+				IsString: true,
+			}
 		}
 		v.javaMultipleFilesOption.Constant = proto.Literal{
 			Source: "true",
@@ -96,6 +117,20 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 			Source:   protostrs.JavaPackage(v.Package.Name),
 			IsString: true,
 		}
+		if v.fix == FixV2 {
+			v.csharpNamespaceOption.Constant = proto.Literal{
+				Source:   protostrs.CSharpNamespace(v.Package.Name),
+				IsString: true,
+			}
+			v.objcClassPrefixOption.Constant = proto.Literal{
+				Source:   protostrs.OBJCClassPrefix(v.Package.Name),
+				IsString: true,
+			}
+			v.phpNamespaceOption.Constant = proto.Literal{
+				Source:   protostrs.PHPNamespace(v.Package.Name),
+				IsString: true,
+			}
+		}
 		v.Options = append(
 			v.Options,
 			v.goPackageOption,
@@ -103,6 +138,14 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 			v.javaOuterClassnameOption,
 			v.javaPackageOption,
 		)
+		if v.fix == FixV2 {
+			v.Options = append(
+				v.Options,
+				v.csharpNamespaceOption,
+				v.objcClassPrefixOption,
+				v.phpNamespaceOption,
+			)
+		}
 	}
 	if len(v.Options) > 0 {
 		v.POptions(v.Options...)
@@ -145,8 +188,11 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 	// this will only hit file options since we don't do any
 	// visiting of children in this visitor
 	v.haveHitNonComment = true
-	if v.fix {
+	if v.fix != FixNone {
 		switch element.Name {
+		case "csharp_namespace":
+			v.csharpNamespaceOption = element
+			return
 		case "go_package":
 			v.goPackageOption = element
 			return
@@ -158,6 +204,12 @@ func (v *firstPassVisitor) VisitOption(element *proto.Option) {
 			return
 		case "java_package":
 			v.javaPackageOption = element
+			return
+		case "objc_class_prefix":
+			v.objcClassPrefixOption = element
+			return
+		case "php_namespace":
+			v.phpNamespaceOption = element
 			return
 		}
 	}
