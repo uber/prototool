@@ -53,6 +53,12 @@ var fileOptionsJavaPackageSameInDirLinter = NewLinter(
 	newCheckFileOptionsSameInDir("java_package"),
 )
 
+var fileOptionsOBJCClassPrefixSameInDirLinter = NewLinter(
+	"FILE_OPTIONS_OBJC_CLASS_PREFIX_SAME_IN_DIR",
+	`Verifies that the file option "objc_class_prefix" of all files in a directory are the same.`,
+	newCheckFileOptionsSameInDir("objc_class_prefix"),
+)
+
 var fileOptionsPHPNamespaceSameInDirLinter = NewLinter(
 	"FILE_OPTIONS_PHP_NAMESPACE_SAME_IN_DIR",
 	`Verifies that the file option "php_namespace" of all files in a directory are the same.`,

@@ -76,6 +76,14 @@ var fileOptionsEqualJavaPackageComPrefixLinter = NewLinter(
 	}),
 )
 
+var fileOptionsEqualOBJCClassPrefixAbbrLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_OBJC_CLASS_PREFIX_ABBR",
+	`Verifies that the file option "objc_class_prefix" is the abbreviated version of the package.`,
+	newCheckFileOptionsEqual("objc_class_prefix", func(_ *proto.Proto, pkg *proto.Package) string {
+		return protostrs.OBJCClassPrefix(pkg.Name)
+	}),
+)
+
 var fileOptionsEqualPHPNamespaceCapitalizedLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_PHP_NAMESPACE_CAPITALIZED",
 	`Verifies that the file option "php_namespace" is the capitalized version of the package.`,

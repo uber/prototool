@@ -57,6 +57,12 @@ var fileOptionsRequireJavaPackageLinter = NewLinter(
 	newCheckFileOptionsRequire("java_package"),
 )
 
+var fileOptionsRequireOBJCClassPrefixLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_OBJC_CLASS_PREFIX",
+	`Verifies that the file option "objc_class_prefix" is set.`,
+	newCheckFileOptionsRequire("objc_class_prefix"),
+)
+
 var fileOptionsRequirePHPNamespaceLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_PHP_NAMESPACE",
 	`Verifies that the file option "php_namespace" is set.`,

@@ -7,6 +7,8 @@ option go_package = "foov1";
 option java_multiple_files = true;
 option java_outer_classname = "OneProto";
 option java_package = "com.uber.proto.foo.v1";
+option objc_class_prefix = "UPF";
+option php_namespace = "Uber\\Proto\\Foo\\V1";
 
 import "uber/proto/bar/v1/one.proto";
 import "uber/proto/bar/v1/two.proto";
