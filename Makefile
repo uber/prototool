@@ -59,9 +59,9 @@ example: install
 	@go install github.com/golang/protobuf/protoc-gen-go
 	@mkdir -p $(TMP_ETC)
 	rm -rf example/gen
-	prototool all example/idl/uber
-	go build ./example/gen/proto/go/foo
-	go build ./example/gen/proto/go/sub
+	prototool all example/proto/uber
+	go build ./example/gen/go/uber/foo/v1
+	go build ./example/gen/go/uber/bar/v1
 	go build -o $(TMP_ETC)/excited ./example/cmd/excited/main.go
 	prototool lint etc/style/google
 	prototool lint etc/style/uber

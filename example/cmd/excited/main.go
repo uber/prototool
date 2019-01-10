@@ -26,7 +26,7 @@ import (
 	"log"
 	"net"
 
-	foopb "github.com/uber/prototool/example/gen/proto/go/foo"
+	foov1 "github.com/uber/prototool/example/gen/go/uber/foo/v1"
 	"google.golang.org/grpc"
 )
 
@@ -38,7 +38,7 @@ func main() {
 
 func do() error {
 	grpcServer := grpc.NewServer()
-	foopb.RegisterExcitedServiceServer(grpcServer, newServer())
+	foov1.RegisterExcitedAPIServer(grpcServer, newServer())
 	listener, err := net.Listen("tcp", "0.0.0.0:8080")
 	if err != nil {
 		return err
@@ -52,13 +52,13 @@ func newServer() *server {
 	return &server{}
 }
 
-func (s *server) Exclamation(ctx context.Context, request *foopb.ExclamationRequest) (*foopb.ExclamationResponse, error) {
-	return &foopb.ExclamationResponse{
+func (s *server) Exclamation(ctx context.Context, request *foov1.ExclamationRequest) (*foov1.ExclamationResponse, error) {
+	return &foov1.ExclamationResponse{
 		Value: request.Value + "!",
 	}, nil
 }
 
-func (s *server) ExclamationClientStream(streamServer foopb.ExcitedService_ExclamationClientStreamServer) error {
+func (s *server) ExclamationClientStream(streamServer foov1.ExcitedAPI_ExclamationClientStreamServer) error {
 	value := ""
 	for request, err := streamServer.Recv(); err != io.EOF; request, err = streamServer.Recv() {
 		if err != nil {
@@ -66,30 +66,30 @@ func (s *server) ExclamationClientStream(streamServer foopb.ExcitedService_Excla
 		}
 		value += request.Value
 	}
-	return streamServer.SendAndClose(&foopb.ExclamationResponse{
+	return streamServer.SendAndClose(&foov1.ExclamationResponse{
 		Value: value + "!",
 	})
 }
 
-func (s *server) ExclamationServerStream(request *foopb.ExclamationRequest, streamServer foopb.ExcitedService_ExclamationServerStreamServer) error {
+func (s *server) ExclamationServerStream(request *foov1.ExclamationRequest, streamServer foov1.ExcitedAPI_ExclamationServerStreamServer) error {
 	for _, c := range request.Value {
-		if err := streamServer.Send(&foopb.ExclamationResponse{
+		if err := streamServer.Send(&foov1.ExclamationResponse{
 			Value: string(c),
 		}); err != nil {
 			return err
 		}
 	}
-	return streamServer.Send(&foopb.ExclamationResponse{
+	return streamServer.Send(&foov1.ExclamationResponse{
 		Value: "!",
 	})
 }
 
-func (s *server) ExclamationBidiStream(streamServer foopb.ExcitedService_ExclamationBidiStreamServer) error {
+func (s *server) ExclamationBidiStream(streamServer foov1.ExcitedAPI_ExclamationBidiStreamServer) error {
 	for request, err := streamServer.Recv(); err != io.EOF; request, err = streamServer.Recv() {
 		if err != nil {
 			return err
 		}
-		if err := streamServer.Send(&foopb.ExclamationResponse{
+		if err := streamServer.Send(&foov1.ExclamationResponse{
 			Value: request.Value + "!",
 		}); err != nil {
 			return err
