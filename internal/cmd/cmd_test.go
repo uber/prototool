@@ -451,6 +451,16 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`14:3:WKT_TIMESTAMP_SUFFIX
+		15:3:WKT_DURATION_SUFFIX
+		17:5:WKT_TIMESTAMP_SUFFIX
+		18:5:WKT_DURATION_SUFFIX`,
+		"testdata/lint/wktsuffix/foo/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`16:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE
 		16:3:ENUM_ZERO_VALUES_INVALID_EXCEPT_MESSAGE
 		17:3:ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE
