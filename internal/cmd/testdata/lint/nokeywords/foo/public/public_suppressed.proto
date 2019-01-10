@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+// @suppresswarnings keywords
+package foo.public;
+
+option go_package = "publicpb";
+option java_multiple_files = true;
+option java_outer_classname = "PublicSuppressedProto";
+option java_package = "com.foo.public";

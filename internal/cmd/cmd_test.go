@@ -392,10 +392,10 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`11:3:FIELDS_NOT_RESERVED
-                 12:3:FIELDS_NOT_RESERVED
-                 14:5:FIELDS_NOT_RESERVED
-                 15:5:FIELDS_NOT_RESERVED
-                 20:5:FIELDS_NOT_RESERVED`,
+		12:3:FIELDS_NOT_RESERVED
+		14:5:FIELDS_NOT_RESERVED
+		15:5:FIELDS_NOT_RESERVED
+		20:5:FIELDS_NOT_RESERVED`,
 		"testdata/lint/noreserved/foo.proto",
 	)
 
@@ -433,6 +433,19 @@ func TestLint(t *testing.T) {
 		`17:3:MESSAGE_FIELDS_NOT_FLOATS
 		18:3:MESSAGE_FIELDS_NOT_FLOATS`,
 		"testdata/lint/floats/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`3:1:PACKAGE_NO_KEYWORDS`,
+		"testdata/lint/nokeywords/foo/public/public.proto",
+	)
+	assertDoLintFile(
+		t,
+		false,
+		``,
+		"testdata/lint/nokeywords/foo/public/public_suppressed.proto",
 	)
 
 	assertDoLintFile(
