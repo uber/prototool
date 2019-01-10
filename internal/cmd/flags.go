@@ -32,6 +32,7 @@ type flags struct {
 	connectTimeout    string
 	data              string
 	debug             bool
+	diffLintGroups    string
 	diffMode          bool
 	disableFormat     bool
 	disableLint       bool
@@ -86,6 +87,10 @@ func (f *flags) bindData(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.debug, "debug", false, "Run in debug mode, which will print out debug logging.")
+}
+
+func (f *flags) bindDiffLintGroups(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.diffLintGroups, "diff-lint-groups", "", "Diff the two lint groups separated by '.', for example google,uber.")
 }
 
 func (f *flags) bindDiffMode(flagSet *pflag.FlagSet) {

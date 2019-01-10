@@ -458,7 +458,7 @@ sys	0m0.924s`,
 
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup)
+			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup, flags.diffLintGroups)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
@@ -468,6 +468,7 @@ sys	0m0.924s`,
 			flags.bindListLinters(flagSet)
 			flags.bindListAllLintGroups(flagSet)
 			flags.bindListLintGroup(flagSet)
+			flags.bindDiffLintGroups(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
