@@ -29,7 +29,7 @@ import (
 
 var wktTimestampSuffixLinter = NewLinter(
 	"WKT_TIMESTAMP_SUFFIX",
-	"Verifies that all google.protobuf.Timestamp field names end in _timestamp.",
+	"Verifies that all google.protobuf.Timestamp field names end in _time.",
 	checkWKTTimestampSuffix,
 )
 
@@ -62,7 +62,7 @@ func (v wktTimestampSuffixVisitor) VisitOneofField(field *proto.OneOfField) {
 }
 
 func (v wktTimestampSuffixVisitor) visitField(field *proto.Field) {
-	if field.Type == "google.protobuf.Timestamp" && !strings.HasSuffix(field.Name, "_timestamp") {
-		v.AddFailuref(field.Position, `Field %q of type "google.protobuf.Timestamp" must end in "_timestamp".`, field.Name)
+	if field.Type == "google.protobuf.Timestamp" && !strings.HasSuffix(field.Name, "_time") {
+		v.AddFailuref(field.Position, `Field %q of type "google.protobuf.Timestamp" must end in "_time".`, field.Name)
 	}
 }
