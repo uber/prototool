@@ -78,6 +78,23 @@ func TestJavaPackage(t *testing.T) {
 	assert.Equal(t, "com.foo.bar", JavaPackage("foo.bar"))
 }
 
+func TestOBJCClassPrefix(t *testing.T) {
+	assert.Equal(t, "", OBJCClassPrefix(""))
+	assert.Equal(t, "FXX", OBJCClassPrefix("foo"))
+	assert.Equal(t, "FBX", OBJCClassPrefix("foo.bar"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("foo.bar.baz"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("foo.bar.baz.v1"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("foo.bar.baz.v1beta1"))
+	assert.Equal(t, "FBB", OBJCClassPrefix("Foo.bAr.baz"))
+	assert.Equal(t, "FBBV", OBJCClassPrefix("foo.bar.baz.v1betaa1"))
+	assert.Equal(t, "GPP", OBJCClassPrefix("goo.par.paz"))
+	assert.Equal(t, "GPP", OBJCClassPrefix("goo.par.paz.v1"))
+	assert.Equal(t, "GPP", OBJCClassPrefix("goo.par.paz.v1beta1"))
+	assert.Equal(t, "GPX", OBJCClassPrefix("goo.par.baz"))
+	assert.Equal(t, "GPX", OBJCClassPrefix("goo.par.baz.v1"))
+	assert.Equal(t, "GPX", OBJCClassPrefix("goo.par.baz.v1beta1"))
+}
+
 func TestMajorBetaVersion(t *testing.T) {
 	testMajorBetaVersionValid(t, "foo.v1", 1, 0)
 	testMajorBetaVersionValid(t, "foo.bar.v1", 1, 0)
