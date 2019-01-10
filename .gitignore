@@ -12,6 +12,11 @@
 /internal/cmd/testdata/create/one/b/c/bar/baz.proto
 /internal/cmd/testdata/create/one/baz.proto
 /internal/cmd/testdata/create/two/baz.proto
+/internal/cmd/testdata/create/version2one/a/b/bar/baz.proto
+/internal/cmd/testdata/create/version2one/a/c/bar/baz.proto
+/internal/cmd/testdata/create/version2one/b/c/bar/baz.proto
+/internal/cmd/testdata/create/version2one/baz.proto
+/internal/cmd/testdata/create/version2two/baz.proto
 /main
 /prototool.iml
 /release

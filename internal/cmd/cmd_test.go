@@ -650,6 +650,134 @@ option java_package = "com.foo";`,
 	)
 }
 
+func TestCreateV2(t *testing.T) {
+	t.Parallel()
+	// package override with also matching shorter override "a"
+	// make sure uses "a/b"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/a/b/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo.bar;
+
+option csharp_namespace = "Foo.Bar";
+option go_package = "foobar";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo.bar";
+option objc_class_prefix = "FBX";
+option php_namespace = "Foo\\Bar";`,
+	)
+	// create same file again but do not remove, should fail
+	assertDoCreateFile(
+		t,
+		false, // do not expect success
+		false, // do not remove
+		"testdata/create/version2one/a/b/bar/baz.proto",
+		"",
+		``,
+	)
+	// use the --package flag
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/a/b/bar/baz.proto",
+		"bat", // --package value
+		`syntax = "proto3";
+
+package bat;
+
+option csharp_namespace = "Bat";
+option go_package = "bat";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.bat";
+option objc_class_prefix = "BXX";
+option php_namespace = "Bat";`,
+	)
+	// package override but a shorter one "a"
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/a/c/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foobar.c.bar;
+
+option csharp_namespace = "Foobar.C.Bar";
+option go_package = "cbar";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foobar.c.bar";
+option objc_class_prefix = "FCB";
+option php_namespace = "Foobar\\C\\Bar";`,
+	)
+	// no package override, do default b.c.bar
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/b/c/bar/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package b.c.bar;
+
+option csharp_namespace = "B.C.Bar";
+option go_package = "cbar";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.b.c.bar";
+option objc_class_prefix = "BCB";
+option php_namespace = "B\\C\\Bar";`,
+	)
+	// in dir with prototool.yaml, use default package
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2one/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package uber.prototool.generated;
+
+option csharp_namespace = "Uber.Prototool.Generated";
+option go_package = "prototoolgenerated";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.uber.prototool.generated";
+option objc_class_prefix = "UPG";
+option php_namespace = "Uber\\Prototool\\Generated";`,
+	)
+	// in dir with prototool.yaml with override
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2two/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo;
+
+option csharp_namespace = "Foo";
+option go_package = "foo";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "com.foo";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo";`,
+	)
+}
+
 func TestGRPC(t *testing.T) {
 	t.Parallel()
 	assertGRPC(t,

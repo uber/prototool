@@ -35,7 +35,8 @@ import (
 	"go.uber.org/zap"
 )
 
-var tmpl = template.Must(template.New("tmpl").Parse(`syntax = "proto3";
+var (
+	tmplV1 = template.Must(template.New("tmplV1").Parse(`syntax = "proto3";
 
 package {{.Pkg}};
 
@@ -44,11 +45,27 @@ option java_multiple_files = true;
 option java_outer_classname = "{{.JavaOuterClassname}}";
 option java_package = "{{.JavaPkg}}";`))
 
+	tmplV2 = template.Must(template.New("tmplV2").Parse(`syntax = "proto3";
+
+package {{.Pkg}};
+
+option csharp_namespace = "{{.CSharpNamespace}}";
+option go_package = "{{.GoPkg}}";
+option java_multiple_files = true;
+option java_outer_classname = "{{.JavaOuterClassname}}";
+option java_package = "{{.JavaPkg}}";
+option objc_class_prefix = "{{.OBJCClassPrefix}}";
+option php_namespace = "{{.PHPNamespace}}";`))
+)
+
 type tmplData struct {
 	Pkg                string
+	CSharpNamespace    string
 	GoPkg              string
 	JavaOuterClassname string
 	JavaPkg            string
+	OBJCClassPrefix    string
+	PHPNamespace       string
 }
 
 type handler struct {
@@ -114,18 +131,57 @@ func (h *handler) create(filePath string) error {
 	if err != nil {
 		return err
 	}
-	data, err := getData(
-		&tmplData{
-			Pkg:                pkg,
-			GoPkg:              protostrs.GoPackage(pkg),
-			JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
-			JavaPkg:            protostrs.JavaPackage(pkg),
-		},
-	)
+	isV2, err := h.isV2(filePath)
 	if err != nil {
 		return err
 	}
+	var data []byte
+	if isV2 {
+		data, err = getDataV2(
+			&tmplData{
+				Pkg:                pkg,
+				CSharpNamespace:    protostrs.CSharpNamespace(pkg),
+				GoPkg:              protostrs.GoPackageLastTwo(pkg),
+				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
+				JavaPkg:            protostrs.JavaPackage(pkg),
+				OBJCClassPrefix:    protostrs.OBJCClassPrefix(pkg),
+				PHPNamespace:       protostrs.PHPNamespace(pkg),
+			},
+		)
+		if err != nil {
+			return err
+		}
+	} else {
+		data, err = getDataV1(
+			&tmplData{
+				Pkg:                pkg,
+				GoPkg:              protostrs.GoPackage(pkg),
+				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
+				JavaPkg:            protostrs.JavaPackage(pkg),
+			},
+		)
+		if err != nil {
+			return err
+		}
+	}
 	return ioutil.WriteFile(filePath, data, 0644)
+}
+
+func (h *handler) isV2(filePath string) (bool, error) {
+	absFilePath, err := filepath.Abs(filePath)
+	if err != nil {
+		return false, err
+	}
+	absDirPath := filepath.Dir(absFilePath)
+	config, err := h.configProvider.GetForDir(absDirPath)
+	if err != nil {
+		return false, err
+	}
+	// no config file found
+	if config.DirPath == "" {
+		return false, nil
+	}
+	return strings.ToLower(config.Lint.Group) == "uber2", nil
 }
 
 func (h *handler) getPkg(filePath string) (string, error) {
@@ -198,9 +254,17 @@ func getPkgFromRel(rel string, basePkg string) string {
 	return basePkg + "." + relPkg
 }
 
-func getData(tmplData *tmplData) ([]byte, error) {
+func getDataV1(tmplData *tmplData) ([]byte, error) {
 	buffer := bytes.NewBuffer(nil)
-	if err := tmpl.Execute(buffer, tmplData); err != nil {
+	if err := tmplV1.Execute(buffer, tmplData); err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
+}
+
+func getDataV2(tmplData *tmplData) ([]byte, error) {
+	buffer := bytes.NewBuffer(nil)
+	if err := tmplV2.Execute(buffer, tmplData); err != nil {
 		return nil, err
 	}
 	return buffer.Bytes(), nil
