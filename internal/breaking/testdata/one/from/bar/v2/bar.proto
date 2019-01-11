@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package bar.v2;
+
+option csharp_namespace = "Bar.V2";
+option go_package = "barv2";
+option java_multiple_files = true;
+option java_outer_classname = "BarProto";
+option java_package = "com.bar.v2";
+option objc_class_prefix = "BXX";
+option php_namespace = "Bar\\V2";
+
+message One {}

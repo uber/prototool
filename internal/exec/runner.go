@@ -585,7 +585,7 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
-func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, includeBeta bool) error {
+func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, includeBeta bool, allowBetaDeps bool) error {
 	if moreThanOneSet(gitBranch != "", gitTag != "") {
 		return newExitErrorf(255, "can only set one of git-branch, git-tag")
 	}
@@ -635,7 +635,7 @@ func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, incl
 		return err
 	}
 
-	failures, err := r.newBreakingRunner(includeBeta).Run(fromPackageSet, toPackageSet)
+	failures, err := r.newBreakingRunner(includeBeta, allowBetaDeps).Run(fromPackageSet, toPackageSet)
 	if err != nil {
 		return err
 	}
@@ -705,7 +705,7 @@ func (r *runner) getPackageSetForRelDirPath(relDirPath string) (*extract.Package
 	return r.getPackageSet([]string{dirPath})
 }
 
-func (r *runner) newBreakingRunner(includeBeta bool) breaking.Runner {
+func (r *runner) newBreakingRunner(includeBeta bool, allowBetaDeps bool) breaking.Runner {
 	runnerOptions := []breaking.RunnerOption{
 		breaking.RunnerWithLogger(r.logger),
 	}
@@ -713,6 +713,12 @@ func (r *runner) newBreakingRunner(includeBeta bool) breaking.Runner {
 		runnerOptions = append(
 			runnerOptions,
 			breaking.RunnerWithIncludeBeta(),
+		)
+	}
+	if allowBetaDeps {
+		runnerOptions = append(
+			runnerOptions,
+			breaking.RunnerWithAllowBetaDeps(),
 		)
 	}
 	return breaking.NewRunner(runnerOptions...)

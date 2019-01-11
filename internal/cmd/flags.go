@@ -25,6 +25,7 @@ import (
 )
 
 type flags struct {
+	allowBetaDeps     bool
 	address           string
 	cachePath         string
 	callTimeout       string
@@ -59,6 +60,10 @@ type flags struct {
 	protocURL         string
 	stdin             bool
 	uncomment         bool
+}
+
+func (f *flags) bindAllowBetaDeps(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.allowBetaDeps, "allow-beta-deps", false, "Allow stable packages to depend on beta packages. This is implicitly set if --include-beta is set.")
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
