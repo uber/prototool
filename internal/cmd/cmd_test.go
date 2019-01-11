@@ -446,6 +446,21 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`23:1:REQUEST_RESPONSE_TYPES_ONLY_IN_FILE
+		27:1:REQUEST_RESPONSE_TYPES_ONLY_IN_FILE`,
+		"testdata/lint/onlyinfile/foo/v1/hello_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`13:1:SERVICE_NAMES_MATCH_FILE_NAME`,
+		"testdata/lint/servicenamefilename/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`3:1:PACKAGE_NO_KEYWORDS`,
 		"testdata/lint/nokeywords/foo/public/public.proto",
 	)
