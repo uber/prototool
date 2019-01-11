@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "HelloApiProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";
+
+import "foo/v1/foo.proto";
+
+// HelloAPI is the hello API.
+service HelloAPI {
+  // SendFoo sends a foo.
+  rpc SendFoo(SendFooRequest) returns (SendFooResponse);
+  // GetPlanet gets a planet.
+  rpc GetPlanet(GetPlanetRequest) returns (GetPlanetResponse);
+  // StreamGalaxies streams galaxies.
+  rpc StreamGalaxies(StreamGalaxiesRequest) returns (stream StreamGalaxiesResponse);
+  // StreamQuasars streams quasars.
+  rpc StreamQuasars(stream StreamQuasarsRequest) returns (StreamQuasarsResponse);
+}
+
+message SendFooRequest {
+  Foo foo = 1;
+}
+
+message SendFooResponse {}
+
+message GetPlanetRequest {
+  string planet_id = 1;
+}
+
+message GetPlanetResponse {
+  Planet planet = 1;
+}
+
+message StreamGalaxiesRequest {}
+
+message StreamGalaxiesResponse {
+  Galaxy galaxy = 1;
+}
+
+message StreamQuasarsRequest {
+  Quasar quasar = 1;
+}
+
+message StreamQuasarsResponse {
+  repeated Quasar quasars = 1;
+}
