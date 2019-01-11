@@ -14,9 +14,10 @@ message One {
   // This is a field we are ok with having floats.
   //
   // @suppresswarnings floats
-  double one = 1;
+  float one = 1;
   // @suppresswarnings floats
   float two = 2;
-  double three = 3;
-  double four = 4;
+  float three = 3;
+  float four = 4;
+  double five = 5;
 }
