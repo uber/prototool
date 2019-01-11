@@ -22,58 +22,23 @@ package breaking
 
 import (
 	"github.com/uber/prototool/internal/extract"
+	"github.com/uber/prototool/internal/protostrs"
 	"github.com/uber/prototool/internal/text"
-	"go.uber.org/zap"
 )
 
-type runner struct {
-	logger        *zap.Logger
-	includeBeta   bool
-	allowBetaDeps bool
-	checkers      []Checker
+func checkPackagesNoBetaDeps(addFailure func(*text.Failure), from *extract.PackageSet, to *extract.PackageSet) error {
+	// this check is only run if WithIncludeBeta is not set
+	// so this map will only contain stable packages
+	for _, toPackage := range to.PackageNameToPackage() {
+		for _, depPackageName := range toPackage.ProtoMessage().DependencyNames {
+			if _, betaVersion, ok := protostrs.MajorBetaVersion(depPackageName); ok && betaVersion > 0 {
+				addFailure(newPackagesNoBetaDepsFailure(toPackage.FullyQualifiedName(), depPackageName))
+			}
+		}
+	}
+	return nil
 }
 
-func newRunner(options ...RunnerOption) *runner {
-	runner := &runner{
-		logger:   zap.NewNop(),
-		checkers: AllCheckers,
-	}
-	for _, option := range options {
-		option(runner)
-	}
-	return runner
-}
-
-func (r *runner) Run(from *extract.PackageSet, to *extract.PackageSet) ([]*text.Failure, error) {
-	var err error
-	if !r.includeBeta {
-		from, err = from.WithoutBeta()
-		if err != nil {
-			return nil, err
-		}
-		to, err = to.WithoutBeta()
-		if err != nil {
-			return nil, err
-		}
-	}
-	checkers := r.checkers
-	// if includeBeta, do not do the check
-	// else if not including beta, unless allow beta deps, do not do the check
-	if !r.includeBeta && !r.allowBetaDeps {
-		checkers = append(checkers, PackagesNoBetaDepsChecker)
-	}
-	var failures []*text.Failure
-	for _, checker := range checkers {
-		if err := checker.Check(
-			func(failure *text.Failure) {
-				failure.LintID = checker.ID
-				failures = append(failures, failure)
-			},
-			from,
-			to,
-		); err != nil {
-			return nil, err
-		}
-	}
-	return failures, nil
+func newPackagesNoBetaDepsFailure(packageName string, depPackageName string) *text.Failure {
+	return newTextFailuref(`Package %q depends on beta package %q which is not allowed.`, packageName, depPackageName)
 }

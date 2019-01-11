@@ -10,6 +10,14 @@ option java_package = "com.foo.v1";
 option objc_class_prefix = "FXX";
 option php_namespace = "Foo\\V1";
 
+import "bar/v1beta1/bar.proto";
+import "bar/v2/bar.proto";
+
+message Deps {
+  bar.v1beta1.One v1beta1_one = 2;
+  bar.v2.One v2_one = 1;
+}
+
 enum EnumOne {
   ENUM_ONE_INVALID = 0;
   ENUM_ONE_ONE = 1;

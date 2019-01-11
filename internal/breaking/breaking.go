@@ -118,6 +118,14 @@ var (
 			Check:   checkServiceMethodsSameServerStreaming,
 		},
 	}
+
+	// PackagesNoBetaDepsChecker is a special checker that verifies no stable packages
+	// import beta packages.
+	PackagesNoBetaDepsChecker = Checker{
+		ID:      "PACKAGES_NO_BETA_DEPS",
+		Purpose: "Checks that stable packages do not have beta dependencies.",
+		Check:   checkPackagesNoBetaDeps,
+	}
 )
 
 // Checker checks compatibility.
@@ -159,6 +167,18 @@ func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 func RunnerWithIncludeBeta() RunnerOption {
 	return func(runner *runner) {
 		runner.includeBeta = true
+	}
+}
+
+// RunnerWithAllowBetaDeps returns a RunnerOption that allows beta dependencies
+// in stable packages.
+//
+// Setting RunnerWithIncludeBeta will cause this to be true.
+//
+// The default is to not allow beta dependencies in stable packages.
+func RunnerWithAllowBetaDeps() RunnerOption {
+	return func(runner *runner) {
+		runner.allowBetaDeps = true
 	}
 }
 

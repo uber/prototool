@@ -35,7 +35,9 @@ func TestRunOne(t *testing.T) {
 		t,
 		"one",
 		false,
+		false,
 		newPackagesNotDeletedFailure("bar.v1"),
+		newPackagesNoBetaDepsFailure("foo.v1", "bar.v1beta1"),
 		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
 		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
 		newMessagesNotDeletedFailure("foo.v1.Two"),
@@ -111,6 +113,7 @@ func TestRunOneIncludeBeta(t *testing.T) {
 		t,
 		"one",
 		true,
+		false,
 		newPackagesNotDeletedFailure("bar.v1"),
 		newPackagesNotDeletedFailure("foo.v1beta2"),
 		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
@@ -250,12 +253,92 @@ func TestRunOneIncludeBeta(t *testing.T) {
 	)
 }
 
-func testRun(t *testing.T, subDirPath string, includeBeta bool, expectedFailures ...*text.Failure) {
+func TestRunOneAllowBetaDeps(t *testing.T) {
+	testRun(
+		t,
+		"one",
+		false,
+		true,
+		newPackagesNotDeletedFailure("bar.v1"),
+		newMessagesNotDeletedFailure("foo.v1.One.NestedOne.NestedNestedTwo"),
+		newMessagesNotDeletedFailure("foo.v1.One.NestedTwo"),
+		newMessagesNotDeletedFailure("foo.v1.Two"),
+		newMessageFieldsNotDeletedFailure("foo.v1.Three", 2),
+		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree", 2),
+		newMessageFieldsNotDeletedFailure("foo.v1.Three.NestedThree.NestedNestedThree", 2),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 2, "string", "bytes"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 2, "string", "bytes"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 2, "string", "bytes"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 3, "foo.v1.Four.NestedFour", "foo.v1.One"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 3, "foo.v1.Four.NestedFour.NestedNestedFour", "foo.v1.One"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 4, "foo.v1.EnumOne", "foo.v1.EnumThree"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 4, "foo.v1.EnumOne", "foo.v1.EnumThree"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 4, "foo.v1.EnumOne", "foo.v1.EnumThree"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 5, "enum", "double"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 5, "enum", "double"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 5, "enum", "double"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four", 6, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour", 6, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour", 6, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.SevenEntry", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.SevenEntry", 1, "int64", "int32"),
+		newMessageFieldsSameTypeFailure("foo.v1.Four.NestedFour.NestedNestedFour.SevenEntry", 1, "int64", "int32"),
+		newMessagesNotDeletedFailure("foo.v1.Five.FourEntry"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 1, "optional", "repeated"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 2, "optional", "repeated"),
+		newMessageFieldsSameTypeFailure("foo.v1.Five", 2, "string", "message"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 3, "repeated", "optional"),
+		newMessageFieldsSameLabelFailure("foo.v1.Five", 4, "repeated", "optional"),
+		newMessageFieldsSameTypeFailure("foo.v1.Five", 4, "message", "int64"),
+		newEnumsNotDeletedFailure("foo.v1.EnumTwo"),
+		newEnumsNotDeletedFailure("foo.v1.Six.Foo"),
+		newEnumsNotDeletedFailure("foo.v1.Six.NestedSix.Foo"),
+		newEnumsNotDeletedFailure("foo.v1.Six.NestedSix.NestedNestedSix.Foo"),
+		newMessagesNotDeletedFailure("foo.v1.Six.NestedSix.NestedNestedSixDelete"),
+		newEnumValuesNotDeletedFailure("foo.v1.EnumSeven", 2),
+		newEnumValuesNotDeletedFailure("foo.v1.Seven.EnumSeven", 2),
+		newEnumValuesNotDeletedFailure("foo.v1.Seven.NestedSeven.EnumSeven", 2),
+		newEnumValuesNotDeletedFailure("foo.v1.Seven.NestedSeven.NestedNestedSeven.EnumSeven", 2),
+		newEnumValuesSameNameFailure("foo.v1.EnumSeven", 1, "ENUM_SEVEN_ONE", "ENUM_SEVEN_TWO"),
+		newEnumValuesSameNameFailure("foo.v1.Seven.EnumSeven", 1, "ENUM_SEVEN_ONE", "ENUM_SEVEN_TWO"),
+		newEnumValuesSameNameFailure("foo.v1.Seven.NestedSeven.EnumSeven", 1, "ENUM_SEVEN_ONE", "ENUM_SEVEN_TWO"),
+		newEnumValuesSameNameFailure("foo.v1.Seven.NestedSeven.NestedNestedSeven.EnumSeven", 1, "ENUM_SEVEN_ONE", "ENUM_SEVEN_TWO"),
+		newMessageOneofsNotDeletedFailure("foo.v1.Eight", "test"),
+		newMessageOneofsNotDeletedFailure("foo.v1.Eight.NestedEight", "test"),
+		newMessageOneofsNotDeletedFailure("foo.v1.Eight.NestedEight.NestedNestedEight", "test"),
+		newServicesNotDeletedFailure("foo.v1.TwoAPI"),
+		newServiceMethodsNotDeletedFailure("foo.v1.OneAPI", "OneTwo"),
+		newMessagesNotDeletedFailure("foo.v1.OneTwoRequest"),
+		newMessagesNotDeletedFailure("foo.v1.OneTwoResponse"),
+		newMessageFieldsSameNameFailure("foo.v1.Nine", 1, "one", "two"),
+		newMessageFieldsSameNameFailure("foo.v1.Nine.NestedNine", 1, "one", "two"),
+		newMessageFieldsSameNameFailure("foo.v1.Nine.NestedNine.NestedNestedNine", 1, "one", "two"),
+		newMessageOneofsFieldsNotRemovedFailure("foo.v1.Ten", "test", 3),
+		newMessageOneofsFieldsNotRemovedFailure("foo.v1.Ten.NestedTen", "test", 3),
+		newMessageOneofsFieldsNotRemovedFailure("foo.v1.Ten.NestedTen.NestedNestedTen", "test", 3),
+		newServiceMethodsSameRequestTypeFailure("foo.v1.ThreeAPI", "ThreeOne", "foo.v1.ThreeOneRequest", "foo.v1.OneOneRequest"),
+		newServiceMethodsSameResponseTypeFailure("foo.v1.ThreeAPI", "ThreeOne", "foo.v1.ThreeOneResponse", "foo.v1.OneOneResponse"),
+		newMessagesNotDeletedFailure("foo.v1.ThreeOneRequest"),
+		newMessagesNotDeletedFailure("foo.v1.ThreeOneResponse"),
+		newServiceMethodsSameClientStreamingFailure("foo.v1.ThreeAPI", "ThreeTwo", true),
+		newServiceMethodsSameClientStreamingFailure("foo.v1.ThreeAPI", "ThreeThree", false),
+		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFour", true),
+		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFive", false),
+	)
+}
+
+func testRun(t *testing.T, subDirPath string, includeBeta bool, allowBetaDeps bool, expectedFailures ...*text.Failure) {
 	fromPackageSet, toPackageSet, err := getPackageSets(subDirPath)
 	require.NoError(t, err)
 	runner := NewRunner()
 	if includeBeta {
 		runner = NewRunner(RunnerWithIncludeBeta())
+	}
+	if allowBetaDeps {
+		runner = NewRunner(RunnerWithAllowBetaDeps())
 	}
 	failures, err := runner.Run(fromPackageSet, toPackageSet)
 	require.NoError(t, err)
