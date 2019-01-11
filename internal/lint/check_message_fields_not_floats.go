@@ -31,7 +31,7 @@ const messageFieldsNotFloatsSuppressableAnnotation = "floats"
 
 var messageFieldsNotFloatsLinter = NewLinter(
 	"MESSAGE_FIELDS_NOT_FLOATS",
-	fmt.Sprintf(`Suppressable with "@suppresswarnings %s". Verifies that all message fields are not floats or doubles.`, messageFieldsNotFloatsSuppressableAnnotation),
+	fmt.Sprintf(`Suppressable with "@suppresswarnings %s". Verifies that all message fields are not floats.`, messageFieldsNotFloatsSuppressableAnnotation),
 	checkMessageFieldsNotFloats,
 )
 
@@ -69,10 +69,10 @@ func (v messageFieldsNotFloatsVisitor) VisitMapField(field *proto.MapField) {
 
 func (v messageFieldsNotFloatsVisitor) checkNotFloat(field *proto.Field) {
 	switch field.Type {
-	case "double", "float":
+	case "float":
 		if isSuppressed(field.Comment, messageFieldsNotFloatsSuppressableAnnotation) {
 			return
 		}
-		v.AddFailuref(field.Position, `Field %q is a float and floating point types should generally not be used, consider using an int64 while representing your value in micros or nanos. This can be suppressed by adding "@suppresswarnings %s" to the field comment.`, field.Name, messageFieldsNotFloatsSuppressableAnnotation)
+		v.AddFailuref(field.Position, `Field %q is a float and floats should generally not be used, consider using a double, or an int64 while representing your value in micros or nanos. This can be suppressed by adding "@suppresswarnings %s" to the field comment.`, field.Name, messageFieldsNotFloatsSuppressableAnnotation)
 	}
 }
