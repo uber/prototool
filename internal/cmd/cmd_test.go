@@ -454,6 +454,14 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`13:1:SERVICE_NAMES_MATCH_FILE_NAME
+		15:1:SERVICE_NAMES_MATCH_FILE_NAME`,
+		"testdata/lint/servicenamefilename/foo/v1/another_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`13:1:SERVICE_NAMES_MATCH_FILE_NAME`,
 		"testdata/lint/servicenamefilename/foo/v1/foo.proto",
 	)

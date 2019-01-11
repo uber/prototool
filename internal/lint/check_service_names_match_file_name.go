@@ -60,7 +60,7 @@ func (v *serviceNamesMatchFileNameVisitor) Finally() error {
 	}
 	if len(v.services) > 1 {
 		for _, service := range v.services {
-			v.AddFailuref(service.Position, `Multiple services defined in this file and there should be only one service per file`)
+			v.AddFailuref(service.Position, `Multiple services defined in this file and there should be only one service per file.`)
 		}
 		return nil
 	}
