@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package uber.foo.v1;
+
+option csharp_namespace = "Uber.Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "HelloApiProto";
+option java_package = "com.uber.foo.v1";
+option objc_class_prefix = "UFX";
+option php_namespace = "Uber\\Foo\\V1";
+
+service HelloAPI {
+  // Foo does a foo.
+  rpc Foo(FooRequest) returns (FooResponse);
+  // Bar does a bar.
+  rpc Bar(BarRequest) returns (BarResponse);
+}
+
+message FooRequest {}
+
+message FooResponse {}
+
+message BarRequest {
+  int64 id = 1;
+}
+
+message BarResponse {}

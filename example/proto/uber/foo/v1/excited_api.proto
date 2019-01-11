@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package uber.foo.v1;
+
+option csharp_namespace = "Uber.Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "ExcitedApiProto";
+option java_package = "com.uber.foo.v1";
+option objc_class_prefix = "UFX";
+option php_namespace = "Uber\\Foo\\V1";
+
+// ExcitedAPI is a service with exciting transformations.
+service ExcitedAPI {
+  // Exclamation adds an exclamation to the request value.
+  rpc Exclamation(ExclamationRequest) returns (ExclamationResponse);
+  // ExclamationClientStream adds an exclamation to the combined request values.
+  rpc ExclamationClientStream(stream ExclamationRequest) returns (ExclamationResponse);
+  // ExclamationServerStream adds an exclamation to the request value
+  // and streams each character as a response.
+  rpc ExclamationServerStream(ExclamationRequest) returns (stream ExclamationResponse);
+  // ExclamationBidiStream adds an exclamation to the each request value.
+  rpc ExclamationBidiStream(stream ExclamationRequest) returns (stream ExclamationResponse);
+}
+
+message ExclamationRequest {
+  string value = 1;
+}
+
+message ExclamationResponse {
+  string value = 1;
+}

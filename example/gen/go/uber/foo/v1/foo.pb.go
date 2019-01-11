@@ -10,11 +10,6 @@ import duration "github.com/golang/protobuf/ptypes/duration"
 import timestamp "github.com/golang/protobuf/ptypes/timestamp"
 import v1 "github.com/uber/prototool/example/gen/go/uber/bar/v1"
 
-import (
-	context "golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
-)
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
@@ -53,7 +48,7 @@ func (x Hello) String() string {
 	return proto.EnumName(Hello_name, int32(x))
 }
 func (Hello) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{0}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0}
 }
 
 // Bar is a bar.
@@ -74,7 +69,7 @@ func (x Bar) String() string {
 	return proto.EnumName(Bar_name, int32(x))
 }
 func (Bar) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{1}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{1}
 }
 
 // Baz is a baz.
@@ -95,7 +90,7 @@ func (x Foo_Bar_Baz) String() string {
 	return proto.EnumName(Foo_Bar_Baz_name, int32(x))
 }
 func (Foo_Bar_Baz) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{0, 0, 0}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0, 0, 0}
 }
 
 // Bat is a bat.
@@ -116,7 +111,7 @@ func (x Foo_Bar_Bat) String() string {
 	return proto.EnumName(Foo_Bar_Bat_name, int32(x))
 }
 func (Foo_Bar_Bat) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{0, 0, 1}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0, 0, 1}
 }
 
 // Foo is a foo.
@@ -131,7 +126,7 @@ func (m *Foo) Reset()         { *m = Foo{} }
 func (m *Foo) String() string { return proto.CompactTextString(m) }
 func (*Foo) ProtoMessage()    {}
 func (*Foo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{0}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0}
 }
 func (m *Foo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo.Unmarshal(m, b)
@@ -171,7 +166,7 @@ func (m *Foo_Bar) Reset()         { *m = Foo_Bar{} }
 func (m *Foo_Bar) String() string { return proto.CompactTextString(m) }
 func (*Foo_Bar) ProtoMessage()    {}
 func (*Foo_Bar) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{0, 0}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0, 0}
 }
 func (m *Foo_Bar) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo_Bar.Unmarshal(m, b)
@@ -219,7 +214,7 @@ func (m *Barr) Reset()         { *m = Barr{} }
 func (m *Barr) String() string { return proto.CompactTextString(m) }
 func (*Barr) ProtoMessage()    {}
 func (*Barr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{1}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{1}
 }
 func (m *Barr) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Barr.Unmarshal(m, b)
@@ -283,7 +278,7 @@ func (m *Another) Reset()         { *m = Another{} }
 func (m *Another) String() string { return proto.CompactTextString(m) }
 func (*Another) ProtoMessage()    {}
 func (*Another) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{2}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{2}
 }
 func (m *Another) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Another.Unmarshal(m, b)
@@ -473,7 +468,7 @@ func (m *HasWKT) Reset()         { *m = HasWKT{} }
 func (m *HasWKT) String() string { return proto.CompactTextString(m) }
 func (*HasWKT) ProtoMessage()    {}
 func (*HasWKT) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{3}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{3}
 }
 func (m *HasWKT) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasWKT.Unmarshal(m, b)
@@ -511,7 +506,7 @@ func (m *Bazz) Reset()         { *m = Bazz{} }
 func (m *Bazz) String() string { return proto.CompactTextString(m) }
 func (*Bazz) ProtoMessage()    {}
 func (*Bazz) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{4}
+	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{4}
 }
 func (m *Bazz) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Bazz.Unmarshal(m, b)
@@ -531,210 +526,6 @@ func (m *Bazz) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Bazz proto.InternalMessageInfo
 
-type BarRequest struct {
-	Id                   int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *BarRequest) Reset()         { *m = BarRequest{} }
-func (m *BarRequest) String() string { return proto.CompactTextString(m) }
-func (*BarRequest) ProtoMessage()    {}
-func (*BarRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{5}
-}
-func (m *BarRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_BarRequest.Unmarshal(m, b)
-}
-func (m *BarRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_BarRequest.Marshal(b, m, deterministic)
-}
-func (dst *BarRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BarRequest.Merge(dst, src)
-}
-func (m *BarRequest) XXX_Size() int {
-	return xxx_messageInfo_BarRequest.Size(m)
-}
-func (m *BarRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_BarRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_BarRequest proto.InternalMessageInfo
-
-func (m *BarRequest) GetId() int64 {
-	if m != nil {
-		return m.Id
-	}
-	return 0
-}
-
-type BarResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *BarResponse) Reset()         { *m = BarResponse{} }
-func (m *BarResponse) String() string { return proto.CompactTextString(m) }
-func (*BarResponse) ProtoMessage()    {}
-func (*BarResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{6}
-}
-func (m *BarResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_BarResponse.Unmarshal(m, b)
-}
-func (m *BarResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_BarResponse.Marshal(b, m, deterministic)
-}
-func (dst *BarResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_BarResponse.Merge(dst, src)
-}
-func (m *BarResponse) XXX_Size() int {
-	return xxx_messageInfo_BarResponse.Size(m)
-}
-func (m *BarResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_BarResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_BarResponse proto.InternalMessageInfo
-
-type FooRequest struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *FooRequest) Reset()         { *m = FooRequest{} }
-func (m *FooRequest) String() string { return proto.CompactTextString(m) }
-func (*FooRequest) ProtoMessage()    {}
-func (*FooRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{7}
-}
-func (m *FooRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FooRequest.Unmarshal(m, b)
-}
-func (m *FooRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FooRequest.Marshal(b, m, deterministic)
-}
-func (dst *FooRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FooRequest.Merge(dst, src)
-}
-func (m *FooRequest) XXX_Size() int {
-	return xxx_messageInfo_FooRequest.Size(m)
-}
-func (m *FooRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_FooRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_FooRequest proto.InternalMessageInfo
-
-type FooResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *FooResponse) Reset()         { *m = FooResponse{} }
-func (m *FooResponse) String() string { return proto.CompactTextString(m) }
-func (*FooResponse) ProtoMessage()    {}
-func (*FooResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{8}
-}
-func (m *FooResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FooResponse.Unmarshal(m, b)
-}
-func (m *FooResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FooResponse.Marshal(b, m, deterministic)
-}
-func (dst *FooResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FooResponse.Merge(dst, src)
-}
-func (m *FooResponse) XXX_Size() int {
-	return xxx_messageInfo_FooResponse.Size(m)
-}
-func (m *FooResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_FooResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_FooResponse proto.InternalMessageInfo
-
-type ExclamationRequest struct {
-	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ExclamationRequest) Reset()         { *m = ExclamationRequest{} }
-func (m *ExclamationRequest) String() string { return proto.CompactTextString(m) }
-func (*ExclamationRequest) ProtoMessage()    {}
-func (*ExclamationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{9}
-}
-func (m *ExclamationRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ExclamationRequest.Unmarshal(m, b)
-}
-func (m *ExclamationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ExclamationRequest.Marshal(b, m, deterministic)
-}
-func (dst *ExclamationRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ExclamationRequest.Merge(dst, src)
-}
-func (m *ExclamationRequest) XXX_Size() int {
-	return xxx_messageInfo_ExclamationRequest.Size(m)
-}
-func (m *ExclamationRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ExclamationRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ExclamationRequest proto.InternalMessageInfo
-
-func (m *ExclamationRequest) GetValue() string {
-	if m != nil {
-		return m.Value
-	}
-	return ""
-}
-
-type ExclamationResponse struct {
-	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *ExclamationResponse) Reset()         { *m = ExclamationResponse{} }
-func (m *ExclamationResponse) String() string { return proto.CompactTextString(m) }
-func (*ExclamationResponse) ProtoMessage()    {}
-func (*ExclamationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_b5e601731ee15dc6, []int{10}
-}
-func (m *ExclamationResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ExclamationResponse.Unmarshal(m, b)
-}
-func (m *ExclamationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ExclamationResponse.Marshal(b, m, deterministic)
-}
-func (dst *ExclamationResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ExclamationResponse.Merge(dst, src)
-}
-func (m *ExclamationResponse) XXX_Size() int {
-	return xxx_messageInfo_ExclamationResponse.Size(m)
-}
-func (m *ExclamationResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ExclamationResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ExclamationResponse proto.InternalMessageInfo
-
-func (m *ExclamationResponse) GetValue() string {
-	if m != nil {
-		return m.Value
-	}
-	return ""
-}
-
 func init() {
 	proto.RegisterType((*Foo)(nil), "uber.foo.v1.Foo")
 	proto.RegisterType((*Foo_Bar)(nil), "uber.foo.v1.Foo.Bar")
@@ -743,447 +534,54 @@ func init() {
 	proto.RegisterMapType((map[string]int64)(nil), "uber.foo.v1.Another.MEntry")
 	proto.RegisterType((*HasWKT)(nil), "uber.foo.v1.HasWKT")
 	proto.RegisterType((*Bazz)(nil), "uber.foo.v1.Bazz")
-	proto.RegisterType((*BarRequest)(nil), "uber.foo.v1.BarRequest")
-	proto.RegisterType((*BarResponse)(nil), "uber.foo.v1.BarResponse")
-	proto.RegisterType((*FooRequest)(nil), "uber.foo.v1.FooRequest")
-	proto.RegisterType((*FooResponse)(nil), "uber.foo.v1.FooResponse")
-	proto.RegisterType((*ExclamationRequest)(nil), "uber.foo.v1.ExclamationRequest")
-	proto.RegisterType((*ExclamationResponse)(nil), "uber.foo.v1.ExclamationResponse")
 	proto.RegisterEnum("uber.foo.v1.Hello", Hello_name, Hello_value)
 	proto.RegisterEnum("uber.foo.v1.Bar", Bar_name, Bar_value)
 	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Baz", Foo_Bar_Baz_name, Foo_Bar_Baz_value)
 	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Bat", Foo_Bar_Bat_name, Foo_Bar_Bat_value)
 }
 
-// Reference imports to suppress errors if they are not otherwise used.
-var _ context.Context
-var _ grpc.ClientConn
+func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_foo_e3b8a0f6d36d9093) }
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
-
-// HelloAPIClient is the client API for HelloAPI service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type HelloAPIClient interface {
-	// Foo does a foo.
-	Foo(ctx context.Context, in *FooRequest, opts ...grpc.CallOption) (*FooResponse, error)
-	// Bar does a bar.
-	Bar(ctx context.Context, in *BarRequest, opts ...grpc.CallOption) (*BarResponse, error)
-}
-
-type helloAPIClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewHelloAPIClient(cc *grpc.ClientConn) HelloAPIClient {
-	return &helloAPIClient{cc}
-}
-
-func (c *helloAPIClient) Foo(ctx context.Context, in *FooRequest, opts ...grpc.CallOption) (*FooResponse, error) {
-	out := new(FooResponse)
-	err := c.cc.Invoke(ctx, "/uber.foo.v1.HelloAPI/Foo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *helloAPIClient) Bar(ctx context.Context, in *BarRequest, opts ...grpc.CallOption) (*BarResponse, error) {
-	out := new(BarResponse)
-	err := c.cc.Invoke(ctx, "/uber.foo.v1.HelloAPI/Bar", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// HelloAPIServer is the server API for HelloAPI service.
-type HelloAPIServer interface {
-	// Foo does a foo.
-	Foo(context.Context, *FooRequest) (*FooResponse, error)
-	// Bar does a bar.
-	Bar(context.Context, *BarRequest) (*BarResponse, error)
-}
-
-func RegisterHelloAPIServer(s *grpc.Server, srv HelloAPIServer) {
-	s.RegisterService(&_HelloAPI_serviceDesc, srv)
-}
-
-func _HelloAPI_Foo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FooRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(HelloAPIServer).Foo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/uber.foo.v1.HelloAPI/Foo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloAPIServer).Foo(ctx, req.(*FooRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _HelloAPI_Bar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BarRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(HelloAPIServer).Bar(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/uber.foo.v1.HelloAPI/Bar",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HelloAPIServer).Bar(ctx, req.(*BarRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _HelloAPI_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "uber.foo.v1.HelloAPI",
-	HandlerType: (*HelloAPIServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Foo",
-			Handler:    _HelloAPI_Foo_Handler,
-		},
-		{
-			MethodName: "Bar",
-			Handler:    _HelloAPI_Bar_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "uber/foo/v1/foo.proto",
-}
-
-// ExcitedAPIClient is the client API for ExcitedAPI service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ExcitedAPIClient interface {
-	// Exclamation adds an exclamation to the request value.
-	Exclamation(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (*ExclamationResponse, error)
-	// ExclamationClientStream adds an exclamation to the combined request values.
-	ExclamationClientStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedAPI_ExclamationClientStreamClient, error)
-	// ExclamationServerStream adds an exclamation to the request value
-	// and streams each character as a response.
-	ExclamationServerStream(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (ExcitedAPI_ExclamationServerStreamClient, error)
-	// ExclamationBidiStream adds an exclamation to the each request value.
-	ExclamationBidiStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedAPI_ExclamationBidiStreamClient, error)
-}
-
-type excitedAPIClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewExcitedAPIClient(cc *grpc.ClientConn) ExcitedAPIClient {
-	return &excitedAPIClient{cc}
-}
-
-func (c *excitedAPIClient) Exclamation(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (*ExclamationResponse, error) {
-	out := new(ExclamationResponse)
-	err := c.cc.Invoke(ctx, "/uber.foo.v1.ExcitedAPI/Exclamation", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *excitedAPIClient) ExclamationClientStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedAPI_ExclamationClientStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_ExcitedAPI_serviceDesc.Streams[0], "/uber.foo.v1.ExcitedAPI/ExclamationClientStream", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &excitedAPIExclamationClientStreamClient{stream}
-	return x, nil
-}
-
-type ExcitedAPI_ExclamationClientStreamClient interface {
-	Send(*ExclamationRequest) error
-	CloseAndRecv() (*ExclamationResponse, error)
-	grpc.ClientStream
-}
-
-type excitedAPIExclamationClientStreamClient struct {
-	grpc.ClientStream
-}
-
-func (x *excitedAPIExclamationClientStreamClient) Send(m *ExclamationRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *excitedAPIExclamationClientStreamClient) CloseAndRecv() (*ExclamationResponse, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(ExclamationResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *excitedAPIClient) ExclamationServerStream(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (ExcitedAPI_ExclamationServerStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_ExcitedAPI_serviceDesc.Streams[1], "/uber.foo.v1.ExcitedAPI/ExclamationServerStream", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &excitedAPIExclamationServerStreamClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type ExcitedAPI_ExclamationServerStreamClient interface {
-	Recv() (*ExclamationResponse, error)
-	grpc.ClientStream
-}
-
-type excitedAPIExclamationServerStreamClient struct {
-	grpc.ClientStream
-}
-
-func (x *excitedAPIExclamationServerStreamClient) Recv() (*ExclamationResponse, error) {
-	m := new(ExclamationResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *excitedAPIClient) ExclamationBidiStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedAPI_ExclamationBidiStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_ExcitedAPI_serviceDesc.Streams[2], "/uber.foo.v1.ExcitedAPI/ExclamationBidiStream", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &excitedAPIExclamationBidiStreamClient{stream}
-	return x, nil
-}
-
-type ExcitedAPI_ExclamationBidiStreamClient interface {
-	Send(*ExclamationRequest) error
-	Recv() (*ExclamationResponse, error)
-	grpc.ClientStream
-}
-
-type excitedAPIExclamationBidiStreamClient struct {
-	grpc.ClientStream
-}
-
-func (x *excitedAPIExclamationBidiStreamClient) Send(m *ExclamationRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *excitedAPIExclamationBidiStreamClient) Recv() (*ExclamationResponse, error) {
-	m := new(ExclamationResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// ExcitedAPIServer is the server API for ExcitedAPI service.
-type ExcitedAPIServer interface {
-	// Exclamation adds an exclamation to the request value.
-	Exclamation(context.Context, *ExclamationRequest) (*ExclamationResponse, error)
-	// ExclamationClientStream adds an exclamation to the combined request values.
-	ExclamationClientStream(ExcitedAPI_ExclamationClientStreamServer) error
-	// ExclamationServerStream adds an exclamation to the request value
-	// and streams each character as a response.
-	ExclamationServerStream(*ExclamationRequest, ExcitedAPI_ExclamationServerStreamServer) error
-	// ExclamationBidiStream adds an exclamation to the each request value.
-	ExclamationBidiStream(ExcitedAPI_ExclamationBidiStreamServer) error
-}
-
-func RegisterExcitedAPIServer(s *grpc.Server, srv ExcitedAPIServer) {
-	s.RegisterService(&_ExcitedAPI_serviceDesc, srv)
-}
-
-func _ExcitedAPI_Exclamation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExclamationRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExcitedAPIServer).Exclamation(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/uber.foo.v1.ExcitedAPI/Exclamation",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExcitedAPIServer).Exclamation(ctx, req.(*ExclamationRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ExcitedAPI_ExclamationClientStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ExcitedAPIServer).ExclamationClientStream(&excitedAPIExclamationClientStreamServer{stream})
-}
-
-type ExcitedAPI_ExclamationClientStreamServer interface {
-	SendAndClose(*ExclamationResponse) error
-	Recv() (*ExclamationRequest, error)
-	grpc.ServerStream
-}
-
-type excitedAPIExclamationClientStreamServer struct {
-	grpc.ServerStream
-}
-
-func (x *excitedAPIExclamationClientStreamServer) SendAndClose(m *ExclamationResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *excitedAPIExclamationClientStreamServer) Recv() (*ExclamationRequest, error) {
-	m := new(ExclamationRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func _ExcitedAPI_ExclamationServerStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ExclamationRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(ExcitedAPIServer).ExclamationServerStream(m, &excitedAPIExclamationServerStreamServer{stream})
-}
-
-type ExcitedAPI_ExclamationServerStreamServer interface {
-	Send(*ExclamationResponse) error
-	grpc.ServerStream
-}
-
-type excitedAPIExclamationServerStreamServer struct {
-	grpc.ServerStream
-}
-
-func (x *excitedAPIExclamationServerStreamServer) Send(m *ExclamationResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _ExcitedAPI_ExclamationBidiStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ExcitedAPIServer).ExclamationBidiStream(&excitedAPIExclamationBidiStreamServer{stream})
-}
-
-type ExcitedAPI_ExclamationBidiStreamServer interface {
-	Send(*ExclamationResponse) error
-	Recv() (*ExclamationRequest, error)
-	grpc.ServerStream
-}
-
-type excitedAPIExclamationBidiStreamServer struct {
-	grpc.ServerStream
-}
-
-func (x *excitedAPIExclamationBidiStreamServer) Send(m *ExclamationResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *excitedAPIExclamationBidiStreamServer) Recv() (*ExclamationRequest, error) {
-	m := new(ExclamationRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-var _ExcitedAPI_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "uber.foo.v1.ExcitedAPI",
-	HandlerType: (*ExcitedAPIServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Exclamation",
-			Handler:    _ExcitedAPI_Exclamation_Handler,
-		},
-	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "ExclamationClientStream",
-			Handler:       _ExcitedAPI_ExclamationClientStream_Handler,
-			ClientStreams: true,
-		},
-		{
-			StreamName:    "ExclamationServerStream",
-			Handler:       _ExcitedAPI_ExclamationServerStream_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "ExclamationBidiStream",
-			Handler:       _ExcitedAPI_ExclamationBidiStream_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
-	},
-	Metadata: "uber/foo/v1/foo.proto",
-}
-
-func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_foo_b5e601731ee15dc6) }
-
-var fileDescriptor_foo_b5e601731ee15dc6 = []byte{
-	// 805 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xdf, 0x6e, 0x3a, 0x45,
-	0x14, 0xee, 0xee, 0x02, 0x85, 0xb3, 0xfd, 0x83, 0x63, 0xff, 0xac, 0x68, 0x2c, 0xd9, 0x0b, 0x83,
-	0x98, 0x2c, 0x05, 0x4d, 0x6c, 0x8c, 0x37, 0xac, 0x65, 0x43, 0x23, 0x52, 0xb2, 0xa5, 0xd5, 0x34,
-	0x8d, 0x64, 0x29, 0x43, 0xbb, 0x29, 0xec, 0xd4, 0x61, 0xa0, 0x2d, 0x17, 0x5e, 0x7a, 0xe7, 0x4b,
-	0x78, 0xa9, 0xcf, 0xe0, 0x0b, 0xf8, 0x50, 0xc6, 0x9c, 0x99, 0x45, 0xfe, 0x14, 0xfd, 0xdd, 0xf4,
-	0xa6, 0x9d, 0x73, 0xce, 0x77, 0xbe, 0xf9, 0xce, 0xb7, 0x7b, 0x16, 0xd8, 0x1f, 0x77, 0x29, 0x2f,
-	0xf5, 0x19, 0x2b, 0x4d, 0xca, 0xf8, 0xcf, 0x79, 0xe4, 0x4c, 0x30, 0x62, 0x62, 0xda, 0xc1, 0x78,
-	0x52, 0xce, 0x7d, 0x7c, 0xc7, 0xd8, 0xdd, 0x80, 0x96, 0x64, 0xa9, 0x3b, 0xee, 0x97, 0x7a, 0x63,
-	0x1e, 0x88, 0x90, 0x45, 0x0a, 0x9c, 0x3b, 0x5a, 0xad, 0x8b, 0x70, 0x48, 0x47, 0x22, 0x18, 0x3e,
-	0xc6, 0x00, 0x75, 0x49, 0x37, 0xe0, 0x78, 0x49, 0x37, 0xe0, 0x2a, 0x6d, 0xff, 0xa9, 0x81, 0xe1,
-	0x31, 0x46, 0x3e, 0x01, 0xa3, 0x1b, 0x70, 0x4b, 0xcb, 0x6b, 0x05, 0xb3, 0xb2, 0xe7, 0x2c, 0x5c,
-	0xed, 0x78, 0x8c, 0x39, 0x6e, 0xc0, 0x7d, 0x04, 0xe4, 0x7e, 0xd5, 0xc0, 0x70, 0x03, 0x4e, 0x8a,
-	0x88, 0x9f, 0x4a, 0xfc, 0x4e, 0xc5, 0x5a, 0x87, 0x77, 0xdc, 0x60, 0x8a, 0x3d, 0x53, 0x85, 0x15,
-	0x96, 0xfe, 0xbf, 0x58, 0x81, 0x58, 0x61, 0x1f, 0x20, 0xfd, 0x94, 0xec, 0x82, 0xe9, 0x56, 0xaf,
-	0x3b, 0x67, 0xcd, 0xab, 0x6a, 0xe3, 0xec, 0x34, 0xbb, 0xa1, 0xf2, 0x42, 0xe5, 0xdb, 0x0b, 0xf9,
-	0x5f, 0x34, 0x48, 0xb8, 0x01, 0xe7, 0x64, 0x0f, 0x92, 0xf7, 0x74, 0x30, 0x60, 0x52, 0x92, 0xe1,
-	0xab, 0x80, 0x7c, 0x09, 0x99, 0x6e, 0xc0, 0x79, 0x07, 0xdd, 0x90, 0x02, 0xcc, 0x4a, 0xce, 0x51,
-	0x56, 0x39, 0x33, 0xab, 0x9c, 0xf6, 0xcc, 0x2a, 0x3f, 0x8d, 0x60, 0x0c, 0x49, 0x49, 0x36, 0x76,
-	0x14, 0xa5, 0x21, 0x1b, 0x89, 0x52, 0x8e, 0xde, 0x4d, 0xca, 0x4e, 0x1d, 0x2b, 0xb2, 0x41, 0x9e,
-	0xec, 0x3f, 0x0c, 0xd8, 0xac, 0x46, 0x4c, 0xdc, 0x53, 0x4e, 0xb2, 0x60, 0xb0, 0x88, 0xc6, 0x4a,
-	0xf0, 0x88, 0x19, 0xf1, 0xc4, 0xa4, 0x82, 0x8c, 0x8f, 0x47, 0xe2, 0xc0, 0x66, 0xa0, 0xe0, 0x31,
-	0xfd, 0xb2, 0xe9, 0x31, 0x95, 0x3f, 0x03, 0x11, 0x02, 0x89, 0x3e, 0x1b, 0x73, 0x2b, 0x91, 0x37,
-	0x0a, 0x19, 0x5f, 0x9e, 0x49, 0x61, 0x36, 0x73, 0x52, 0x5a, 0x4b, 0x96, 0x18, 0x94, 0xc0, 0xd8,
-	0x87, 0x4f, 0x41, 0x1b, 0x5a, 0xa9, 0xbc, 0x51, 0x30, 0x2b, 0x1f, 0xae, 0xbb, 0xc7, 0xf9, 0xae,
-	0x16, 0x09, 0xfe, 0xe2, 0x6b, 0x43, 0x72, 0x00, 0xc9, 0x11, 0x9d, 0xd0, 0xc8, 0xda, 0x44, 0xf9,
-	0xf5, 0x0d, 0x5f, 0x85, 0x98, 0xa7, 0xe1, 0xdd, 0xbd, 0xb0, 0xd2, 0x38, 0x04, 0xe6, 0x65, 0x48,
-	0x0a, 0x90, 0x88, 0xc2, 0x88, 0x5a, 0x19, 0xc9, 0xbe, 0x7e, 0x0a, 0x89, 0x20, 0xa7, 0x90, 0x8d,
-	0xa7, 0xe9, 0xcc, 0xde, 0x5e, 0x0b, 0xe4, 0xec, 0x1f, 0xbc, 0x7a, 0x26, 0xa7, 0x31, 0xc0, 0xdf,
-	0x8d, 0x5b, 0x66, 0x89, 0xdc, 0x17, 0x90, 0x52, 0x62, 0xd1, 0xd4, 0x07, 0xfa, 0x22, 0x6d, 0xce,
-	0xf8, 0x78, 0xc4, 0x97, 0x60, 0x12, 0x0c, 0xc6, 0xea, 0x51, 0x1b, 0xbe, 0x0a, 0xbe, 0xd2, 0x4f,
-	0x34, 0x77, 0x1b, 0x4c, 0x16, 0x51, 0xd6, 0xef, 0xc8, 0xbf, 0xb6, 0x07, 0xa9, 0x7a, 0x30, 0xfa,
-	0xfe, 0xdb, 0x36, 0xf9, 0x1a, 0xb6, 0x9e, 0x1e, 0xc4, 0x5c, 0x90, 0xf6, 0x2e, 0x41, 0xe6, 0xd3,
-	0x83, 0x98, 0x05, 0x76, 0x0a, 0xdf, 0xbe, 0xe9, 0xd4, 0xfe, 0x08, 0x00, 0x57, 0x84, 0xfe, 0x34,
-	0xa6, 0x23, 0x41, 0x76, 0x40, 0x0f, 0x7b, 0xf1, 0xe3, 0xd7, 0xc3, 0x9e, 0xbd, 0x0d, 0xa6, 0xac,
-	0x8e, 0x1e, 0x59, 0x34, 0xa2, 0xf6, 0x16, 0x80, 0xc7, 0x58, 0x0c, 0xc6, 0xa2, 0x8c, 0xe2, 0x62,
-	0x11, 0x48, 0xed, 0xf9, 0x76, 0x10, 0x0c, 0xd5, 0x6d, 0x31, 0xe3, 0xbf, 0x83, 0xa9, 0x61, 0x55,
-	0x60, 0x7f, 0x06, 0xef, 0x2f, 0x61, 0x15, 0xc5, 0x7a, 0x70, 0xb1, 0x09, 0x49, 0xf9, 0x4a, 0x90,
-	0xf7, 0x60, 0xbb, 0x5e, 0x6b, 0x34, 0xce, 0xe7, 0x5b, 0x84, 0x6b, 0xa5, 0x52, 0x97, 0xcd, 0x8b,
-	0x5a, 0x3b, 0xab, 0x91, 0x1d, 0x00, 0x95, 0x68, 0xfb, 0xb5, 0x5a, 0x56, 0x9f, 0xf7, 0xb8, 0xd5,
-	0x46, 0xe3, 0xfc, 0xbc, 0x99, 0x35, 0x8a, 0x07, 0xea, 0x43, 0x20, 0x37, 0xd2, 0x9f, 0x73, 0x55,
-	0x7e, 0x86, 0xb4, 0xbc, 0xa7, 0xda, 0x3a, 0x23, 0x27, 0xea, 0xe3, 0x72, 0xb8, 0xba, 0xf3, 0xf1,
-	0x58, 0x39, 0xeb, 0x75, 0x21, 0x9e, 0xe1, 0x44, 0xb1, 0x2f, 0x77, 0xce, 0x2d, 0x5e, 0xe9, 0x5c,
-	0x70, 0xb7, 0xf2, 0xb7, 0x0e, 0x50, 0x7b, 0xbe, 0x0d, 0x05, 0xed, 0xa1, 0x84, 0x16, 0x98, 0x0b,
-	0x1e, 0x91, 0xa3, 0xa5, 0xbe, 0xd7, 0x4e, 0xe7, 0xf2, 0xff, 0x0d, 0x88, 0xa5, 0xfd, 0x08, 0x87,
-	0x0b, 0xe9, 0x6f, 0x06, 0x21, 0x8d, 0xc4, 0x85, 0xe0, 0x34, 0x18, 0xbe, 0x01, 0x7b, 0x41, 0x5b,
-	0xe1, 0xbf, 0xa0, 0x7c, 0x42, 0xf9, 0x9b, 0xf1, 0x1f, 0x23, 0xff, 0xfe, 0x42, 0xc1, 0x0d, 0x7b,
-	0xe1, 0x1b, 0xaa, 0x3f, 0xd6, 0x5c, 0x0f, 0x76, 0x6f, 0xd9, 0x70, 0x11, 0xea, 0xa6, 0x3d, 0xc6,
-	0x5a, 0xb8, 0x49, 0x2d, 0xed, 0x3a, 0xd9, 0x67, 0x6c, 0x52, 0xfe, 0x4d, 0x37, 0x2e, 0xbd, 0x1f,
-	0x7e, 0xd7, 0xcd, 0x4b, 0x84, 0xe1, 0xcf, 0xc0, 0x55, 0xf9, 0x2f, 0x15, 0xdd, 0x78, 0x8c, 0xdd,
-	0x5c, 0x95, 0xbb, 0x29, 0xb9, 0x7b, 0x9f, 0xff, 0x13, 0x00, 0x00, 0xff, 0xff, 0x0c, 0x45, 0xba,
-	0x35, 0x1f, 0x07, 0x00, 0x00,
+var fileDescriptor_foo_e3b8a0f6d36d9093 = []byte{
+	// 625 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0x51, 0x6f, 0x12, 0x41,
+	0x10, 0xee, 0x71, 0x40, 0xcb, 0x9c, 0x6d, 0x71, 0x53, 0x9b, 0x13, 0x13, 0x6d, 0x78, 0x30, 0xd8,
+	0x87, 0x23, 0xa0, 0x89, 0xc6, 0xf8, 0xc2, 0xa5, 0x5c, 0x68, 0x44, 0xda, 0xac, 0xb4, 0x9a, 0xa6,
+	0x09, 0xd9, 0xd3, 0xa5, 0x25, 0x85, 0x9b, 0x66, 0xbb, 0xd0, 0x94, 0x1f, 0xe0, 0x9b, 0x7f, 0xc2,
+	0x47, 0xfd, 0x0d, 0xfe, 0x01, 0x7f, 0x95, 0x99, 0xdd, 0xbb, 0xd0, 0x2a, 0xd1, 0x17, 0x98, 0xf9,
+	0xf6, 0x9b, 0xd9, 0x6f, 0xbe, 0x9b, 0x85, 0x07, 0xd3, 0x58, 0xaa, 0xfa, 0x10, 0xb1, 0x3e, 0x6b,
+	0xd0, 0x5f, 0x70, 0xa9, 0x50, 0x23, 0xf3, 0x08, 0x0e, 0x28, 0x9f, 0x35, 0x2a, 0x8f, 0xcf, 0x10,
+	0xcf, 0xc6, 0xb2, 0x6e, 0x8e, 0xe2, 0xe9, 0xb0, 0xfe, 0x79, 0xaa, 0x84, 0x1e, 0x61, 0x62, 0xc9,
+	0x95, 0x27, 0x7f, 0x9e, 0xeb, 0xd1, 0x44, 0x5e, 0x69, 0x31, 0xb9, 0x4c, 0x09, 0xf6, 0x92, 0x58,
+	0x28, 0xba, 0x24, 0x16, 0xca, 0xc2, 0xd5, 0x9f, 0x0e, 0xb8, 0x11, 0x22, 0x7b, 0x0a, 0x6e, 0x2c,
+	0x94, 0xef, 0xec, 0x38, 0x35, 0xaf, 0xb9, 0x15, 0xdc, 0xba, 0x3a, 0x88, 0x10, 0x83, 0x50, 0x28,
+	0x4e, 0x84, 0xca, 0x57, 0x07, 0xdc, 0x50, 0x28, 0xb6, 0x4b, 0xfc, 0xb9, 0xe1, 0x6f, 0x34, 0xfd,
+	0x65, 0xfc, 0x20, 0x14, 0x73, 0xaa, 0x99, 0x5b, 0xae, 0xf6, 0x73, 0xff, 0xe4, 0x6a, 0xe2, 0xea,
+	0xea, 0x36, 0xb5, 0x9f, 0xb3, 0x4d, 0xf0, 0xc2, 0xd6, 0xc9, 0x60, 0xbf, 0x77, 0xdc, 0xea, 0xee,
+	0xef, 0x95, 0x57, 0x2c, 0xae, 0x2d, 0xde, 0xbf, 0x85, 0x7f, 0x71, 0x20, 0x1f, 0x0a, 0xa5, 0xd8,
+	0x16, 0x14, 0xce, 0xe5, 0x78, 0x8c, 0x46, 0x92, 0xcb, 0x6d, 0xc2, 0x5e, 0x42, 0x29, 0x16, 0x4a,
+	0x0d, 0xc8, 0x0d, 0x23, 0xc0, 0x6b, 0x56, 0x02, 0x6b, 0x55, 0x90, 0x59, 0x15, 0xf4, 0x33, 0xab,
+	0xf8, 0x1a, 0x91, 0x29, 0x65, 0x75, 0x53, 0x38, 0xb0, 0x2d, 0x5d, 0x53, 0xc8, 0xac, 0x72, 0xf2,
+	0x6e, 0xd6, 0x08, 0x3a, 0x74, 0x62, 0x0a, 0x4c, 0x54, 0xfd, 0xe1, 0xc2, 0x6a, 0x2b, 0x41, 0x7d,
+	0x2e, 0x15, 0x2b, 0x83, 0x8b, 0x89, 0x4c, 0x95, 0x50, 0x48, 0x88, 0xbe, 0x46, 0xa3, 0xa0, 0xc4,
+	0x29, 0x64, 0x01, 0xac, 0x0a, 0x4b, 0x4f, 0xdb, 0xdf, 0x35, 0x3d, 0x6d, 0xc5, 0x33, 0x12, 0x63,
+	0x90, 0x1f, 0xe2, 0x54, 0xf9, 0xf9, 0x1d, 0xb7, 0x56, 0xe2, 0x26, 0x66, 0xb5, 0x6c, 0xe6, 0x82,
+	0xb1, 0x96, 0xdd, 0xe9, 0x60, 0x05, 0xa6, 0x3e, 0x3c, 0x03, 0x67, 0xe2, 0x17, 0x77, 0xdc, 0x9a,
+	0xd7, 0x7c, 0xb4, 0xec, 0x9e, 0xe0, 0x5d, 0x3b, 0xd1, 0xea, 0x86, 0x3b, 0x13, 0xb6, 0x0d, 0x85,
+	0x2b, 0x39, 0x93, 0x89, 0xbf, 0x4a, 0xf2, 0x3b, 0x2b, 0xdc, 0xa6, 0x84, 0xcb, 0xd1, 0xd9, 0xb9,
+	0xf6, 0xd7, 0x68, 0x08, 0xc2, 0x4d, 0xca, 0x6a, 0x90, 0x4f, 0x46, 0x89, 0xf4, 0x4b, 0xa6, 0xfb,
+	0xf2, 0x29, 0x0c, 0x83, 0xed, 0x41, 0x39, 0x9d, 0x66, 0x90, 0x6d, 0xaf, 0x0f, 0x66, 0xf6, 0x87,
+	0x7f, 0x7d, 0x93, 0xbd, 0x94, 0xc0, 0x37, 0xd3, 0x92, 0x0c, 0xa8, 0xbc, 0x80, 0xa2, 0x15, 0x4b,
+	0xa6, 0x5e, 0xc8, 0x1b, 0x63, 0x73, 0x89, 0x53, 0x48, 0x4b, 0x30, 0x13, 0xe3, 0xa9, 0xfd, 0xd4,
+	0x2e, 0xb7, 0xc9, 0xeb, 0xdc, 0x2b, 0x27, 0x5c, 0x07, 0x0f, 0x13, 0x89, 0xc3, 0x81, 0xf9, 0xad,
+	0x46, 0x50, 0xec, 0x88, 0xab, 0x0f, 0x6f, 0xfb, 0xec, 0x0d, 0xdc, 0xbb, 0xbe, 0xd0, 0x0b, 0x41,
+	0xce, 0xff, 0x04, 0x79, 0xd7, 0x17, 0x3a, 0x4b, 0xaa, 0x45, 0xda, 0xbe, 0xf9, 0x7c, 0xb7, 0x07,
+	0x05, 0xe3, 0x37, 0xbb, 0x0f, 0xeb, 0x9d, 0x76, 0xb7, 0x7b, 0xb0, 0x58, 0x51, 0xda, 0x59, 0x0b,
+	0x1d, 0xf5, 0xde, 0xb7, 0xfb, 0x65, 0x87, 0x6d, 0x00, 0x58, 0xa0, 0xcf, 0xdb, 0xed, 0x72, 0x6e,
+	0x51, 0x13, 0xb6, 0xba, 0xdd, 0x83, 0x83, 0x5e, 0xd9, 0xdd, 0xdd, 0xb6, 0xaf, 0xcc, 0xac, 0x3b,
+	0x5f, 0xf4, 0x0a, 0x23, 0xd8, 0xfc, 0x84, 0x93, 0xdb, 0x1e, 0x87, 0x6b, 0x11, 0xe2, 0x21, 0xa9,
+	0x3c, 0x74, 0x4e, 0x0a, 0x43, 0xc4, 0x59, 0xe3, 0x5b, 0xce, 0x3d, 0x8a, 0x3e, 0x7e, 0xcf, 0x79,
+	0x47, 0x44, 0xa3, 0x27, 0x76, 0xdc, 0xf8, 0x65, 0xb3, 0xd3, 0x08, 0xf1, 0xf4, 0xb8, 0x11, 0x17,
+	0xcd, 0x5c, 0xcf, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0x4c, 0xde, 0xd3, 0x9d, 0x7b, 0x04, 0x00,
+	0x00,
 }
