@@ -85,6 +85,11 @@ func IsUpperSnakeCase(s string) bool {
 	return true
 }
 
+// ToLowerSnakeCase converts s to lower_snake_case.
+func ToLowerSnakeCase(s string) string {
+	return strings.ToLower(toSnake(s))
+}
+
 // ToUpperSnakeCase converts s to UPPER_SNAKE_CASE.
 func ToUpperSnakeCase(s string) string {
 	return strings.ToUpper(toSnake(s))

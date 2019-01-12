@@ -82,6 +82,17 @@ func TestIsUppercase(t *testing.T) {
 	assert.True(t, IsUppercase("HELLO"))
 }
 
+func TestToLowerSnakeCase(t *testing.T) {
+	assert.Equal(t, "", ToUpperSnakeCase(""))
+	assert.Equal(t, "camel_case", ToLowerSnakeCase("CamelCase"))
+	assert.Equal(t, "camel_case", ToLowerSnakeCase("camelCase"))
+	assert.Equal(t, "camel_case_", ToLowerSnakeCase("CamelCase_"))
+	assert.Equal(t, "_camel_case", ToLowerSnakeCase("_CamelCase"))
+	assert.Equal(t, "camel_case__hello", ToLowerSnakeCase("CamelCase__Hello"))
+	assert.Equal(t, "abbr_camel", ToLowerSnakeCase("ABBRCamel"))
+	assert.Equal(t, "foo_abbr_camel", ToLowerSnakeCase("FooABBRCamel"))
+}
+
 func TestToUpperSnakeCase(t *testing.T) {
 	assert.Equal(t, "", ToUpperSnakeCase(""))
 	assert.Equal(t, "CAMEL_CASE", ToUpperSnakeCase("CamelCase"))
