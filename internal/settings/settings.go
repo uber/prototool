@@ -288,7 +288,10 @@ type ExternalConfig struct {
 			Add       []string `json:"add" yaml:"add"`
 			Remove    []string `json:"remove" yaml:"remove"`
 		}
-		FileHeaderPath string `json:"file_header_path,omitempty" yaml:"file_header_path,omitempty"`
+		FileHeader struct {
+			Path        string `json:"path,omitempty" yaml:"path,omitempty"`
+			IsCommented bool   `json:"is_commented,omitempty" yaml:"is_commented,omitempty"`
+		} `json:"file_header,omitempty" yaml:"file_header,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
 	Gen struct {
 		GoOptions struct {

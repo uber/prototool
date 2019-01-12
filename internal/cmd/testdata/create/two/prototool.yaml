@@ -3,4 +3,5 @@ create:
     - directory: .
       name: foo
 lint:
-  file_header_path: protobuf_file_header.txt
+  file_header:
+    path: protobuf_file_header.txt

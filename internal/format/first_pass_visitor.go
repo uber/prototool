@@ -52,8 +52,8 @@ type firstPassVisitor struct {
 	phpNamespaceOption       *proto.Option
 }
 
-func newFirstPassVisitor(filename string, fix int) *firstPassVisitor {
-	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix}
+func newFirstPassVisitor(filename string, fix int, fileHeader string) *firstPassVisitor {
+	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix, fileHeader: fileHeader}
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {

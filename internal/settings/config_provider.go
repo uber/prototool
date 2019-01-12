@@ -287,15 +287,21 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 	}
 
 	var fileHeader string
-	if e.Lint.FileHeaderPath != "" {
-		if filepath.IsAbs(e.Lint.FileHeaderPath) {
-			return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeaderPath)
+	if e.Lint.FileHeader.Path != "" {
+		if filepath.IsAbs(e.Lint.FileHeader.Path) {
+			return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeader.Path)
 		}
-		fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeaderPath))
+		fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeader.Path))
 		if err != nil {
 			return Config{}, err
 		}
-		fileHeader = cleanFileHeaderData(fileHeaderData)
+		fileHeaderLines := getFileHeaderLines(fileHeaderData)
+		if !e.Lint.FileHeader.IsCommented {
+			for i, fileHeaderLine := range fileHeaderLines {
+				fileHeaderLines[i] = "// " + fileHeaderLine
+			}
+		}
+		fileHeader = strings.Join(fileHeaderLines, "\n")
 	}
 
 	config := Config{
@@ -393,13 +399,10 @@ func jsonUnmarshalStrict(data []byte, v interface{}) error {
 	return decoder.Decode(v)
 }
 
-func cleanFileHeaderData(data []byte) string {
+func getFileHeaderLines(data []byte) []string {
 	var lines []string
-	for _, line := range strings.Split(string(data), "\n") {
-		line = strings.TrimSpace(line)
-		if line != "" {
-			lines = append(lines, line)
-		}
+	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
+		lines = append(lines, strings.TrimSpace(line))
 	}
-	return strings.Join(lines, "\n")
+	return lines
 }

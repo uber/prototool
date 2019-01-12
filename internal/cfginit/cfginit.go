@@ -107,7 +107,13 @@ protoc:
   # will place this header before the syntax declaration. Note that
   # format --fix will delete anything before the syntax declaration
   # if this is set.
-{{.V}}  file_header_path: path/to/protobuf_file_header.txt
+  #
+  # If is_commented is set, this file is assumed to already have comments
+  # and will be added directly. If is_commented is not set, "// " will be
+  # added before every line.
+{{.V}}  file_header:
+{{.V}}    path: path/to/protobuf_file_header.txt
+{{.V}}    is_commented: true
 
 # Code generation directives.
 {{.V}}generate:
