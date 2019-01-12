@@ -102,7 +102,7 @@ protoc:
 {{.V}}      - ENUM_NAMES_CAMEL_CASE
 
   # The path to the file header for all Protobuf files.
-  # If this is set and the LICENSE_HEADER linter is turned on, files will
+  # If this is set and the FILE_HEADER linter is turned on, files will
   # be checked to begin with the contents of this file, and format --fix
   # will place this header before the syntax declaration. Note that
   # format --fix will delete anything before the syntax declaration

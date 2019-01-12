@@ -57,6 +57,10 @@ func newFirstPassVisitor(filename string, fix int, fileHeader string) *firstPass
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {
+	if v.fix != FixNone && v.fileHeader != "" {
+		v.P(v.fileHeader)
+		v.P()
+	}
 	if v.Syntax != nil {
 		v.PComment(v.Syntax.Comment)
 		if v.Syntax.Comment != nil {
@@ -238,8 +242,10 @@ func (v *firstPassVisitor) VisitComment(element *proto.Comment) {
 	// We only print file-level comments before syntax, package, file-level options,
 	// or package if they are at the top of the file
 	if !v.haveHitNonComment {
-		v.PComment(element)
-		v.P()
+		if v.fix == FixNone || v.fileHeader == "" {
+			v.PComment(element)
+			v.P()
+		}
 	}
 }
 

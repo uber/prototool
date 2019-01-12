@@ -193,7 +193,7 @@ type LintConfig struct {
 	IgnoreIDToFilePaths map[string][]string
 	// FileHeader is contents of the file that contains the header for all
 	// Protobuf files, typically a license header. If this is set and the
-	// LICENSE_HEADER linter is turned on, files will be checked to begin
+	// FILE_HEADER linter is turned on, files will be checked to begin
 	// with the contents of this file, and format --fix will place this
 	// header before the syntax declaration. Note that format --fix will delete
 	// anything before the syntax declaration if this is set.
