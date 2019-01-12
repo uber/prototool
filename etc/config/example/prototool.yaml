@@ -71,6 +71,14 @@ lint:
     remove:
       - ENUM_NAMES_CAMEL_CASE
 
+  # The path to the file header for all Protobuf files.
+  # If this is set and the LICENSE_HEADER linter is turned on, files will
+  # be checked to begin with the contents of this file, and format --fix
+  # will place this header before the syntax declaration. Note that
+  # format --fix will delete anything before the syntax declaration
+  # if this is set.
+  file_header_path: path/to/protobuf_file_header.txt
+
 # Code generation directives.
 generate:
   # Options that will apply to all plugins of type go and gogo.
