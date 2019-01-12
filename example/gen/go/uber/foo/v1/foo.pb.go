@@ -48,7 +48,7 @@ func (x Hello) String() string {
 	return proto.EnumName(Hello_name, int32(x))
 }
 func (Hello) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0}
 }
 
 // Bar is a bar.
@@ -69,7 +69,7 @@ func (x Bar) String() string {
 	return proto.EnumName(Bar_name, int32(x))
 }
 func (Bar) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{1}
+	return fileDescriptor_foo_18696cee75944a2c, []int{1}
 }
 
 // Baz is a baz.
@@ -90,7 +90,7 @@ func (x Foo_Bar_Baz) String() string {
 	return proto.EnumName(Foo_Bar_Baz_name, int32(x))
 }
 func (Foo_Bar_Baz) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0, 0, 0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0, 0, 0}
 }
 
 // Bat is a bat.
@@ -111,7 +111,7 @@ func (x Foo_Bar_Bat) String() string {
 	return proto.EnumName(Foo_Bar_Bat_name, int32(x))
 }
 func (Foo_Bar_Bat) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0, 0, 1}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0, 0, 1}
 }
 
 // Foo is a foo.
@@ -126,7 +126,7 @@ func (m *Foo) Reset()         { *m = Foo{} }
 func (m *Foo) String() string { return proto.CompactTextString(m) }
 func (*Foo) ProtoMessage()    {}
 func (*Foo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0}
 }
 func (m *Foo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo.Unmarshal(m, b)
@@ -166,7 +166,7 @@ func (m *Foo_Bar) Reset()         { *m = Foo_Bar{} }
 func (m *Foo_Bar) String() string { return proto.CompactTextString(m) }
 func (*Foo_Bar) ProtoMessage()    {}
 func (*Foo_Bar) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{0, 0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0, 0}
 }
 func (m *Foo_Bar) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo_Bar.Unmarshal(m, b)
@@ -214,7 +214,7 @@ func (m *Barr) Reset()         { *m = Barr{} }
 func (m *Barr) String() string { return proto.CompactTextString(m) }
 func (*Barr) ProtoMessage()    {}
 func (*Barr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{1}
+	return fileDescriptor_foo_18696cee75944a2c, []int{1}
 }
 func (m *Barr) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Barr.Unmarshal(m, b)
@@ -278,7 +278,7 @@ func (m *Another) Reset()         { *m = Another{} }
 func (m *Another) String() string { return proto.CompactTextString(m) }
 func (*Another) ProtoMessage()    {}
 func (*Another) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{2}
+	return fileDescriptor_foo_18696cee75944a2c, []int{2}
 }
 func (m *Another) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Another.Unmarshal(m, b)
@@ -468,7 +468,7 @@ func (m *HasWKT) Reset()         { *m = HasWKT{} }
 func (m *HasWKT) String() string { return proto.CompactTextString(m) }
 func (*HasWKT) ProtoMessage()    {}
 func (*HasWKT) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{3}
+	return fileDescriptor_foo_18696cee75944a2c, []int{3}
 }
 func (m *HasWKT) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasWKT.Unmarshal(m, b)
@@ -506,7 +506,7 @@ func (m *Bazz) Reset()         { *m = Bazz{} }
 func (m *Bazz) String() string { return proto.CompactTextString(m) }
 func (*Bazz) ProtoMessage()    {}
 func (*Bazz) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_e3b8a0f6d36d9093, []int{4}
+	return fileDescriptor_foo_18696cee75944a2c, []int{4}
 }
 func (m *Bazz) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Bazz.Unmarshal(m, b)
@@ -540,9 +540,9 @@ func init() {
 	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Bat", Foo_Bar_Bat_name, Foo_Bar_Bat_value)
 }
 
-func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_foo_e3b8a0f6d36d9093) }
+func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_foo_18696cee75944a2c) }
 
-var fileDescriptor_foo_e3b8a0f6d36d9093 = []byte{
+var fileDescriptor_foo_18696cee75944a2c = []byte{
 	// 625 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0x51, 0x6f, 0x12, 0x41,
 	0x10, 0xee, 0x71, 0x40, 0xcb, 0x9c, 0x6d, 0x71, 0x53, 0x9b, 0x13, 0x13, 0x6d, 0x78, 0x30, 0xd8,

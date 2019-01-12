@@ -388,14 +388,14 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fixFlag bo
 	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
-	return r.format(overwrite, diffMode, lintMode, getFormatFixValue(fixFlag, meta), meta)
+	return r.format(overwrite, diffMode, lintMode, getFormatFixValue(fixFlag, meta), getFormatFileHeaderValue(fixFlag, meta), meta)
 }
 
-func (r *runner) format(overwrite, diffMode, lintMode bool, fix int, meta *meta) error {
+func (r *runner) format(overwrite, diffMode, lintMode bool, fix int, fileHeader string, meta *meta) error {
 	success := true
 	for _, protoFiles := range meta.ProtoSet.DirPathToFiles {
 		for _, protoFile := range protoFiles {
-			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, fix, meta, protoFile)
+			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, fix, fileHeader, meta, protoFile)
 			if err != nil {
 				return err
 			}
@@ -413,7 +413,7 @@ func (r *runner) format(overwrite, diffMode, lintMode bool, fix int, meta *meta)
 // return true if there was no unexpected diff and we should exit with 0
 // return false if we should exit with non-zero
 // if false and nil error, we will return an ExitError outside of this function
-func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix int, meta *meta, protoFile *file.ProtoFile) (bool, error) {
+func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix int, fileHeader string, meta *meta, protoFile *file.ProtoFile) (bool, error) {
 	absSingleFilename, err := file.AbsClean(meta.SingleFilename)
 	if err != nil {
 		return false, err
@@ -426,7 +426,7 @@ func (r *runner) formatFile(overwrite bool, diffMode bool, lintMode bool, fix in
 	if err != nil {
 		return false, err
 	}
-	data, failures, err := r.newTransformer(fix).Transform(protoFile.Path, input)
+	data, failures, err := r.newTransformer(fix, fileHeader).Transform(protoFile.Path, input)
 	if err != nil {
 		return false, err
 	}
@@ -479,7 +479,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, fixFlag bool) er
 		return err
 	}
 	if !disableFormat {
-		if err := r.format(true, false, false, getFormatFixValue(fixFlag, meta), meta); err != nil {
+		if err := r.format(true, false, false, getFormatFixValue(fixFlag, meta), getFormatFileHeaderValue(fixFlag, meta), meta); err != nil {
 			return err
 		}
 	}
@@ -804,10 +804,13 @@ func (r *runner) newLintRunner() lint.Runner {
 	)
 }
 
-func (r *runner) newTransformer(fix int) format.Transformer {
+func (r *runner) newTransformer(fix int, fileHeader string) format.Transformer {
 	transformerOptions := []format.TransformerOption{format.TransformerWithLogger(r.logger)}
 	if fix != format.FixNone {
 		transformerOptions = append(transformerOptions, format.TransformerWithFix(fix))
+	}
+	if fileHeader != "" {
+		transformerOptions = append(transformerOptions, format.TransformerWithFileHeader(fileHeader))
 	}
 	return format.NewTransformer(transformerOptions...)
 }
@@ -1016,6 +1019,13 @@ func getFormatFixValue(fixFlag bool, meta *meta) int {
 		return format.FixV2
 	}
 	return format.FixV1
+}
+
+func getFormatFileHeaderValue(fixFlag bool, meta *meta) string {
+	if !fixFlag {
+		return ""
+	}
+	return meta.ProtoSet.Config.Lint.FileHeader
 }
 
 func extractSortPackageNames(m map[string]*extract.Package) []string {

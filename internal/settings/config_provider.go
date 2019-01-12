@@ -298,7 +298,11 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		fileHeaderLines := getFileHeaderLines(fileHeaderData)
 		if !e.Lint.FileHeader.IsCommented {
 			for i, fileHeaderLine := range fileHeaderLines {
-				fileHeaderLines[i] = "// " + fileHeaderLine
+				if fileHeaderLine == "" {
+					fileHeaderLines[i] = "//"
+				} else {
+					fileHeaderLines[i] = "// " + fileHeaderLine
+				}
 			}
 		}
 		fileHeader = strings.Join(fileHeaderLines, "\n")
