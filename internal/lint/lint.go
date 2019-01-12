@@ -240,15 +240,16 @@ var (
 		"uber":   UberLinters,
 		"uber2":  Uber2Linters,
 	}
+
+	allLintIDs = make(map[string]struct{})
 )
 
 func init() {
-	ids := make(map[string]struct{})
 	for _, linter := range AllLinters {
-		if _, ok := ids[linter.ID()]; ok {
+		if _, ok := allLintIDs[linter.ID()]; ok {
 			panic(fmt.Sprintf("duplicate linter id %s", linter.ID()))
 		}
-		ids[linter.ID()] = struct{}{}
+		allLintIDs[linter.ID()] = struct{}{}
 	}
 }
 
@@ -341,6 +342,9 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 	if len(config.IncludeIDs) > 0 {
 		for _, l := range AllLinters {
 			for _, id := range config.IncludeIDs {
+				if err := checkLintID(id); err != nil {
+					return nil, err
+				}
 				if l.ID() == id {
 					linterMap[id] = l
 				}
@@ -348,7 +352,15 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 		}
 	}
 	for _, excludeID := range config.ExcludeIDs {
+		if err := checkLintID(excludeID); err != nil {
+			return nil, err
+		}
 		delete(linterMap, excludeID)
+	}
+	for ignoreID := range config.IgnoreIDToFilePaths {
+		if err := checkLintID(ignoreID); err != nil {
+			return nil, err
+		}
 	}
 
 	result := make([]Linter, 0, len(linterMap))
@@ -454,6 +466,13 @@ func shouldIgnore(linter Linter, descriptor *FileDescriptor, ignoreIDToFilePaths
 		}
 	}
 	return false, nil
+}
+
+func checkLintID(lintID string) error {
+	if _, ok := allLintIDs[lintID]; !ok {
+		return fmt.Errorf("unknown lint id in configuration file: %s", lintID)
+	}
+	return nil
 }
 
 func isSuppressed(comment *proto.Comment, annotation string) bool {
