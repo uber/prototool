@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "HelloApiProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";
+
+import "google/api/api.proto";
+
+service HelloAPI {
+  rpc SendFoo(SendFooRequest) returns (SendFooResponse) {
+    option (google.api.http) = {
+      get: "test"
+    };
+  }
+  rpc SendBar(SendBarRequest) returns (SendBarResponse) {
+    option (google.api.http).get = "test";
+  }
+  rpc SendBaz(SendBazRequest) returns (SendBazResponse) {
+    option (.google.api.http) = {
+      get: "test"
+    };
+  }
+  rpc SendBat(SendBatRequest) returns (SendBatResponse) {
+    option (.google.api.http).get = "test";
+  }
+  // @suppresswarnings google-api-http
+  rpc SendTwoFoo(SendTwoFooRequest) returns (SendTwoFooResponse) {
+    option (google.api.http) = {
+      get: "test"
+    };
+  }
+  // @suppresswarnings google-api-http
+  rpc SendTwoBar(SendTwoBarRequest) returns (SendTwoBarResponse) {
+    option (google.api.http).get = "test";
+  }
+  // @suppresswarnings google-api-http
+  rpc SendTwoBaz(SendTwoBazRequest) returns (SendTwoBazResponse) {
+    option (.google.api.http) = {
+      get: "test"
+    };
+  }
+  // @suppresswarnings google-api-http
+  rpc SendTwoBat(SendTwoBatRequest) returns (SendTwoBatResponse) {
+    option (.google.api.http).get = "test";
+  }
+}
+
+message SendFooRequest {}
+
+message SendFooResponse {}
+
+message SendBarRequest {}
+
+message SendBarResponse {}
+
+message SendBazRequest {}
+
+message SendBazResponse {}
+
+message SendBatRequest {}
+
+message SendBatResponse {}
+
+message SendTwoFooRequest {}
+
+message SendTwoFooResponse {}
+
+message SendTwoBarRequest {}
+
+message SendTwoBarResponse {}
+
+message SendTwoBazRequest {}
+
+message SendTwoBazResponse {}
+
+message SendTwoBatRequest {}
+
+message SendTwoBatResponse {}

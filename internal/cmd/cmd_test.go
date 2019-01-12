@@ -459,6 +459,16 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`17:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
+		22:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
+		25:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
+		30:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP`,
+		"testdata/lint/nogoogleapihttp/foo/v1/hello_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`10:1:GOGO_NOT_IMPORTED`,
 		"testdata/lint/gogonotimported/gogonotimported.proto",
 	)

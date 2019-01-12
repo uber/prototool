@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package google.api;
+
+option csharp_namespace = "Google.Api";
+option go_package = "apipb";
+option java_multiple_files = true;
+option java_outer_classname = "ApiProto";
+option java_package = "com.google.api";
+option objc_class_prefix = "GAX";
+option php_namespace = "Google\\Api";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MethodOptions {
+  Http http = 50001;
+}
+
+message Http {
+  string get = 1;
+}

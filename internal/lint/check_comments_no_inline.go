@@ -21,8 +21,6 @@
 package lint
 
 import (
-	"text/scanner"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
@@ -54,30 +52,30 @@ func (v commentsNoInlineVisitor) VisitService(element *proto.Service) {
 }
 
 func (v commentsNoInlineVisitor) VisitSyntax(element *proto.Syntax) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("syntax", element.InlineComment)
 }
 
 func (v commentsNoInlineVisitor) VisitPackage(element *proto.Package) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("packages", element.InlineComment)
 }
 
 func (v commentsNoInlineVisitor) VisitOption(element *proto.Option) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("options", element.InlineComment)
 }
 
 func (v commentsNoInlineVisitor) VisitImport(element *proto.Import) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("imports", element.InlineComment)
 }
 
 func (v commentsNoInlineVisitor) VisitNormalField(element *proto.NormalField) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("fields", element.InlineComment)
 	for _, child := range element.Options {
 		child.Accept(v)
 	}
 }
 
 func (v commentsNoInlineVisitor) VisitEnumField(element *proto.EnumField) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("enum values", element.InlineComment)
 	if element.ValueOption != nil {
 		element.ValueOption.Accept(v)
 	}
@@ -89,55 +87,49 @@ func (v commentsNoInlineVisitor) VisitEnum(element *proto.Enum) {
 	}
 }
 
-func (v commentsNoInlineVisitor) VisitComment(element *proto.Comment) {
-	v.checkInlineComment(element.Position, element)
-}
-
 func (v commentsNoInlineVisitor) VisitOneof(element *proto.Oneof) {
-	v.checkInlineComment(element.Position, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }
 
 func (v commentsNoInlineVisitor) VisitOneofField(element *proto.OneOfField) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("oneofs", element.InlineComment)
 	for _, child := range element.Options {
 		child.Accept(v)
 	}
 }
 
 func (v commentsNoInlineVisitor) VisitReserved(element *proto.Reserved) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("reserved", element.InlineComment)
 }
 
 func (v commentsNoInlineVisitor) VisitRPC(element *proto.RPC) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("RPCs", element.InlineComment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }
 
 func (v commentsNoInlineVisitor) VisitMapField(element *proto.MapField) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("fields", element.InlineComment)
 	for _, child := range element.Options {
 		child.Accept(v)
 	}
 }
 
 func (v commentsNoInlineVisitor) VisitGroup(element *proto.Group) {
-	v.checkInlineComment(element.Position, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }
 
 func (v commentsNoInlineVisitor) VisitExtensions(element *proto.Extensions) {
-	v.checkInlineComment(element.Position, element.InlineComment)
+	v.checkInlineComment("extensions", element.InlineComment)
 }
 
-func (v commentsNoInlineVisitor) checkInlineComment(position scanner.Position, inlineComment *proto.Comment) {
+func (v commentsNoInlineVisitor) checkInlineComment(t string, inlineComment *proto.Comment) {
 	if inlineComment != nil {
-		v.AddFailuref(inlineComment.Position, "Inline comments are not allowed, only comment above the type.")
+		v.AddFailuref(inlineComment.Position, "Inline comments are not allowed on %s, only comment above the type.", t)
 	}
 }

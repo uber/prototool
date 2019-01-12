@@ -1,0 +1,6 @@
+lint:
+  group: uber2
+  ignores:
+    - id: PACKAGE_MAJOR_BETA_VERSIONED
+      files:
+        - google/api/api.proto
