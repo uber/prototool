@@ -32,7 +32,7 @@ import (
 
 	"github.com/uber/prototool/internal/strs"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type configProvider struct {
@@ -286,6 +286,18 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		createDirPathToBasePackage = nil
 	}
 
+	var fileHeader string
+	if e.Lint.FileHeaderPath != "" {
+		if filepath.IsAbs(e.Lint.FileHeaderPath) {
+			return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeaderPath)
+		}
+		fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeaderPath))
+		if err != nil {
+			return Config{}, err
+		}
+		fileHeader = cleanFileHeaderData(fileHeaderData)
+	}
+
 	config := Config{
 		DirPath:         dirPath,
 		ExcludePrefixes: excludePrefixes,
@@ -304,6 +316,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
+			FileHeader:          fileHeader,
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
@@ -378,4 +391,15 @@ func jsonUnmarshalStrict(data []byte, v interface{}) error {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(v)
+}
+
+func cleanFileHeaderData(data []byte) string {
+	var lines []string
+	for _, line := range strings.Split(string(data), "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" {
+			lines = append(lines, line)
+		}
+	}
+	return strings.Join(lines, "\n")
 }
