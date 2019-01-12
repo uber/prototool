@@ -84,18 +84,18 @@ func (v *requestResponseTypesAfterServiceVisitor) Finally() error {
 		requestMessage, requestOK := v.messageNameToMessage[rpc.RequestType]
 		if requestOK {
 			if rpc.Position.Line > requestMessage.Position.Line {
-				v.AddFailuref(requestMessage.Position, `Message %q is a request for RPC %q and should be defined in the file after the RPC`, requestMessage.Name, rpc.Name)
+				v.AddFailuref(requestMessage.Position, `Message %q is a request for RPC %q and should be defined in the file after the RPC.`, requestMessage.Name, rpc.Name)
 			}
 		}
 		responseMessage, responseOK := v.messageNameToMessage[rpc.ResponseType]
 		if responseOK {
 			if rpc.Position.Line > responseMessage.Position.Line {
-				v.AddFailuref(responseMessage.Position, `Message %q is a response for RPC %q and should be defined in the file after the RPC`, responseMessage.Name, rpc.Name)
+				v.AddFailuref(responseMessage.Position, `Message %q is a response for RPC %q and should be defined in the file after the RPC.`, responseMessage.Name, rpc.Name)
 			}
 		}
 		if requestOK && responseOK {
 			if requestMessage.Position.Line > responseMessage.Position.Line {
-				v.AddFailuref(responseMessage.Position, `Message %q is a response for RPC %q and should be defined in the file after the request %q`, responseMessage.Name, rpc.Name, requestMessage.Name)
+				v.AddFailuref(responseMessage.Position, `Message %q is a response for RPC %q and should be defined in the file after the request %q.`, responseMessage.Name, rpc.Name, requestMessage.Name)
 			}
 		}
 	}

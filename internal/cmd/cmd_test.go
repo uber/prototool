@@ -410,6 +410,28 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`13:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
+		"testdata/lint/afterservice/foo/v1/hello_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`13:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE
+		15:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
+		"testdata/lint/afterservice/foo/v1/hello2api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`17:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
+		"testdata/lint/afterservice/foo/v1/hello3api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`10:1:GOGO_NOT_IMPORTED`,
 		"testdata/lint/gogonotimported/gogonotimported.proto",
 	)

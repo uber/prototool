@@ -5,16 +5,15 @@ package foo.v1;
 option csharp_namespace = "Foo.V1";
 option go_package = "foov1";
 option java_multiple_files = true;
-option java_outer_classname = "HelloApiProto";
+option java_outer_classname = "Hello3apiProto";
 option java_package = "com.foo.v1";
 option objc_class_prefix = "FXX";
 option php_namespace = "Foo\\V1";
 
-message SendFooRequest {}
-
-service HelloAPI {
-  rpc SendFoo(SendFooRequest) returns (SendFooResponse);
+service Hello3API {
+  rpc SendFoo3(SendFoo3Request) returns (SendFoo3Response);
 }
 
-message SendFooResponse {}
+message SendFoo3Response {}
 
+message SendFoo3Request {}
