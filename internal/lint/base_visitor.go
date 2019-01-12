@@ -31,7 +31,7 @@ var _ proto.Visitor = baseVisitor{}
 
 type baseVisitor struct{}
 
-func (baseVisitor) OnStart(*proto.Proto) error { return nil }
+func (baseVisitor) OnStart(*FileDescriptor) error { return nil }
 func (baseVisitor) Finally() error             { return nil }
 
 func (baseVisitor) VisitMessage(m *proto.Message)         {}
@@ -72,12 +72,12 @@ type extendedVisitor interface {
 	proto.Visitor
 
 	// OnStart is called when visiting is started.
-	OnStart(*proto.Proto) error
+	OnStart(*FileDescriptor) error
 	// Finally is called when visiting is done.
 	Finally() error
 }
 
-func runVisitor(visitor extendedVisitor, descriptors []*proto.Proto) error {
+func runVisitor(visitor extendedVisitor, descriptors []*FileDescriptor) error {
 	for _, descriptor := range descriptors {
 		if err := visitor.OnStart(descriptor); err != nil {
 			return err

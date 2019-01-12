@@ -34,7 +34,7 @@ var messagesHaveCommentsExceptRequestResponseTypesLinter = NewLinter(
 	checkMessagesHaveCommentsExceptRequestResponseTypes,
 )
 
-func checkMessagesHaveCommentsExceptRequestResponseTypes(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessagesHaveCommentsExceptRequestResponseTypes(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&messagesHaveCommentsExceptRequestResponseTypesVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -45,7 +45,7 @@ type messagesHaveCommentsExceptRequestResponseTypesVisitor struct {
 	nestedMessageNames   []string
 }
 
-func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) OnStart(*proto.Proto) error {
+func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) OnStart(*FileDescriptor) error {
 	v.messageNameToMessage = nil
 	v.requestResponseTypes = nil
 	v.nestedMessageNames = nil

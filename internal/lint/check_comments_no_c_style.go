@@ -33,7 +33,7 @@ var commentsNoCStyleLinter = NewLinter(
 	checkCommentsNoCStyle,
 )
 
-func checkCommentsNoCStyle(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkCommentsNoCStyle(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&commentsNoCStyleVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

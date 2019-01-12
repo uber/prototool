@@ -32,7 +32,7 @@ var rpcNamesCapitalizedLinter = NewLinter(
 	checkRPCNamesCapitalized,
 )
 
-func checkRPCNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRPCNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(rpcNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

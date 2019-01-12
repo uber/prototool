@@ -31,7 +31,7 @@ var commentsNoInlineLinter = NewLinter(
 	checkCommentsNoInline,
 )
 
-func checkCommentsNoInline(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkCommentsNoInline(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&commentsNoInlineVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

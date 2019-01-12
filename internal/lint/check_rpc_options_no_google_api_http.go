@@ -36,7 +36,7 @@ var rpcOptionsNoGoogleAPIHTTPLinter = NewLinter(
 	checkRPCOptionsNoGoogleAPIHTTP,
 )
 
-func checkRPCOptionsNoGoogleAPIHTTP(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRPCOptionsNoGoogleAPIHTTP(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&rpcOptionsNoGoogleAPIHTTPVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -45,7 +45,7 @@ type rpcOptionsNoGoogleAPIHTTPVisitor struct {
 	rpc *proto.RPC
 }
 
-func (v *rpcOptionsNoGoogleAPIHTTPVisitor) OnStart(*proto.Proto) error {
+func (v *rpcOptionsNoGoogleAPIHTTPVisitor) OnStart(*FileDescriptor) error {
 	v.rpc = nil
 	return nil
 }

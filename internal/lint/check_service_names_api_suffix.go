@@ -33,7 +33,7 @@ var serviceNamesAPISuffixLinter = NewLinter(
 	checkServiceNamesAPISuffix,
 )
 
-func checkServiceNamesAPISuffix(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkServiceNamesAPISuffix(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(serviceNamesAPISuffixVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

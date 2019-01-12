@@ -65,8 +65,8 @@ var fileOptionsPHPNamespaceSameInDirLinter = NewLinter(
 	newCheckFileOptionsSameInDir("php_namespace"),
 )
 
-func newCheckFileOptionsSameInDir(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func newCheckFileOptionsSameInDir(fileOption string) func(func(*text.Failure), string, []*FileDescriptor) error {
+	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		visitor := &fileOptionsSameInDirVisitor{
 			baseAddVisitor:   newBaseAddVisitor(add),
 			fileOption:       fileOption,
@@ -105,7 +105,7 @@ type fileOptionsSameInDirVisitor struct {
 	option *proto.Option
 }
 
-func (v *fileOptionsSameInDirVisitor) OnStart(*proto.Proto) error {
+func (v *fileOptionsSameInDirVisitor) OnStart(*FileDescriptor) error {
 	v.option = nil
 	return nil
 }

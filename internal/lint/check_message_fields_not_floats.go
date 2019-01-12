@@ -35,7 +35,7 @@ var messageFieldsNotFloatsLinter = NewLinter(
 	checkMessageFieldsNotFloats,
 )
 
-func checkMessageFieldsNotFloats(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessageFieldsNotFloats(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(messageFieldsNotFloatsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

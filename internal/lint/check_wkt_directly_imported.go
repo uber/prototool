@@ -39,7 +39,7 @@ var (
 	)
 )
 
-func checkWKTDirectlyImported(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkWKTDirectlyImported(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&wktDirectlyImportedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

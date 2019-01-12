@@ -34,7 +34,7 @@ var messagesHaveCommentsLinter = NewLinter(
 	checkMessagesHaveComments,
 )
 
-func checkMessagesHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessagesHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(messagesHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

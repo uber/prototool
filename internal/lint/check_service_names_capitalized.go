@@ -32,7 +32,7 @@ var serviceNamesCapitalizedLinter = NewLinter(
 	checkServiceNamesCapitalized,
 )
 
-func checkServiceNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkServiceNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(serviceNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

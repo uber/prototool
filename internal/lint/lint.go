@@ -22,6 +22,7 @@ package lint
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -269,6 +270,13 @@ func NewRunner(options ...RunnerOption) Runner {
 	return newRunner(options...)
 }
 
+// FileDescriptor is a wrapper for proto.Proto.
+type FileDescriptor struct {
+	*proto.Proto
+
+	FileData string
+}
+
 // The below should not be needed in the CLI
 // TODO make private
 
@@ -283,7 +291,7 @@ type Linter interface {
 	// slice and does not return an error. An error is returned if something
 	// unexpected happens. Callers should verify the files are compilable
 	// before running this.
-	Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error)
+	Check(dirPath string, descriptors []*FileDescriptor) ([]*text.Failure, error)
 }
 
 // NewLinter is a convenience function that returns a new Linter for the
@@ -292,7 +300,7 @@ type Linter interface {
 // The ID will be upper-cased.
 //
 // Failures returned from check do not need to set the ID, this will be overwritten.
-func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*proto.Proto) error) Linter {
+func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*FileDescriptor) error) Linter {
 	return newBaseLinter(id, purpose, addCheck)
 }
 
@@ -347,10 +355,10 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 
 // GetDirPathToDescriptors is a convenience function that gets the
 // descriptors for the given ProtoSet.
-func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto, error) {
-	dirPathToDescriptors := make(map[string][]*proto.Proto, len(protoSet.DirPathToFiles))
+func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*FileDescriptor, error) {
+	dirPathToDescriptors := make(map[string][]*FileDescriptor, len(protoSet.DirPathToFiles))
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
-		descriptors := make([]*proto.Proto, len(protoFiles))
+		descriptors := make([]*FileDescriptor, len(protoFiles))
 		for i, protoFile := range protoFiles {
 			file, err := os.Open(protoFile.Path)
 			if err != nil {
@@ -359,11 +367,24 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto
 			parser := proto.NewParser(file)
 			parser.Filename(protoFile.DisplayPath)
 			descriptor, err := parser.Parse()
-			_ = file.Close()
 			if err != nil {
+				_ = file.Close()
 				return nil, err
 			}
-			descriptors[i] = descriptor
+			if _, err := file.Seek(0, 0); err != nil {
+				_ = file.Close()
+				return nil, err
+			}
+			fileData, err := ioutil.ReadAll(file)
+			if err != nil {
+				_ = file.Close()
+				return nil, err
+			}
+			_ = file.Close()
+			descriptors[i] = &FileDescriptor{
+				Proto:    descriptor,
+				FileData: string(fileData),
+			}
 		}
 		dirPathToDescriptors[dirPath] = descriptors
 	}
@@ -371,7 +392,7 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto
 }
 
 // CheckMultiple is a convenience function that checks multiple linters and multiple descriptors.
-func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
+func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
 	var allFailures []*text.Failure
 	for dirPath, descriptors := range dirPathToDescriptors {
 		for _, linter := range linters {
@@ -386,7 +407,7 @@ func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*proto.Pr
 	return allFailures, nil
 }
 
-func checkOne(linter Linter, dirPath string, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
+func checkOne(linter Linter, dirPath string, descriptors []*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
 	filteredDescriptors, err := filterIgnores(linter, descriptors, ignoreIDToFilePaths)
 	if err != nil {
 		return nil, err
@@ -394,8 +415,8 @@ func checkOne(linter Linter, dirPath string, descriptors []*proto.Proto, ignoreI
 	return linter.Check(dirPath, filteredDescriptors)
 }
 
-func filterIgnores(linter Linter, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*proto.Proto, error) {
-	var filteredDescriptors []*proto.Proto
+func filterIgnores(linter Linter, descriptors []*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*FileDescriptor, error) {
+	var filteredDescriptors []*FileDescriptor
 	for _, descriptor := range descriptors {
 		ignore, err := shouldIgnore(linter, descriptor, ignoreIDToFilePaths)
 		if err != nil {
@@ -408,7 +429,7 @@ func filterIgnores(linter Linter, descriptors []*proto.Proto, ignoreIDToFilePath
 	return filteredDescriptors, nil
 }
 
-func shouldIgnore(linter Linter, descriptor *proto.Proto, ignoreIDToFilePaths map[string][]string) (bool, error) {
+func shouldIgnore(linter Linter, descriptor *FileDescriptor, ignoreIDToFilePaths map[string][]string) (bool, error) {
 	filePath := descriptor.Filename
 	var err error
 	if !filepath.IsAbs(filePath) {

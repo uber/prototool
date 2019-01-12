@@ -55,7 +55,7 @@ func init() {
 
 }
 
-func checkPackageNoKeywords(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackageNoKeywords(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(packageNoKeywordsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

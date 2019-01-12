@@ -34,7 +34,7 @@ var servicesHaveCommentsLinter = NewLinter(
 	checkServicesHaveComments,
 )
 
-func checkServicesHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkServicesHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(servicesHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

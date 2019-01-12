@@ -33,7 +33,7 @@ var fileOptionsGoPackageNotLongFormLinter = NewLinter(
 	checkFileOptionsGoPackageNotLongForm,
 )
 
-func checkFileOptionsGoPackageNotLongForm(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkFileOptionsGoPackageNotLongForm(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&fileOptionsGoPackageNotLongFormVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -43,7 +43,7 @@ type fileOptionsGoPackageNotLongFormVisitor struct {
 	option *proto.Option
 }
 
-func (v *fileOptionsGoPackageNotLongFormVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *fileOptionsGoPackageNotLongFormVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.option = nil
 	return nil
 }

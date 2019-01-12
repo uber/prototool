@@ -33,7 +33,7 @@ var fieldsNotReservedLinter = NewLinter(
 	checkFieldsNotReserved,
 )
 
-func checkFieldsNotReserved(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkFieldsNotReserved(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(fieldsNotReservedVisitor{baseAddVisitor: newBaseAddVisitor(add), outerNameStack: make([]string, 0)}, descriptors)
 }
 

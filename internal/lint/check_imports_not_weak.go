@@ -33,7 +33,7 @@ var (
 	)
 )
 
-func checkImportsNotWeak(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkImportsNotWeak(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&importsNotWeakVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

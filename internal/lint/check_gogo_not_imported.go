@@ -35,7 +35,7 @@ var (
 	)
 )
 
-func checkGogoNotImported(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkGogoNotImported(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&gogoNotImportedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

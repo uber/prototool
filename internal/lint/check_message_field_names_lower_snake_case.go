@@ -32,7 +32,7 @@ var messageFieldNamesLowerSnakeCaseLinter = NewLinter(
 	checkMessageFieldNamesLowerSnakeCase,
 )
 
-func checkMessageFieldNamesLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessageFieldNamesLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(messageFieldNamesLowerSnakeCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

@@ -35,7 +35,7 @@ var packagesSameInDirLinter = NewLinter(
 	checkPackagesSameInDir,
 )
 
-func checkPackagesSameInDir(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackagesSameInDir(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	visitor := &packagesSameInDirVisitor{baseAddVisitor: newBaseAddVisitor(add), pkgs: make(map[string]struct{})}
 	if err := runVisitor(visitor, descriptors); err != nil {
 		return err
@@ -61,7 +61,7 @@ type packagesSameInDirVisitor struct {
 	pkg *proto.Package
 }
 
-func (v *packagesSameInDirVisitor) OnStart(*proto.Proto) error {
+func (v *packagesSameInDirVisitor) OnStart(*FileDescriptor) error {
 	v.pkg = nil
 	return nil
 }

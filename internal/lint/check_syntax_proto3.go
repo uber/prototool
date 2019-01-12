@@ -33,7 +33,7 @@ var syntaxProto3Linter = NewLinter(
 	checkSyntaxProto3,
 )
 
-func checkSyntaxProto3(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkSyntaxProto3(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&syntaxProto3Visitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -44,7 +44,7 @@ type syntaxProto3Visitor struct {
 	syntax   *proto.Syntax
 }
 
-func (v *syntaxProto3Visitor) OnStart(descriptor *proto.Proto) error {
+func (v *syntaxProto3Visitor) OnStart(descriptor *FileDescriptor) error {
 	v.filename = descriptor.Filename
 	v.syntax = nil
 	return nil

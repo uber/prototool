@@ -34,7 +34,7 @@ var enumFieldPrefixesLinter = NewLinter(
 	checkEnumFieldPrefixes,
 )
 
-func checkEnumFieldPrefixes(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumFieldPrefixes(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&enumFieldPrefixesVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

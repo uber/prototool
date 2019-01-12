@@ -32,7 +32,7 @@ var serviceNamesCamelCaseLinter = NewLinter(
 	checkServiceNamesCamelCase,
 )
 
-func checkServiceNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkServiceNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(serviceNamesCamelCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

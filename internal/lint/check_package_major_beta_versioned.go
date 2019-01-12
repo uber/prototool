@@ -34,7 +34,7 @@ var packageMajorBetaVersionedLinter = NewLinter(
 	checkPackageMajorBetaVersioned,
 )
 
-func checkPackageMajorBetaVersioned(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackageMajorBetaVersioned(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&packageMajorBetaVersionedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -45,7 +45,7 @@ type packageMajorBetaVersionedVisitor struct {
 	pkg      *proto.Package
 }
 
-func (v *packageMajorBetaVersionedVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *packageMajorBetaVersionedVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.filename = descriptor.Filename
 	v.pkg = nil
 	return nil

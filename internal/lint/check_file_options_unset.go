@@ -39,8 +39,8 @@ var fileOptionsUnsetJavaOuterClassnameLinter = NewLinter(
 	newCheckFileOptionsUnset("java_outer_classname"),
 )
 
-func newCheckFileOptionsUnset(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func newCheckFileOptionsUnset(fileOption string) func(func(*text.Failure), string, []*FileDescriptor) error {
+	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		return runVisitor(&fileOptionsUnsetVisitor{
 			baseAddVisitor: newBaseAddVisitor(add),
 			fileOption:     fileOption,
@@ -57,7 +57,7 @@ type fileOptionsUnsetVisitor struct {
 	position scanner.Position
 }
 
-func (v *fileOptionsUnsetVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *fileOptionsUnsetVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.seen = false
 	v.position = scanner.Position{}
 	return nil

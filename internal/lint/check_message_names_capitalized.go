@@ -32,7 +32,7 @@ var messageNamesCapitalizedLinter = NewLinter(
 	checkMessageNamesCapitalized,
 )
 
-func checkMessageNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessageNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(messageNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
