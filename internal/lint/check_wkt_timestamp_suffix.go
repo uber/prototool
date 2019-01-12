@@ -33,7 +33,7 @@ var wktTimestampSuffixLinter = NewLinter(
 	checkWKTTimestampSuffix,
 )
 
-func checkWKTTimestampSuffix(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkWKTTimestampSuffix(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(wktTimestampSuffixVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

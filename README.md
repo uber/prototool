@@ -200,10 +200,11 @@ commonly used, but still have validity within the lint group construct. These ru
 to the element comment. The following lint rules can be suppressed:
 
 
-| Lint Rule                   | Containing Lint Groups   | Suppressing Annotation   |
-|-----------------------------|--------------------------|--------------------------|
-| `MESSAGE_FIELDS_NOT_FLOATS` | `uber2`                  | `floats`                 |
-| `PACKAGE_NO_KEYWORDS`       | `uber2`                  | `keywords`               |
+| Lint Rule                        | Containing Lint Groups   | Suppressing Annotation   |
+|----------------------------------|--------------------------|--------------------------|
+| `MESSAGE_FIELDS_NOT_FLOATS`      | `uber2`                  | `floats`                 |
+| `PACKAGE_NO_KEYWORDS`            | `uber2`                  | `keywords`               |
+| `RPC_OPTIONS_NO_GOOGLE_API_HTTP` | `uber2`                  | `google-api-http`        |
 
 As an example:
 
@@ -213,11 +214,36 @@ As an example:
 // @suppresswarnings keywords
 package foo.public.bar;
 
-// Hello is a field where we understand the concerns with using doubles but require them.
+// Hello is a field where we understand the concerns with using floats but require them.
 //
 // @suppresswarnings floats
-double hello = 1;
+float hello = 1;
+
+service FooAPI {
+  // We understand the concerns with using the http option so we allow it here.
+  // @suppresswarnings google-api-http
+  rpc Bar(BarRequest) returns (BarResponse) {
+    option (google.api.http).get = "/bar";
+  }
+}
 ```
+
+Linting also understands the concept of file headers, typically license headers. To specify a license header, add the following to your
+`prototool.yaml`:
+
+```yaml
+lint:
+  file_header:
+    path: path/to/header.txt
+    is_commented: true
+```
+
+The `path` option specifies the path to the file that contains the header data.
+The `is_commented` option specifies whether the header data is already commented, and if not, `// ` will be added before all non-empty lines,
+and `//` will be added before all empty lines. `is_commented` is optional and generally will not be set if the file is not commented, for
+example if `path` points to a text LICENSE file.
+
+If `lint.file_header.path` is set, `prototool create`, `prototool format --fix`, and `prototool lint` will all take the file header into account.
 
 See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
 

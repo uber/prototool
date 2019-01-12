@@ -32,7 +32,7 @@ var enumNamesCapitalizedLinter = NewLinter(
 	checkEnumNamesCapitalized,
 )
 
-func checkEnumNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumNamesCapitalized(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(enumNamesCapitalizedVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

@@ -31,7 +31,7 @@ var requestResponseNamesMatchRPCLinter = NewLinter(
 	checkRequestResponseNamesMatchRPC,
 )
 
-func checkRequestResponseNamesMatchRPC(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseNamesMatchRPC(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(requestResponseNamesMatchRPCVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

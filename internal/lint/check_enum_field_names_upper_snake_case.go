@@ -32,7 +32,7 @@ var enumFieldNamesUpperSnakeCaseLinter = NewLinter(
 	checkEnumFieldNamesUpperSnakeCase,
 )
 
-func checkEnumFieldNamesUpperSnakeCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumFieldNamesUpperSnakeCase(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(enumFieldNamesUpperSnakeCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

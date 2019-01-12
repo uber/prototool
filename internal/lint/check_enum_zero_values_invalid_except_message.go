@@ -32,7 +32,7 @@ var enumZeroValuesInvalidExceptMessageLinter = NewLinter(
 	checkEnumZeroValuesInvalidExceptMessage,
 )
 
-func checkEnumZeroValuesInvalidExceptMessage(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumZeroValuesInvalidExceptMessage(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&enumZeroValuesInvalidExceptMessageVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

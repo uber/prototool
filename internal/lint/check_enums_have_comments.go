@@ -34,7 +34,7 @@ var enumsHaveCommentsLinter = NewLinter(
 	checkEnumsHaveComments,
 )
 
-func checkEnumsHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumsHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(enumsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

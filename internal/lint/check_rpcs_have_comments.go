@@ -34,7 +34,7 @@ var rpcsHaveCommentsLinter = NewLinter(
 	checkRPCsHaveComments,
 )
 
-func checkRPCsHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRPCsHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(rpcsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

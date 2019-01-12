@@ -33,7 +33,7 @@ var requestResponseTypesOnlyInFileLinter = NewLinter(
 	checkRequestResponseTypesOnlyInFile,
 )
 
-func checkRequestResponseTypesOnlyInFile(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseTypesOnlyInFile(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&requestResponseTypesOnlyInFileVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -44,7 +44,7 @@ type requestResponseTypesOnlyInFileVisitor struct {
 	rpcs                 []*requestResponseTypesOnlyInFileVisitorRPCMapKey
 }
 
-func (v *requestResponseTypesOnlyInFileVisitor) OnStart(*proto.Proto) error {
+func (v *requestResponseTypesOnlyInFileVisitor) OnStart(*FileDescriptor) error {
 	v.enumNameToEnum = nil
 	v.messageNameToMessage = nil
 	v.rpcs = nil

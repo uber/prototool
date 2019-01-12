@@ -34,7 +34,7 @@ var enumFieldPrefixesExceptMessageLinter = NewLinter(
 	checkEnumFieldPrefixesExceptMessage,
 )
 
-func checkEnumFieldPrefixesExceptMessage(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumFieldPrefixesExceptMessage(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&enumFieldPrefixesExceptMessageVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

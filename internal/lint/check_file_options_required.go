@@ -69,8 +69,8 @@ var fileOptionsRequirePHPNamespaceLinter = NewLinter(
 	newCheckFileOptionsRequire("php_namespace"),
 )
 
-func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*FileDescriptor) error {
+	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		return runVisitor(&fileOptionsRequireVisitor{
 			baseAddVisitor: newBaseAddVisitor(add),
 			fileOption:     fileOption,
@@ -87,7 +87,7 @@ type fileOptionsRequireVisitor struct {
 	seen     bool
 }
 
-func (v *fileOptionsRequireVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *fileOptionsRequireVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.filename = descriptor.Filename
 	v.seen = false
 	return nil

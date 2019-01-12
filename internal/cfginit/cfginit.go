@@ -101,6 +101,20 @@ protoc:
 {{.V}}    remove:
 {{.V}}      - ENUM_NAMES_CAMEL_CASE
 
+  # The path to the file header for all Protobuf files.
+  # If this is set and the FILE_HEADER linter is turned on, files will
+  # be checked to begin with the contents of this file, and format --fix
+  # will place this header before the syntax declaration. Note that
+  # format --fix will delete anything before the syntax declaration
+  # if this is set.
+  #
+  # If is_commented is set, this file is assumed to already have comments
+  # and will be added directly. If is_commented is not set, "// " will be
+  # added before every line.
+{{.V}}  file_header:
+{{.V}}    path: path/to/protobuf_file_header.txt
+{{.V}}    is_commented: true
+
 # Code generation directives.
 {{.V}}generate:
   # Options that will apply to all plugins of type go and gogo.

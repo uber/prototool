@@ -34,7 +34,7 @@ var enumZeroValuesInvalidLinter = NewLinter(
 	checkEnumZeroValuesInvalid,
 )
 
-func checkEnumZeroValuesInvalid(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumZeroValuesInvalid(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&enumZeroValuesInvalidVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

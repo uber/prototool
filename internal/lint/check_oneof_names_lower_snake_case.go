@@ -32,7 +32,7 @@ var oneofNamesLowerSnakeCaseLinter = NewLinter(
 	checkOneofNamesLowerSnakeCase,
 )
 
-func checkOneofNamesLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkOneofNamesLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(oneofNamesLowerSnakeCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

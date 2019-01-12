@@ -34,7 +34,7 @@ var serviceNamesMatchFileNameLinter = NewLinter(
 	checkServiceNamesMatchFileName,
 )
 
-func checkServiceNamesMatchFileName(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkServiceNamesMatchFileName(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&serviceNamesMatchFileNameVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -44,7 +44,7 @@ type serviceNamesMatchFileNameVisitor struct {
 	services []*proto.Service
 }
 
-func (v *serviceNamesMatchFileNameVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *serviceNamesMatchFileNameVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.filename = descriptor.Filename
 	v.services = nil
 	return nil

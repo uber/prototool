@@ -34,7 +34,7 @@ var requestResponseTypesInSameFileLinter = NewLinter(
 	checkRequestResponseTypesInSameFile,
 )
 
-func checkRequestResponseTypesInSameFile(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseTypesInSameFile(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&requestResponseTypesInSameFileVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -45,7 +45,7 @@ type requestResponseTypesInSameFileVisitor struct {
 	nestedMessageNames []string
 }
 
-func (v *requestResponseTypesInSameFileVisitor) OnStart(*proto.Proto) error {
+func (v *requestResponseTypesInSameFileVisitor) OnStart(*FileDescriptor) error {
 	v.messageTypes = nil
 	v.rpcs = nil
 	v.nestedMessageNames = nil

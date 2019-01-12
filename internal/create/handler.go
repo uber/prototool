@@ -36,7 +36,7 @@ import (
 )
 
 var (
-	tmplV1 = template.Must(template.New("tmplV1").Parse(`syntax = "proto3";
+	tmplV1 = template.Must(template.New("tmplV1").Parse(`{{.Header}}syntax = "proto3";
 
 package {{.Pkg}};
 
@@ -45,7 +45,7 @@ option java_multiple_files = true;
 option java_outer_classname = "{{.JavaOuterClassname}}";
 option java_package = "{{.JavaPkg}}";`))
 
-	tmplV2 = template.Must(template.New("tmplV2").Parse(`syntax = "proto3";
+	tmplV2 = template.Must(template.New("tmplV2").Parse(`{{.Header}}syntax = "proto3";
 
 package {{.Pkg}};
 
@@ -59,6 +59,7 @@ option php_namespace = "{{.PHPNamespace}}";`))
 )
 
 type tmplData struct {
+	Header             string
 	Pkg                string
 	CSharpNamespace    string
 	GoPkg              string
@@ -135,6 +136,13 @@ func (h *handler) create(filePath string) error {
 	if isV2 {
 		defaultPackage = DefaultPackageV2
 	}
+	fileHeader, err := h.getFileHeader(filePath)
+	if err != nil {
+		return err
+	}
+	if fileHeader != "" {
+		fileHeader = fileHeader + "\n\n"
+	}
 	pkg, err := h.getPkg(filePath, defaultPackage)
 	if err != nil {
 		return err
@@ -143,6 +151,7 @@ func (h *handler) create(filePath string) error {
 	if isV2 {
 		data, err = getDataV2(
 			&tmplData{
+				Header:             fileHeader,
 				Pkg:                pkg,
 				CSharpNamespace:    protostrs.CSharpNamespace(pkg),
 				GoPkg:              protostrs.GoPackageV2(pkg),
@@ -158,6 +167,7 @@ func (h *handler) create(filePath string) error {
 	} else {
 		data, err = getDataV1(
 			&tmplData{
+				Header:             fileHeader,
 				Pkg:                pkg,
 				GoPkg:              protostrs.GoPackage(pkg),
 				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
@@ -186,6 +196,23 @@ func (h *handler) isV2(filePath string) (bool, error) {
 		return false, nil
 	}
 	return strings.ToLower(config.Lint.Group) == "uber2", nil
+}
+
+func (h *handler) getFileHeader(filePath string) (string, error) {
+	absFilePath, err := filepath.Abs(filePath)
+	if err != nil {
+		return "", err
+	}
+	absDirPath := filepath.Dir(absFilePath)
+	config, err := h.configProvider.GetForDir(absDirPath)
+	if err != nil {
+		return "", err
+	}
+	// no config file found
+	if config.DirPath == "" {
+		return "", nil
+	}
+	return config.Lint.FileHeader, nil
 }
 
 func (h *handler) getPkg(filePath string, defaultPackage string) (string, error) {

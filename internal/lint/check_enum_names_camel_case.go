@@ -32,7 +32,7 @@ var enumNamesCamelCaseLinter = NewLinter(
 	checkEnumNamesCamelCase,
 )
 
-func checkEnumNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumNamesCamelCase(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(enumNamesCamelCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

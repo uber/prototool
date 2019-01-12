@@ -191,6 +191,13 @@ type LintConfig struct {
 	// IDs expected to be all upper-case.
 	// File paths expected to be absolute paths.
 	IgnoreIDToFilePaths map[string][]string
+	// FileHeader is contents of the file that contains the header for all
+	// Protobuf files, typically a license header. If this is set and the
+	// FILE_HEADER linter is turned on, files will be checked to begin
+	// with the contents of this file, and format --fix will place this
+	// header before the syntax declaration. Note that format --fix will delete
+	// anything before the syntax declaration if this is set.
+	FileHeader string
 }
 
 // GenConfig is the gen config.
@@ -281,6 +288,10 @@ type ExternalConfig struct {
 			Add       []string `json:"add" yaml:"add"`
 			Remove    []string `json:"remove" yaml:"remove"`
 		}
+		FileHeader struct {
+			Path        string `json:"path,omitempty" yaml:"path,omitempty"`
+			IsCommented bool   `json:"is_commented,omitempty" yaml:"is_commented,omitempty"`
+		} `json:"file_header,omitempty" yaml:"file_header,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
 	Gen struct {
 		GoOptions struct {

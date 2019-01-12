@@ -23,20 +23,19 @@ package lint
 import (
 	"strings"
 
-	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
 
 type baseLinter struct {
 	id       string
 	purpose  string
-	addCheck func(func(*text.Failure), string, []*proto.Proto) error
+	addCheck func(func(*text.Failure), string, []*FileDescriptor) error
 }
 
 func newBaseLinter(
 	id string,
 	purpose string,
-	addCheck func(func(*text.Failure), string, []*proto.Proto) error,
+	addCheck func(func(*text.Failure), string, []*FileDescriptor) error,
 ) *baseLinter {
 	return &baseLinter{
 		id:       strings.ToUpper(id),
@@ -53,7 +52,7 @@ func (c *baseLinter) Purpose() string {
 	return c.purpose
 }
 
-func (c *baseLinter) Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
+func (c *baseLinter) Check(dirPath string, descriptors []*FileDescriptor) ([]*text.Failure, error) {
 	var failures []*text.Failure
 	err := c.addCheck(
 		func(failure *text.Failure) {

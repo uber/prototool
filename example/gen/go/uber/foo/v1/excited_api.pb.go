@@ -34,7 +34,7 @@ func (m *ExclamationRequest) Reset()         { *m = ExclamationRequest{} }
 func (m *ExclamationRequest) String() string { return proto.CompactTextString(m) }
 func (*ExclamationRequest) ProtoMessage()    {}
 func (*ExclamationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_excited_api_8e3a03afe7e468e9, []int{0}
+	return fileDescriptor_excited_api_33d65e5c5e15bc95, []int{0}
 }
 func (m *ExclamationRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ExclamationRequest.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *ExclamationResponse) Reset()         { *m = ExclamationResponse{} }
 func (m *ExclamationResponse) String() string { return proto.CompactTextString(m) }
 func (*ExclamationResponse) ProtoMessage()    {}
 func (*ExclamationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_excited_api_8e3a03afe7e468e9, []int{1}
+	return fileDescriptor_excited_api_33d65e5c5e15bc95, []int{1}
 }
 func (m *ExclamationResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ExclamationResponse.Unmarshal(m, b)
@@ -380,10 +380,10 @@ var _ExcitedAPI_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("uber/foo/v1/excited_api.proto", fileDescriptor_excited_api_8e3a03afe7e468e9)
+	proto.RegisterFile("uber/foo/v1/excited_api.proto", fileDescriptor_excited_api_33d65e5c5e15bc95)
 }
 
-var fileDescriptor_excited_api_8e3a03afe7e468e9 = []byte{
+var fileDescriptor_excited_api_33d65e5c5e15bc95 = []byte{
 	// 262 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2d, 0x4d, 0x4a, 0x2d,
 	0xd2, 0x4f, 0xcb, 0xcf, 0xd7, 0x2f, 0x33, 0xd4, 0x4f, 0xad, 0x48, 0xce, 0x2c, 0x49, 0x4d, 0x89,

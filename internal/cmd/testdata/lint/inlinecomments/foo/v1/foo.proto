@@ -1,0 +1,50 @@
+syntax = "proto3"; // inline comment
+
+package foo.v1; // inline comment
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1"; // inline comment
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";
+
+enum FooType {
+  FOO_TYPE_INVALID = 0;
+  FOO_TYPE_UNSET = 1; // inline comment
+  FOO_TYPE_BALLOON = 2;
+  FOO_TYPE_TREE = 3;
+}
+
+message Foo {
+  FooType type = 1; // inline comment
+  sint32 latitude_micros = 3;
+  sint32 longitude_micros = 4;
+  string bar_id = 5;
+}
+
+message Bar {
+  message Nested {
+    enum Type {
+      TYPE_INVALID = 0; // inline comment
+      TYPE_UNSET = 1;
+      TYPE_REMOTE_CONTROL = 2;
+      TYPE_FAN = 3;
+    }
+    Type type = 1;
+    string id = 2; // inline comment
+    repeated string planet_ids = 3; // inline comment
+    map<int64, string> map_ids = 4; // inline comment
+  }
+  enum Type {
+    TYPE_INVALID = 0; // inline comment
+    TYPE_UNSET = 1;
+    TYPE_REMOTE_CONTROL = 2;
+    TYPE_FAN = 3;
+  }
+  Type type = 1;
+  string id = 2; // inline comment
+  repeated string planet_ids = 3; // inline comment
+  map<int64, string> map_ids = 4; // inline comment
+}

@@ -42,6 +42,7 @@ type firstPassVisitor struct {
 
 	filename                 string
 	fix                      int
+	fileHeader               string
 	goPackageOption          *proto.Option
 	javaMultipleFilesOption  *proto.Option
 	javaOuterClassnameOption *proto.Option
@@ -51,11 +52,15 @@ type firstPassVisitor struct {
 	phpNamespaceOption       *proto.Option
 }
 
-func newFirstPassVisitor(filename string, fix int) *firstPassVisitor {
-	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix}
+func newFirstPassVisitor(filename string, fix int, fileHeader string) *firstPassVisitor {
+	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix, fileHeader: fileHeader}
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {
+	if v.fix != FixNone && v.fileHeader != "" {
+		v.P(v.fileHeader)
+		v.P()
+	}
 	if v.Syntax != nil {
 		v.PComment(v.Syntax.Comment)
 		if v.Syntax.Comment != nil {
@@ -237,8 +242,10 @@ func (v *firstPassVisitor) VisitComment(element *proto.Comment) {
 	// We only print file-level comments before syntax, package, file-level options,
 	// or package if they are at the top of the file
 	if !v.haveHitNonComment {
-		v.PComment(element)
-		v.P()
+		if v.fix == FixNone || v.fileHeader == "" {
+			v.PComment(element)
+			v.P()
+		}
 	}
 }
 

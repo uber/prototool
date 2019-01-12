@@ -31,7 +31,7 @@ var messageFieldsNoJSONNameLinter = NewLinter(
 	checkMessageFieldsNoJSONName,
 )
 
-func checkMessageFieldsNoJSONName(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessageFieldsNoJSONName(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(messageFieldsNoJSONNameVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

@@ -33,7 +33,7 @@ var wktDurationSuffixLinter = NewLinter(
 	checkWKTDurationSuffix,
 )
 
-func checkWKTDurationSuffix(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkWKTDurationSuffix(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(wktDurationSuffixVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

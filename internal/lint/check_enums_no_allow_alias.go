@@ -31,7 +31,7 @@ var enumsNoAllowAliasLinter = NewLinter(
 	checkEnumsNoAllowAlias,
 )
 
-func checkEnumsNoAllowAlias(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumsNoAllowAlias(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(enumsNoAllowAliasVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

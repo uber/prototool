@@ -33,7 +33,7 @@ var (
 	)
 )
 
-func checkImportsNotPublic(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkImportsNotPublic(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&importsNotPublicVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

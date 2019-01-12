@@ -410,6 +410,65 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`13:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
+		"testdata/lint/afterservice/foo/v1/hello_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`13:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE
+		15:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
+		"testdata/lint/afterservice/foo/v1/hello2api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`17:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
+		"testdata/lint/afterservice/foo/v1/hello3api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`1:20:COMMENTS_NO_INLINE
+		3:17:COMMENTS_NO_INLINE
+		6:30:COMMENTS_NO_INLINE
+		15:23:COMMENTS_NO_INLINE
+		21:21:COMMENTS_NO_INLINE
+		30:25:COMMENTS_NO_INLINE
+		36:20:COMMENTS_NO_INLINE
+		37:37:COMMENTS_NO_INLINE
+		38:37:COMMENTS_NO_INLINE
+		41:23:COMMENTS_NO_INLINE
+		47:18:COMMENTS_NO_INLINE
+		48:35:COMMENTS_NO_INLINE
+		49:35:COMMENTS_NO_INLINE`,
+		"testdata/lint/inlinecomments/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`13:28:COMMENTS_NO_INLINE
+		16:58:COMMENTS_NO_INLINE`,
+		"testdata/lint/inlinecomments/foo/v1/hello_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`17:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
+		22:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
+		25:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
+		30:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP`,
+		"testdata/lint/nogoogleapihttp/foo/v1/hello_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`10:1:GOGO_NOT_IMPORTED`,
 		"testdata/lint/gogonotimported/gogonotimported.proto",
 	)
@@ -663,7 +722,11 @@ option java_package = "com.uber.prototool.generated";`,
 		true,
 		"testdata/create/two/baz.proto",
 		"",
-		`syntax = "proto3";
+		`// this
+// is a
+// header
+
+syntax = "proto3";
 
 package foo;
 
@@ -769,7 +832,11 @@ option php_namespace = "B\\C\\Bar";`,
 		true,
 		"testdata/create/version2two/baz.proto",
 		"",
-		`syntax = "proto3";
+		`// this
+// is a
+// header
+
+syntax = "proto3";
 
 package foo;
 
