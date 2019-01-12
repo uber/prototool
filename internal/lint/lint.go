@@ -37,6 +37,7 @@ var (
 	// AllLinters is the slice of all known Linters.
 	AllLinters = []Linter{
 		commentsNoCStyleLinter,
+		commentsNoInlineLinter,
 		enumFieldNamesUppercaseLinter,
 		enumFieldNamesUpperSnakeCaseLinter,
 		enumFieldPrefixesLinter,
@@ -166,6 +167,7 @@ var (
 	// Uber2Linters is the slice of linters for the uber2 lint group.
 	Uber2Linters = []Linter{
 		commentsNoCStyleLinter,
+		commentsNoInlineLinter,
 		enumFieldNamesUpperSnakeCaseLinter,
 		enumFieldPrefixesExceptMessageLinter,
 		enumNamesCamelCaseLinter,
