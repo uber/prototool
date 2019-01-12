@@ -50,6 +50,7 @@ var (
 		enumsHaveCommentsLinter,
 		enumsNoAllowAliasLinter,
 		fieldsNotReservedLinter,
+		fileHeaderLinter,
 		fileOptionsCSharpNamespaceSameInDirLinter,
 		fileOptionsEqualCSharpNamespaceCapitalizedLinter,
 		fileOptionsEqualGoPackageV2SuffixLinter,
@@ -119,6 +120,7 @@ var (
 		enumFieldNamesUpperSnakeCaseLinter,
 		enumNamesCamelCaseLinter,
 		enumNamesCapitalizedLinter,
+		fileHeaderLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
 		messageNamesCamelCaseLinter,
 		messageNamesCapitalizedLinter,
@@ -137,6 +139,7 @@ var (
 		enumNamesCapitalizedLinter,
 		enumZeroValuesInvalidLinter,
 		enumsNoAllowAliasLinter,
+		fileHeaderLinter,
 		fileOptionsEqualGoPackagePbSuffixLinter,
 		fileOptionsEqualJavaMultipleFilesTrueLinter,
 		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
@@ -177,6 +180,7 @@ var (
 		enumZeroValuesInvalidExceptMessageLinter,
 		enumsNoAllowAliasLinter,
 		fieldsNotReservedLinter,
+		fileHeaderLinter,
 		fileOptionsCSharpNamespaceSameInDirLinter,
 		fileOptionsEqualCSharpNamespaceCapitalizedLinter,
 		fileOptionsEqualGoPackageV2SuffixLinter,
@@ -274,6 +278,7 @@ func NewRunner(options ...RunnerOption) Runner {
 type FileDescriptor struct {
 	*proto.Proto
 
+	ProtoSet *file.ProtoSet
 	FileData string
 }
 
@@ -383,6 +388,7 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*FileDescrip
 			_ = file.Close()
 			descriptors[i] = &FileDescriptor{
 				Proto:    descriptor,
+				ProtoSet: protoSet,
 				FileData: string(fileData),
 			}
 		}
