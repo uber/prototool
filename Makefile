@@ -59,7 +59,7 @@ example: install
 	@go install github.com/golang/protobuf/protoc-gen-go
 	@mkdir -p $(TMP_ETC)
 	rm -rf example/gen
-	prototool all example/proto/uber
+	prototool all --fix example/proto/uber
 	go build ./example/gen/go/uber/foo/v1
 	go build ./example/gen/go/uber/bar/v1
 	go build -o $(TMP_ETC)/excited ./example/cmd/excited/main.go
@@ -71,7 +71,7 @@ internalgen: install
 	rm -rf internal/cmd/testdata/grpc/gen
 	prototool generate internal/cmd/testdata/grpc
 	rm -rf internal/reflect/gen
-	prototool all internal/reflect/proto
+	prototool all --fix internal/reflect/proto
 	rm -f etc/config/example/prototool.yaml
 	prototool config init etc/config/example --uncomment
 

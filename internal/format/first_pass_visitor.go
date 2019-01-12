@@ -42,6 +42,7 @@ type firstPassVisitor struct {
 
 	filename                 string
 	fix                      int
+	fileHeader               string
 	goPackageOption          *proto.Option
 	javaMultipleFilesOption  *proto.Option
 	javaOuterClassnameOption *proto.Option

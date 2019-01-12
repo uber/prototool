@@ -64,6 +64,16 @@ func TransformerWithFix(fix int) TransformerOption {
 	}
 }
 
+// TransformerWithFileHeader returns a TransformerOption that will update the file
+// header to match the given file header.
+//
+// This is only valid if fix is set to a value other than FixNone.
+func TransformerWithFileHeader(fileHeader string) TransformerOption {
+	return func(transformer *transformer) {
+		transformer.fileHeader = fileHeader
+	}
+}
+
 // NewTransformer returns a new Transformer.
 func NewTransformer(options ...TransformerOption) Transformer {
 	return newTransformer(options...)
