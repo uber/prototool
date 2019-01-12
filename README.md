@@ -200,10 +200,11 @@ commonly used, but still have validity within the lint group construct. These ru
 to the element comment. The following lint rules can be suppressed:
 
 
-| Lint Rule                   | Containing Lint Groups   | Suppressing Annotation   |
-|-----------------------------|--------------------------|--------------------------|
-| `MESSAGE_FIELDS_NOT_FLOATS` | `uber2`                  | `floats`                 |
-| `PACKAGE_NO_KEYWORDS`       | `uber2`                  | `keywords`               |
+| Lint Rule                        | Containing Lint Groups   | Suppressing Annotation   |
+|----------------------------------|--------------------------|--------------------------|
+| `MESSAGE_FIELDS_NOT_FLOATS`      | `uber2`                  | `floats`                 |
+| `PACKAGE_NO_KEYWORDS`            | `uber2`                  | `keywords`               |
+| `RPC_OPTIONS_NO_GOOGLE_API_HTTP` | `uber2`                  | `google-api-http`        |
 
 As an example:
 
@@ -213,10 +214,18 @@ As an example:
 // @suppresswarnings keywords
 package foo.public.bar;
 
-// Hello is a field where we understand the concerns with using doubles but require them.
+// Hello is a field where we understand the concerns with using floats but require them.
 //
 // @suppresswarnings floats
-double hello = 1;
+float hello = 1;
+
+service FooAPI {
+  // We understand the concerns with using the http option so we allow it here.
+  // @suppresswarnings google-api-http
+  rpc Bar(BarRequest) returns (BarResponse) {
+    option (google.api.http).get = "/bar";
+  }
+}
 ```
 
 See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
