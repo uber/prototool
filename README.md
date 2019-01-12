@@ -228,6 +228,23 @@ service FooAPI {
 }
 ```
 
+Linting also understands the concept of file headers, typically license headers. To specify a license header, add the following to your
+`prototool.yaml`:
+
+```yaml
+lint:
+  file_header:
+    path: path/to/header.txt
+    is_commented: true
+```
+
+The `path` option specifies the path to the file that contains the header data.
+The `is_commented` option specifies whether the header data is already commented, and if not, `// ` will be added before all non-empty lines,
+and `//` will be added before all empty lines. `is_commented` is optional and generally will not be set if the file is not commented, for
+example if `path` points to a text LICENSE file.
+
+If `lint.file_header.path` is set, `prototool create`, `prototool format --fix`, and `prototool lint` will all take the file header into account.
+
 See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
 
 Files must be valid Protobuf that can be compiled with `protoc`, so prior to linting, `prototool lint` will compile your using `protoc`.
