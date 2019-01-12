@@ -2,3 +2,5 @@ create:
   packages:
     - directory: .
       name: foo
+lint:
+  file_header_path: protobuf_file_header.txt

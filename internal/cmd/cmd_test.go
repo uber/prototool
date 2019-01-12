@@ -722,7 +722,11 @@ option java_package = "com.uber.prototool.generated";`,
 		true,
 		"testdata/create/two/baz.proto",
 		"",
-		`syntax = "proto3";
+		`// this
+// is a
+// header
+
+syntax = "proto3";
 
 package foo;
 
@@ -828,7 +832,11 @@ option php_namespace = "B\\C\\Bar";`,
 		true,
 		"testdata/create/version2two/baz.proto",
 		"",
-		`syntax = "proto3";
+		`// this
+// is a
+// header
+
+syntax = "proto3";
 
 package foo;
 

@@ -1,5 +1,6 @@
 lint:
   group: uber2
+  file_header_path: protobuf_file_header.txt
 create:
   packages:
     - directory: .
