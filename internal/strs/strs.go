@@ -119,6 +119,54 @@ func ToUpperCamelCase(s string) string {
 	return output
 }
 
+// SplitCamelCaseWord splits a CamelCase word into its parts.
+//
+// If s is empty, returns nil.
+// If s is not CamelCase, returns nil.
+func SplitCamelCaseWord(s string) []string {
+	if s == "" {
+		return nil
+	}
+	s = strings.TrimSpace(s)
+	if !IsCamelCase(s) {
+		return nil
+	}
+	return SplitSnakeCaseWord(ToLowerSnakeCase(s))
+}
+
+// SplitSnakeCaseWord splits a snake_case word into its parts.
+//
+// If s is empty, returns nil.
+// If s is not snake_case, returns nil.
+func SplitSnakeCaseWord(s string) []string {
+	if s == "" {
+		return nil
+	}
+	s = strings.ToLower(strings.TrimSpace(s))
+	if !IsLowerSnakeCase(s) {
+		return nil
+	}
+	var previous rune
+	var words []string
+	var curWord string
+	for _, c := range s {
+		if c != '_' {
+			if previous == '_' {
+				if curWord != "" {
+					words = append(words, curWord)
+				}
+				curWord = ""
+			}
+			curWord += string(c)
+		}
+		previous = c
+	}
+	if curWord != "" {
+		words = append(words, curWord)
+	}
+	return words
+}
+
 // DedupeSort returns s with no duplicates and no empty strings, sorted.
 // If modifier is not nil, modifier will be applied to each element in s.
 func DedupeSort(s []string, modifier func(string) string) []string {
@@ -192,6 +240,7 @@ func IsUppercase(s string) bool {
 // It is assumed s has no spaces.
 func toSnake(s string) string {
 	output := ""
+	s = strings.TrimSpace(s)
 	for i, c := range s {
 		if i > 0 && isUpper(c) && output[len(output)-1] != '_' && ((i < len(s)-1 && !isUpper(rune(s[i+1]))) || (isLower(rune(s[i-1])))) {
 			output += "_" + string(c)
