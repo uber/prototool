@@ -30,10 +30,11 @@ option java_package = "com.uber.foo.v1";
 option objc_class_prefix = "UFX";
 option php_namespace = "Uber\\Foo\\V1";
 
+// This API controls Foos and Bars.
 service HelloAPI {
-  // Foo does a foo.
+  // This does a foo.
   rpc Foo(FooRequest) returns (FooResponse);
-  // Bar does a bar.
+  // This does a bar.
   rpc Bar(BarRequest) returns (BarResponse);
 }
 

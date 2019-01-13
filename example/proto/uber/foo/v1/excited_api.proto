@@ -30,7 +30,7 @@ option java_package = "com.uber.foo.v1";
 option objc_class_prefix = "UFX";
 option php_namespace = "Uber\\Foo\\V1";
 
-// ExcitedAPI is a service with exciting transformations.
+// This handles exciting transformations.
 service ExcitedAPI {
   // Exclamation adds an exclamation to the request value.
   rpc Exclamation(ExclamationRequest) returns (ExclamationResponse);
