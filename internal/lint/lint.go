@@ -26,6 +26,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/file"
@@ -48,6 +49,7 @@ var (
 		enumZeroValuesInvalidLinter,
 		enumZeroValuesInvalidExceptMessageLinter,
 		enumsHaveCommentsLinter,
+		enumsHaveSentenceCommentsLinter,
 		enumsNoAllowAliasLinter,
 		fieldsNotReservedLinter,
 		fileHeaderLinter,
@@ -178,6 +180,7 @@ var (
 		enumNamesCamelCaseLinter,
 		enumNamesCapitalizedLinter,
 		enumZeroValuesInvalidExceptMessageLinter,
+		enumsHaveSentenceCommentsLinter,
 		enumsNoAllowAliasLinter,
 		fieldsNotReservedLinter,
 		fileHeaderLinter,
@@ -477,6 +480,35 @@ func checkLintID(lintID string) error {
 
 func hasGolangStyleComment(comment *proto.Comment, name string) bool {
 	return comment != nil && len(comment.Lines) > 0 && strings.HasPrefix(comment.Lines[0], fmt.Sprintf(" %s ", name))
+}
+
+func hasCompleteSentenceComment(comment *proto.Comment) bool {
+	return commentStartsWithUppercaseLetter(comment) && commentContainsPeriod(comment)
+}
+
+func commentStartsWithUppercaseLetter(comment *proto.Comment) bool {
+	if comment == nil || len(comment.Lines) == 0 {
+		return false
+	}
+	firstLine := strings.TrimSpace(comment.Lines[0])
+	if firstLine == "" {
+		return false
+	}
+	return unicode.IsUpper(rune(firstLine[0]))
+}
+
+func commentContainsPeriod(comment *proto.Comment) bool {
+	if comment == nil || len(comment.Lines) == 0 {
+		return false
+	}
+	// very primitive check, could make better with NLP but this is hard with comments
+	// since comments can contain code examples, links, etc.
+	for _, line := range comment.Lines {
+		if strings.Contains(line, ".") {
+			return true
+		}
+	}
+	return false
 }
 
 func isSuppressed(comment *proto.Comment, annotation string) bool {
