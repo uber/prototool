@@ -156,7 +156,9 @@ protoc:
       # Optional override for the plugin path. For example, if you set set path to
       # /usr/local/bin/gogo_plugin", prototool will add the
       # "--plugin=protoc-gen-gogo=/usr/local/bin/gogo_plugin" flag to protoc calls.
-{{.V}}      path: /usr/local/bin/gogo
+      # If set to "gogo_plugin", prototool will search your path for "gogo_plugin",.
+      # and fail if "gogo_plugin" cannot be found.
+{{.V}}      path: gogo_plugin
 
 {{.V}}    - name: yarpc-go
 {{.V}}      type: gogo
