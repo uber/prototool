@@ -425,7 +425,7 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
-		`17:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
+		`19:1:REQUEST_RESPONSE_TYPES_AFTER_SERVICE`,
 		"testdata/lint/afterservice/foo/v1/hello3api.proto",
 	)
 

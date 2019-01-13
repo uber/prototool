@@ -14,6 +14,8 @@ message SendFoo2Request {}
 
 message SendFoo2Response {}
 
+// Hello2API is the second HelloAPI.
 service Hello2API {
+  // SendFoo2 sends foos.
   rpc SendFoo2(SendFoo2Request) returns (SendFoo2Response);
 }
