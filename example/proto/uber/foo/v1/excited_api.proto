@@ -32,14 +32,14 @@ option php_namespace = "Uber\\Foo\\V1";
 
 // This handles exciting transformations.
 service ExcitedAPI {
-  // Exclamation adds an exclamation to the request value.
+  // This adds an exclamation to the request value.
   rpc Exclamation(ExclamationRequest) returns (ExclamationResponse);
-  // ExclamationClientStream adds an exclamation to the combined request values.
+  // This adds an exclamation to the combined request values.
   rpc ExclamationClientStream(stream ExclamationRequest) returns (ExclamationResponse);
-  // ExclamationServerStream adds an exclamation to the request value
+  // This adds an exclamation to the request value
   // and streams each character as a response.
   rpc ExclamationServerStream(ExclamationRequest) returns (stream ExclamationResponse);
-  // ExclamationBidiStream adds an exclamation to the each request value.
+  // This adds an exclamation to the each request value.
   rpc ExclamationBidiStream(stream ExclamationRequest) returns (stream ExclamationResponse);
 }
 

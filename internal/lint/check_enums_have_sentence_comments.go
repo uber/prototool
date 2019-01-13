@@ -27,7 +27,7 @@ import (
 
 var enumsHaveSentenceCommentsLinter = NewLinter(
 	"ENUMS_HAVE_SENTENCE_COMMENTS",
-	`Verifies that all enums have a comment that contains at least one complete sentence and does not start with "// EnumName ...".`,
+	`Verifies that all enums have a comment that contains at least one complete sentence.`,
 	checkEnumsHaveSentenceComments,
 )
 
@@ -49,7 +49,5 @@ func (v enumsHaveSentenceCommentsVisitor) VisitMessage(message *proto.Message) {
 func (v enumsHaveSentenceCommentsVisitor) VisitEnum(enum *proto.Enum) {
 	if !hasCompleteSentenceComment(enum.Comment) {
 		v.AddFailuref(enum.Position, `Enum %q needs a comment with a complete sentence that starts on the first line of the comment.`, enum.Name)
-	} else if hasGolangStyleComment(enum.Comment, enum.Name) {
-		v.AddFailuref(enum.Position, `Enum %q needs a comment with a complete sentence that does not start with "// %s ...".`, enum.Name, enum.Name)
 	}
 }

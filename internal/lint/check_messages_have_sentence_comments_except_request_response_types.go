@@ -29,7 +29,7 @@ import (
 
 var messagesHaveSentenceCommentsExceptRequestResponseTypesLinter = NewLinter(
 	"MESSAGES_HAVE_SENTENCE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES",
-	`Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence and does not start with "// MessageName ...".`,
+	`Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence.`,
 	checkMessagesHaveSentenceCommentsExceptRequestResponseTypes,
 )
 
@@ -91,8 +91,6 @@ func (v *messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor) Finally(
 			if _, ok := v.requestResponseTypes[messageName]; !ok {
 				if !hasCompleteSentenceComment(message.Comment) {
 					v.AddFailuref(message.Position, `Message %q needs a comment with a complete sentence that starts on the first line of the comment.`, message.Name)
-				} else if hasGolangStyleComment(message.Comment, message.Name) {
-					v.AddFailuref(message.Position, `Message %q needs a comment with a complete sentence that does not start with "// %s ...".`, message.Name, message.Name)
 				}
 			}
 		}

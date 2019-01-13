@@ -27,7 +27,7 @@ import (
 
 var rpcsHaveSentenceCommentsLinter = NewLinter(
 	"RPCS_HAVE_SENTENCE_COMMENTS",
-	`Verifies that all rpcs have a comment that contains at least one complete sentence and does not start with "// RPCName ...".`,
+	`Verifies that all rpcs have a comment that contains at least one complete sentence.`,
 	checkRPCsHaveSentenceComments,
 )
 
@@ -48,7 +48,5 @@ func (v rpcsHaveSentenceCommentsVisitor) VisitService(service *proto.Service) {
 func (v rpcsHaveSentenceCommentsVisitor) VisitRPC(rpc *proto.RPC) {
 	if !hasCompleteSentenceComment(rpc.Comment) {
 		v.AddFailuref(rpc.Position, `RPC %q needs a comment with a complete sentence that starts on the first line of the comment.`, rpc.Name)
-	} else if hasGolangStyleComment(rpc.Comment, rpc.Name) {
-		v.AddFailuref(rpc.Position, `RPC %q needs a comment with a complete sentence that does not start with "// %s ...".`, rpc.Name, rpc.Name)
 	}
 }
