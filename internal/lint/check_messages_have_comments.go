@@ -21,9 +21,6 @@
 package lint
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
@@ -50,7 +47,7 @@ func (v messagesHaveCommentsVisitor) VisitMessage(message *proto.Message) {
 	if message.IsExtend {
 		return
 	}
-	if message.Comment == nil || len(message.Comment.Lines) == 0 || !strings.HasPrefix(message.Comment.Lines[0], fmt.Sprintf(" %s ", message.Name)) {
+	if !hasGolangStyleComment(message.Comment, message.Name) {
 		v.AddFailuref(message.Position, `Message %q needs a comment of the form "// %s ..."`, message.Name, message.Name)
 	}
 }

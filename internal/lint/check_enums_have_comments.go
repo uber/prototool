@@ -21,9 +21,6 @@
 package lint
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
@@ -50,7 +47,7 @@ func (v enumsHaveCommentsVisitor) VisitMessage(message *proto.Message) {
 }
 
 func (v enumsHaveCommentsVisitor) VisitEnum(enum *proto.Enum) {
-	if enum.Comment == nil || len(enum.Comment.Lines) == 0 || !strings.HasPrefix(enum.Comment.Lines[0], fmt.Sprintf(" %s ", enum.Name)) {
+	if !hasGolangStyleComment(enum.Comment, enum.Name) {
 		v.AddFailuref(enum.Position, `Enum %q needs a comment of the form "// %s ..."`, enum.Name, enum.Name)
 	}
 }

@@ -475,6 +475,10 @@ func checkLintID(lintID string) error {
 	return nil
 }
 
+func hasGolangStyleComment(comment *proto.Comment, name string) bool {
+	return comment != nil && len(comment.Lines) > 0 && strings.HasPrefix(comment.Lines[0], fmt.Sprintf(" %s ", name))
+}
+
 func isSuppressed(comment *proto.Comment, annotation string) bool {
 	if comment == nil {
 		return false

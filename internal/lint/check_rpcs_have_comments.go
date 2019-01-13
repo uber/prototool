@@ -21,9 +21,6 @@
 package lint
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
@@ -49,7 +46,7 @@ func (v rpcsHaveCommentsVisitor) VisitService(service *proto.Service) {
 }
 
 func (v rpcsHaveCommentsVisitor) VisitRPC(rpc *proto.RPC) {
-	if rpc.Comment == nil || len(rpc.Comment.Lines) == 0 || !strings.HasPrefix(rpc.Comment.Lines[0], fmt.Sprintf(" %s ", rpc.Name)) {
+	if !hasGolangStyleComment(rpc.Comment, rpc.Name) {
 		v.AddFailuref(rpc.Position, `RPC %q needs a comment of the form "// %s ..."`, rpc.Name, rpc.Name)
 	}
 }
