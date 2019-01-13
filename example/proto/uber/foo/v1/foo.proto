@@ -34,7 +34,7 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "uber/bar/v1/bar.proto";
 
-//  A hello.
+// Hello is a hello.
 enum Hello {
   HELLO_INVALID = 0;
   HELLO_UNSET = 1;
@@ -42,15 +42,15 @@ enum Hello {
   HELLO_BALLOON = 3;
 }
 
-// A foo.
+// Foo is a foo.
 message Foo {
-  // A bar.
+  // Bar is a bar.
   message Bar {
-    // A baz.
+    // Baz is a baz.
     enum Baz {
       BAZ_INVALID = 0;
     }
-    // A bat.
+    // Bat is a bat.
     enum Bat {
       BAT_INVALID = 0;
     }
@@ -60,19 +60,19 @@ message Foo {
   Bar bar = 1;
 }
 
-// A bar.
+// Bar is a bar.
 enum Bar {
   BAR_INVALID = 0;
 }
 
-// A barr.
+// Barr is a barr.
 message Barr {
   int64 hello = 1;
   google.protobuf.Timestamp barr_time = 2;
   bar.v1.Hello bar_hello = 3;
 }
 
-// Some other message.
+// Another is another message.
 message Another {
   int64 one = 1;
   string two = 2;
@@ -88,10 +88,10 @@ message Another {
   google.protobuf.Duration another_duration = 10;
 }
 
-// This contains Well-Known Types.
+// HasWKT has Well-Known Types.
 message HasWKT {
   google.protobuf.Duration wkt_duration = 1;
 }
 
-// A bazzzz.
+// Bazz is a bazzzz.
 message Bazz {}

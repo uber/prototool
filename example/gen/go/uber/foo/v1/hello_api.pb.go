@@ -33,7 +33,7 @@ func (m *FooRequest) Reset()         { *m = FooRequest{} }
 func (m *FooRequest) String() string { return proto.CompactTextString(m) }
 func (*FooRequest) ProtoMessage()    {}
 func (*FooRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_hello_api_b57d4bf7b3a774cf, []int{0}
+	return fileDescriptor_hello_api_8ba890b48aa56f70, []int{0}
 }
 func (m *FooRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_FooRequest.Unmarshal(m, b)
@@ -63,7 +63,7 @@ func (m *FooResponse) Reset()         { *m = FooResponse{} }
 func (m *FooResponse) String() string { return proto.CompactTextString(m) }
 func (*FooResponse) ProtoMessage()    {}
 func (*FooResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_hello_api_b57d4bf7b3a774cf, []int{1}
+	return fileDescriptor_hello_api_8ba890b48aa56f70, []int{1}
 }
 func (m *FooResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_FooResponse.Unmarshal(m, b)
@@ -94,7 +94,7 @@ func (m *BarRequest) Reset()         { *m = BarRequest{} }
 func (m *BarRequest) String() string { return proto.CompactTextString(m) }
 func (*BarRequest) ProtoMessage()    {}
 func (*BarRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_hello_api_b57d4bf7b3a774cf, []int{2}
+	return fileDescriptor_hello_api_8ba890b48aa56f70, []int{2}
 }
 func (m *BarRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BarRequest.Unmarshal(m, b)
@@ -131,7 +131,7 @@ func (m *BarResponse) Reset()         { *m = BarResponse{} }
 func (m *BarResponse) String() string { return proto.CompactTextString(m) }
 func (*BarResponse) ProtoMessage()    {}
 func (*BarResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_hello_api_b57d4bf7b3a774cf, []int{3}
+	return fileDescriptor_hello_api_8ba890b48aa56f70, []int{3}
 }
 func (m *BarResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_BarResponse.Unmarshal(m, b)
@@ -170,9 +170,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type HelloAPIClient interface {
-	// This does a foo.
+	// Foo does a foo.
 	Foo(ctx context.Context, in *FooRequest, opts ...grpc.CallOption) (*FooResponse, error)
-	// This does a bar.
+	// Bar does a bar.
 	Bar(ctx context.Context, in *BarRequest, opts ...grpc.CallOption) (*BarResponse, error)
 }
 
@@ -204,9 +204,9 @@ func (c *helloAPIClient) Bar(ctx context.Context, in *BarRequest, opts ...grpc.C
 
 // HelloAPIServer is the server API for HelloAPI service.
 type HelloAPIServer interface {
-	// This does a foo.
+	// Foo does a foo.
 	Foo(context.Context, *FooRequest) (*FooResponse, error)
-	// This does a bar.
+	// Bar does a bar.
 	Bar(context.Context, *BarRequest) (*BarResponse, error)
 }
 
@@ -268,10 +268,10 @@ var _HelloAPI_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("uber/foo/v1/hello_api.proto", fileDescriptor_hello_api_b57d4bf7b3a774cf)
+	proto.RegisterFile("uber/foo/v1/hello_api.proto", fileDescriptor_hello_api_8ba890b48aa56f70)
 }
 
-var fileDescriptor_hello_api_b57d4bf7b3a774cf = []byte{
+var fileDescriptor_hello_api_8ba890b48aa56f70 = []byte{
 	// 227 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2e, 0x4d, 0x4a, 0x2d,
 	0xd2, 0x4f, 0xcb, 0xcf, 0xd7, 0x2f, 0x33, 0xd4, 0xcf, 0x48, 0xcd, 0xc9, 0xc9, 0x8f, 0x4f, 0x2c,

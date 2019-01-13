@@ -21,7 +21,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-//  A hello.
+// Hello is a hello.
 type Hello int32
 
 const (
@@ -48,10 +48,10 @@ func (x Hello) String() string {
 	return proto.EnumName(Hello_name, int32(x))
 }
 func (Hello) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0}
 }
 
-// A bar.
+// Bar is a bar.
 type Bar int32
 
 const (
@@ -69,10 +69,10 @@ func (x Bar) String() string {
 	return proto.EnumName(Bar_name, int32(x))
 }
 func (Bar) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{1}
+	return fileDescriptor_foo_18696cee75944a2c, []int{1}
 }
 
-// A baz.
+// Baz is a baz.
 type Foo_Bar_Baz int32
 
 const (
@@ -90,10 +90,10 @@ func (x Foo_Bar_Baz) String() string {
 	return proto.EnumName(Foo_Bar_Baz_name, int32(x))
 }
 func (Foo_Bar_Baz) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{0, 0, 0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0, 0, 0}
 }
 
-// A bat.
+// Bat is a bat.
 type Foo_Bar_Bat int32
 
 const (
@@ -111,10 +111,10 @@ func (x Foo_Bar_Bat) String() string {
 	return proto.EnumName(Foo_Bar_Bat_name, int32(x))
 }
 func (Foo_Bar_Bat) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{0, 0, 1}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0, 0, 1}
 }
 
-// A foo.
+// Foo is a foo.
 type Foo struct {
 	Bar                  *Foo_Bar `protobuf:"bytes,1,opt,name=bar,proto3" json:"bar,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -126,7 +126,7 @@ func (m *Foo) Reset()         { *m = Foo{} }
 func (m *Foo) String() string { return proto.CompactTextString(m) }
 func (*Foo) ProtoMessage()    {}
 func (*Foo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0}
 }
 func (m *Foo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo.Unmarshal(m, b)
@@ -153,7 +153,7 @@ func (m *Foo) GetBar() *Foo_Bar {
 	return nil
 }
 
-// A bar.
+// Bar is a bar.
 type Foo_Bar struct {
 	Baz                  Foo_Bar_Baz `protobuf:"varint,1,opt,name=baz,proto3,enum=uber.foo.v1.Foo_Bar_Baz" json:"baz,omitempty"`
 	Bat                  Foo_Bar_Bat `protobuf:"varint,2,opt,name=bat,proto3,enum=uber.foo.v1.Foo_Bar_Bat" json:"bat,omitempty"`
@@ -166,7 +166,7 @@ func (m *Foo_Bar) Reset()         { *m = Foo_Bar{} }
 func (m *Foo_Bar) String() string { return proto.CompactTextString(m) }
 func (*Foo_Bar) ProtoMessage()    {}
 func (*Foo_Bar) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{0, 0}
+	return fileDescriptor_foo_18696cee75944a2c, []int{0, 0}
 }
 func (m *Foo_Bar) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo_Bar.Unmarshal(m, b)
@@ -200,7 +200,7 @@ func (m *Foo_Bar) GetBat() Foo_Bar_Bat {
 	return Foo_Bar_BAT_INVALID
 }
 
-// A barr.
+// Barr is a barr.
 type Barr struct {
 	Hello                int64                `protobuf:"varint,1,opt,name=hello,proto3" json:"hello,omitempty"`
 	BarrTime             *timestamp.Timestamp `protobuf:"bytes,2,opt,name=barr_time,json=barrTime,proto3" json:"barr_time,omitempty"`
@@ -214,7 +214,7 @@ func (m *Barr) Reset()         { *m = Barr{} }
 func (m *Barr) String() string { return proto.CompactTextString(m) }
 func (*Barr) ProtoMessage()    {}
 func (*Barr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{1}
+	return fileDescriptor_foo_18696cee75944a2c, []int{1}
 }
 func (m *Barr) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Barr.Unmarshal(m, b)
@@ -255,7 +255,7 @@ func (m *Barr) GetBarHello() *v1.Hello {
 	return nil
 }
 
-// Some other message.
+// Another is another message.
 type Another struct {
 	One     int64            `protobuf:"varint,1,opt,name=one,proto3" json:"one,omitempty"`
 	Two     string           `protobuf:"bytes,2,opt,name=two,proto3" json:"two,omitempty"`
@@ -278,7 +278,7 @@ func (m *Another) Reset()         { *m = Another{} }
 func (m *Another) String() string { return proto.CompactTextString(m) }
 func (*Another) ProtoMessage()    {}
 func (*Another) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{2}
+	return fileDescriptor_foo_18696cee75944a2c, []int{2}
 }
 func (m *Another) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Another.Unmarshal(m, b)
@@ -456,7 +456,7 @@ func _Another_OneofSizer(msg proto.Message) (n int) {
 	return n
 }
 
-// This contains Well-Known Types.
+// HasWKT has Well-Known Types.
 type HasWKT struct {
 	WktDuration          *duration.Duration `protobuf:"bytes,1,opt,name=wkt_duration,json=wktDuration,proto3" json:"wkt_duration,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
@@ -468,7 +468,7 @@ func (m *HasWKT) Reset()         { *m = HasWKT{} }
 func (m *HasWKT) String() string { return proto.CompactTextString(m) }
 func (*HasWKT) ProtoMessage()    {}
 func (*HasWKT) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{3}
+	return fileDescriptor_foo_18696cee75944a2c, []int{3}
 }
 func (m *HasWKT) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasWKT.Unmarshal(m, b)
@@ -495,7 +495,7 @@ func (m *HasWKT) GetWktDuration() *duration.Duration {
 	return nil
 }
 
-// A bazzzz.
+// Bazz is a bazzzz.
 type Bazz struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -506,7 +506,7 @@ func (m *Bazz) Reset()         { *m = Bazz{} }
 func (m *Bazz) String() string { return proto.CompactTextString(m) }
 func (*Bazz) ProtoMessage()    {}
 func (*Bazz) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_3e683094908a9aee, []int{4}
+	return fileDescriptor_foo_18696cee75944a2c, []int{4}
 }
 func (m *Bazz) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Bazz.Unmarshal(m, b)
@@ -540,9 +540,9 @@ func init() {
 	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Bat", Foo_Bar_Bat_name, Foo_Bar_Bat_value)
 }
 
-func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_foo_3e683094908a9aee) }
+func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_foo_18696cee75944a2c) }
 
-var fileDescriptor_foo_3e683094908a9aee = []byte{
+var fileDescriptor_foo_18696cee75944a2c = []byte{
 	// 625 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0x51, 0x6f, 0x12, 0x41,
 	0x10, 0xee, 0x71, 0x40, 0xcb, 0x9c, 0x6d, 0x71, 0x53, 0x9b, 0x13, 0x13, 0x6d, 0x78, 0x30, 0xd8,

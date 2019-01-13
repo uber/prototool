@@ -34,7 +34,7 @@ func (m *ExclamationRequest) Reset()         { *m = ExclamationRequest{} }
 func (m *ExclamationRequest) String() string { return proto.CompactTextString(m) }
 func (*ExclamationRequest) ProtoMessage()    {}
 func (*ExclamationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_excited_api_80dfa58c03f9dcbd, []int{0}
+	return fileDescriptor_excited_api_33d65e5c5e15bc95, []int{0}
 }
 func (m *ExclamationRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ExclamationRequest.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *ExclamationResponse) Reset()         { *m = ExclamationResponse{} }
 func (m *ExclamationResponse) String() string { return proto.CompactTextString(m) }
 func (*ExclamationResponse) ProtoMessage()    {}
 func (*ExclamationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_excited_api_80dfa58c03f9dcbd, []int{1}
+	return fileDescriptor_excited_api_33d65e5c5e15bc95, []int{1}
 }
 func (m *ExclamationResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ExclamationResponse.Unmarshal(m, b)
@@ -116,14 +116,14 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ExcitedAPIClient interface {
-	// This adds an exclamation to the request value.
+	// Exclamation adds an exclamation to the request value.
 	Exclamation(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (*ExclamationResponse, error)
-	// This adds an exclamation to the combined request values.
+	// ExclamationClientStream adds an exclamation to the combined request values.
 	ExclamationClientStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedAPI_ExclamationClientStreamClient, error)
-	// This adds an exclamation to the request value
+	// ExclamationServerStream adds an exclamation to the request value
 	// and streams each character as a response.
 	ExclamationServerStream(ctx context.Context, in *ExclamationRequest, opts ...grpc.CallOption) (ExcitedAPI_ExclamationServerStreamClient, error)
-	// This adds an exclamation to the each request value.
+	// ExclamationBidiStream adds an exclamation to the each request value.
 	ExclamationBidiStream(ctx context.Context, opts ...grpc.CallOption) (ExcitedAPI_ExclamationBidiStreamClient, error)
 }
 
@@ -243,14 +243,14 @@ func (x *excitedAPIExclamationBidiStreamClient) Recv() (*ExclamationResponse, er
 
 // ExcitedAPIServer is the server API for ExcitedAPI service.
 type ExcitedAPIServer interface {
-	// This adds an exclamation to the request value.
+	// Exclamation adds an exclamation to the request value.
 	Exclamation(context.Context, *ExclamationRequest) (*ExclamationResponse, error)
-	// This adds an exclamation to the combined request values.
+	// ExclamationClientStream adds an exclamation to the combined request values.
 	ExclamationClientStream(ExcitedAPI_ExclamationClientStreamServer) error
-	// This adds an exclamation to the request value
+	// ExclamationServerStream adds an exclamation to the request value
 	// and streams each character as a response.
 	ExclamationServerStream(*ExclamationRequest, ExcitedAPI_ExclamationServerStreamServer) error
-	// This adds an exclamation to the each request value.
+	// ExclamationBidiStream adds an exclamation to the each request value.
 	ExclamationBidiStream(ExcitedAPI_ExclamationBidiStreamServer) error
 }
 
@@ -380,10 +380,10 @@ var _ExcitedAPI_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("uber/foo/v1/excited_api.proto", fileDescriptor_excited_api_80dfa58c03f9dcbd)
+	proto.RegisterFile("uber/foo/v1/excited_api.proto", fileDescriptor_excited_api_33d65e5c5e15bc95)
 }
 
-var fileDescriptor_excited_api_80dfa58c03f9dcbd = []byte{
+var fileDescriptor_excited_api_33d65e5c5e15bc95 = []byte{
 	// 262 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2d, 0x4d, 0x4a, 0x2d,
 	0xd2, 0x4f, 0xcb, 0xcf, 0xd7, 0x2f, 0x33, 0xd4, 0x4f, 0xad, 0x48, 0xce, 0x2c, 0x49, 0x4d, 0x89,
