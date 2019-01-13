@@ -121,6 +121,7 @@ func ToUpperCamelCase(s string) string {
 
 // SplitCamelCaseWord splits a CamelCase word into its parts.
 //
+// Returned words will be lowercase.
 // If s is empty, returns nil.
 // If s is not CamelCase, returns nil.
 func SplitCamelCaseWord(s string) []string {
@@ -136,6 +137,7 @@ func SplitCamelCaseWord(s string) []string {
 
 // SplitSnakeCaseWord splits a snake_case word into its parts.
 //
+// Returned words will be lowercase.
 // If s is empty, returns nil.
 // If s is not snake_case, returns nil.
 func SplitSnakeCaseWord(s string) []string {
