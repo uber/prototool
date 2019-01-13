@@ -22,7 +22,6 @@ require (
 	go.uber.org/zap v1.9.1
 	golang.org/x/net v0.0.0-20181220203305-927f97764cc3
 	golang.org/x/tools v0.0.0-20190103205943-8a6051197512
-	google.golang.org/appengine v1.2.0 // indirect
 	google.golang.org/grpc v1.17.0
 	gopkg.in/yaml.v2 v2.2.2
 	honnef.co/go/tools v0.0.0-20190103051756-51b3beccf3bd
