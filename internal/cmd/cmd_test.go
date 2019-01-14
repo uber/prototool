@@ -455,6 +455,33 @@ func TestLint(t *testing.T) {
 		16:58:COMMENTS_NO_INLINE`,
 		"testdata/lint/inlinecomments/foo/v1/hello_api.proto",
 	)
+	assertDoLintFile(
+		t,
+		false,
+		`13:1:NAMES_NO_COMMON
+		14:3:NAMES_NO_COMMON
+		17:1:NAMES_NO_DATA
+		18:3:NAMES_NO_DATA
+		21:1:NAMES_NO_UUID
+		22:3:NAMES_NO_UUID
+		25:1:NAMES_NO_COMMON
+		26:3:NAMES_NO_UUID
+		27:5:NAMES_NO_UUID
+		28:7:NAMES_NO_UUID
+		33:1:NAMES_NO_COMMON
+		33:1:NAMES_NO_DATA
+		37:1:NAMES_NO_UUID
+		38:3:NAMES_NO_DATA
+		40:3:NAMES_NO_DATA
+		41:5:NAMES_NO_COMMON
+		45:1:NAMES_NO_COMMON
+		46:3:NAMES_NO_COMMON
+		49:1:NAMES_NO_DATA
+		50:3:NAMES_NO_COMMON
+		53:1:NAMES_NO_UUID
+		54:3:NAMES_NO_COMMON`,
+		"testdata/lint/naming/foo/v1/foo.proto",
+	)
 
 	assertDoLintFile(
 		t,

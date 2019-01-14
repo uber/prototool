@@ -36,13 +36,13 @@ service FooOperationsBarAPI {}
 // @suppresswarnings plurals
 service FooOperationsBarsAPI {}
 
-service DataAPI {}
+service InfoAPI {}
 
-service FooDataAPI {}
+service FooInfoAPI {}
 
-service FooDataBarAPI {}
+service FooInfoBarAPI {}
 
-service FooDataBarsAPI {}
+service FooInfoBarsAPI {}
 
 // @suppresswarnings plurals
-service BarDataBarsAPI {}
+service BarInfoBarsAPI {}

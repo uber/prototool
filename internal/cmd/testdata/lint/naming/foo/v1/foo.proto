@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";
+
+enum CommonEnum {
+  COMMON_ENUM_INVALID = 0;
+}
+
+enum DataEnum {
+  DATA_ENUM_INVALID = 0;
+}
+
+enum UuidEnum {
+  UUID_ENUM_INVALID = 0;
+}
+
+message Common {
+  message UUID {
+    enum HelloUUID {
+      HELLO_UUID_INVALID = 0;
+    }
+  }
+}
+
+message DataCommon {
+
+}
+
+message UUID {
+  reserved "foo_data";
+
+  oneof data {
+    int64 common = 1;
+  }
+}
+
+service FooCommonAPI {
+  rpc Common(Request) returns (Response);
+}
+
+service FooDataAPI {
+  rpc Common(Request) returns (Response);
+}
+
+service FooUUIDAPI {
+  rpc Common(Request) returns (Response);
+}
+
+message Request {}
+
+message Response {}
