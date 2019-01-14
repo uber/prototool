@@ -79,14 +79,14 @@ type namesVisitor struct {
 }
 
 func (v *namesVisitor) VisitMessage(element *proto.Message) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }
 
 func (v *namesVisitor) VisitService(element *proto.Service) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
@@ -97,11 +97,11 @@ func (v *namesVisitor) VisitSyntax(element *proto.Syntax) {
 }
 
 func (v *namesVisitor) VisitPackage(element *proto.Package) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 }
 
 func (v *namesVisitor) VisitOption(element *proto.Option) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 }
 
 func (v *namesVisitor) VisitImport(element *proto.Import) {
@@ -109,21 +109,21 @@ func (v *namesVisitor) VisitImport(element *proto.Import) {
 }
 
 func (v *namesVisitor) VisitNormalField(element *proto.NormalField) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Options {
 		child.Accept(v)
 	}
 }
 
 func (v *namesVisitor) VisitEnumField(element *proto.EnumField) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	if element.ValueOption != nil {
 		element.ValueOption.Accept(v)
 	}
 }
 
 func (v *namesVisitor) VisitEnum(element *proto.Enum) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
@@ -134,14 +134,14 @@ func (v *namesVisitor) VisitComment(element *proto.Comment) {
 }
 
 func (v *namesVisitor) VisitOneof(element *proto.Oneof) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }
 
 func (v *namesVisitor) VisitOneofField(element *proto.OneOfField) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Options {
 		child.Accept(v)
 	}
@@ -149,26 +149,26 @@ func (v *namesVisitor) VisitOneofField(element *proto.OneOfField) {
 
 func (v *namesVisitor) VisitReserved(element *proto.Reserved) {
 	for _, fieldName := range element.FieldNames {
-		v.checkName(element.Position, fieldName)
+		v.checkName(element.Position, fieldName, element.Comment)
 	}
 }
 
 func (v *namesVisitor) VisitRPC(element *proto.RPC) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
 }
 
 func (v *namesVisitor) VisitMapField(element *proto.MapField) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Options {
 		child.Accept(v)
 	}
 }
 
 func (v *namesVisitor) VisitGroup(element *proto.Group) {
-	v.checkName(element.Position, element.Name)
+	v.checkName(element.Position, element.Name, element.Comment)
 	for _, child := range element.Elements {
 		child.Accept(v)
 	}
@@ -178,8 +178,11 @@ func (v *namesVisitor) VisitExtensions(element *proto.Extensions) {
 	// do nothing
 }
 
-func (v *namesVisitor) checkName(position scanner.Position, name string) {
+func (v *namesVisitor) checkName(position scanner.Position, name string, comment *proto.Comment) {
 	if strings.Contains(strings.ToLower(name), v.outlawedName) {
+		if isSuppressed(comment, namesSuppressableAnnotation) {
+			return
+		}
 		v.AddFailuref(position, `The name %q contains the outlawed name %q. %s This can be suppressed by adding "@suppresswarnings %s" to the type comment.`, name, v.outlawedName, v.additionalHelp, namesSuppressableAnnotation)
 	}
 }
