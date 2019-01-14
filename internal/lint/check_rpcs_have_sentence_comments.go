@@ -25,29 +25,28 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumsHaveCommentsLinter = NewLinter(
-	"ENUMS_HAVE_COMMENTS",
-	`Verifies that all enums have a comment of the form "// EnumName ...".`,
-	checkEnumsHaveComments,
+var rpcsHaveSentenceCommentsLinter = NewLinter(
+	"RPCS_HAVE_SENTENCE_COMMENTS",
+	`Verifies that all rpcs have a comment that contains at least one complete sentence.`,
+	checkRPCsHaveSentenceComments,
 )
 
-func checkEnumsHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
-	return runVisitor(enumsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkRPCsHaveSentenceComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+	return runVisitor(rpcsHaveSentenceCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
-type enumsHaveCommentsVisitor struct {
+type rpcsHaveSentenceCommentsVisitor struct {
 	baseAddVisitor
 }
 
-func (v enumsHaveCommentsVisitor) VisitMessage(message *proto.Message) {
-	// for nested enums
-	for _, child := range message.Elements {
+func (v rpcsHaveSentenceCommentsVisitor) VisitService(service *proto.Service) {
+	for _, child := range service.Elements {
 		child.Accept(v)
 	}
 }
 
-func (v enumsHaveCommentsVisitor) VisitEnum(enum *proto.Enum) {
-	if !hasGolangStyleComment(enum.Comment, enum.Name) {
-		v.AddFailuref(enum.Position, `Enum %q needs a comment of the form "// %s ..."`, enum.Name, enum.Name)
+func (v rpcsHaveSentenceCommentsVisitor) VisitRPC(rpc *proto.RPC) {
+	if !hasCompleteSentenceComment(rpc.Comment) {
+		v.AddFailuref(rpc.Position, `RPC %q needs a comment with a complete sentence that starts on the first line of the comment.`, rpc.Name)
 	}
 }

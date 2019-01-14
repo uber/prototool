@@ -27,31 +27,31 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var messagesHaveCommentsExceptRequestResponseTypesLinter = NewLinter(
-	"MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES",
-	`Verifies that all non-extended messages except for request and response types have a comment of the form "// MessageName ...".`,
-	checkMessagesHaveCommentsExceptRequestResponseTypes,
+var messagesHaveSentenceCommentsExceptRequestResponseTypesLinter = NewLinter(
+	"MESSAGES_HAVE_SENTENCE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES",
+	`Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence.`,
+	checkMessagesHaveSentenceCommentsExceptRequestResponseTypes,
 )
 
-func checkMessagesHaveCommentsExceptRequestResponseTypes(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
-	return runVisitor(&messagesHaveCommentsExceptRequestResponseTypesVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkMessagesHaveSentenceCommentsExceptRequestResponseTypes(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+	return runVisitor(&messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
-type messagesHaveCommentsExceptRequestResponseTypesVisitor struct {
+type messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor struct {
 	baseAddVisitor
 	messageNameToMessage map[string]*proto.Message
 	requestResponseTypes map[string]struct{}
 	nestedMessageNames   []string
 }
 
-func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) OnStart(*FileDescriptor) error {
+func (v *messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor) OnStart(*FileDescriptor) error {
 	v.messageNameToMessage = nil
 	v.requestResponseTypes = nil
 	v.nestedMessageNames = nil
 	return nil
 }
 
-func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) VisitMessage(message *proto.Message) {
+func (v *messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor) VisitMessage(message *proto.Message) {
 	v.nestedMessageNames = append(v.nestedMessageNames, message.Name)
 	for _, child := range message.Elements {
 		child.Accept(v)
@@ -68,13 +68,13 @@ func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) VisitMessage(mes
 	}
 }
 
-func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) VisitService(service *proto.Service) {
+func (v *messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor) VisitService(service *proto.Service) {
 	for _, child := range service.Elements {
 		child.Accept(v)
 	}
 }
 
-func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) VisitRPC(rpc *proto.RPC) {
+func (v *messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor) VisitRPC(rpc *proto.RPC) {
 	if v.requestResponseTypes == nil {
 		v.requestResponseTypes = make(map[string]struct{})
 	}
@@ -82,15 +82,15 @@ func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) VisitRPC(rpc *pr
 	v.requestResponseTypes[rpc.ReturnsType] = struct{}{}
 }
 
-func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) Finally() error {
+func (v *messagesHaveSentenceCommentsExceptRequestResponseTypesVisitor) Finally() error {
 	if v.messageNameToMessage == nil {
 		v.messageNameToMessage = make(map[string]*proto.Message)
 	}
 	for messageName, message := range v.messageNameToMessage {
 		if !message.IsExtend {
 			if _, ok := v.requestResponseTypes[messageName]; !ok {
-				if !hasGolangStyleComment(message.Comment, message.Name) {
-					v.AddFailuref(message.Position, `Message %q needs a comment of the form "// %s ..."`, message.Name, message.Name)
+				if !hasCompleteSentenceComment(message.Comment) {
+					v.AddFailuref(message.Position, `Message %q needs a comment with a complete sentence that starts on the first line of the comment.`, message.Name)
 				}
 			}
 		}

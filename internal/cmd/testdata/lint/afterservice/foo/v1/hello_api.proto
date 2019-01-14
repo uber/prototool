@@ -12,7 +12,9 @@ option php_namespace = "Foo\\V1";
 
 message SendFooRequest {}
 
+// HelloAPI is the first HelloAPI.
 service HelloAPI {
+  // SendFoo sends foos.
   rpc SendFoo(SendFooRequest) returns (SendFooResponse);
 }
 

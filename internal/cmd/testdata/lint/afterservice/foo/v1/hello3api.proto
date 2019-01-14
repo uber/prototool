@@ -10,7 +10,9 @@ option java_package = "com.foo.v1";
 option objc_class_prefix = "FXX";
 option php_namespace = "Foo\\V1";
 
+// Hello2API is the third HelloAPI.
 service Hello3API {
+  // SendFoo3 sends foos.
   rpc SendFoo3(SendFoo3Request) returns (SendFoo3Response);
 }
 

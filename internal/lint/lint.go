@@ -26,6 +26,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"unicode"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/file"
@@ -48,6 +49,7 @@ var (
 		enumZeroValuesInvalidLinter,
 		enumZeroValuesInvalidExceptMessageLinter,
 		enumsHaveCommentsLinter,
+		enumsHaveSentenceCommentsLinter,
 		enumsNoAllowAliasLinter,
 		fieldsNotReservedLinter,
 		fileHeaderLinter,
@@ -86,6 +88,7 @@ var (
 		messageNamesCapitalizedLinter,
 		messagesHaveCommentsLinter,
 		messagesHaveCommentsExceptRequestResponseTypesLinter,
+		messagesHaveSentenceCommentsExceptRequestResponseTypesLinter,
 		oneofNamesLowerSnakeCaseLinter,
 		packageIsDeclaredLinter,
 		packageLowerSnakeCaseLinter,
@@ -93,6 +96,7 @@ var (
 		packageNoKeywordsLinter,
 		packagesSameInDirLinter,
 		rpcsHaveCommentsLinter,
+		rpcsHaveSentenceCommentsLinter,
 		rpcNamesCamelCaseLinter,
 		rpcNamesCapitalizedLinter,
 		rpcOptionsNoGoogleAPIHTTPLinter,
@@ -102,6 +106,7 @@ var (
 		requestResponseTypesUniqueLinter,
 		requestResponseNamesMatchRPCLinter,
 		servicesHaveCommentsLinter,
+		servicesHaveSentenceCommentsLinter,
 		serviceNamesAPISuffixLinter,
 		serviceNamesCamelCaseLinter,
 		serviceNamesCapitalizedLinter,
@@ -179,6 +184,7 @@ var (
 		enumNamesCamelCaseLinter,
 		enumNamesCapitalizedLinter,
 		enumZeroValuesInvalidExceptMessageLinter,
+		enumsHaveSentenceCommentsLinter,
 		enumsNoAllowAliasLinter,
 		fieldsNotReservedLinter,
 		fileHeaderLinter,
@@ -206,6 +212,7 @@ var (
 		gogoNotImportedLinter,
 		importsNotPublicLinter,
 		importsNotWeakLinter,
+		messagesHaveSentenceCommentsExceptRequestResponseTypesLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
 		messageFieldsNoJSONNameLinter,
 		messageFieldsNotFloatsLinter,
@@ -217,6 +224,7 @@ var (
 		packageMajorBetaVersionedLinter,
 		packageNoKeywordsLinter,
 		packagesSameInDirLinter,
+		rpcsHaveSentenceCommentsLinter,
 		rpcNamesCamelCaseLinter,
 		rpcNamesCapitalizedLinter,
 		rpcOptionsNoGoogleAPIHTTPLinter,
@@ -225,6 +233,7 @@ var (
 		requestResponseTypesInSameFileLinter,
 		requestResponseTypesOnlyInFileLinter,
 		requestResponseTypesUniqueLinter,
+		servicesHaveSentenceCommentsLinter,
 		serviceNamesAPISuffixLinter,
 		serviceNamesCamelCaseLinter,
 		serviceNamesCapitalizedLinter,
@@ -475,6 +484,39 @@ func checkLintID(lintID string) error {
 		return fmt.Errorf("unknown lint id in configuration file: %s", lintID)
 	}
 	return nil
+}
+
+func hasGolangStyleComment(comment *proto.Comment, name string) bool {
+	return comment != nil && len(comment.Lines) > 0 && strings.HasPrefix(comment.Lines[0], fmt.Sprintf(" %s ", name))
+}
+
+func hasCompleteSentenceComment(comment *proto.Comment) bool {
+	return commentStartsWithUppercaseLetter(comment) && commentContainsPeriod(comment)
+}
+
+func commentStartsWithUppercaseLetter(comment *proto.Comment) bool {
+	if comment == nil || len(comment.Lines) == 0 {
+		return false
+	}
+	firstLine := strings.TrimSpace(comment.Lines[0])
+	if firstLine == "" {
+		return false
+	}
+	return unicode.IsUpper(rune(firstLine[0]))
+}
+
+func commentContainsPeriod(comment *proto.Comment) bool {
+	if comment == nil || len(comment.Lines) == 0 {
+		return false
+	}
+	// very primitive check, could make better with NLP but this is hard with comments
+	// since comments can contain code examples, links, etc.
+	for _, line := range comment.Lines {
+		if strings.Contains(line, ".") {
+			return true
+		}
+	}
+	return false
 }
 
 func isSuppressed(comment *proto.Comment, annotation string) bool {

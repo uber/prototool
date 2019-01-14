@@ -18,6 +18,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
+// Hello is a hello.
 type Hello struct {
 	Hello                int64    `protobuf:"varint,1,opt,name=hello,proto3" json:"hello,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -29,7 +30,7 @@ func (m *Hello) Reset()         { *m = Hello{} }
 func (m *Hello) String() string { return proto.CompactTextString(m) }
 func (*Hello) ProtoMessage()    {}
 func (*Hello) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bar_ab45b574cbbc9a08, []int{0}
+	return fileDescriptor_bar_7da55e4d7db32d57, []int{0}
 }
 func (m *Hello) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Hello.Unmarshal(m, b)
@@ -60,9 +61,9 @@ func init() {
 	proto.RegisterType((*Hello)(nil), "uber.bar.v1.Hello")
 }
 
-func init() { proto.RegisterFile("uber/bar/v1/bar.proto", fileDescriptor_bar_ab45b574cbbc9a08) }
+func init() { proto.RegisterFile("uber/bar/v1/bar.proto", fileDescriptor_bar_7da55e4d7db32d57) }
 
-var fileDescriptor_bar_ab45b574cbbc9a08 = []byte{
+var fileDescriptor_bar_7da55e4d7db32d57 = []byte{
 	// 138 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2d, 0x4d, 0x4a, 0x2d,
 	0xd2, 0x4f, 0x4a, 0x2c, 0xd2, 0x2f, 0x33, 0x04, 0x51, 0x7a, 0x05, 0x45, 0xf9, 0x25, 0xf9, 0x42,

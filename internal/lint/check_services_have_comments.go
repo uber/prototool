@@ -21,9 +21,6 @@
 package lint
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
@@ -43,7 +40,7 @@ type servicesHaveCommentsVisitor struct {
 }
 
 func (v servicesHaveCommentsVisitor) VisitService(service *proto.Service) {
-	if service.Comment == nil || len(service.Comment.Lines) == 0 || !strings.HasPrefix(service.Comment.Lines[0], fmt.Sprintf(" %s ", service.Name)) {
+	if !hasGolangStyleComment(service.Comment, service.Name) {
 		v.AddFailuref(service.Position, `Service %q needs a comment of the form "// %s ..."`, service.Name, service.Name)
 	}
 }

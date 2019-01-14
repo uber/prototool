@@ -25,29 +25,29 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
-var enumsHaveCommentsLinter = NewLinter(
-	"ENUMS_HAVE_COMMENTS",
-	`Verifies that all enums have a comment of the form "// EnumName ...".`,
-	checkEnumsHaveComments,
+var enumsHaveSentenceCommentsLinter = NewLinter(
+	"ENUMS_HAVE_SENTENCE_COMMENTS",
+	`Verifies that all enums have a comment that contains at least one complete sentence.`,
+	checkEnumsHaveSentenceComments,
 )
 
-func checkEnumsHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
-	return runVisitor(enumsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkEnumsHaveSentenceComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+	return runVisitor(enumsHaveSentenceCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
-type enumsHaveCommentsVisitor struct {
+type enumsHaveSentenceCommentsVisitor struct {
 	baseAddVisitor
 }
 
-func (v enumsHaveCommentsVisitor) VisitMessage(message *proto.Message) {
+func (v enumsHaveSentenceCommentsVisitor) VisitMessage(message *proto.Message) {
 	// for nested enums
 	for _, child := range message.Elements {
 		child.Accept(v)
 	}
 }
 
-func (v enumsHaveCommentsVisitor) VisitEnum(enum *proto.Enum) {
-	if !hasGolangStyleComment(enum.Comment, enum.Name) {
-		v.AddFailuref(enum.Position, `Enum %q needs a comment of the form "// %s ..."`, enum.Name, enum.Name)
+func (v enumsHaveSentenceCommentsVisitor) VisitEnum(enum *proto.Enum) {
+	if !hasCompleteSentenceComment(enum.Comment) {
+		v.AddFailuref(enum.Position, `Enum %q needs a comment with a complete sentence that starts on the first line of the comment.`, enum.Name)
 	}
 }
