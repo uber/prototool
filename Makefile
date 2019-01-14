@@ -136,8 +136,12 @@ cover:
 	@mkdir -p $(TMP_ETC)
 	@rm -f $(TMP_ETC)/coverage.txt $(TMP_ETC)/coverage.html
 	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=$(shell echo $(PKGS) | tr ' ' ',') $(PKGS)
-	go tool cover -html=$(TMP_ETC)/coverage.txt -o $(TMP_ETC)/coverage.html
-	go tool cover -func=$(TMP_ETC)/coverage.txt | grep total
+	@go tool cover -html=$(TMP_ETC)/coverage.txt -o $(TMP_ETC)/coverage.html
+	@echo
+	@go tool cover -func=$(TMP_ETC)/coverage.txt | grep total
+	@echo
+	@echo Open the coverage report:
+	@echo open $(TMP_ETC)/coverage.html
 
 .PHONY: codecov
 codecov:
