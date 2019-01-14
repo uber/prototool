@@ -134,8 +134,8 @@ func TestInit(t *testing.T) {
 		_ = os.RemoveAll(tmpDir)
 	}()
 
-	assertDo(t, 0, "", "config", "init", tmpDir)
-	assertDo(t, 1, fmt.Sprintf("%s already exists", filepath.Join(tmpDir, settings.DefaultConfigFilename)), "config", "init", tmpDir)
+	assertDo(t, false, 0, "", "config", "init", tmpDir)
+	assertDo(t, false, 1, fmt.Sprintf("%s already exists", filepath.Join(tmpDir, settings.DefaultConfigFilename)), "config", "init", tmpDir)
 }
 
 func TestLint(t *testing.T) {
@@ -616,6 +616,7 @@ func TestLintConfigDataOverride(t *testing.T) {
 	)
 	assertExact(
 		t,
+		true,
 		1,
 		`json: unknown field "unknown_key"`,
 		"lint",
@@ -1040,16 +1041,17 @@ func TestGRPC(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
-	assertRegexp(t, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
+	assertRegexp(t, false, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
 }
 
 func TestVersionJSON(t *testing.T) {
-	assertRegexp(t, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
+	assertRegexp(t, false, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
 func TestInspectPackages(t *testing.T) {
 	assertExact(
 		t,
+		true,
 		0,
 		`bar
 foo
@@ -1061,6 +1063,7 @@ google.protobuf`,
 func TestInspectPackageDeps(t *testing.T) {
 	assertExact(
 		t,
+		true,
 		0,
 		`bar
 google.protobuf`,
@@ -1068,12 +1071,14 @@ google.protobuf`,
 	)
 	assertExact(
 		t,
+		true,
 		0,
 		``,
 		"inspect", "package-deps", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
+		true,
 		0,
 		``,
 		"inspect", "package-deps", "testdata/foo", "--name", "google.protobuf",
@@ -1083,18 +1088,21 @@ google.protobuf`,
 func TestInspectPackageImporters(t *testing.T) {
 	assertExact(
 		t,
+		true,
 		0,
 		``,
 		"inspect", "package-importers", "testdata/foo", "--name", "foo",
 	)
 	assertExact(
 		t,
+		true,
 		0,
 		`foo`,
 		"inspect", "package-importers", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
+		true,
 		0,
 		`foo`,
 		"inspect", "package-importers", "testdata/foo", "--name", "google.protobuf",
@@ -1111,7 +1119,7 @@ func TestListAllLinters(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, 0, "google\nuber\nuber2", "lint", "--list-all-lint-groups")
+	assertExact(t, true, 0, "google\nuber\nuber2", "lint", "--list-all-lint-groups")
 }
 
 func TestListLintGroup(t *testing.T) {
@@ -1123,6 +1131,7 @@ func TestListLintGroup(t *testing.T) {
 func TestDiffLintGroups(t *testing.T) {
 	assertExact(
 		t,
+		true,
 		0,
 		`> COMMENTS_NO_C_STYLE
 > ENUMS_NO_ALLOW_ALIAS
@@ -1158,7 +1167,7 @@ func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
 		linterIDs = append(linterIDs, linter.ID())
 	}
 	sort.Strings(linterIDs)
-	assertDo(t, 0, strings.Join(linterIDs, "\n"), args...)
+	assertDo(t, true, 0, strings.Join(linterIDs, "\n"), args...)
 }
 
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, asJSON bool, expectedLinePrefixes string, filePaths ...string) {
@@ -1171,7 +1180,7 @@ func assertDoCompileFiles(t *testing.T, expectSuccess bool, asJSON bool, expecte
 	if asJSON {
 		cmd = append(cmd, "--json")
 	}
-	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append(cmd, filePaths...)...)
+	assertDo(t, true, expectedExitCode, strings.Join(lines, "\n"), append(cmd, filePaths...)...)
 }
 
 func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath string, pkgOverride string, expectedFileData string) {
@@ -1183,7 +1192,7 @@ func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath 
 	if pkgOverride != "" {
 		args = append(args, "--package", pkgOverride)
 	}
-	_, exitCode := testDo(t, args...)
+	_, exitCode := testDo(t, false, args...)
 	if expectSuccess {
 		assert.Equal(t, 0, exitCode)
 		fileData, err := ioutil.ReadFile(filePath)
@@ -1203,7 +1212,7 @@ func assertDoLintFile(t *testing.T, expectSuccess bool, expectedLinePrefixesWith
 	if !expectSuccess {
 		expectedExitCode = 255
 	}
-	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint", filePath}, args...)...)
+	assertDo(t, true, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint", filePath}, args...)...)
 }
 
 func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
@@ -1212,7 +1221,7 @@ func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes st
 	if !expectSuccess {
 		expectedExitCode = 255
 	}
-	assertDo(t, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint"}, filePaths...)...)
+	assertDo(t, true, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint"}, filePaths...)...)
 }
 
 func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath string) {
@@ -1221,7 +1230,7 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 		args = append(args, "--fix")
 	}
 	args = append(args, filePath)
-	output, exitCode := testDo(t, args...)
+	output, exitCode := testDo(t, true, args...)
 	expectedExitCode := 0
 	if !expectSuccess {
 		expectedExitCode = 255
@@ -1235,39 +1244,39 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string) {
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), expectedExitCode, expectedLinePrefixes, "grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin")
+	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, "grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin")
 }
 
-func assertRegexp(t *testing.T, expectedExitCode int, expectedRegexp string, args ...string) {
-	stdout, exitCode := testDo(t, args...)
+func assertRegexp(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedRegexp string, args ...string) {
+	stdout, exitCode := testDo(t, extraErrorFormat, args...)
 	assert.Equal(t, expectedExitCode, exitCode)
 	matched, err := regexp.MatchString(expectedRegexp, stdout)
 	assert.NoError(t, err)
 	assert.True(t, matched, "Expected regex %s but got %s", expectedRegexp, stdout)
 }
 
-func assertExact(t *testing.T, expectedExitCode int, expectedStdout string, args ...string) {
-	stdout, exitCode := testDo(t, args...)
+func assertExact(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedStdout string, args ...string) {
+	stdout, exitCode := testDo(t, extraErrorFormat, args...)
 	assert.Equal(t, expectedExitCode, exitCode)
 	assert.Equal(t, expectedStdout, stdout)
 }
 
-func assertDoStdin(t *testing.T, stdin io.Reader, expectedExitCode int, expectedLinePrefixes string, args ...string) {
-	assertDoInternal(t, stdin, expectedExitCode, expectedLinePrefixes, args...)
+func assertDoStdin(t *testing.T, stdin io.Reader, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
+	assertDoInternal(t, stdin, extraErrorFormat, expectedExitCode, expectedLinePrefixes, args...)
 }
 
-func assertDo(t *testing.T, expectedExitCode int, expectedLinePrefixes string, args ...string) {
-	assertDoInternal(t, nil, expectedExitCode, expectedLinePrefixes, args...)
+func assertDo(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
+	assertDoInternal(t, nil, extraErrorFormat, expectedExitCode, expectedLinePrefixes, args...)
 }
 
-func testDoStdin(t *testing.T, stdin io.Reader, args ...string) (string, int) {
+func testDoStdin(t *testing.T, stdin io.Reader, extraErrorFormat bool, args ...string) (string, int) {
 	testDownload(t)
-	return testDoInternal(stdin, args...)
+	return testDoInternal(stdin, extraErrorFormat, args...)
 }
 
-func testDo(t *testing.T, args ...string) (string, int) {
+func testDo(t *testing.T, extraErrorFormat bool, args ...string) (string, int) {
 	testDownload(t)
-	return testDoInternal(nil, args...)
+	return testDoInternal(nil, extraErrorFormat, args...)
 }
 
 func getCleanLines(output string) []string {
@@ -1369,8 +1378,8 @@ func (s *excitedServer) ExclamationBidiStream(streamServer grpcpb.ExcitedService
 
 // do not use these in tests
 
-func assertDoInternal(t *testing.T, stdin io.Reader, expectedExitCode int, expectedLinePrefixes string, args ...string) {
-	stdout, exitCode := testDoStdin(t, stdin, args...)
+func assertDoInternal(t *testing.T, stdin io.Reader, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
+	stdout, exitCode := testDoStdin(t, stdin, extraErrorFormat, args...)
 	outputSplit := getCleanLines(stdout)
 	assert.Equal(t, expectedExitCode, exitCode, strings.Join(outputSplit, "\n"))
 	expectedLinePrefixesSplit := getCleanLines(expectedLinePrefixes)
@@ -1386,20 +1395,22 @@ func testDownload(t *testing.T) {
 	// download checks if protoc is already downloaded to the cache location
 	// if it is, then this is effectively a no-op
 	// if it isn't, then this downloads to the cache
-	stdout, exitCode := testDoInternal(nil, "cache", "update")
+	stdout, exitCode := testDoInternal(nil, false, "cache", "update")
 	require.Equal(t, 0, exitCode, "had non-zero exit code when downloading: %s", stdout)
 }
 
-func testDoInternal(stdin io.Reader, args ...string) (string, int) {
-	args = append(args,
-		"--print-fields", "filename:line:column:id:message",
-	)
+func testDoInternal(stdin io.Reader, extraErrorFormat bool, args ...string) (string, int) {
 	if stdin == nil {
 		stdin = os.Stdin
 	}
+	if extraErrorFormat {
+		args = append(args,
+			"--error-format", "filename:line:column:id:message",
+		)
+	}
 	buffer := bytes.NewBuffer(nil)
 	// develMode is on, so we have access to all commands
-	exitCode := do(true, args, stdin, buffer, buffer)
+	exitCode := do(args, stdin, buffer, buffer)
 	return strings.TrimSpace(buffer.String()), exitCode
 }
 

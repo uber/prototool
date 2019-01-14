@@ -38,6 +38,7 @@ type flags struct {
 	disableFormat     bool
 	disableLint       bool
 	dryRun            bool
+	errorFormat       string
 	fix               bool
 	gitBranch         string
 	gitTag            string
@@ -54,7 +55,6 @@ type flags struct {
 	name              string
 	overwrite         bool
 	pkg               string
-	printFields       string
 	protocBinPath     string
 	protocWKTPath     string
 	protocURL         string
@@ -112,6 +112,10 @@ func (f *flags) bindDisableLint(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.dryRun, "dry-run", false, "Print the protoc commands that would have been run without actually running them.")
+}
+
+func (f *flags) bindErrorFormat(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.errorFormat, "error-format", "filename:line:column:message", `The colon-separated fields to print out on error. Valid values are "filename:line:column:id:message".`)
 }
 
 func (f *flags) bindGitBranch(flagSet *pflag.FlagSet) {
@@ -172,10 +176,6 @@ func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindPackage(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.pkg, "package", "", "The Protobuf package to use in the created file.")
-}
-
-func (f *flags) bindPrintFields(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.printFields, "print-fields", "filename:line:column:message", "The colon-separated fields to print out on error.")
 }
 
 func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {

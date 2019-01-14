@@ -96,11 +96,11 @@ func RunnerWithJSON() RunnerOption {
 	}
 }
 
-// RunnerWithPrintFields returns a RunnerOption that uses the given colon-separated
-// print fields. The default is filename:line:column:message.
-func RunnerWithPrintFields(printFields string) RunnerOption {
+// RunnerWithErrorFormat returns a RunnerOption that uses the given colon-separated
+// error format. The default is filename:line:column:message.
+func RunnerWithErrorFormat(errorFormat string) RunnerOption {
 	return func(runner *runner) {
-		runner.printFields = printFields
+		runner.errorFormat = errorFormat
 	}
 }
 

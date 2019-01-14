@@ -49,6 +49,7 @@ var (
 			flags.bindConfigData(flagSet)
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
@@ -133,6 +134,7 @@ Artifacts are downloaded to the following directories based on flags and environ
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
@@ -234,6 +236,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDiffMode(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindLintMode(flagSet)
 			flags.bindOverwrite(flagSet)
@@ -255,6 +258,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
@@ -344,6 +348,7 @@ $ cat input.json | prototool grpc example \
 			flags.bindCallTimeout(flagSet)
 			flags.bindConnectTimeout(flagSet)
 			flags.bindData(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindHeaders(flagSet)
 			flags.bindKeepaliveTime(flagSet)
 			flags.bindMethod(flagSet)
@@ -364,6 +369,7 @@ $ cat input.json | prototool grpc example \
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
@@ -380,6 +386,7 @@ $ cat input.json | prototool grpc example \
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindName(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
@@ -397,6 +404,7 @@ $ cat input.json | prototool grpc example \
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindName(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
@@ -464,6 +472,7 @@ sys	0m0.924s`,
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
@@ -592,10 +601,10 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 			exec.RunnerWithProtocWKTPath(flags.protocWKTPath),
 		)
 	}
-	if flags.printFields != "" {
+	if flags.errorFormat != "" {
 		runnerOptions = append(
 			runnerOptions,
-			exec.RunnerWithPrintFields(flags.printFields),
+			exec.RunnerWithErrorFormat(flags.errorFormat),
 		)
 	}
 	if flags.protocURL != "" {
