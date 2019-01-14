@@ -83,14 +83,51 @@ func TestIsUppercase(t *testing.T) {
 }
 
 func TestToLowerSnakeCase(t *testing.T) {
-	assert.Equal(t, "", ToUpperSnakeCase(""))
+	assert.Equal(t, "", ToLowerSnakeCase(""))
 	assert.Equal(t, "camel_case", ToLowerSnakeCase("CamelCase"))
+	assert.Equal(t, "camel_case", ToLowerSnakeCase("  CamelCase"))
+	assert.Equal(t, "camel_case", ToLowerSnakeCase("CamelCase  "))
 	assert.Equal(t, "camel_case", ToLowerSnakeCase("camelCase"))
 	assert.Equal(t, "camel_case_", ToLowerSnakeCase("CamelCase_"))
 	assert.Equal(t, "_camel_case", ToLowerSnakeCase("_CamelCase"))
 	assert.Equal(t, "camel_case__hello", ToLowerSnakeCase("CamelCase__Hello"))
 	assert.Equal(t, "abbr_camel", ToLowerSnakeCase("ABBRCamel"))
 	assert.Equal(t, "foo_abbr_camel", ToLowerSnakeCase("FooABBRCamel"))
+	assert.Equal(t, "abbr_camel_abbr", ToLowerSnakeCase("ABBRCamelABBR"))
+}
+
+func TestSplitCamelCaseWord(t *testing.T) {
+	assert.Equal(t, []string(nil), SplitSnakeCaseWord(""))
+	assert.Equal(t, []string{"camel", "case"}, SplitCamelCaseWord("CamelCase"))
+	assert.Equal(t, []string{"camel", "case"}, SplitCamelCaseWord("  CamelCase"))
+	assert.Equal(t, []string{"camel", "case"}, SplitCamelCaseWord("CamelCase  "))
+	assert.Equal(t, []string{"camel", "case"}, SplitCamelCaseWord("camelCase"))
+	assert.Equal(t, []string{"camel", "case", "hello"}, SplitCamelCaseWord("camelCaseHello"))
+	assert.Equal(t, []string(nil), SplitCamelCaseWord("CamelCase_"))
+	assert.Equal(t, []string(nil), SplitCamelCaseWord("_CamelCase"))
+	assert.Equal(t, []string(nil), SplitCamelCaseWord("CamelCase__Hello"))
+	assert.Equal(t, []string{"abbr", "camel"}, SplitCamelCaseWord("ABBRCamel"))
+	assert.Equal(t, []string{"foo", "abbr", "camel"}, SplitCamelCaseWord("FooABBRCamel"))
+	assert.Equal(t, []string{"abbr", "camel", "abbr"}, SplitCamelCaseWord("ABBRCamelABBR"))
+	assert.Equal(t, []string(nil), SplitCamelCaseWord("Camel_Case"))
+}
+
+func TestSplitSnakeCaseWord(t *testing.T) {
+	assert.Equal(t, []string(nil), SplitSnakeCaseWord(""))
+	assert.Equal(t, []string{"snake", "case"}, SplitSnakeCaseWord("Snake_Case"))
+	assert.Equal(t, []string{"snake", "case"}, SplitSnakeCaseWord("  Snake_Case"))
+	assert.Equal(t, []string{"snake", "case"}, SplitSnakeCaseWord("Snake_Case  "))
+	assert.Equal(t, []string{"snake", "case"}, SplitSnakeCaseWord("snake_Case"))
+	assert.Equal(t, []string(nil), SplitSnakeCaseWord("Snake_Case_"))
+	assert.Equal(t, []string(nil), SplitSnakeCaseWord("_Snake_Case"))
+	assert.Equal(t, []string{"snake", "case", "hello"}, SplitSnakeCaseWord("Snake_Case__Hello"))
+	assert.Equal(t, []string{"abbr", "snake"}, SplitSnakeCaseWord("ABBR_Snake"))
+	assert.Equal(t, []string{"foo", "abbr", "snake"}, SplitSnakeCaseWord("Foo_ABBR_Snake"))
+	assert.Equal(t, []string{"abbr", "snake", "abbr"}, SplitSnakeCaseWord("ABBR_Snake_ABBR"))
+	assert.Equal(t, []string{"snake", "case"}, SplitSnakeCaseWord("SNAKE_CASE"))
+	assert.Equal(t, []string{"snake", "case"}, SplitSnakeCaseWord("snake_case"))
+	assert.Equal(t, []string(nil), SplitSnakeCaseWord("SNAKE_CASE_"))
+	assert.Equal(t, []string(nil), SplitSnakeCaseWord("_snake_case"))
 }
 
 func TestToUpperSnakeCase(t *testing.T) {

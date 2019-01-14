@@ -205,6 +205,7 @@ to the element comment. The following lint rules can be suppressed:
 | `MESSAGE_FIELDS_NOT_FLOATS`      | `uber2`                  | `floats`                 |
 | `PACKAGE_NO_KEYWORDS`            | `uber2`                  | `keywords`               |
 | `RPC_OPTIONS_NO_GOOGLE_API_HTTP` | `uber2`                  | `google-api-http`        |
+| `SERVICE_NAMES_NO_PLURALS`       | `uber2`                  | `plurals`                |
 
 As an example:
 
@@ -219,7 +220,11 @@ package foo.public.bar;
 // @suppresswarnings floats
 float hello = 1;
 
-service FooAPI {
+// TripOperationsAPI contains the plural component "Operations" and we want to have
+// consistent naming where everything is singular.
+//
+// @suppresswarnings plurals
+service TripOperationsAPI {
   // We understand the concerns with using the http option so we allow it here.
   // @suppresswarnings google-api-http
   rpc Bar(BarRequest) returns (BarResponse) {
@@ -516,6 +521,8 @@ major version, with some exceptions:
   breaking previously might become a breaking change.
 - The `PACKAGE_NO_KEYWORDS` linter on the `uber2` lint group may have additional keywords added. This can be suppressed by adding
   `@suppresswarnings keywords` to the package comment.
+- The `SERVICE_NAMES_NO_PLURALS` linter on the `uber2` lint group ignores certain plurals such as "data". We may add additional ignored
+  plurals in the future, so plurals that are not ignored now may be ignored later.
 
 ## Development
 

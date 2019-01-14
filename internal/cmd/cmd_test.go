@@ -528,6 +528,18 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`15:1:SERVICE_NAMES_NO_PLURALS
+		19:1:SERVICE_NAMES_NO_PLURALS
+		23:1:SERVICE_NAMES_NO_PLURALS
+		25:1:SERVICE_NAMES_NO_PLURALS
+		25:1:SERVICE_NAMES_NO_PLURALS
+		45:1:SERVICE_NAMES_NO_PLURALS`,
+		"testdata/lint/noplurals/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`3:1:PACKAGE_NO_KEYWORDS`,
 		"testdata/lint/nokeywords/foo/public/public.proto",
 	)

@@ -1,0 +1,5 @@
+lint:
+  group: uber2
+  rules:
+    remove:
+      - SERVICE_NAMES_MATCH_FILE_NAME
