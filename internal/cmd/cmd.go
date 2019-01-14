@@ -48,26 +48,26 @@ var genManTime = time.Date(2018, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 // Do runs the command logic.
 func Do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return do(false, args, stdin, stdout, stderr)
+	return do(args, stdin, stdout, stderr)
 }
 
-func do(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(develMode, args, stdin, stdout, stderr, (*cobra.Command).Execute)
+func do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
+	return runRootCommand(args, stdin, stdout, stderr, (*cobra.Command).Execute)
 }
 
 // GenBashCompletion generates a bash completion file to the writer.
 func GenBashCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
+	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
 }
 
 // GenZshCompletion generates a zsh completion file to the writer.
 func GenZshCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
+	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
 }
 
 // GenManpages generates the manpages to the given directory.
 func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(false, args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
+	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
 		if len(args) != 1 {
 			return fmt.Errorf("usage: %s dirPath", os.Args[0])
 		}
@@ -80,23 +80,21 @@ func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Wri
 	})
 }
 
-// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
-func runRootCommandOutput(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
-	return runRootCommand(develMode, args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
+func runRootCommandOutput(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
+	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
 }
 
-// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
-func runRootCommand(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
+func runRootCommand(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
 	if err := checkOS(); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
-	if err := f(getRootCommand(&exitCode, develMode, args, stdin, stdout, stderr)); err != nil {
+	if err := f(getRootCommand(&exitCode, args, stdin, stdout, stderr)); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
 	return exitCode
 }
 
-func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
+func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
 	flags := &flags{}
 
 	rootCmd := &cobra.Command{Use: "prototool"}
@@ -127,10 +125,6 @@ func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.R
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())
-
-	if develMode {
-		flags.bindPrintFields(rootCmd.PersistentFlags())
-	}
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetOutput(stdout)

@@ -70,7 +70,7 @@ type runner struct {
 	protocBinPath string
 	protocWKTPath string
 	protocURL     string
-	printFields   string
+	errorFormat   string
 	json          bool
 }
 
@@ -112,7 +112,7 @@ func (r *runner) cloneForWorkDirPath(workDirPath string) *runner {
 		protocBinPath:    r.protocBinPath,
 		protocWKTPath:    r.protocWKTPath,
 		protocURL:        r.protocURL,
-		printFields:      r.printFields,
+		errorFormat:      r.errorFormat,
 		json:             r.json,
 	}
 }
@@ -640,7 +640,7 @@ func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, incl
 		return err
 	}
 	if len(failures) > 0 {
-		if err := r.printFailuresForPrintFields("message", "", nil, failures...); err != nil {
+		if err := r.printFailuresForErrorFormat("message", "", nil, failures...); err != nil {
 			return err
 		}
 		return newExitErrorf(255, "")
@@ -902,16 +902,16 @@ func (r *runner) getMeta(args []string) (*meta, error) {
 // if set, it will update the Failures to have this filename
 // will be sorted
 func (r *runner) printFailures(filename string, meta *meta, failures ...*text.Failure) error {
-	return r.printFailuresForPrintFields(r.printFields, filename, meta, failures...)
+	return r.printFailuresForErrorFormat(r.errorFormat, filename, meta, failures...)
 }
 
-func (r *runner) printFailuresForPrintFields(printFields string, filename string, meta *meta, failures ...*text.Failure) error {
+func (r *runner) printFailuresForErrorFormat(errorFormat string, filename string, meta *meta, failures ...*text.Failure) error {
 	for _, failure := range failures {
 		if filename != "" {
 			failure.Filename = filename
 		}
 	}
-	failureFields, err := text.ParseColonSeparatedFailureFields(printFields)
+	failureFields, err := text.ParseColonSeparatedFailureFields(errorFormat)
 	if err != nil {
 		return err
 	}

@@ -502,7 +502,7 @@ func commentStartsWithUppercaseLetter(comment *proto.Comment) bool {
 	if firstLine == "" {
 		return false
 	}
-	return unicode.IsUpper(rune(firstLine[0]))
+	return unicode.IsUpper(rune(firstLine[0])) || unicode.IsDigit(rune(firstLine[0]))
 }
 
 func commentContainsPeriod(comment *proto.Comment) bool {
