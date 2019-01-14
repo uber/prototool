@@ -26,7 +26,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -250,9 +252,13 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 				return Config{}, fmt.Errorf("include_source_info is only valid for the descriptor_set plugin but set on %q", plugin.Name)
 			}
 		}
+		pluginPath, err := getPluginPath(plugin.Path)
+		if err != nil {
+			return Config{}, err
+		}
 		genPlugins[i] = GenPlugin{
 			Name:              plugin.Name,
-			Path:              plugin.Path,
+			Path:              pluginPath,
 			Type:              genPluginType,
 			Flags:             plugin.Flags,
 			FileSuffix:        plugin.FileSuffix,
@@ -409,4 +415,31 @@ func getFileHeaderLines(data []byte) []string {
 		lines = append(lines, strings.TrimSpace(line))
 	}
 	return lines
+}
+
+func getPluginPath(path string) (string, error) {
+	if path == "" {
+		return "", nil
+	}
+	if filepath.IsAbs(path) {
+		return path, nil
+	}
+	return which(path)
+}
+
+func which(program string) (string, error) {
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		// "command -v" is the POSIX command for "which"
+		output, err := exec.Command("command", "-v", program).Output()
+		if err != nil {
+			if errString := strings.TrimSpace(err.Error()); errString != "" {
+				return "", fmt.Errorf("could not find %q", program)
+			}
+			return "", fmt.Errorf("could not find %q: %v", program, err)
+		}
+		return strings.TrimSpace(string(output)), nil
+	default:
+		return "", fmt.Errorf("runtime.GOOS not supported: %s", runtime.GOOS)
+	}
 }
