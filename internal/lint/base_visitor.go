@@ -32,9 +32,8 @@ var _ proto.Visitor = baseVisitor{}
 
 type baseVisitor struct{}
 
-func (baseVisitor) OnStart(*FileDescriptor) error { return nil }
-func (baseVisitor) Finally() error                { return nil }
-
+func (baseVisitor) OnStart(*FileDescriptor) error         { return nil }
+func (baseVisitor) Finally() error                        { return nil }
 func (baseVisitor) VisitMessage(m *proto.Message)         {}
 func (baseVisitor) VisitService(s *proto.Service)         {}
 func (baseVisitor) VisitSyntax(s *proto.Syntax)           {}

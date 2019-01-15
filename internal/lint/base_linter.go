@@ -131,16 +131,3 @@ func (c *baseLinter) isSuppressed(protoSet *file.ProtoSet, comment *proto.Commen
 	}
 	return false
 }
-
-func isSuppressed(comment *proto.Comment, annotation string) bool {
-	if comment == nil {
-		return false
-	}
-	annotation = "@suppresswarnings " + annotation
-	for _, line := range comment.Lines {
-		if strings.Contains(line, annotation) {
-			return true
-		}
-	}
-	return false
-}
