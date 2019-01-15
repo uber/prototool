@@ -21,31 +21,33 @@
 package lint
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/text"
 )
 
-const rpcOptionsNoGoogleAPIHTTPSuppressableAnnotation = "google-api-http"
-
-var rpcOptionsNoGoogleAPIHTTPLinter = NewLinter(
+var rpcOptionsNoGoogleAPIHTTPLinter = NewSuppressableLinter(
 	"RPC_OPTIONS_NO_GOOGLE_API_HTTP",
-	fmt.Sprintf(`Suppressable with "@suppresswarnings %s". Verifies that the RPC option "google.api.http" is not used.`, rpcOptionsNoGoogleAPIHTTPSuppressableAnnotation),
+	`Verifies that the RPC option "google.api.http" is not used.`,
+	"google-api-http",
 	checkRPCOptionsNoGoogleAPIHTTP,
 )
 
-func checkRPCOptionsNoGoogleAPIHTTP(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
-	return runVisitor(&rpcOptionsNoGoogleAPIHTTPVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkRPCOptionsNoGoogleAPIHTTP(add func(*file.ProtoSet, *proto.Comment, *text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+	return runVisitor(&rpcOptionsNoGoogleAPIHTTPVisitor{baseAddSuppressableVisitor: newBaseAddSuppressableVisitor(add)}, descriptors)
 }
 
 type rpcOptionsNoGoogleAPIHTTPVisitor struct {
-	baseAddVisitor
+	*baseAddSuppressableVisitor
 	rpc *proto.RPC
 }
 
-func (v *rpcOptionsNoGoogleAPIHTTPVisitor) OnStart(*FileDescriptor) error {
+func (v *rpcOptionsNoGoogleAPIHTTPVisitor) OnStart(descriptor *FileDescriptor) error {
+	if err := v.baseAddSuppressableVisitor.OnStart(descriptor); err != nil {
+		return err
+	}
 	v.rpc = nil
 	return nil
 }
@@ -65,10 +67,7 @@ func (v *rpcOptionsNoGoogleAPIHTTPVisitor) VisitRPC(rpc *proto.RPC) {
 }
 
 func (v *rpcOptionsNoGoogleAPIHTTPVisitor) VisitOption(option *proto.Option) {
-	if strings.HasPrefix(option.Name, "(google.api.http)") || strings.HasPrefix(option.Name, "(.google.api.http)") {
-		if v.rpc != nil && isSuppressed(v.rpc.Comment, rpcOptionsNoGoogleAPIHTTPSuppressableAnnotation) {
-			return
-		}
-		v.AddFailuref(option.Position, `Option "google.api.http" is not allowed. This option signifies HTTP/REST usage, use the RPC framework instead. This can be suppressed by adding "@suppresswarnings %s" to the RPC comment.`, rpcOptionsNoGoogleAPIHTTPSuppressableAnnotation)
+	if v.rpc != nil && strings.HasPrefix(option.Name, "(google.api.http)") || strings.HasPrefix(option.Name, "(.google.api.http)") {
+		v.AddFailuref(v.rpc.Comment, option.Position, `Option "google.api.http" is not allowed. This option signifies HTTP/REST usage, use the RPC framework instead.`)
 	}
 }

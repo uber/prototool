@@ -48,7 +48,7 @@ type Runner interface {
 	Init(args []string, uncomment bool) error
 	Create(args []string, pkg string) error
 	Version() error
-	CacheUpdate() error
+	CacheUpdate(args []string) error
 	CacheDelete() error
 	Files(args []string) error
 	Compile(args []string, dryRun bool) error
@@ -72,6 +72,13 @@ type RunnerOption func(*runner)
 func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 	return func(runner *runner) {
 		runner.logger = logger
+	}
+}
+
+// RunnerWithDevelMode returns a RunnerOption that allows devel-mode.
+func RunnerWithDevelMode() RunnerOption {
+	return func(runner *runner) {
+		runner.develMode = true
 	}
 }
 

@@ -33,6 +33,7 @@ import (
 
 type protoSetProvider struct {
 	logger         *zap.Logger
+	develMode      bool
 	configData     string
 	walkTimeout    time.Duration
 	configProvider settings.ConfigProvider
@@ -46,9 +47,16 @@ func newProtoSetProvider(options ...ProtoSetProviderOption) *protoSetProvider {
 	for _, option := range options {
 		option(protoSetProvider)
 	}
-	protoSetProvider.configProvider = settings.NewConfigProvider(
+	configProviderOptions := []settings.ConfigProviderOption{
 		settings.ConfigProviderWithLogger(protoSetProvider.logger),
-	)
+	}
+	if protoSetProvider.develMode {
+		configProviderOptions = append(
+			configProviderOptions,
+			settings.ConfigProviderWithDevelMode(),
+		)
+	}
+	protoSetProvider.configProvider = settings.NewConfigProvider(configProviderOptions...)
 	return protoSetProvider
 }
 

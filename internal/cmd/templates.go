@@ -83,7 +83,7 @@ The input directory must be relative.`,
 	}
 
 	cacheUpdateCmdTemplate = &cmdTemplate{
-		Use:   "update",
+		Use:   "update [dirOrFile]",
 		Short: "Update the cache by downloading all artifacts.",
 		Long: `This will download artifacts to a cache directory before running any commands. Note that calling this command is not necessary, all artifacts are automatically downloaded when required by other commands. This just provides a mechanism to pre-cache artifacts during your build.
 
@@ -96,9 +96,9 @@ Artifacts are downloaded to the following directories based on flags and environ
   will be used.
 - Otherwise, if on Linux, $HOME/.cache/prototool will be used, or on Darwin,
   $HOME/Library/Caches/prototool will be used.`,
-		Args: cobra.NoArgs,
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.CacheUpdate()
+			return runner.CacheUpdate(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
@@ -535,7 +535,7 @@ type cmdTemplate struct {
 }
 
 // Build builds a *cobra.Command from the cmdTemplate.
-func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) *cobra.Command {
+func (c *cmdTemplate) Build(develMode bool, exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) *cobra.Command {
 	command := &cobra.Command{}
 	command.Use = c.Use
 	command.Short = strings.TrimSpace(c.Short)
@@ -544,7 +544,7 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	}
 	command.Args = c.Args
 	command.Run = func(_ *cobra.Command, args []string) {
-		checkCmd(exitCodeAddr, stdin, stdout, stderr, args, flags, c.Run)
+		checkCmd(develMode, exitCodeAddr, stdin, stdout, stderr, args, flags, c.Run)
 	}
 	if c.BindFlags != nil {
 		c.BindFlags(command.PersistentFlags(), flags)
@@ -552,8 +552,8 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	return command
 }
 
-func checkCmd(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, args []string, flags *flags, f func(exec.Runner, []string, *flags) error) {
-	runner, err := getRunner(stdin, stdout, stderr, flags)
+func checkCmd(develMode bool, exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, args []string, flags *flags, f func(exec.Runner, []string, *flags) error) {
+	runner, err := getRunner(develMode, stdin, stdout, stderr, flags)
 	if err != nil {
 		*exitCodeAddr = printAndGetErrorExitCode(err, stdout)
 		return
@@ -563,7 +563,7 @@ func checkCmd(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Wr
 	}
 }
 
-func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) (exec.Runner, error) {
+func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) (exec.Runner, error) {
 	logger, err := getLogger(stderr, flags.debug)
 	if err != nil {
 		return nil, err
@@ -611,6 +611,12 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithProtocURL(flags.protocURL),
+		)
+	}
+	if develMode {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithDevelMode(),
 		)
 	}
 	workDirPath, err := os.Getwd()

@@ -71,6 +71,7 @@ type tmplData struct {
 
 type handler struct {
 	logger         *zap.Logger
+	develMode      bool
 	configProvider settings.ConfigProvider
 	pkg            string
 }
@@ -82,9 +83,16 @@ func newHandler(options ...HandlerOption) *handler {
 	for _, option := range options {
 		option(handler)
 	}
-	handler.configProvider = settings.NewConfigProvider(
+	configProviderOptions := []settings.ConfigProviderOption{
 		settings.ConfigProviderWithLogger(handler.logger),
-	)
+	}
+	if handler.develMode {
+		configProviderOptions = append(
+			configProviderOptions,
+			settings.ConfigProviderWithDevelMode(),
+		)
+	}
+	handler.configProvider = settings.NewConfigProvider(configProviderOptions...)
 	return handler
 }
 

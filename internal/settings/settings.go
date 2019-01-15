@@ -198,6 +198,8 @@ type LintConfig struct {
 	// header before the syntax declaration. Note that format --fix will delete
 	// anything before the syntax declaration if this is set.
 	FileHeader string
+	// AllowSuppression says to honor @suppresswarnings annotations.
+	AllowSuppression bool
 }
 
 // GenConfig is the gen config.
@@ -292,6 +294,8 @@ type ExternalConfig struct {
 			Path        string `json:"path,omitempty" yaml:"path,omitempty"`
 			IsCommented bool   `json:"is_commented,omitempty" yaml:"is_commented,omitempty"`
 		} `json:"file_header,omitempty" yaml:"file_header,omitempty"`
+		// devel-mode only
+		AllowSuppression bool `json:"allow_suppression,omitempty" yaml:"allow_suppression,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
 	Gen struct {
 		GoOptions struct {
@@ -366,6 +370,13 @@ type ConfigProviderOption func(*configProvider)
 func ConfigProviderWithLogger(logger *zap.Logger) ConfigProviderOption {
 	return func(configProvider *configProvider) {
 		configProvider.logger = logger
+	}
+}
+
+// ConfigProviderWithDevelMode returns a ConfigProviderOption that allows devel-mode.
+func ConfigProviderWithDevelMode() ConfigProviderOption {
+	return func(configProvider *configProvider) {
+		configProvider.develMode = true
 	}
 }
 

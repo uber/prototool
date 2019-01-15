@@ -21,20 +21,19 @@
 package lint
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/emicklei/proto"
 	"github.com/gobuffalo/flect"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/strs"
 	"github.com/uber/prototool/internal/text"
 )
 
-const serviceNamesNoPluralsSuppressableAnnotation = "plurals"
-
-var serviceNamesNoPluralsLinter = NewLinter(
+var serviceNamesNoPluralsLinter = NewSuppressableLinter(
 	"SERVICE_NAMES_NO_PLURALS",
-	fmt.Sprintf(`Suppressable with "@suppresswarnings %s". Verifies that all CamelCase service names do not contain plural components.`, serviceNamesNoPluralsSuppressableAnnotation),
+	`Verifies that all CamelCase service names do not contain plural components.`,
+	"plurals",
 	checkServiceNamesNoPlurals,
 )
 
@@ -42,22 +41,19 @@ var allowedServiceNamePlurals = map[string]struct{}{
 	"data": struct{}{},
 }
 
-func checkServiceNamesNoPlurals(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
-	return runVisitor(serviceNamesNoPluralsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkServiceNamesNoPlurals(add func(*file.ProtoSet, *proto.Comment, *text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+	return runVisitor(&serviceNamesNoPluralsVisitor{baseAddSuppressableVisitor: newBaseAddSuppressableVisitor(add)}, descriptors)
 }
 
 type serviceNamesNoPluralsVisitor struct {
-	baseAddVisitor
+	*baseAddSuppressableVisitor
 }
 
-func (v serviceNamesNoPluralsVisitor) VisitService(service *proto.Service) {
+func (v *serviceNamesNoPluralsVisitor) VisitService(service *proto.Service) {
 	for _, word := range strs.SplitCamelCaseWord(service.Name) {
 		if singular := flect.New(word).Singularize().String(); singular != word {
 			if _, ok := allowedServiceNamePlurals[word]; !ok {
-				if isSuppressed(service.Comment, serviceNamesNoPluralsSuppressableAnnotation) {
-					return
-				}
-				v.AddFailuref(service.Position, `Service name %q contains plural component %q, consider using %q instead. This can be suppressed by adding "@suppresswarnings %s" to the service comment.`, service.Name, strings.Title(word), strings.Title(singular), serviceNamesNoPluralsSuppressableAnnotation)
+				v.AddFailuref(service.Comment, service.Position, `Service name %q contains plural component %q, consider using %q instead.`, service.Name, strings.Title(word), strings.Title(singular))
 			}
 		}
 	}

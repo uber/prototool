@@ -25,10 +25,9 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/text"
 )
-
-const packageNoKeywordsSuppressableAnnotation = "keywords"
 
 var (
 	packageNoKeywordsKeywords = []string{
@@ -39,9 +38,10 @@ var (
 		"std",       // C++ (causes a problem with the std package)
 	}
 
-	packageNoKeywordsLinter = NewLinter(
+	packageNoKeywordsLinter = NewSuppressableLinter(
 		"PACKAGE_NO_KEYWORDS",
-		fmt.Sprintf(`Suppressable with "@suppresswarnings %s". Verifies that no packages contain one of the keywords "%s" as part of the name when split on '.'.`, packageNoKeywordsSuppressableAnnotation, strings.Join(packageNoKeywordsKeywords, ",")),
+		fmt.Sprintf(`Verifies that no packages contain one of the keywords "%s" as part of the name when split on '.'.`, strings.Join(packageNoKeywordsKeywords, ",")),
+		"keywords",
 		checkPackageNoKeywords,
 	)
 
@@ -55,23 +55,19 @@ func init() {
 
 }
 
-func checkPackageNoKeywords(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
-	return runVisitor(packageNoKeywordsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkPackageNoKeywords(add func(*file.ProtoSet, *proto.Comment, *text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+	return runVisitor(&packageNoKeywordsVisitor{baseAddSuppressableVisitor: newBaseAddSuppressableVisitor(add)}, descriptors)
 }
 
 type packageNoKeywordsVisitor struct {
-	baseAddVisitor
+	*baseAddSuppressableVisitor
 }
 
-func (v packageNoKeywordsVisitor) VisitPackage(pkg *proto.Package) {
+func (v *packageNoKeywordsVisitor) VisitPackage(pkg *proto.Package) {
 	for _, subPackage := range strings.Split(pkg.Name, ".") {
 		potentialKeyword := strings.ToLower(subPackage)
 		if _, ok := packageNoKeywordsKeywordsMap[potentialKeyword]; ok {
-			if isSuppressed(pkg.Comment, packageNoKeywordsSuppressableAnnotation) {
-				// can just return as this will be true for other keywords as well
-				return
-			}
-			v.AddFailuref(pkg.Position, `Package %q contains the keyword %q, this could cause problems in generated code. This can be suppressed by adding "@suppresswarnings %s" to the package comment.`, pkg.Name, potentialKeyword, packageNoKeywordsSuppressableAnnotation)
+			v.AddFailuref(pkg.Comment, pkg.Position, `Package %q contains the keyword %q, this could cause problems in generated code.`, pkg.Name, potentialKeyword)
 		}
 	}
 }

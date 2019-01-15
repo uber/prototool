@@ -119,6 +119,13 @@ func ProtoSetProviderWithLogger(logger *zap.Logger) ProtoSetProviderOption {
 	}
 }
 
+// ProtoSetProviderWithDevelMode returns a ProtoSetProviderOption that allows devel-mode.
+func ProtoSetProviderWithDevelMode() ProtoSetProviderOption {
+	return func(protoSetProvider *protoSetProvider) {
+		protoSetProvider.develMode = true
+	}
+}
+
 // ProtoSetProviderWithConfigData returns a ProtoSetProviderOption that uses the given configuration
 // data instead of using configuration files that are found. This acts as if there is only one
 // configuration file at the current working directory. All found configuration files are ignored.

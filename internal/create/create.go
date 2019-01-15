@@ -49,6 +49,13 @@ func HandlerWithLogger(logger *zap.Logger) HandlerOption {
 	}
 }
 
+// HandlerWithDevelMode returns a HandlerOption that allows devel-mode.
+func HandlerWithDevelMode() HandlerOption {
+	return func(handler *handler) {
+		handler.develMode = true
+	}
+}
+
 // HandlerWithPackage returns a HandlerOption that uses the given package for
 // new Protobuf files.
 //

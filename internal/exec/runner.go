@@ -65,6 +65,7 @@ type runner struct {
 	output      io.Writer
 
 	logger        *zap.Logger
+	develMode     bool
 	cachePath     string
 	configData    string
 	protocBinPath string
@@ -83,9 +84,16 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	for _, option := range options {
 		option(runner)
 	}
-	runner.configProvider = settings.NewConfigProvider(
+	configProviderOptions := []settings.ConfigProviderOption{
 		settings.ConfigProviderWithLogger(runner.logger),
-	)
+	}
+	if runner.develMode {
+		configProviderOptions = append(
+			configProviderOptions,
+			settings.ConfigProviderWithDevelMode(),
+		)
+	}
+	runner.configProvider = settings.NewConfigProvider(configProviderOptions...)
 	protoSetProviderOptions := []file.ProtoSetProviderOption{
 		file.ProtoSetProviderWithLogger(runner.logger),
 	}
@@ -93,6 +101,12 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 		protoSetProviderOptions = append(
 			protoSetProviderOptions,
 			file.ProtoSetProviderWithConfigData(runner.configData),
+		)
+	}
+	if runner.develMode {
+		protoSetProviderOptions = append(
+			protoSetProviderOptions,
+			file.ProtoSetProviderWithDevelMode(),
 		)
 	}
 	runner.protoSetProvider = file.NewProtoSetProvider(protoSetProviderOptions...)
@@ -181,12 +195,12 @@ func (r *runner) Create(args []string, pkg string) error {
 	return r.newCreateHandler(pkg).Create(args...)
 }
 
-func (r *runner) CacheUpdate() error {
-	config, err := r.getConfig(r.workDirPath)
+func (r *runner) CacheUpdate(args []string) error {
+	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
 	}
-	d, err := r.newDownloader(config)
+	d, err := r.newDownloader(meta.ProtoSet.Config)
 	if err != nil {
 		return err
 	}
@@ -195,11 +209,12 @@ func (r *runner) CacheUpdate() error {
 }
 
 func (r *runner) CacheDelete() error {
-	config, err := r.getConfig(r.workDirPath)
+	meta, err := r.getMeta(nil)
 	if err != nil {
 		return err
 	}
-	d, err := r.newDownloader(config)
+	// TODO: do not need config for delete, refactor
+	d, err := r.newDownloader(meta.ProtoSet.Config)
 	if err != nil {
 		return err
 	}
@@ -276,17 +291,8 @@ func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, list
 	if moreThanOneSet(listAllLinters, listLinters, listAllLintGroups, listLintGroup != "", diffLintGroups != "") {
 		return newExitErrorf(255, "can only set one of list-all-linters, list-linters, list-all-lint-groups, list-lint-group, diff-lint-groups")
 	}
-	if listAllLinters {
-		return r.listAllLinters()
-	}
-	if listLinters {
-		return r.listLinters()
-	}
 	if listAllLintGroups {
 		return r.listAllLintGroups()
-	}
-	if listLintGroup != "" {
-		return r.listLintGroup(listLintGroup)
 	}
 	if diffLintGroups != "" {
 		return r.diffLintGroups(diffLintGroups)
@@ -294,6 +300,15 @@ func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, list
 	meta, err := r.getMeta(args)
 	if err != nil {
 		return err
+	}
+	if listAllLinters {
+		return r.listAllLinters(meta)
+	}
+	if listLinters {
+		return r.listLinters(meta)
+	}
+	if listLintGroup != "" {
+		return r.listLintGroup(meta, listLintGroup)
 	}
 	r.printAffectedFiles(meta)
 	if _, err := r.compile(false, false, false, meta); err != nil {
@@ -317,28 +332,24 @@ func (r *runner) lint(meta *meta) error {
 	return nil
 }
 
-func (r *runner) listLinters() error {
-	config, err := r.getConfig(r.workDirPath)
+func (r *runner) listLinters(meta *meta) error {
+	linters, err := lint.GetLinters(meta.ProtoSet.Config.Lint)
 	if err != nil {
 		return err
 	}
-	linters, err := lint.GetLinters(config.Lint)
-	if err != nil {
-		return err
-	}
-	return r.printLinters(linters)
+	return r.printLinters(meta.ProtoSet.Config.Lint, linters)
 }
 
-func (r *runner) listAllLinters() error {
-	return r.printLinters(lint.AllLinters)
+func (r *runner) listAllLinters(meta *meta) error {
+	return r.printLinters(meta.ProtoSet.Config.Lint, lint.AllLinters)
 }
 
-func (r *runner) listLintGroup(group string) error {
+func (r *runner) listLintGroup(meta *meta, group string) error {
 	linters, ok := lint.GroupToLinters[strings.ToLower(group)]
 	if !ok {
 		return newExitErrorf(255, "unknown lint group: %s", strings.ToLower(group))
 	}
-	return r.printLinters(linters)
+	return r.printLinters(meta.ProtoSet.Config.Lint, linters)
 }
 
 func (r *runner) listAllLintGroups() error {
@@ -820,6 +831,9 @@ func (r *runner) newCreateHandler(pkg string) create.Handler {
 	if pkg != "" {
 		handlerOptions = append(handlerOptions, create.HandlerWithPackage(pkg))
 	}
+	if r.develMode {
+		handlerOptions = append(handlerOptions, create.HandlerWithDevelMode())
+	}
 	return create.NewHandler(handlerOptions...)
 }
 
@@ -845,13 +859,6 @@ func (r *runner) newGRPCHandler(
 		handlerOptions = append(handlerOptions, grpc.HandlerWithKeepaliveTime(keepaliveTime))
 	}
 	return grpc.NewHandler(handlerOptions...)
-}
-
-func (r *runner) getConfig(dirPath string) (settings.Config, error) {
-	if r.configData != "" {
-		return r.configProvider.GetForData(dirPath, r.configData)
-	}
-	return r.configProvider.GetForDir(dirPath)
 }
 
 type meta struct {
@@ -956,11 +963,11 @@ func (r *runner) printFailuresForErrorFormat(errorFormat string, filename string
 	return bufWriter.Flush()
 }
 
-func (r *runner) printLinters(linters []lint.Linter) error {
+func (r *runner) printLinters(config settings.LintConfig, linters []lint.Linter) error {
 	sort.Slice(linters, func(i int, j int) bool { return linters[i].ID() < linters[j].ID() })
 	tabWriter := newTabWriter(r.output)
 	for _, linter := range linters {
-		if _, err := fmt.Fprintf(tabWriter, "%s\t%s\n", linter.ID(), linter.Purpose()); err != nil {
+		if _, err := fmt.Fprintf(tabWriter, "%s\t%s\n", linter.ID(), linter.Purpose(config)); err != nil {
 			return err
 		}
 	}
