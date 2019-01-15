@@ -58,7 +58,6 @@ func newBaseLinter(
 				dirPath,
 				descriptors,
 			)
-			return nil
 		},
 	)
 }

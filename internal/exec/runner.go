@@ -861,13 +861,6 @@ func (r *runner) newGRPCHandler(
 	return grpc.NewHandler(handlerOptions...)
 }
 
-func (r *runner) getConfig(dirPath string) (settings.Config, error) {
-	if r.configData != "" {
-		return r.configProvider.GetForData(dirPath, r.configData)
-	}
-	return r.configProvider.GetForDir(dirPath)
-}
-
 type meta struct {
 	ProtoSet *file.ProtoSet
 	// this will be empty if not in dir mode
