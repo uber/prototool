@@ -1,4 +1,5 @@
 lint:
+  allow_suppression: true
   rules:
     add:
       - PACKAGE_NO_KEYWORDS

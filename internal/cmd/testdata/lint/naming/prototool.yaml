@@ -1,5 +1,6 @@
 lint:
   group: uber2
+  allow_suppression: true
   rules:
     remove:
       - ENUMS_HAVE_SENTENCE_COMMENTS

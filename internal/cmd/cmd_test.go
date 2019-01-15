@@ -32,7 +32,6 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,11 +41,6 @@ import (
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
 	"google.golang.org/grpc"
-)
-
-var (
-	// testLock is to lock around prototool download in testDownload
-	testLock sync.Mutex
 )
 
 func TestCompile(t *testing.T) {
@@ -527,6 +521,16 @@ func TestLint(t *testing.T) {
 		`20:3:MESSAGE_FIELDS_NOT_FLOATS
 		21:3:MESSAGE_FIELDS_NOT_FLOATS`,
 		"testdata/lint/floats/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`17:3:MESSAGE_FIELDS_NOT_FLOATS
+		19:3:MESSAGE_FIELDS_NOT_FLOATS
+		20:3:MESSAGE_FIELDS_NOT_FLOATS
+		21:3:MESSAGE_FIELDS_NOT_FLOATS`,
+		"testdata/lint/floatsnosuppress/foo/v1/foo.proto",
 	)
 
 	assertDoLintFile(
@@ -1137,12 +1141,12 @@ func TestInspectPackageImporters(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters")
-	assertLinters(t, lint.UberLinters, "lint", "--list-linters")
+	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters", "testdata/lint/base")
+	assertLinters(t, lint.UberLinters, "lint", "--list-linters", "testdata/lint/base")
 }
 
 func TestListAllLinters(t *testing.T) {
-	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters")
+	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters", "testdata/lint/base")
 }
 
 func TestListAllLintGroups(t *testing.T) {
@@ -1150,9 +1154,9 @@ func TestListAllLintGroups(t *testing.T) {
 }
 
 func TestListLintGroup(t *testing.T) {
-	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google")
-	assertLinters(t, lint.UberLinters, "lint", "--list-lint-group", "uber")
-	assertLinters(t, lint.Uber2Linters, "lint", "--list-lint-group", "uber2")
+	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google", "testdata/lint/base")
+	assertLinters(t, lint.UberLinters, "lint", "--list-lint-group", "uber", "testdata/lint/base")
+	assertLinters(t, lint.Uber2Linters, "lint", "--list-lint-group", "uber2", "testdata/lint/base")
 }
 
 func TestDiffLintGroups(t *testing.T) {
@@ -1297,12 +1301,10 @@ func assertDo(t *testing.T, extraErrorFormat bool, expectedExitCode int, expecte
 }
 
 func testDoStdin(t *testing.T, stdin io.Reader, extraErrorFormat bool, args ...string) (string, int) {
-	testDownload(t)
 	return testDoInternal(stdin, extraErrorFormat, args...)
 }
 
 func testDo(t *testing.T, extraErrorFormat bool, args ...string) (string, int) {
-	testDownload(t)
 	return testDoInternal(nil, extraErrorFormat, args...)
 }
 
@@ -1414,16 +1416,6 @@ func assertDoInternal(t *testing.T, stdin io.Reader, extraErrorFormat bool, expe
 	for i, expectedLinePrefix := range expectedLinePrefixesSplit {
 		assert.True(t, strings.HasPrefix(outputSplit[i], expectedLinePrefix), "%s %d %s", expectedLinePrefix, i, strings.Join(outputSplit, "\n"))
 	}
-}
-
-func testDownload(t *testing.T) {
-	testLock.Lock()
-	defer testLock.Unlock()
-	// download checks if protoc is already downloaded to the cache location
-	// if it is, then this is effectively a no-op
-	// if it isn't, then this downloads to the cache
-	stdout, exitCode := testDoInternal(nil, false, "cache", "update")
-	require.Equal(t, 0, exitCode, "had non-zero exit code when downloading: %s", stdout)
 }
 
 func testDoInternal(stdin io.Reader, extraErrorFormat bool, args ...string) (string, int) {
