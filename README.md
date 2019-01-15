@@ -195,44 +195,6 @@ See the `prototool.yaml` files at [etc/style/google/prototool.yaml](etc/style/go
 
 The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
 
-While Prototool takes the stance that linting should be a pass/fail exercise, some lint rules are linting for usages that should not be
-commonly used, but still have validity within the lint group construct. These rules can be suppressed by adding `@suppresswarnings ANNOTATION`
-to the element comment. The following lint rules can be suppressed:
-
-
-| Lint Rule                        | Containing Lint Groups   | Suppressing Annotation   |
-|----------------------------------|--------------------------|--------------------------|
-| `MESSAGE_FIELDS_NOT_FLOATS`      | `uber2`                  | `floats`                 |
-| `PACKAGE_NO_KEYWORDS`            | `uber2`                  | `keywords`               |
-| `RPC_OPTIONS_NO_GOOGLE_API_HTTP` | `uber2`                  | `google-api-http`        |
-| `SERVICE_NAMES_NO_PLURALS`       | `uber2`                  | `plurals`                |
-
-As an example:
-
-```
-// This contains the "public". keyword.
-//
-// @suppresswarnings keywords
-package foo.public.bar;
-
-// Hello is a field where we understand the concerns with using floats but require them.
-//
-// @suppresswarnings floats
-float hello = 1;
-
-// TripOperationsAPI contains the plural component "Operations" and we want to have
-// consistent naming where everything is singular.
-//
-// @suppresswarnings plurals
-service TripOperationsAPI {
-  // We understand the concerns with using the http option so we allow it here.
-  // @suppresswarnings google-api-http
-  rpc Bar(BarRequest) returns (BarResponse) {
-    option (google.api.http).get = "/bar";
-  }
-}
-```
-
 Linting also understands the concept of file headers, typically license headers. To specify a license header, add the following to your
 `prototool.yaml`:
 
@@ -519,8 +481,7 @@ major version, with some exceptions:
   reflect things such as max line lengths.
 - The breaking change detector may have additional checks added between minor versions, and therefore a change that might not have been
   breaking previously might become a breaking change.
-- The `PACKAGE_NO_KEYWORDS` linter on the `uber2` lint group may have additional keywords added. This can be suppressed by adding
-  `@suppresswarnings keywords` to the package comment.
+- The `PACKAGE_NO_KEYWORDS` linter on the `uber2` lint group may have additional keywords added.
 - The `SERVICE_NAMES_NO_PLURALS` linter on the `uber2` lint group ignores certain plurals such as "data". We may add additional ignored
   plurals in the future, so plurals that are not ignored now may be ignored later.
 
