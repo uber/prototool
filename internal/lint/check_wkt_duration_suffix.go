@@ -29,7 +29,7 @@ import (
 
 var wktDurationSuffixLinter = NewLinter(
 	"WKT_DURATION_SUFFIX",
-	"Verifies that all google.protobuf.Duration field names end in _duration.",
+	`Verifies that all google.protobuf.Duration field names are "duration" or end in "_duration".`,
 	checkWKTDurationSuffix,
 )
 
@@ -62,7 +62,7 @@ func (v wktDurationSuffixVisitor) VisitOneofField(field *proto.OneOfField) {
 }
 
 func (v wktDurationSuffixVisitor) visitField(field *proto.Field) {
-	if field.Type == "google.protobuf.Duration" && !strings.HasSuffix(field.Name, "_duration") {
-		v.AddFailuref(field.Position, `Field %q of type "google.protobuf.Duration" must end in "_duration".`, field.Name)
+	if field.Type == "google.protobuf.Duration" && !(field.Name == "duration" || strings.HasSuffix(field.Name, "_duration")) {
+		v.AddFailuref(field.Position, `Field %q of type "google.protobuf.Duration" must be "duration" or end in "_duration".`, field.Name)
 	}
 }

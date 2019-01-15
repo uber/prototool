@@ -333,6 +333,7 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 			FileHeader:          fileHeader,
+			AllowSuppression:    e.Lint.AllowSuppression,
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{

@@ -326,19 +326,27 @@ func (r *runner) listLinters() error {
 	if err != nil {
 		return err
 	}
-	return r.printLinters(linters)
+	return r.printLinters(config.Lint, linters)
 }
 
 func (r *runner) listAllLinters() error {
-	return r.printLinters(lint.AllLinters)
+	config, err := r.getConfig(r.workDirPath)
+	if err != nil {
+		return err
+	}
+	return r.printLinters(config.Lint, lint.AllLinters)
 }
 
 func (r *runner) listLintGroup(group string) error {
+	config, err := r.getConfig(r.workDirPath)
+	if err != nil {
+		return err
+	}
 	linters, ok := lint.GroupToLinters[strings.ToLower(group)]
 	if !ok {
 		return newExitErrorf(255, "unknown lint group: %s", strings.ToLower(group))
 	}
-	return r.printLinters(linters)
+	return r.printLinters(config.Lint, linters)
 }
 
 func (r *runner) listAllLintGroups() error {
@@ -956,11 +964,11 @@ func (r *runner) printFailuresForErrorFormat(errorFormat string, filename string
 	return bufWriter.Flush()
 }
 
-func (r *runner) printLinters(linters []lint.Linter) error {
+func (r *runner) printLinters(config settings.LintConfig, linters []lint.Linter) error {
 	sort.Slice(linters, func(i int, j int) bool { return linters[i].ID() < linters[j].ID() })
 	tabWriter := newTabWriter(r.output)
 	for _, linter := range linters {
-		if _, err := fmt.Fprintf(tabWriter, "%s\t%s\n", linter.ID(), linter.Purpose()); err != nil {
+		if _, err := fmt.Fprintf(tabWriter, "%s\t%s\n", linter.ID(), linter.Purpose(config)); err != nil {
 			return err
 		}
 	}

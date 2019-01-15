@@ -29,7 +29,7 @@ import (
 
 var wktTimestampSuffixLinter = NewLinter(
 	"WKT_TIMESTAMP_SUFFIX",
-	"Verifies that all google.protobuf.Timestamp field names end in _time.",
+	`Verifies that all google.protobuf.Timestamp field names are "time" or end in "_time".`,
 	checkWKTTimestampSuffix,
 )
 

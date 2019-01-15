@@ -308,7 +308,7 @@ type Linter interface {
 	// Return the ID of this Linter. This should be all UPPER_SNAKE_CASE.
 	ID() string
 	// Return the purpose of this Linter. This should be a human-readable string.
-	Purpose() string
+	Purpose(config settings.LintConfig) string
 	// Check the file data for the descriptors in a common directgory.
 	// If there is a lint failure, this returns it in the
 	// slice and does not return an error. An error is returned if something
@@ -325,6 +325,17 @@ type Linter interface {
 // Failures returned from check do not need to set the ID, this will be overwritten.
 func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*FileDescriptor) error) Linter {
 	return newBaseLinter(id, purpose, addCheck)
+}
+
+// NewSuppressableLinter is a convenience function that returns a new Linter for the
+// given parameters, using a function to record failures. This linter can be
+// suppressed given the annotation.
+//
+// The ID will be upper-cased.
+//
+// Failures returned from check do not need to set the ID, this will be overwritten.
+func NewSuppressableLinter(id string, purpose string, suppressableAnnotation string, addCheck func(func(*file.ProtoSet, *proto.Comment, *text.Failure), string, []*FileDescriptor) error) Linter {
+	return newBaseSuppressableLinter(id, purpose, suppressableAnnotation, addCheck)
 }
 
 // GetLinters returns the Linters for the LintConfig.
@@ -519,19 +530,6 @@ func commentContainsPeriod(comment *proto.Comment) bool {
 	// since comments can contain code examples, links, etc.
 	for _, line := range comment.Lines {
 		if strings.Contains(line, ".") {
-			return true
-		}
-	}
-	return false
-}
-
-func isSuppressed(comment *proto.Comment, annotation string) bool {
-	if comment == nil {
-		return false
-	}
-	annotation = "@suppresswarnings " + annotation
-	for _, line := range comment.Lines {
-		if strings.Contains(line, annotation) {
 			return true
 		}
 	}
