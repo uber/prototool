@@ -24,6 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -32,7 +33,7 @@ var _ proto.Visitor = baseVisitor{}
 type baseVisitor struct{}
 
 func (baseVisitor) OnStart(*FileDescriptor) error { return nil }
-func (baseVisitor) Finally() error             { return nil }
+func (baseVisitor) Finally() error                { return nil }
 
 func (baseVisitor) VisitMessage(m *proto.Message)         {}
 func (baseVisitor) VisitService(s *proto.Service)         {}
@@ -63,6 +64,25 @@ func newBaseAddVisitor(add func(*text.Failure)) baseAddVisitor {
 
 func (v baseAddVisitor) AddFailuref(position scanner.Position, format string, args ...interface{}) {
 	v.add(text.NewFailuref(position, "", format, args...))
+}
+
+type baseAddSuppressableVisitor struct {
+	baseVisitor
+	fileDescriptor *FileDescriptor
+	add            func(*file.ProtoSet, *proto.Comment, *text.Failure)
+}
+
+func newBaseAddSuppressableVisitor(add func(*file.ProtoSet, *proto.Comment, *text.Failure)) *baseAddSuppressableVisitor {
+	return &baseAddSuppressableVisitor{add: add}
+}
+
+func (v *baseAddSuppressableVisitor) OnStart(fileDescriptor *FileDescriptor) error {
+	v.fileDescriptor = fileDescriptor
+	return nil
+}
+
+func (v *baseAddSuppressableVisitor) AddFailuref(comment *proto.Comment, position scanner.Position, format string, args ...interface{}) {
+	v.add(v.fileDescriptor.ProtoSet, comment, text.NewFailuref(position, "", format, args...))
 }
 
 // extendedVisitor extends the proto.Visitor interface.

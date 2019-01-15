@@ -83,7 +83,7 @@ The input directory must be relative.`,
 	}
 
 	cacheUpdateCmdTemplate = &cmdTemplate{
-		Use:   "update",
+		Use:   "update [dirOrFile]",
 		Short: "Update the cache by downloading all artifacts.",
 		Long: `This will download artifacts to a cache directory before running any commands. Note that calling this command is not necessary, all artifacts are automatically downloaded when required by other commands. This just provides a mechanism to pre-cache artifacts during your build.
 
@@ -96,9 +96,9 @@ Artifacts are downloaded to the following directories based on flags and environ
   will be used.
 - Otherwise, if on Linux, $HOME/.cache/prototool will be used, or on Darwin,
   $HOME/Library/Caches/prototool will be used.`,
-		Args: cobra.NoArgs,
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.CacheUpdate()
+			return runner.CacheUpdate(args)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)

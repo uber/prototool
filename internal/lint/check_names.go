@@ -26,10 +26,9 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/text"
 )
-
-const namesSuppressableAnnotation = "naming"
 
 var (
 	namesNoCommonLinter = newNamesLinter(
@@ -47,13 +46,10 @@ var (
 )
 
 func newNamesLinter(outlawedName string, additionalHelp string) Linter {
-	return NewLinter(
+	return NewSuppressableLinter(
 		"NAMES_NO_"+strings.ToUpper(outlawedName),
-		fmt.Sprintf(
-			`Suppressable with "@suppresswarnings %s". Verifies that no type name contains the word %q.`,
-			namesSuppressableAnnotation,
-			outlawedName,
-		),
+		fmt.Sprintf(`Verifies that no type name contains the word %q.`, outlawedName),
+		"naming",
 		newCheckNames(
 			outlawedName,
 			additionalHelp,
@@ -61,18 +57,18 @@ func newNamesLinter(outlawedName string, additionalHelp string) Linter {
 	)
 }
 
-func newCheckNames(outlawedName string, additionalHelp string) func(func(*text.Failure), string, []*FileDescriptor) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+func newCheckNames(outlawedName string, additionalHelp string) func(func(*file.ProtoSet, *proto.Comment, *text.Failure), string, []*FileDescriptor) error {
+	return func(add func(*file.ProtoSet, *proto.Comment, *text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		return runVisitor(&namesVisitor{
-			baseAddVisitor: newBaseAddVisitor(add),
-			outlawedName:   outlawedName,
-			additionalHelp: additionalHelp,
+			baseAddSuppressableVisitor: newBaseAddSuppressableVisitor(add),
+			outlawedName:               outlawedName,
+			additionalHelp:             additionalHelp,
 		}, descriptors)
 	}
 }
 
 type namesVisitor struct {
-	baseAddVisitor
+	*baseAddSuppressableVisitor
 
 	outlawedName   string
 	additionalHelp string
@@ -180,9 +176,6 @@ func (v *namesVisitor) VisitExtensions(element *proto.Extensions) {
 
 func (v *namesVisitor) checkName(position scanner.Position, name string, comment *proto.Comment) {
 	if strings.Contains(strings.ToLower(name), v.outlawedName) {
-		if isSuppressed(comment, namesSuppressableAnnotation) {
-			return
-		}
-		v.AddFailuref(position, `The name %q contains the outlawed name %q. %s This can be suppressed by adding "@suppresswarnings %s" to the type comment.`, name, v.outlawedName, v.additionalHelp, namesSuppressableAnnotation)
+		v.AddFailuref(comment, position, `The name %q contains the outlawed name %q. %s.`, name, v.outlawedName, v.additionalHelp)
 	}
 }

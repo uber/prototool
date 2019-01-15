@@ -93,6 +93,13 @@ func (c *baseLinter) Check(dirPath string, descriptors []*FileDescriptor) ([]*te
 	err := c.addCheck(
 		func(protoSet *file.ProtoSet, comment *proto.Comment, failure *text.Failure) {
 			if !c.isSuppressed(protoSet, comment) {
+				if c.allowSuppression(protoSet) && failure.Message != "" {
+					suppressionMessage := fmt.Sprintf(`This can be suppressed by adding "@suppresswarnings %s" to the comment.`, c.suppressableAnnotation)
+					if failure.Message != "" {
+						suppressionMessage = " " + suppressionMessage
+					}
+					failure.Message = failure.Message + suppressionMessage
+				}
 				failures = append(failures, failure)
 			}
 		},
@@ -105,11 +112,15 @@ func (c *baseLinter) Check(dirPath string, descriptors []*FileDescriptor) ([]*te
 	return failures, err
 }
 
+func (c *baseLinter) allowSuppression(protoSet *file.ProtoSet) bool {
+	return c.suppressableAnnotation != "" && protoSet != nil && protoSet.Config.Lint.AllowSuppression
+}
+
 func (c *baseLinter) isSuppressed(protoSet *file.ProtoSet, comment *proto.Comment) bool {
-	if comment == nil {
+	if !c.allowSuppression(protoSet) {
 		return false
 	}
-	if protoSet == nil || !protoSet.Config.Lint.AllowSuppression {
+	if comment == nil {
 		return false
 	}
 	annotation := "@suppresswarnings " + c.suppressableAnnotation

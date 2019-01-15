@@ -21,58 +21,53 @@
 package lint
 
 import (
-	"fmt"
-
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/text"
 )
 
-const messageFieldsNotFloatsSuppressableAnnotation = "floats"
-
-var messageFieldsNotFloatsLinter = NewLinter(
+var messageFieldsNotFloatsLinter = NewSuppressableLinter(
 	"MESSAGE_FIELDS_NOT_FLOATS",
-	fmt.Sprintf(`Suppressable with "@suppresswarnings %s". Verifies that all message fields are not floats.`, messageFieldsNotFloatsSuppressableAnnotation),
+	`Verifies that all message fields are not floats.`,
+	"floats",
 	checkMessageFieldsNotFloats,
 )
 
-func checkMessageFieldsNotFloats(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
-	return runVisitor(messageFieldsNotFloatsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
+func checkMessageFieldsNotFloats(add func(*file.ProtoSet, *proto.Comment, *text.Failure), dirPath string, descriptors []*FileDescriptor) error {
+	return runVisitor(&messageFieldsNotFloatsVisitor{baseAddSuppressableVisitor: newBaseAddSuppressableVisitor(add)}, descriptors)
 }
 
 type messageFieldsNotFloatsVisitor struct {
-	baseAddVisitor
+	*baseAddSuppressableVisitor
 }
 
-func (v messageFieldsNotFloatsVisitor) VisitMessage(message *proto.Message) {
+func (v *messageFieldsNotFloatsVisitor) VisitMessage(message *proto.Message) {
 	for _, element := range message.Elements {
 		element.Accept(v)
 	}
 }
 
-func (v messageFieldsNotFloatsVisitor) VisitOneof(oneof *proto.Oneof) {
+func (v *messageFieldsNotFloatsVisitor) VisitOneof(oneof *proto.Oneof) {
 	for _, element := range oneof.Elements {
 		element.Accept(v)
 	}
 }
 
-func (v messageFieldsNotFloatsVisitor) VisitNormalField(field *proto.NormalField) {
+func (v *messageFieldsNotFloatsVisitor) VisitNormalField(field *proto.NormalField) {
 	v.checkNotFloat(field.Field)
 }
 
-func (v messageFieldsNotFloatsVisitor) VisitOneofField(field *proto.OneOfField) {
+func (v *messageFieldsNotFloatsVisitor) VisitOneofField(field *proto.OneOfField) {
 	v.checkNotFloat(field.Field)
 }
 
-func (v messageFieldsNotFloatsVisitor) VisitMapField(field *proto.MapField) {
+func (v *messageFieldsNotFloatsVisitor) VisitMapField(field *proto.MapField) {
 	v.checkNotFloat(field.Field)
 }
 
-func (v messageFieldsNotFloatsVisitor) checkNotFloat(field *proto.Field) {
+func (v *messageFieldsNotFloatsVisitor) checkNotFloat(field *proto.Field) {
 	switch field.Type {
 	case "float":
-		if isSuppressed(field.Comment, messageFieldsNotFloatsSuppressableAnnotation) {
-			return
-		}
-		v.AddFailuref(field.Position, `Field %q is a float and floats should generally not be used, consider using a double, or an int64 while representing your value in micros or nanos. This can be suppressed by adding "@suppresswarnings %s" to the field comment.`, field.Name, messageFieldsNotFloatsSuppressableAnnotation)
+		v.AddFailuref(field.Comment, field.Position, `Field %q is a float and floats should generally not be used, consider using a double, or an int64 while representing your value in micros or nanos.`, field.Name)
 	}
 }
