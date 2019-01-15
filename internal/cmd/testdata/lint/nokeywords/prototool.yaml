@@ -1,4 +1,5 @@
 lint:
+  # allow_suppression is an option that is only allowed in tests, this is not exposed as part of the prototool command
   allow_suppression: true
   rules:
     add:

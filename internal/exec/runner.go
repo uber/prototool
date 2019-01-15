@@ -65,6 +65,7 @@ type runner struct {
 	output      io.Writer
 
 	logger        *zap.Logger
+	develMode     bool
 	cachePath     string
 	configData    string
 	protocBinPath string
@@ -83,9 +84,16 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	for _, option := range options {
 		option(runner)
 	}
-	runner.configProvider = settings.NewConfigProvider(
+	configProviderOptions := []settings.ConfigProviderOption{
 		settings.ConfigProviderWithLogger(runner.logger),
-	)
+	}
+	if runner.develMode {
+		configProviderOptions = append(
+			configProviderOptions,
+			settings.ConfigProviderWithDevelMode(),
+		)
+	}
+	runner.configProvider = settings.NewConfigProvider(configProviderOptions...)
 	protoSetProviderOptions := []file.ProtoSetProviderOption{
 		file.ProtoSetProviderWithLogger(runner.logger),
 	}
@@ -93,6 +101,12 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 		protoSetProviderOptions = append(
 			protoSetProviderOptions,
 			file.ProtoSetProviderWithConfigData(runner.configData),
+		)
+	}
+	if runner.develMode {
+		protoSetProviderOptions = append(
+			protoSetProviderOptions,
+			file.ProtoSetProviderWithDevelMode(),
 		)
 	}
 	runner.protoSetProvider = file.NewProtoSetProvider(protoSetProviderOptions...)
@@ -816,6 +830,9 @@ func (r *runner) newCreateHandler(pkg string) create.Handler {
 	handlerOptions := []create.HandlerOption{create.HandlerWithLogger(r.logger)}
 	if pkg != "" {
 		handlerOptions = append(handlerOptions, create.HandlerWithPackage(pkg))
+	}
+	if r.develMode {
+		handlerOptions = append(handlerOptions, create.HandlerWithDevelMode())
 	}
 	return create.NewHandler(handlerOptions...)
 }

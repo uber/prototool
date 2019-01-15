@@ -38,7 +38,8 @@ import (
 )
 
 type configProvider struct {
-	logger *zap.Logger
+	logger    *zap.Logger
+	develMode bool
 }
 
 func newConfigProvider(options ...ConfigProviderOption) *configProvider {
@@ -74,7 +75,7 @@ func (c *configProvider) Get(filePath string) (Config, error) {
 		return Config{}, fmt.Errorf("%s is not an absolute path", filePath)
 	}
 	filePath = filepath.Clean(filePath)
-	return get(filePath)
+	return get(c.develMode, filePath)
 }
 
 func (c *configProvider) GetForData(dirPath string, externalConfigData string) (Config, error) {
@@ -86,7 +87,7 @@ func (c *configProvider) GetForData(dirPath string, externalConfigData string) (
 	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
 		return Config{}, err
 	}
-	return externalConfigToConfig(externalConfig, dirPath)
+	return externalConfigToConfig(c.develMode, externalConfig, dirPath)
 }
 
 func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, error) {
@@ -157,12 +158,12 @@ func getSingleFilePathForDir(dirPath string) (string, error) {
 // get reads the config at the given path.
 //
 // This is expected to be in YAML or JSON format, which is denoted by the file extension.
-func get(filePath string) (Config, error) {
+func get(develMode bool, filePath string) (Config, error) {
 	externalConfig, err := getExternalConfig(filePath)
 	if err != nil {
 		return Config{}, err
 	}
-	return externalConfigToConfig(externalConfig, filepath.Dir(filePath))
+	return externalConfigToConfig(develMode, externalConfig, filepath.Dir(filePath))
 }
 
 func getExternalConfig(filePath string) (ExternalConfig, error) {
@@ -193,7 +194,7 @@ func getExternalConfig(filePath string) (ExternalConfig, error) {
 // externalConfigToConfig converts an ExternalConfig to a Config.
 //
 // This will return a valid Config, or an error.
-func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
+func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (Config, error) {
 	excludePrefixes, err := getExcludePrefixes(e.Excludes, dirPath)
 	if err != nil {
 		return Config{}, err
@@ -312,6 +313,12 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			}
 		}
 		fileHeader = strings.Join(fileHeaderLines, "\n")
+	}
+
+	if !develMode {
+		if e.Lint.AllowSuppression {
+			return Config{}, fmt.Errorf("allow_suppression is not allowed outside of internal prototool tests")
+		}
 	}
 
 	config := Config{

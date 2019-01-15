@@ -48,26 +48,26 @@ var genManTime = time.Date(2018, time.January, 1, 0, 0, 0, 0, time.UTC)
 
 // Do runs the command logic.
 func Do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return do(args, stdin, stdout, stderr)
+	return do(false, args, stdin, stdout, stderr)
 }
 
-func do(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(args, stdin, stdout, stderr, (*cobra.Command).Execute)
+func do(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
+	return runRootCommand(develMode, args, stdin, stdout, stderr, (*cobra.Command).Execute)
 }
 
 // GenBashCompletion generates a bash completion file to the writer.
 func GenBashCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
+	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenBashCompletion)
 }
 
 // GenZshCompletion generates a zsh completion file to the writer.
 func GenZshCompletion(stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommandOutput([]string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
+	return runRootCommandOutput(false, []string{}, stdin, stdout, stderr, (*cobra.Command).GenZshCompletion)
 }
 
 // GenManpages generates the manpages to the given directory.
 func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) int {
-	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
+	return runRootCommand(false, args, stdin, stdout, stderr, func(cmd *cobra.Command) error {
 		if len(args) != 1 {
 			return fmt.Errorf("usage: %s dirPath", os.Args[0])
 		}
@@ -80,47 +80,47 @@ func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Wri
 	})
 }
 
-func runRootCommandOutput(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
-	return runRootCommand(args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
+func runRootCommandOutput(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
+	return runRootCommand(develMode, args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
 }
 
-func runRootCommand(args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
+func runRootCommand(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
 	if err := checkOS(); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
-	if err := f(getRootCommand(&exitCode, args, stdin, stdout, stderr)); err != nil {
+	if err := f(getRootCommand(develMode, &exitCode, args, stdin, stdout, stderr)); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
 	return exitCode
 }
 
-func getRootCommand(exitCodeAddr *int, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
+func getRootCommand(develMode bool, exitCodeAddr *int, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
 	flags := &flags{}
 
 	rootCmd := &cobra.Command{Use: "prototool"}
-	rootCmd.AddCommand(allCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(compileCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(createCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(filesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(formatCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(generateCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(grpcCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(allCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(compileCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(createCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(filesCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(formatCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(generateCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(grpcCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	configCmd := &cobra.Command{Use: "config", Short: "Interact with configuration files."}
-	configCmd.AddCommand(configInitCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	configCmd.AddCommand(configInitCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(configCmd)
-	rootCmd.AddCommand(lintCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(versionCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(lintCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(versionCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	cacheCmd := &cobra.Command{Use: "cache", Short: "Interact with the cache."}
-	cacheCmd.AddCommand(cacheUpdateCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	cacheCmd.AddCommand(cacheDeleteCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	cacheCmd.AddCommand(cacheUpdateCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	cacheCmd.AddCommand(cacheDeleteCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(cacheCmd)
 	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
-	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(inspectCmd)
 	breakCmd := &cobra.Command{Use: "break", Short: "Top-level command for breaking change commands."}
-	breakCmd.AddCommand(breakCheckCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	breakCmd.AddCommand(breakCheckCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(breakCmd)
 
 	// flags bound to rootCmd are global flags

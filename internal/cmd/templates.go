@@ -535,7 +535,7 @@ type cmdTemplate struct {
 }
 
 // Build builds a *cobra.Command from the cmdTemplate.
-func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) *cobra.Command {
+func (c *cmdTemplate) Build(develMode bool, exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) *cobra.Command {
 	command := &cobra.Command{}
 	command.Use = c.Use
 	command.Short = strings.TrimSpace(c.Short)
@@ -544,7 +544,7 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	}
 	command.Args = c.Args
 	command.Run = func(_ *cobra.Command, args []string) {
-		checkCmd(exitCodeAddr, stdin, stdout, stderr, args, flags, c.Run)
+		checkCmd(develMode, exitCodeAddr, stdin, stdout, stderr, args, flags, c.Run)
 	}
 	if c.BindFlags != nil {
 		c.BindFlags(command.PersistentFlags(), flags)
@@ -552,8 +552,8 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	return command
 }
 
-func checkCmd(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, args []string, flags *flags, f func(exec.Runner, []string, *flags) error) {
-	runner, err := getRunner(stdin, stdout, stderr, flags)
+func checkCmd(develMode bool, exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, args []string, flags *flags, f func(exec.Runner, []string, *flags) error) {
+	runner, err := getRunner(develMode, stdin, stdout, stderr, flags)
 	if err != nil {
 		*exitCodeAddr = printAndGetErrorExitCode(err, stdout)
 		return
@@ -563,7 +563,7 @@ func checkCmd(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Wr
 	}
 }
 
-func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) (exec.Runner, error) {
+func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) (exec.Runner, error) {
 	logger, err := getLogger(stderr, flags.debug)
 	if err != nil {
 		return nil, err
@@ -611,6 +611,12 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithProtocURL(flags.protocURL),
+		)
+	}
+	if develMode {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithDevelMode(),
 		)
 	}
 	workDirPath, err := os.Getwd()

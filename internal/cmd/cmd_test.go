@@ -1429,7 +1429,7 @@ func testDoInternal(stdin io.Reader, extraErrorFormat bool, args ...string) (str
 	}
 	buffer := bytes.NewBuffer(nil)
 	// develMode is on, so we have access to all commands
-	exitCode := do(args, stdin, buffer, buffer)
+	exitCode := do(true, args, stdin, buffer, buffer)
 	return strings.TrimSpace(buffer.String()), exitCode
 }
 

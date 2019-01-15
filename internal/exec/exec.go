@@ -75,6 +75,13 @@ func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 	}
 }
 
+// RunnerWithDevelMode returns a RunnerOption that allows devel-mode.
+func RunnerWithDevelMode() RunnerOption {
+	return func(runner *runner) {
+		runner.develMode = true
+	}
+}
+
 // RunnerWithCachePath returns a RunnerOption that uses the given cache path.
 func RunnerWithCachePath(cachePath string) RunnerOption {
 	return func(runner *runner) {
