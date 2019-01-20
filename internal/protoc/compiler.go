@@ -197,6 +197,9 @@ func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 			genDirs[baseOutputPath] = struct{}{}
 		} else {
 			for dirPath := range protoSet.DirPathToFiles {
+				if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+					continue
+				}
 				relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
 				if err != nil {
 					return err
@@ -293,6 +296,9 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 		return cmdMetas, err
 	}
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+			continue
+		}
 		// you want your proto files to be in at least one of the -I directories
 		// or otherwise things can get weird
 		// we make best effort to make sure we have the a parent directory of the file

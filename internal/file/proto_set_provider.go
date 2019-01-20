@@ -61,7 +61,7 @@ func newProtoSetProvider(options ...ProtoSetProviderOption) *protoSetProvider {
 }
 
 func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*ProtoSet, error) {
-	protoSets, err := c.GetMultipleForDir(workDirPath, dirPath)
+	protoSets, err := c.getMultipleForDir(workDirPath, dirPath)
 	if err != nil {
 		return nil, err
 	}
@@ -79,26 +79,7 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*Proto
 	}
 }
 
-func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error) {
-	protoSets, err := c.GetMultipleForFiles(workDirPath, filePaths...)
-	if err != nil {
-		return nil, err
-	}
-	switch len(protoSets) {
-	case 0:
-		return nil, fmt.Errorf("no proto files found for filePaths %v", filePaths)
-	case 1:
-		return protoSets[0], nil
-	default:
-		configDirPaths := make([]string, 0, len(protoSets))
-		for _, protoSet := range protoSets {
-			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
-		}
-		return nil, fmt.Errorf("expected exactly one configuration file for filePaths %v, but found multiple in directories: %v", filePaths, configDirPaths)
-	}
-}
-
-func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
+func (c *protoSetProvider) getMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
 	workDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
@@ -137,28 +118,6 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 		protoSet.DirPath = absDirPath
 	}
 	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.String("dirPath", dirPath), zap.Any("protoSets", protoSets))
-	return protoSets, nil
-}
-
-func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
-	workDirPath, err := AbsClean(workDirPath)
-	if err != nil {
-		return nil, err
-	}
-	protoFiles, err := getProtoFiles(filePaths)
-	if err != nil {
-		return nil, err
-	}
-	dirPathToProtoFiles := getDirPathToProtoFiles(protoFiles)
-	protoSets, err := c.getBaseProtoSets(workDirPath, dirPathToProtoFiles)
-	if err != nil {
-		return nil, err
-	}
-	for _, protoSet := range protoSets {
-		protoSet.WorkDirPath = workDirPath
-		protoSet.DirPath = workDirPath
-	}
-	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.Strings("filePaths", filePaths), zap.Any("protoSets", protoSets))
 	return protoSets, nil
 }
 
