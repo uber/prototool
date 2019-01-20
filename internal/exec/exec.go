@@ -118,13 +118,6 @@ func RunnerWithProtocBinPath(protocBinPath string) RunnerOption {
 	}
 }
 
-// RunnerWithProtocWKTPath returns a RunnerOption that uses the given path to include the well-known types.
-func RunnerWithProtocWKTPath(protocWKTPath string) RunnerOption {
-	return func(runner *runner) {
-		runner.protocWKTPath = protocWKTPath
-	}
-}
-
 // RunnerWithProtocURL returns a RunnerOption that uses the given protoc zip file URL.
 func RunnerWithProtocURL(protocURL string) RunnerOption {
 	return func(runner *runner) {

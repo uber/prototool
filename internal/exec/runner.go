@@ -69,7 +69,6 @@ type runner struct {
 	cachePath     string
 	configData    string
 	protocBinPath string
-	protocWKTPath string
 	protocURL     string
 	errorFormat   string
 	json          bool
@@ -124,7 +123,6 @@ func (r *runner) cloneForWorkDirPath(workDirPath string) *runner {
 		cachePath:        r.cachePath,
 		configData:       r.configData,
 		protocBinPath:    r.protocBinPath,
-		protocWKTPath:    r.protocWKTPath,
 		protocURL:        r.protocURL,
 		errorFormat:      r.errorFormat,
 		json:             r.json,
@@ -759,12 +757,6 @@ func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error
 			protoc.DownloaderWithProtocBinPath(r.protocBinPath),
 		)
 	}
-	if r.protocWKTPath != "" {
-		downloaderOptions = append(
-			downloaderOptions,
-			protoc.DownloaderWithProtocWKTPath(r.protocWKTPath),
-		)
-	}
 	if r.protocURL != "" {
 		downloaderOptions = append(
 			downloaderOptions,
@@ -788,12 +780,6 @@ func (r *runner) newCompiler(doGen bool, doFileDescriptorSet bool) protoc.Compil
 		compilerOptions = append(
 			compilerOptions,
 			protoc.CompilerWithProtocBinPath(r.protocBinPath),
-		)
-	}
-	if r.protocWKTPath != "" {
-		compilerOptions = append(
-			compilerOptions,
-			protoc.CompilerWithProtocWKTPath(r.protocWKTPath),
 		)
 	}
 	if r.protocURL != "" {

@@ -61,11 +61,8 @@ type downloader struct {
 	// the looked-up and verified to exist base path
 	cachedBasePath string
 
-	// If set, Prototool will invoke protoc and include
-	// the well-known-types, from the configured binPath
-	// and wktPath.
+	// If set, Prototool will invoke protoc from the configured binPath
 	protocBinPath string
-	protocWKTPath string
 }
 
 func newDownloader(config settings.Config, options ...DownloaderOption) (*downloader, error) {
@@ -79,31 +76,15 @@ func newDownloader(config settings.Config, options ...DownloaderOption) (*downlo
 	if downloader.config.Compile.ProtobufVersion == "" {
 		downloader.config.Compile.ProtobufVersion = vars.DefaultProtocVersion
 	}
-	if downloader.protocBinPath != "" || downloader.protocWKTPath != "" {
+	if downloader.protocBinPath != "" {
 		if downloader.protocURL != "" {
-			return nil, fmt.Errorf("cannot use protoc-url in combination with either protoc-bin-path or protoc-wkt-path")
-		}
-		if downloader.protocBinPath == "" || downloader.protocWKTPath == "" {
-			return nil, fmt.Errorf("both protoc-bin-path and protoc-wkt-path must be set")
+			return nil, fmt.Errorf("cannot use protoc-url in combination with protoc-bin-path")
 		}
 		cleanBinPath := filepath.Clean(downloader.protocBinPath)
 		if _, err := os.Stat(cleanBinPath); os.IsNotExist(err) {
 			return nil, err
 		}
-		cleanWKTPath := filepath.Clean(downloader.protocWKTPath)
-		if _, err := os.Stat(cleanWKTPath); os.IsNotExist(err) {
-			return nil, err
-		}
-		protobufPath := filepath.Join(cleanWKTPath, "google", "protobuf")
-		info, err := os.Stat(protobufPath)
-		if os.IsNotExist(err) {
-			return nil, err
-		}
-		if !info.IsDir() {
-			return nil, fmt.Errorf("%q is not a valid well-known types directory", protobufPath)
-		}
 		downloader.protocBinPath = cleanBinPath
-		downloader.protocWKTPath = cleanWKTPath
 	}
 	return downloader, nil
 }
@@ -127,17 +108,6 @@ func (d *downloader) ProtocPath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(basePath, "bin", "protoc"), nil
-}
-
-func (d *downloader) WellKnownTypesIncludePath() (string, error) {
-	if d.protocWKTPath != "" {
-		return d.protocWKTPath, nil
-	}
-	basePath, err := d.Download()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(basePath, "include"), nil
 }
 
 func (d *downloader) Delete() error {
