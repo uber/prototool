@@ -309,7 +309,7 @@ type Linter interface {
 	ID() string
 	// Return the purpose of this Linter. This should be a human-readable string.
 	Purpose(config settings.LintConfig) string
-	// Check the file data for the descriptors in a common directgory.
+	// Check the file data for the descriptors in a common directory.
 	// If there is a lint failure, this returns it in the
 	// slice and does not return an error. An error is returned if something
 	// unexpected happens. Callers should verify the files are compilable
@@ -403,6 +403,10 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*FileDescriptor, error) {
 	dirPathToDescriptors := make(map[string][]*FileDescriptor, len(protoSet.DirPathToFiles))
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		// skip those files not under the directory
+		if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+			continue
+		}
 		descriptors := make([]*FileDescriptor, len(protoFiles))
 		for i, protoFile := range protoFiles {
 			file, err := os.Open(protoFile.Path)

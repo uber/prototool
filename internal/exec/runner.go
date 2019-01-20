@@ -226,7 +226,11 @@ func (r *runner) Files(args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, files := range meta.ProtoSet.DirPathToFiles {
+	for dirPath, files := range meta.ProtoSet.DirPathToFiles {
+		// skip those files not under the directory
+		if !strings.HasPrefix(dirPath, meta.ProtoSet.DirPath) {
+			continue
+		}
 		for _, file := range files {
 			if err := r.println(file.DisplayPath); err != nil {
 				return err
@@ -404,7 +408,11 @@ func (r *runner) Format(args []string, overwrite, diffMode, lintMode, fixFlag bo
 
 func (r *runner) format(overwrite, diffMode, lintMode bool, fix int, fileHeader string, meta *meta) error {
 	success := true
-	for _, protoFiles := range meta.ProtoSet.DirPathToFiles {
+	for dirPath, protoFiles := range meta.ProtoSet.DirPathToFiles {
+		// skip those files not under the directory
+		if !strings.HasPrefix(dirPath, meta.ProtoSet.DirPath) {
+			continue
+		}
 		for _, protoFile := range protoFiles {
 			fileSuccess, err := r.formatFile(overwrite, diffMode, lintMode, fix, fileHeader, meta, protoFile)
 			if err != nil {
@@ -975,7 +983,11 @@ func (r *runner) printLinters(config settings.LintConfig, linters []lint.Linter)
 }
 
 func (r *runner) printAffectedFiles(meta *meta) {
-	for _, files := range meta.ProtoSet.DirPathToFiles {
+	for dirPath, files := range meta.ProtoSet.DirPathToFiles {
+		// skip those files not under the directory
+		if !strings.HasPrefix(dirPath, meta.ProtoSet.DirPath) {
+			continue
+		}
 		for _, file := range files {
 			r.logger.Debug("using file", zap.String("file", file.DisplayPath))
 		}

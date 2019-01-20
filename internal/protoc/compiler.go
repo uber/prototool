@@ -197,6 +197,7 @@ func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 			genDirs[baseOutputPath] = struct{}{}
 		} else {
 			for dirPath := range protoSet.DirPathToFiles {
+				// skip those files not under the directory
 				if !strings.HasPrefix(dirPath, protoSet.DirPath) {
 					continue
 				}
@@ -296,6 +297,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 		return cmdMetas, err
 	}
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		// skip those files not under the directory
 		if !strings.HasPrefix(dirPath, protoSet.DirPath) {
 			continue
 		}
@@ -508,6 +510,8 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 		// you cannot include the files in the same package in the Mfile=package map
 		// or otherwise protoc-gen-go, protoc-gen-gogo, etc freak out and put
 		// these packages in as imports
+		// but, unlike other usages of DirPathToFiles, you MUST include all directories
+		// under control of the prototool.yaml to make sure all modifiers are added
 		if subDirPath != dirPath {
 			for _, protoFile := range protoFiles {
 				path, err := filepath.Rel(protoSet.Config.DirPath, protoFile.Path)
