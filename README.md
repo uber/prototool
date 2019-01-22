@@ -136,7 +136,7 @@ Usage:
 
 `dirOrFile` can take two forms:
 
-- You can specify exactly one directory. If this is done, Prototool goes up until it finds a `prototool.yaml` or `prototool.json` file (or uses the current directory if none is found), and then walks starting at this location for all `.proto` files, and these are used, except for files in the `excludes` lists in `prototool.yaml` or `prototool.json` files.
+- You can specify exactly one directory. If this is done, Prototool goes up until it finds a `prototool.yaml` or `prototool.json` file (or uses the current directory if none is found), and then uses this config for all `.proto` files under the given directory recursively, except for files in the `excludes` lists in `prototool.yaml` or `prototool.json` files.
 - You can specify exactly one file. This has the effect as if you specified the directory of this file (using the logic above), but errors are only printed for that file. This is useful for e.g. Vim integration.
 - You can specify nothing. This has the effect as if you specified the current directory as the directory.
 

@@ -31,269 +31,6 @@ import (
 	"go.uber.org/zap"
 )
 
-func TestProtoSetProviderGetMultipleForFilesAll(t *testing.T) {
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForFiles(
-		cwd,
-		"testdata/valid/base/a/file.proto",
-		"testdata/valid/base/b/file.proto",
-		"testdata/valid/base/c/file.proto",
-		"testdata/valid/base/a/d/file.proto",
-		"testdata/valid/base/a/d/file2.proto",
-		"testdata/valid/base/a/d/file3.proto",
-		"testdata/valid/base/a/e/file.proto",
-		"testdata/valid/base/a/f/file.proto",
-		"testdata/valid/base/b/g/h/file.proto",
-	)
-	require.NoError(t, err)
-	require.Equal(
-		t,
-		[]*ProtoSet{
-			&ProtoSet{
-				WorkDirPath: cwd,
-				DirPath:     cwd,
-				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/file.proto",
-							DisplayPath: "testdata/valid/base/a/file.proto",
-						},
-					},
-					cwd + "/testdata/valid/base/c": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/c/file.proto",
-							DisplayPath: "testdata/valid/base/c/file.proto",
-						},
-					},
-					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
-							DisplayPath: "testdata/valid/base/a/e/file.proto",
-						},
-					},
-					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
-							DisplayPath: "testdata/valid/base/a/f/file.proto",
-						},
-					},
-				},
-				Config: settings.Config{
-					DirPath: cwd + "/testdata/valid/base",
-					ExcludePrefixes: []string{
-						cwd + "/testdata/valid/base/c/i",
-						cwd + "/testdata/valid/base/d",
-					},
-					Compile: settings.CompileConfig{
-						ProtobufVersion:       "3.4.0",
-						IncludePaths:          []string{},
-						IncludeWellKnownTypes: true,
-					},
-					Lint: settings.LintConfig{
-						IncludeIDs:          []string{},
-						ExcludeIDs:          []string{},
-						IgnoreIDToFilePaths: map[string][]string{},
-					},
-					Gen: settings.GenConfig{
-						GoPluginOptions: settings.GenGoPluginOptions{},
-						Plugins:         []settings.GenPlugin{},
-					},
-				},
-			},
-			&ProtoSet{
-				WorkDirPath: cwd,
-				DirPath:     cwd,
-				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
-							DisplayPath: "testdata/valid/base/a/d/file.proto",
-						},
-						{
-							Path:        cwd + "/testdata/valid/base/a/d/file2.proto",
-							DisplayPath: "testdata/valid/base/a/d/file2.proto",
-						},
-						{
-							Path:        cwd + "/testdata/valid/base/a/d/file3.proto",
-							DisplayPath: "testdata/valid/base/a/d/file3.proto",
-						},
-					},
-				},
-				Config: settings.Config{
-					DirPath: cwd + "/testdata/valid/base/a/d",
-					ExcludePrefixes: []string{
-						cwd + "/testdata/valid/base/a/d/file3.proto",
-					},
-					Compile: settings.CompileConfig{
-						ProtobufVersion:       "3.2.0",
-						IncludePaths:          []string{},
-						IncludeWellKnownTypes: true,
-					},
-					Lint: settings.LintConfig{
-						IncludeIDs:          []string{},
-						ExcludeIDs:          []string{},
-						IgnoreIDToFilePaths: map[string][]string{},
-					},
-					Gen: settings.GenConfig{
-						GoPluginOptions: settings.GenGoPluginOptions{},
-						Plugins:         []settings.GenPlugin{},
-					},
-				},
-			},
-			&ProtoSet{
-				WorkDirPath: cwd,
-				DirPath:     cwd,
-				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/b": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/b/file.proto",
-							DisplayPath: "testdata/valid/base/b/file.proto",
-						},
-					},
-					cwd + "/testdata/valid/base/b/g/h": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/b/g/h/file.proto",
-							DisplayPath: "testdata/valid/base/b/g/h/file.proto",
-						},
-					},
-				},
-				Config: settings.Config{
-					DirPath: cwd + "/testdata/valid/base/b",
-					ExcludePrefixes: []string{
-						cwd + "/testdata/valid/base/b/g/h",
-					},
-					Compile: settings.CompileConfig{
-						ProtobufVersion:       "3.3.0",
-						IncludePaths:          []string{},
-						IncludeWellKnownTypes: true,
-					},
-					Lint: settings.LintConfig{
-						IncludeIDs:          []string{},
-						ExcludeIDs:          []string{},
-						IgnoreIDToFilePaths: map[string][]string{},
-					},
-					Gen: settings.GenConfig{
-						GoPluginOptions: settings.GenGoPluginOptions{},
-						Plugins:         []settings.GenPlugin{},
-					},
-				},
-			},
-		},
-		protoSets,
-	)
-}
-
-func TestProtoSetProviderGetMultipleForFilesSomeMissing(t *testing.T) {
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForFiles(
-		cwd,
-		"testdata/valid/base/a/file.proto",
-		"testdata/valid/base/c/file.proto",
-		"testdata/valid/base/a/d/file.proto",
-		"testdata/valid/base/a/d/file3.proto",
-		"testdata/valid/base/a/e/file.proto",
-		"testdata/valid/base/a/f/file.proto",
-	)
-	require.NoError(t, err)
-	require.Equal(
-		t,
-		[]*ProtoSet{
-			&ProtoSet{
-				WorkDirPath: cwd,
-				DirPath:     cwd,
-				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/file.proto",
-							DisplayPath: "testdata/valid/base/a/file.proto",
-						},
-					},
-					cwd + "/testdata/valid/base/c": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/c/file.proto",
-							DisplayPath: "testdata/valid/base/c/file.proto",
-						},
-					},
-					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
-							DisplayPath: "testdata/valid/base/a/e/file.proto",
-						},
-					},
-					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
-							DisplayPath: "testdata/valid/base/a/f/file.proto",
-						},
-					},
-				},
-				Config: settings.Config{
-					DirPath: cwd + "/testdata/valid/base",
-					ExcludePrefixes: []string{
-						cwd + "/testdata/valid/base/c/i",
-						cwd + "/testdata/valid/base/d",
-					},
-					Compile: settings.CompileConfig{
-						ProtobufVersion:       "3.4.0",
-						IncludePaths:          []string{},
-						IncludeWellKnownTypes: true,
-					},
-					Lint: settings.LintConfig{
-						IncludeIDs:          []string{},
-						ExcludeIDs:          []string{},
-						IgnoreIDToFilePaths: map[string][]string{},
-					},
-					Gen: settings.GenConfig{
-						GoPluginOptions: settings.GenGoPluginOptions{},
-						Plugins:         []settings.GenPlugin{},
-					},
-				},
-			},
-			&ProtoSet{
-				WorkDirPath: cwd,
-				DirPath:     cwd,
-				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
-						{
-							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
-							DisplayPath: "testdata/valid/base/a/d/file.proto",
-						},
-						{
-							Path:        cwd + "/testdata/valid/base/a/d/file3.proto",
-							DisplayPath: "testdata/valid/base/a/d/file3.proto",
-						},
-					},
-				},
-				Config: settings.Config{
-					DirPath: cwd + "/testdata/valid/base/a/d",
-					ExcludePrefixes: []string{
-						cwd + "/testdata/valid/base/a/d/file3.proto",
-					},
-					Compile: settings.CompileConfig{
-						ProtobufVersion:       "3.2.0",
-						IncludePaths:          []string{},
-						IncludeWellKnownTypes: true,
-					},
-					Lint: settings.LintConfig{
-						IncludeIDs:          []string{},
-						ExcludeIDs:          []string{},
-						IgnoreIDToFilePaths: map[string][]string{},
-					},
-					Gen: settings.GenConfig{
-						GoPluginOptions: settings.GenGoPluginOptions{},
-						Plugins:         []settings.GenPlugin{},
-					},
-				},
-			},
-		},
-		protoSets,
-	)
-}
-
 // We need to use valid as a representation of "cwd" so we verify
 // that we do the recursive search properly. We used to use actual cwd,
 // however since we added testdata/invalid, this will not work anymore.
@@ -303,7 +40,7 @@ func TestProtoSetProviderGetMultipleForDirCwdAsValidRel(t *testing.T) {
 	require.NoError(t, err)
 	validDirPath := filepath.Join(cwd, "testdata", "valid")
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, filepath.Join(".", "testdata", "valid"))
+	protoSets, err := protoSetProvider.getMultipleForDir(cwd, filepath.Join(".", "testdata", "valid"))
 	require.NoError(t, err)
 	require.Equal(
 		t,
@@ -441,7 +178,7 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 	require.NoError(t, err)
 	validDirPath := filepath.Join(cwd, "testdata", "valid")
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, validDirPath)
+	protoSets, err := protoSetProvider.getMultipleForDir(cwd, validDirPath)
 	require.NoError(t, err)
 	require.Equal(
 		t,
@@ -574,7 +311,7 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	protoSets, err := protoSetProvider.GetMultipleForDir(cwd, "testdata/valid/base/d/g")
+	protoSets, err := protoSetProvider.getMultipleForDir(cwd, "testdata/valid/base/d/g")
 	require.NoError(t, err)
 	require.Equal(
 		t,
@@ -624,7 +361,7 @@ func TestProtoSetProviderGetMultipleForDirTwoConfigFiles(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
 	protoSetProvider := newTestProtoSetProvider(t)
-	_, err = protoSetProvider.GetMultipleForDir(cwd, "testdata/invalid")
+	_, err = protoSetProvider.getMultipleForDir(cwd, "testdata/invalid")
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "multiple configuration files")
 }
@@ -680,8 +417,8 @@ func TestIsExcluded(t *testing.T) {
 	}
 }
 
-func newTestProtoSetProvider(t *testing.T) ProtoSetProvider {
+func newTestProtoSetProvider(t *testing.T) *protoSetProvider {
 	logger, err := zap.NewDevelopment()
 	require.NoError(t, err)
-	return NewProtoSetProvider(ProtoSetProviderWithLogger(logger))
+	return newProtoSetProvider(ProtoSetProviderWithLogger(logger))
 }

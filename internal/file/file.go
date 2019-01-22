@@ -70,41 +70,18 @@ type ProtoFile struct {
 
 // ProtoSetProvider provides ProtoSets.
 type ProtoSetProvider interface {
-	// GetMultipleForDir gets the ProtoSets for the given dirPath.
-	// Each ProtoSet will have the config assocated with all files associated with
+	// GetForDir gets the ProtoSet for the given dirPath.
+	// The ProtoSet will have the config assocated with all files associated with
 	// the ProtoSet.
 	//
 	// This will return all .proto files in the directory of the associated config file
 	// and all it's subdirectories, or the given directory and its subdirectories
 	// if there is no config file.
 	//
-	// Configs will be searched for starting at the directory of each .proto file
+	// Config will be searched for starting at the directory of each .proto file
 	// and going up a directory until hitting root.
-	GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error)
-
-	// GetMultipleForFiles gets the ProtoSets for the given filePaths.
-	// Each ProtoSet will have the config assocated with all files associated with
-	// the ProtoSet.
-	//
-	// Configs will be searched for starting at the directory of each .proto file
-	// and going up a directory until hitting root.
-	//
-	// This ignores excludes, all files given will be included.
-	GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error)
-
-	// GetForDir does the same logic as GetMultipleForDir, but returns an error if there
-	// is not exactly one ProtoSet. We keep the original logic and testing for multiple
-	// ProtoSets around as we are still discussing this pre-v1.0.
-	// https://github.com/uber/prototool/issues/10
-	// https://github.com/uber/prototool/issues/93
+	// Returns an error if there is not exactly one ProtoSet.
 	GetForDir(workDirPath string, dirPath string) (*ProtoSet, error)
-
-	// GetForFiles does the same logic as GetMultipleForFiles, but returns an error if there
-	// is not exactly one ProtoSet. We keep the original logic and testing for multiple
-	// ProtoSets around as we are still discussing this pre-v1.0.
-	// https://github.com/uber/prototool/issues/10
-	// https://github.com/uber/prototool/issues/93
-	GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error)
 }
 
 // ProtoSetProviderOption is an option for a new ProtoSetProvider.

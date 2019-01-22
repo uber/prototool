@@ -70,7 +70,6 @@ type compiler struct {
 	logger              *zap.Logger
 	cachePath           string
 	protocBinPath       string
-	protocWKTPath       string
 	protocURL           string
 	doGen               bool
 	doFileDescriptorSet bool
@@ -197,6 +196,10 @@ func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 			genDirs[baseOutputPath] = struct{}{}
 		} else {
 			for dirPath := range protoSet.DirPathToFiles {
+				// skip those files not under the directory
+				if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+					continue
+				}
 				relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
 				if err != nil {
 					return err
@@ -293,6 +296,10 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 		return cmdMetas, err
 	}
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		// skip those files not under the directory
+		if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+			continue
+		}
 		// you want your proto files to be in at least one of the -I directories
 		// or otherwise things can get weird
 		// we make best effort to make sure we have the a parent directory of the file
@@ -388,12 +395,6 @@ func (c *compiler) newDownloader(config settings.Config) (Downloader, error) {
 		downloaderOptions = append(
 			downloaderOptions,
 			DownloaderWithProtocBinPath(c.protocBinPath),
-		)
-	}
-	if c.protocWKTPath != "" {
-		downloaderOptions = append(
-			downloaderOptions,
-			DownloaderWithProtocWKTPath(c.protocWKTPath),
 		)
 	}
 	if c.protocURL != "" {
@@ -502,6 +503,8 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 		// you cannot include the files in the same package in the Mfile=package map
 		// or otherwise protoc-gen-go, protoc-gen-gogo, etc freak out and put
 		// these packages in as imports
+		// but, unlike other usages of DirPathToFiles, you MUST include all directories
+		// under control of the prototool.yaml to make sure all modifiers are added
 		if subDirPath != dirPath {
 			for _, protoFile := range protoFiles {
 				path, err := filepath.Rel(protoSet.Config.DirPath, protoFile.Path)
@@ -547,17 +550,6 @@ func getIncludes(downloader Downloader, config settings.Config, dirPath string, 
 		}
 		if includePath == configDirPath {
 			includedConfigDirPath = true
-		}
-	}
-	if config.Compile.IncludeWellKnownTypes {
-		wellKnownTypesIncludePath, err := downloader.WellKnownTypesIncludePath()
-		if err != nil {
-			return nil, err
-		}
-		includes = append(includes, wellKnownTypesIncludePath)
-		// TODO: not exactly platform independent
-		if strings.HasPrefix(dirPath, wellKnownTypesIncludePath) {
-			fileInIncludePath = true
 		}
 	}
 	// you want your proto files to be in at least one of the -I directories
