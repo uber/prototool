@@ -273,21 +273,6 @@ func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
 	return dirPathToProtoFiles
 }
 
-func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
-	protoFiles := make([]*ProtoFile, 0, len(filePaths))
-	for _, filePath := range filePaths {
-		absFilePath, err := AbsClean(filePath)
-		if err != nil {
-			return nil, err
-		}
-		protoFiles = append(protoFiles, &ProtoFile{
-			Path:        absFilePath,
-			DisplayPath: filePath,
-		})
-	}
-	return protoFiles, nil
-}
-
 // isExcluded determines whether the given filePath should be excluded.
 // Note that all excludes are assumed to be cleaned absolute paths at
 // this point.
