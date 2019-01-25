@@ -184,3 +184,8 @@ dockerall:
 		--workdir "/app" \
 		$(DOCKER_IMAGE) \
 		make all
+
+.PHONY: bazelgen
+bazelgen:
+	bazel run //:gazelle
+	bazel run //:gazelle -- update-repos -from_file=go.mod
