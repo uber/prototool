@@ -1,0 +1,18 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/uber/prototool
+# gazelle:exclude etc
+# gazelle:exclude example
+# gazelle:exclude internal/breaking/testdata
+# gazelle:exclude internal/cmd/testdata/lint
+# gazelle:exclude internal/cmd/testdata/compile
+# gazelle:exclude internal/cmd/testdata/foo
+# gazelle:exclude internal/cmd/testdata/format
+# gazelle:exclude internal/cmd/testdata/format-fix-v2
+# gazelle:exclude internal/cmd/testdata/format-fix
+# gazelle:exclude internal/cmd/testdata/bar
+# gazelle:exclude internal/cmd/testdata/create
+# gazelle:exclude internal/file/testdata
+# gazelle:exclude internal/reflect/proto
+# gazelle:exclude internal/reflect/testdata
+gazelle(name = "gazelle")

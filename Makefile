@@ -20,7 +20,7 @@ export GOBIN := $(abspath $(TMP_BIN))
 export PATH := $(GOBIN):$(PATH)
 
 .PHONY: all
-all: lint cover
+all: lint cover bazelbuild
 
 .PHONY: init
 init:
@@ -75,8 +75,14 @@ internalgen: install
 	rm -f etc/config/example/prototool.yaml
 	prototool config init etc/config/example --uncomment
 
+.PHONY: bazelgen
+bazelgen:
+	bazel run //:gazelle
+	bazel run //:gazelle -- update-repos -from_file=go.mod
+	rm internal/cmd/testdata/grpc/BUILD.bazel
+
 .PHONY: generate
-generate: license golden example internalgen
+generate: license golden example internalgen bazelgen
 
 .PHONY: checknodiffgenerated
 checknodiffgenerated:
@@ -146,6 +152,10 @@ cover:
 .PHONY: codecov
 codecov:
 	bash <(curl -s https://codecov.io/bash) -c -f $(TMP_ETC)/coverage.txt
+
+.PHONY: bazelbuild
+bazelbuild:
+	bazel build //...:all
 
 .PHONY: releasegen
 releasegen: internalgen

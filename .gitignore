@@ -1,6 +1,7 @@
 /.glide
 /.idea
 /.tmp
+/bazel-*
 /brew
 /example/gen/java
 /cmd/prototool/prototool

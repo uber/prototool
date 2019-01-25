@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "config_provider.go",
+        "settings.go",
+    ],
+    importpath = "github.com/uber/prototool/internal/settings",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/strs:go_default_library",
+        "@in_gopkg_yaml_v2//:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
+)
