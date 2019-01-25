@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["git.go"],
+    importpath = "github.com/uber/prototool/internal/git",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/file:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
+)
