@@ -189,3 +189,8 @@ dockerall:
 bazelgen:
 	bazel run //:gazelle
 	bazel run //:gazelle -- update-repos -from_file=go.mod
+	rm internal/cmd/testdata/grpc/BUILD.bazel
+
+.PHONY: bazelbuild
+bazelbuild: bazelgen
+	bazel build //...:all
