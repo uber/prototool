@@ -77,9 +77,7 @@ internalgen: install
 
 .PHONY: bazelgen
 bazelgen:
-	bazel run //:gazelle
-	bazel run //:gazelle -- update-repos -from_file=go.mod
-	rm internal/cmd/testdata/grpc/BUILD.bazel
+	bash etc/bin/bazelgen.sh
 
 .PHONY: generate
 generate: license golden example internalgen bazelgen
