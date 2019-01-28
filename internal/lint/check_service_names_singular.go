@@ -51,10 +51,23 @@ type serviceNamesNoPluralsVisitor struct {
 
 func (v *serviceNamesNoPluralsVisitor) VisitService(service *proto.Service) {
 	for _, word := range strs.SplitCamelCaseWord(service.Name) {
-		if singular := flect.New(word).Singularize().String(); singular != word {
-			if _, ok := allowedServiceNamePlurals[word]; !ok {
+		wordLowerCase := strings.ToLower(word)
+		if singular := flect.New(wordLowerCase).Singularize().String(); singular != wordLowerCase {
+			if !isAllowedServiceNamePlural(word) {
 				v.AddFailuref(service.Comment, service.Position, `Service name %q contains plural component %q, consider using %q instead.`, service.Name, strings.Title(word), strings.Title(singular))
 			}
 		}
 	}
+}
+
+func isAllowedServiceNamePlural(word string) bool {
+	// if word is all uppercase, it is assumed to be an abbreviation, which we allow
+	if strings.ToUpper(word) == word {
+		return true
+	}
+	// if word is allowed, then we allow it
+	if _, ok := allowedServiceNamePlurals[strings.ToLower(word)]; ok {
+		return true
+	}
+	return false
 }

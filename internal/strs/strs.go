@@ -121,7 +121,6 @@ func ToUpperCamelCase(s string) string {
 
 // SplitCamelCaseWord splits a CamelCase word into its parts.
 //
-// Returned words will be lowercase.
 // If s is empty, returns nil.
 // If s is not CamelCase, returns nil.
 func SplitCamelCaseWord(s string) []string {
@@ -132,20 +131,19 @@ func SplitCamelCaseWord(s string) []string {
 	if !IsCamelCase(s) {
 		return nil
 	}
-	return SplitSnakeCaseWord(ToLowerSnakeCase(s))
+	return SplitSnakeCaseWord(toSnake(s))
 }
 
 // SplitSnakeCaseWord splits a snake_case word into its parts.
 //
-// Returned words will be lowercase.
 // If s is empty, returns nil.
 // If s is not snake_case, returns nil.
 func SplitSnakeCaseWord(s string) []string {
 	if s == "" {
 		return nil
 	}
-	s = strings.ToLower(strings.TrimSpace(s))
-	if !IsLowerSnakeCase(s) {
+	s = strings.TrimSpace(s)
+	if !isSnake(s) {
 		return nil
 	}
 	var previous rune
@@ -236,6 +234,20 @@ func IsUppercase(s string) bool {
 		return false
 	}
 	return strings.ToUpper(s) == s
+}
+
+// isSnake returns true if s only contains letters, digits, and/or underscores.
+// s MUST NOT begin or end with an underscore.
+func isSnake(s string) bool {
+	if s == "" || s[0] == '_' || s[len(s)-1] == '_' {
+		return false
+	}
+	for _, r := range s {
+		if !(isLetter(r) || isDigit(r) || r == '_') {
+			return false
+		}
+	}
+	return true
 }
 
 // toSnake converts s to snake_case.
