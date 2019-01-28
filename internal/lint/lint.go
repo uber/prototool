@@ -358,6 +358,21 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 		// we ignore NoDefault if Group is set
 		linters = DefaultLinters
 	}
+	for _, id := range config.IncludeIDs {
+		if err := checkLintID(id); err != nil {
+			return nil, err
+		}
+	}
+	for _, excludeID := range config.ExcludeIDs {
+		if err := checkLintID(excludeID); err != nil {
+			return nil, err
+		}
+	}
+	for ignoreID := range config.IgnoreIDToFilePaths {
+		if err := checkLintID(ignoreID); err != nil {
+			return nil, err
+		}
+	}
 	if len(config.IncludeIDs) == 0 && len(config.ExcludeIDs) == 0 {
 		return linters, nil
 	}
@@ -370,9 +385,6 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 	if len(config.IncludeIDs) > 0 {
 		for _, l := range AllLinters {
 			for _, id := range config.IncludeIDs {
-				if err := checkLintID(id); err != nil {
-					return nil, err
-				}
 				if l.ID() == id {
 					linterMap[id] = l
 				}
@@ -380,15 +392,7 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 		}
 	}
 	for _, excludeID := range config.ExcludeIDs {
-		if err := checkLintID(excludeID); err != nil {
-			return nil, err
-		}
 		delete(linterMap, excludeID)
-	}
-	for ignoreID := range config.IgnoreIDToFilePaths {
-		if err := checkLintID(ignoreID); err != nil {
-			return nil, err
-		}
 	}
 
 	result := make([]Linter, 0, len(linterMap))
