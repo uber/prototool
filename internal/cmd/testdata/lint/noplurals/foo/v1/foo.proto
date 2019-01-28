@@ -46,3 +46,5 @@ service FooInfoBarsAPI {}
 
 // @suppresswarnings plurals
 service BarInfoBarsAPI {}
+
+service FooInfoBARSAPI {}
