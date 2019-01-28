@@ -70,6 +70,7 @@ type compiler struct {
 	logger              *zap.Logger
 	cachePath           string
 	protocBinPath       string
+	protocWKTPath       string
 	protocURL           string
 	doGen               bool
 	doFileDescriptorSet bool
@@ -397,6 +398,12 @@ func (c *compiler) newDownloader(config settings.Config) (Downloader, error) {
 			DownloaderWithProtocBinPath(c.protocBinPath),
 		)
 	}
+	if c.protocWKTPath != "" {
+		downloaderOptions = append(
+			downloaderOptions,
+			DownloaderWithProtocWKTPath(c.protocWKTPath),
+		)
+	}
 	if c.protocURL != "" {
 		downloaderOptions = append(
 			downloaderOptions,
@@ -550,6 +557,17 @@ func getIncludes(downloader Downloader, config settings.Config, dirPath string, 
 		}
 		if includePath == configDirPath {
 			includedConfigDirPath = true
+		}
+	}
+	if config.Compile.IncludeWellKnownTypes {
+		wellKnownTypesIncludePath, err := downloader.WellKnownTypesIncludePath()
+		if err != nil {
+			return nil, err
+		}
+		includes = append(includes, wellKnownTypesIncludePath)
+		// TODO: not exactly platform independent
+		if strings.HasPrefix(dirPath, wellKnownTypesIncludePath) {
+			fileInIncludePath = true
 		}
 	}
 	// you want your proto files to be in at least one of the -I directories

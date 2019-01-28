@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -103,7 +104,9 @@ func TestNewDownloaderProtocValidation(t *testing.T) {
 		desc          string
 		url           string
 		binPath       string
+		wktPath       string
 		createBinPath bool
+		createWKTPath bool
 		err           error
 	}{
 		{
@@ -114,20 +117,36 @@ func TestNewDownloaderProtocValidation(t *testing.T) {
 			url:  "http://example.com",
 		},
 		{
-			desc:          "protocBinPath",
+			desc:          "protocBinPath with protocWKTPath",
 			binPath:       "protoc",
+			wktPath:       "include",
 			createBinPath: true,
+			createWKTPath: true,
 		},
 		{
-			desc:    "protocURL set with protocBinPath",
+			desc:    "protocURL set with protocBinPath and protocWKTPath",
 			url:     "http://example.com",
 			binPath: "protoc",
-			err:     fmt.Errorf("cannot use protoc-url in combination with protoc-bin-path"),
+			wktPath: "include",
+			err:     fmt.Errorf("cannot use protoc-url in combination with either protoc-bin-path or protoc-wkt-path"),
+		},
+		{
+			desc:    "protocBinPath set without protocWKTPath",
+			binPath: "protoc",
+			err:     fmt.Errorf("both protoc-bin-path and protoc-wkt-path must be set"),
 		},
 		{
 			desc:    "protocBinPath does not exist",
 			binPath: "protoc",
+			wktPath: "include",
 			err:     fmt.Errorf("stat protoc: no such file or directory"),
+		},
+		{
+			desc:          "protocWKTPath does not exist",
+			binPath:       "protoc",
+			wktPath:       "include",
+			createBinPath: true,
+			err:           fmt.Errorf("stat include: no such file or directory"),
 		},
 	}
 	for _, tt := range tests {
@@ -143,10 +162,20 @@ func TestNewDownloaderProtocValidation(t *testing.T) {
 				require.NoError(t, err)
 			}
 
+			if tt.createWKTPath {
+				tt.wktPath, err = ioutil.TempDir(tmpRoot, tt.wktPath)
+				require.NoError(t, err)
+			}
+
+			if tt.createBinPath && tt.createWKTPath {
+				require.NoError(t, os.MkdirAll(filepath.Join(tt.wktPath, "google", "protobuf"), 0755))
+			}
+
 			_, err = newDownloader(
 				settings.Config{},
 				DownloaderWithProtocURL(tt.url),
 				DownloaderWithProtocBinPath(tt.binPath),
+				DownloaderWithProtocWKTPath(tt.wktPath),
 			)
 
 			if tt.err != nil {
