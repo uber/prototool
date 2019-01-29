@@ -41,13 +41,20 @@ type Downloader interface {
 	//
 	// Returns the path to the downloaded protobuf artifacts.
 	//
-	// ProtocPath implicitly calls this.
+	// ProtocPath and WellKnownTypesIncludePath implicitly call this.
 	Download() (string, error)
 
 	// Get the path to protoc.
 	//
 	// If not downloaded, this downloads and caches protobuf. This is thread-safe.
 	ProtocPath() (string, error)
+
+	// Get the path to include for the well-known types.
+	//
+	// Inside this directory will be the subdirectories google/protobuf.
+	//
+	// If not downloaded, this downloads and caches protobuf. This is thread-safe.
+	WellKnownTypesIncludePath() (string, error)
 
 	// Delete any downloaded artifacts.
 	//
@@ -81,6 +88,14 @@ func DownloaderWithCachePath(cachePath string) DownloaderOption {
 func DownloaderWithProtocBinPath(protocBinPath string) DownloaderOption {
 	return func(downloader *downloader) {
 		downloader.protocBinPath = protocBinPath
+	}
+}
+
+// DownloaderWithProtocWKTPath returns a DownloaderOption that uses the given path to include
+// the well-known types.
+func DownloaderWithProtocWKTPath(protocWKTPath string) DownloaderOption {
+	return func(downloader *downloader) {
+		downloader.protocWKTPath = protocWKTPath
 	}
 }
 
@@ -151,6 +166,14 @@ func CompilerWithCachePath(cachePath string) CompilerOption {
 func CompilerWithProtocBinPath(protocBinPath string) CompilerOption {
 	return func(compiler *compiler) {
 		compiler.protocBinPath = protocBinPath
+	}
+}
+
+// CompilerWithProtocWKTPath returns a CompilerOption that uses the given path to include the
+// well-known types.
+func CompilerWithProtocWKTPath(protocWKTPath string) CompilerOption {
+	return func(compiler *compiler) {
+		compiler.protocWKTPath = protocWKTPath
 	}
 }
 

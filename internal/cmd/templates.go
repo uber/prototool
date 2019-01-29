@@ -595,6 +595,12 @@ func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writ
 			exec.RunnerWithProtocBinPath(flags.protocBinPath),
 		)
 	}
+	if flags.protocWKTPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocWKTPath(flags.protocWKTPath),
+		)
+	}
 	if flags.errorFormat != "" {
 		runnerOptions = append(
 			runnerOptions,
