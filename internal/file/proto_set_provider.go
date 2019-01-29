@@ -67,7 +67,7 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*Proto
 	}
 	switch len(protoSets) {
 	case 0:
-		return nil, fmt.Errorf("no proto files found for dirPath %q", dirPath)
+		return nil, fmt.Errorf("no ProtoSet returned, this is a system error")
 	case 1:
 		return protoSets[0], nil
 	default:
@@ -122,6 +122,13 @@ func (c *protoSetProvider) getMultipleForDir(workDirPath string, dirPath string)
 }
 
 func (c *protoSetProvider) getBaseProtoSets(absWorkDirPath string, dirPathToProtoFiles map[string][]*ProtoFile) ([]*ProtoSet, error) {
+	if len(dirPathToProtoFiles) == 0 {
+		protoSet, err := c.getDefaultBaseProtoSet(absWorkDirPath)
+		if err != nil {
+			return nil, err
+		}
+		return []*ProtoSet{protoSet}, nil
+	}
 	filePathToProtoSet := make(map[string]*ProtoSet)
 	for dirPath, protoFiles := range dirPathToProtoFiles {
 		var configFilePath string
@@ -154,6 +161,12 @@ func (c *protoSetProvider) getBaseProtoSets(absWorkDirPath string, dirPathToProt
 			if err != nil {
 				return nil, err
 			}
+		} else {
+			// still want default config
+			config, err = c.configProvider.GetForDir(absWorkDirPath)
+			if err != nil {
+				return nil, err
+			}
 		}
 		protoSet.Config = config
 	}
@@ -165,6 +178,26 @@ func (c *protoSetProvider) getBaseProtoSets(absWorkDirPath string, dirPathToProt
 		return protoSets[i].Config.DirPath < protoSets[j].Config.DirPath
 	})
 	return protoSets, nil
+}
+
+// getDefaultBaseProtoSet gets a ProtoSet with no files for the given working directory path.
+func (c *protoSetProvider) getDefaultBaseProtoSet(absWorkDirPath string) (*ProtoSet, error) {
+	protoSet := &ProtoSet{
+		DirPathToFiles: make(map[string][]*ProtoFile),
+	}
+	config, err := c.getConfig(absWorkDirPath)
+	if err != nil {
+		return nil, err
+	}
+	protoSet.Config = config
+	return protoSet, nil
+}
+
+func (c *protoSetProvider) getConfig(absDirPath string) (settings.Config, error) {
+	if c.configData == "" {
+		return c.configProvider.GetForDir(absDirPath)
+	}
+	return c.configProvider.GetForData(absDirPath, c.configData)
 }
 
 // walkAndGetAllProtoFiles collects the .proto files nested under the given absDirPath.

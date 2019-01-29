@@ -66,6 +66,15 @@ func HandlerWithPackage(pkg string) HandlerOption {
 	}
 }
 
+// HandlerWithConfigData returns a HandlerOption that uses the given configuration
+// data instead of using configuration files that are found. This acts as if there is only one
+// configuration file at the current working directory. All found configuration files are ignored.
+func HandlerWithConfigData(configData string) HandlerOption {
+	return func(handler *handler) {
+		handler.configData = configData
+	}
+}
+
 // NewHandler returns a new Handler.
 func NewHandler(options ...HandlerOption) Handler {
 	return newHandler(options...)
