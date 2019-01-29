@@ -58,7 +58,7 @@ func (c *configProvider) GetForDir(dirPath string) (Config, error) {
 		return Config{}, err
 	}
 	if filePath == "" {
-		return Config{}, nil
+		return getDefaultConfig(c.develMode, dirPath)
 	}
 	return c.Get(filePath)
 }
@@ -164,6 +164,10 @@ func get(develMode bool, filePath string) (Config, error) {
 		return Config{}, err
 	}
 	return externalConfigToConfig(develMode, externalConfig, filepath.Dir(filePath))
+}
+
+func getDefaultConfig(develMode bool, dirPath string) (Config, error) {
+	return externalConfigToConfig(develMode, ExternalConfig{}, dirPath)
 }
 
 func getExternalConfig(filePath string) (ExternalConfig, error) {

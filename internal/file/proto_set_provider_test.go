@@ -21,6 +21,7 @@
 package file
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -366,6 +367,81 @@ func TestProtoSetProviderGetMultipleForDirTwoConfigFiles(t *testing.T) {
 	require.Contains(t, err.Error(), "multiple configuration files")
 }
 
+func TestProtoSetProviderGetForDirEmpty(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	require.NoError(t, err)
+	defer func() {
+		_ = os.RemoveAll(dir)
+	}()
+	protoSetProvider := newTestProtoSetProvider(t)
+	protoSet, err := protoSetProvider.GetForDir(dir, dir)
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		&ProtoSet{
+			WorkDirPath:    dir,
+			DirPath:        dir,
+			DirPathToFiles: map[string][]*ProtoFile{},
+			Config: settings.Config{
+				DirPath:         dir,
+				ExcludePrefixes: []string{},
+				Compile: settings.CompileConfig{
+					IncludePaths:          []string{},
+					IncludeWellKnownTypes: true,
+				},
+				Lint: settings.LintConfig{
+					IncludeIDs:          []string{},
+					ExcludeIDs:          []string{},
+					IgnoreIDToFilePaths: map[string][]string{},
+				},
+				Gen: settings.GenConfig{
+					GoPluginOptions: settings.GenGoPluginOptions{},
+					Plugins:         []settings.GenPlugin{},
+				},
+			},
+		},
+		protoSet,
+	)
+}
+
+func TestProtoSetProviderGetForDirConfigData(t *testing.T) {
+	dir, err := ioutil.TempDir("", "")
+	require.NoError(t, err)
+	defer func() {
+		_ = os.RemoveAll(dir)
+	}()
+	protoSetProvider := newTestProtoSetProviderConfigData(t, `{"protoc":{"version":"3.5.1"}}`)
+	protoSet, err := protoSetProvider.GetForDir(dir, dir)
+	assert.NoError(t, err)
+	assert.Equal(
+		t,
+		&ProtoSet{
+			WorkDirPath:    dir,
+			DirPath:        dir,
+			DirPathToFiles: map[string][]*ProtoFile{},
+			Config: settings.Config{
+				DirPath:         dir,
+				ExcludePrefixes: []string{},
+				Compile: settings.CompileConfig{
+					ProtobufVersion:       "3.5.1",
+					IncludePaths:          []string{},
+					IncludeWellKnownTypes: true,
+				},
+				Lint: settings.LintConfig{
+					IncludeIDs:          []string{},
+					ExcludeIDs:          []string{},
+					IgnoreIDToFilePaths: map[string][]string{},
+				},
+				Gen: settings.GenConfig{
+					GoPluginOptions: settings.GenGoPluginOptions{},
+					Plugins:         []settings.GenPlugin{},
+				},
+			},
+		},
+		protoSet,
+	)
+}
+
 func TestIsExcluded(t *testing.T) {
 	cwd, err := os.Getwd()
 	require.NoError(t, err)
@@ -418,7 +494,13 @@ func TestIsExcluded(t *testing.T) {
 }
 
 func newTestProtoSetProvider(t *testing.T) *protoSetProvider {
-	logger, err := zap.NewDevelopment()
-	require.NoError(t, err)
-	return newProtoSetProvider(ProtoSetProviderWithLogger(logger))
+	return newProtoSetProvider(ProtoSetProviderWithLogger(newTestLogger(t)))
+}
+
+func newTestProtoSetProviderConfigData(t *testing.T, configData string) *protoSetProvider {
+	return newProtoSetProvider(ProtoSetProviderWithLogger(newTestLogger(t)), ProtoSetProviderWithConfigData(configData))
+}
+
+func newTestLogger(t *testing.T) *zap.Logger {
+	return zap.NewNop()
 }

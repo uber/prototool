@@ -57,7 +57,6 @@ import (
 )
 
 type runner struct {
-	configProvider   settings.ConfigProvider
 	protoSetProvider file.ProtoSetProvider
 
 	workDirPath string
@@ -84,16 +83,6 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	for _, option := range options {
 		option(runner)
 	}
-	configProviderOptions := []settings.ConfigProviderOption{
-		settings.ConfigProviderWithLogger(runner.logger),
-	}
-	if runner.develMode {
-		configProviderOptions = append(
-			configProviderOptions,
-			settings.ConfigProviderWithDevelMode(),
-		)
-	}
-	runner.configProvider = settings.NewConfigProvider(configProviderOptions...)
 	protoSetProviderOptions := []file.ProtoSetProviderOption{
 		file.ProtoSetProviderWithLogger(runner.logger),
 	}
@@ -115,7 +104,6 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 
 func (r *runner) cloneForWorkDirPath(workDirPath string) *runner {
 	return &runner{
-		configProvider:   r.configProvider,
 		protoSetProvider: r.protoSetProvider,
 		workDirPath:      workDirPath,
 		input:            r.input,
@@ -677,9 +665,6 @@ func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return nil, fmt.Errorf("no FileDescriptorSets returned")
-	}
 	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
 	if err != nil {
 		return nil, err
@@ -841,6 +826,12 @@ func (r *runner) newCreateHandler(pkg string) create.Handler {
 	}
 	if r.develMode {
 		handlerOptions = append(handlerOptions, create.HandlerWithDevelMode())
+	}
+	if r.configData != "" {
+		handlerOptions = append(
+			handlerOptions,
+			create.HandlerWithConfigData(r.configData),
+		)
 	}
 	return create.NewHandler(handlerOptions...)
 }

@@ -74,6 +74,7 @@ type handler struct {
 	develMode      bool
 	configProvider settings.ConfigProvider
 	pkg            string
+	configData     string
 }
 
 func newHandler(options ...HandlerOption) *handler {
@@ -195,7 +196,7 @@ func (h *handler) isV2(filePath string) (bool, error) {
 		return false, err
 	}
 	absDirPath := filepath.Dir(absFilePath)
-	config, err := h.configProvider.GetForDir(absDirPath)
+	config, err := h.getConfig(absDirPath)
 	if err != nil {
 		return false, err
 	}
@@ -212,7 +213,7 @@ func (h *handler) getFileHeader(filePath string) (string, error) {
 		return "", err
 	}
 	absDirPath := filepath.Dir(absFilePath)
-	config, err := h.configProvider.GetForDir(absDirPath)
+	config, err := h.getConfig(absDirPath)
 	if err != nil {
 		return "", err
 	}
@@ -232,7 +233,7 @@ func (h *handler) getPkg(filePath string, defaultPackage string) (string, error)
 		return "", err
 	}
 	absDirPath := filepath.Dir(absFilePath)
-	config, err := h.configProvider.GetForDir(absDirPath)
+	config, err := h.getConfig(absDirPath)
 	if err != nil {
 		return "", err
 	}
@@ -277,6 +278,13 @@ func (h *handler) getPkg(filePath string, defaultPackage string) (string, error)
 		return "", err
 	}
 	return getPkgFromRel(rel, "", defaultPackage), nil
+}
+
+func (h *handler) getConfig(absDirPath string) (settings.Config, error) {
+	if h.configData != "" {
+		return h.configProvider.GetForData(absDirPath, h.configData)
+	}
+	return h.configProvider.GetForDir(absDirPath)
 }
 
 func getPkgFromRel(rel string, basePkg string, defaultPackage string) string {

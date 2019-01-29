@@ -37,6 +37,9 @@ import (
 // The FileDescriptorSets can have FileDescriptorProtos with the same name, but
 // they must be equal.
 func NewPackageSet(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*reflectv1.PackageSet, error) {
+	if len(fileDescriptorSets) == 0 {
+		return &reflectv1.PackageSet{}, nil
+	}
 	packageNameToFileNameToFileDescriptorProto, err := getPackageNameToFileNameToFileDescriptorProto(fileDescriptorSets)
 	if err != nil {
 		return nil, err

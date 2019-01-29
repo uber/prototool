@@ -323,7 +323,7 @@ type ConfigProvider interface {
 	// The directory must be an absolute path.
 	//
 	// If such a file is found, it is read as an ExternalConfig and converted to a Config.
-	// If no such file is found, Config{} is returned.
+	// If no such file is found, the default config is returned.
 	// If multiple files named by one of the ConfigFilenames are found in the same
 	// directory, error is returned.
 	GetForDir(dirPath string) (Config, error)
@@ -333,7 +333,7 @@ type ConfigProvider interface {
 	// The file must have either the extension .yaml or .json.
 	//
 	// If such a file is found, it is read as an ExternalConfig and converted to a Config.
-	// If no such file is found, Config{} is returned.
+	// If no such file is found, error is returned.
 	Get(filePath string) (Config, error)
 	// GetFilePathForDir tries to find a file named by one of the ConfigFilenames starting in the
 	// given directory, and going up a directory until hitting root.
