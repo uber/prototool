@@ -615,7 +615,7 @@ We do have multiple lint groups available, see the help section on `prototool li
 
 It is possible to ignore lint rules via configuration. However, especially if starting from a clean slate, we highly recommend using all default lint rules for consistency.
 
-Many of the lint rules exist to mitigate backwards compatibility problems as schemas evolves. For example: requiring a unique request-response pair per RPC - while this potentially resuls in duplicated messages, this makes it impossible to affect an adjacent RPC by adding or modifying an existing field.
+Many of the lint rules exist to mitigate backwards compatibility problems as schemas evolves. For example: requiring a unique request-response pair per RPC - while this potentially results in duplicated messages, this makes it impossible to affect an adjacent RPC by adding or modifying an existing field.
 
 ## Special Thanks
 
