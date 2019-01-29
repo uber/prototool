@@ -20,6 +20,7 @@ go_library(
         "check_enums_no_allow_alias.go",
         "check_fields_not_reserved.go",
         "check_file_header.go",
+        "check_file_names_lower_snake_case.go",
         "check_file_options_equal.go",
         "check_file_options_required.go",
         "check_file_options_same_in_dir.go",

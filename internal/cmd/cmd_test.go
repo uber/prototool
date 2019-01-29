@@ -584,6 +584,13 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`1:1:FILE_NAMES_LOWER_SNAKE_CASE`,
+		"testdata/lint/filename/fileNameInvalid.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`14:3:WKT_TIMESTAMP_SUFFIX
 		15:3:WKT_DURATION_SUFFIX
 		17:5:WKT_TIMESTAMP_SUFFIX
