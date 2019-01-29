@@ -665,9 +665,6 @@ func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(fileDescriptorSets) == 0 {
-		return nil, fmt.Errorf("no FileDescriptorSets returned")
-	}
 	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
 	if err != nil {
 		return nil, err
