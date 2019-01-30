@@ -49,6 +49,8 @@ var (
 	// special cased
 	pluginFailedRegexp       = regexp.MustCompile("^--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 	otherPluginFailureRegexp = regexp.MustCompile("^--(.*)_out: (.*)$")
+	// backup that does not require this to be at the beginning of the line
+	fullPluginFailedRegexp = regexp.MustCompile("(.*)--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 
 	extraImportRegexp     = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
 	recursiveImportRegexp = regexp.MustCompile("^(.*): File recursively imports itself: (.*)$")
@@ -605,6 +607,11 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 	if matches := otherPluginFailureRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 		return &text.Failure{
 			Message: fmt.Sprintf("protoc-gen-%s: %s", matches[1], matches[2]),
+		}
+	}
+	if matches := fullPluginFailedRegexp.FindStringSubmatch(protocLine); len(matches) > 3 {
+		return &text.Failure{
+			Message: fmt.Sprintf("protoc-gen-%s failed with status code %s: %s", matches[2], matches[3], matches[1]),
 		}
 	}
 	split := strings.Split(protocLine, ":")
