@@ -495,6 +495,17 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`16:7:MESSAGE_FIELD_NAMES_FILENAME
+		18:9:MESSAGE_FIELD_NAMES_FILENAME
+		21:5:MESSAGE_FIELD_NAMES_FILENAME
+		23:3:MESSAGE_FIELD_NAMES_FILENAME
+		24:3:MESSAGE_FIELD_NAMES_FILENAME`,
+		"testdata/lint/fieldnamesfilename/hello.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`17:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
 		22:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP
 		25:5:RPC_OPTIONS_NO_GOOGLE_API_HTTP

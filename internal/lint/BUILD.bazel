@@ -29,6 +29,7 @@ go_library(
         "check_gogo_not_imported.go",
         "check_imports_not_public.go",
         "check_imports_not_weak.go",
+        "check_message_field_names_filename.go",
         "check_message_field_names_lower_snake_case.go",
         "check_message_field_names_lowercase.go",
         "check_message_fields_no_json_name.go",
