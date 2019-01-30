@@ -10,6 +10,7 @@ go_library(
         "check_message_fields_not_deleted.go",
         "check_message_fields_same_label.go",
         "check_message_fields_same_name.go",
+        "check_message_fields_same_oneof.go",
         "check_message_fields_same_type.go",
         "check_message_oneofs_fields_not_removed.go",
         "check_message_oneofs_not_deleted.go",

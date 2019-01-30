@@ -232,3 +232,13 @@ message ThreeFourResponse {}
 message ThreeFiveRequest {}
 
 message ThreeFiveResponse {}
+
+message Eleven {
+  message NestedEleven {
+    message NestedNestedEleven {
+      int64 hello = 1;
+    }
+    int64 hello = 1;
+  }
+  int64 hello = 1;
+}

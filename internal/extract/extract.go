@@ -201,7 +201,8 @@ func (m *Message) OneofNameToOneof() map[string]*MessageOneof {
 type MessageField struct {
 	protoMessage *reflectv1.MessageField
 
-	message *Message
+	message      *Message
+	messageOneof *MessageOneof
 }
 
 // ProtoMessage returns the underlying Protobuf message.
@@ -214,11 +215,20 @@ func (m *MessageField) Message() *Message {
 	return m.message
 }
 
+// MessageOneof returns the parent MessageOneof.
+//
+// This will be nil if this field is not part of a oneof.
+func (m *MessageField) MessageOneof() *MessageOneof {
+	return m.messageOneof
+}
+
 // MessageOneof is the Golang wrapper for the Protobuf MessageOneof object.
 type MessageOneof struct {
 	protoMessage *reflectv1.MessageOneof
 
-	message *Message
+	message            *Message
+	fieldNameToField   map[string]*MessageField
+	fieldNumberToField map[int32]*MessageField
 }
 
 // ProtoMessage returns the underlying Protobuf message.
@@ -229,6 +239,16 @@ func (m *MessageOneof) ProtoMessage() *reflectv1.MessageOneof {
 // Message returns the parent Message.
 func (m *MessageOneof) Message() *Message {
 	return m.message
+}
+
+// FieldNameToField returns the fields of the given MessageOneof.
+func (m *MessageOneof) FieldNameToField() map[string]*MessageField {
+	return m.fieldNameToField
+}
+
+// FieldNumberToField returns the fields of the given MessageOneof.
+func (m *MessageOneof) FieldNumberToField() map[int32]*MessageField {
+	return m.fieldNumberToField
 }
 
 // Service is the Golang wrapper for the Protobuf Service object.
@@ -312,7 +332,11 @@ func newPackageSet(protoMessage *reflectv1.PackageSet, withoutBeta bool) (*Packa
 			pkg.enumNameToEnum[enum.Name] = newEnum(enum, packageName)
 		}
 		for _, message := range pkg.protoMessage.Messages {
-			pkg.messageNameToMessage[message.Name] = newMessage(message, packageName)
+			extractMessage, err := newMessage(message, packageName)
+			if err != nil {
+				return nil, err
+			}
+			pkg.messageNameToMessage[message.Name] = extractMessage
 		}
 		for _, service := range pkg.protoMessage.Services {
 			pkg.serviceNameToService[service.Name] = newService(service, packageName)
@@ -343,7 +367,7 @@ func newEnumValue(protoMessage *reflectv1.EnumValue, enum *Enum) *EnumValue {
 	}
 }
 
-func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName string) *Message {
+func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName string) (*Message, error) {
 	message := &Message{
 		protoMessage:               protoMessage,
 		fullyQualifiedName:         getFullyQualifiedName(encapsulatingFullyQualifiedName, protoMessage.Name),
@@ -357,7 +381,11 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		message.nestedEnumNameToEnum[nestedEnum.Name] = newEnum(nestedEnum, message.fullyQualifiedName)
 	}
 	for _, nestedMessage := range protoMessage.NestedMessages {
-		message.nestedMessageNameToMessage[nestedMessage.Name] = newMessage(nestedMessage, message.fullyQualifiedName)
+		extractMessage, err := newMessage(nestedMessage, message.fullyQualifiedName)
+		if err != nil {
+			return nil, err
+		}
+		message.nestedMessageNameToMessage[nestedMessage.Name] = extractMessage
 	}
 	for _, field := range protoMessage.MessageFields {
 		messageField := newMessageField(field, message)
@@ -368,7 +396,10 @@ func newMessage(protoMessage *reflectv1.Message, encapsulatingFullyQualifiedName
 		messageOneof := newMessageOneof(oneof, message)
 		message.oneofNameToOneof[oneof.Name] = messageOneof
 	}
-	return message
+	if err := linkMessageFieldsOneofs(message.fieldNumberToField, message.oneofNameToOneof); err != nil {
+		return nil, err
+	}
+	return message, nil
 }
 
 func newMessageField(protoMessage *reflectv1.MessageField, message *Message) *MessageField {
@@ -380,8 +411,10 @@ func newMessageField(protoMessage *reflectv1.MessageField, message *Message) *Me
 
 func newMessageOneof(protoMessage *reflectv1.MessageOneof, message *Message) *MessageOneof {
 	return &MessageOneof{
-		protoMessage: protoMessage,
-		message:      message,
+		protoMessage:       protoMessage,
+		message:            message,
+		fieldNameToField:   make(map[string]*MessageField),
+		fieldNumberToField: make(map[int32]*MessageField),
 	}
 }
 
@@ -403,6 +436,21 @@ func newServiceMethod(protoMessage *reflectv1.ServiceMethod, service *Service) *
 		protoMessage: protoMessage,
 		service:      service,
 	}
+}
+
+func linkMessageFieldsOneofs(fieldNumberToField map[int32]*MessageField, oneofNameToOneof map[string]*MessageOneof) error {
+	for oneofName, oneof := range oneofNameToOneof {
+		for _, fieldNumber := range oneof.protoMessage.FieldNumbers {
+			field, ok := fieldNumberToField[fieldNumber]
+			if !ok {
+				return fmt.Errorf("oneof %s has field number %d which is not in the encapsulating message", oneofName, fieldNumber)
+			}
+			field.messageOneof = oneof
+			oneof.fieldNameToField[field.protoMessage.Name] = field
+			oneof.fieldNumberToField[field.protoMessage.Number] = field
+		}
+	}
+	return nil
 }
 
 func getFullyQualifiedName(encapsulatingFullyQualifiedName string, name string) string {

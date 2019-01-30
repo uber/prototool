@@ -68,6 +68,11 @@ var (
 			Check:   checkMessageFieldsSameName,
 		},
 		Checker{
+			ID:      "MESSAGE_FIELDS_SAME_ONEOF",
+			Purpose: "Checks that message fields that were not in a oneof are not now in a oneof.",
+			Check:   checkMessageFieldsSameOneof,
+		},
+		Checker{
 			ID:      "MESSAGE_FIELDS_SAME_TYPE",
 			Purpose: "Checks that message fields have the same type.",
 			Check:   checkMessageFieldsSameType,
