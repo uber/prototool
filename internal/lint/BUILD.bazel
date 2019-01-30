@@ -38,6 +38,7 @@ go_library(
         "check_messages_have_comments.go",
         "check_messages_have_comments_except_request_response_types.go",
         "check_messages_have_sentence_comments_except_request_response_types.go",
+        "check_messages_not_empty_except_request_response_types.go",
         "check_names.go",
         "check_oneof_names_lower_snake_case.go",
         "check_package_is_declared.go",

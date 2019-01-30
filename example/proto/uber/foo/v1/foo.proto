@@ -94,4 +94,6 @@ message HasWKT {
 }
 
 // Bazz is a bazzzz.
-message Bazz {}
+message Bazz {
+  int64 one = 1;
+}
