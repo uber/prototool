@@ -29,7 +29,7 @@ import (
 
 var messageFieldsDurationLinter = NewLinter(
 	"MESSAGE_FIELDS_DURATION",
-	`Verifies that all fields that contain "duration" in their name are google.protobuf.Durations.`,
+	`Verifies that all non-map fields that contain "duration" in their name are google.protobuf.Durations.`,
 	checkMessageFieldsDuration,
 )
 

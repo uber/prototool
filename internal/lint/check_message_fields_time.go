@@ -29,7 +29,7 @@ import (
 
 var messageFieldsTimeLinter = NewLinter(
 	"MESSAGE_FIELDS_TIME",
-	`Verifies that all fields that contain "time" in their name are google.protobuf.Timestamps.`,
+	`Verifies that all non-map fields that contain "time" in their name are google.protobuf.Timestamps.`,
 	checkMessageFieldsTime,
 )
 
