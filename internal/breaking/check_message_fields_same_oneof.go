@@ -40,5 +40,5 @@ func checkMessageFieldsSameOneofMessageField(addFailure func(*text.Failure), fro
 }
 
 func newMessageFieldsSameOneofFailure(messageName string, fieldNumber int32, oneofName string) *text.Failure {
-	return newTextFailuref(`Message field "%d" on message %q moved from not in oneof to in oneof %q.`, fieldNumber, messageName, oneofName)
+	return newTextFailuref(`Message field "%d" on message %q moved from outside any oneof to inside the oneof %q.`, fieldNumber, messageName, oneofName)
 }

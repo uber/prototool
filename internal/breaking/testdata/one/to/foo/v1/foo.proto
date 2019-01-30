@@ -198,3 +198,19 @@ message ThreeFourResponse {}
 message ThreeFiveRequest {}
 
 message ThreeFiveResponse {}
+
+message Eleven {
+  message NestedEleven {
+    message NestedNestedEleven {
+      oneof test {
+        int64 hello = 1;
+      }
+    }
+    oneof test {
+      int64 hello = 1;
+    }
+  }
+  oneof test {
+    int64 hello = 1;
+  }
+}

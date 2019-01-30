@@ -105,6 +105,9 @@ func TestRunOne(t *testing.T) {
 		newServiceMethodsSameClientStreamingFailure("foo.v1.ThreeAPI", "ThreeThree", false),
 		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFour", true),
 		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFive", false),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven", 1, "test"),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven.NestedEleven", 1, "test"),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven.NestedEleven.NestedNestedEleven", 1, "test"),
 	)
 }
 
@@ -183,6 +186,9 @@ func TestRunOneIncludeBeta(t *testing.T) {
 		newServiceMethodsSameClientStreamingFailure("foo.v1.ThreeAPI", "ThreeThree", false),
 		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFour", true),
 		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFive", false),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven", 1, "test"),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven.NestedEleven", 1, "test"),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven.NestedEleven.NestedNestedEleven", 1, "test"),
 		newMessagesNotDeletedFailure("foo.v1beta1.One.NestedOne.NestedNestedTwo"),
 		newMessagesNotDeletedFailure("foo.v1beta1.One.NestedTwo"),
 		newMessagesNotDeletedFailure("foo.v1beta1.Two"),
@@ -327,6 +333,9 @@ func TestRunOneAllowBetaDeps(t *testing.T) {
 		newServiceMethodsSameClientStreamingFailure("foo.v1.ThreeAPI", "ThreeThree", false),
 		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFour", true),
 		newServiceMethodsSameServerStreamingFailure("foo.v1.ThreeAPI", "ThreeFive", false),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven", 1, "test"),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven.NestedEleven", 1, "test"),
+		newMessageFieldsSameOneofFailure("foo.v1.Eleven.NestedEleven.NestedNestedEleven", 1, "test"),
 	)
 }
 
