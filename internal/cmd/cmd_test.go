@@ -462,19 +462,34 @@ func TestLint(t *testing.T) {
 		26:3:NAMES_NO_UUID
 		27:5:NAMES_NO_UUID
 		28:7:NAMES_NO_UUID
-		33:1:NAMES_NO_COMMON
-		33:1:NAMES_NO_DATA
-		37:1:NAMES_NO_UUID
-		38:3:NAMES_NO_DATA
+		35:1:NAMES_NO_COMMON
+		35:1:NAMES_NO_DATA
+		39:1:NAMES_NO_UUID
 		40:3:NAMES_NO_DATA
-		41:5:NAMES_NO_COMMON
-		45:1:NAMES_NO_COMMON
-		46:3:NAMES_NO_COMMON
-		49:1:NAMES_NO_DATA
-		50:3:NAMES_NO_COMMON
-		53:1:NAMES_NO_UUID
-		54:3:NAMES_NO_COMMON`,
+		42:3:NAMES_NO_DATA
+		43:5:NAMES_NO_COMMON
+		47:1:NAMES_NO_COMMON
+		48:3:NAMES_NO_COMMON
+		51:1:NAMES_NO_DATA
+		52:3:NAMES_NO_COMMON
+		55:1:NAMES_NO_UUID
+		56:3:NAMES_NO_COMMON`,
 		"testdata/lint/naming/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`13:1:MESSAGES_NOT_EMPTY_EXCEPT_REQUEST_RESPONSE_TYPES
+		14:3:MESSAGES_NOT_EMPTY_EXCEPT_REQUEST_RESPONSE_TYPES
+		15:5:MESSAGES_NOT_EMPTY_EXCEPT_REQUEST_RESPONSE_TYPES`,
+		"testdata/lint/notempty/foo/v1/hello.proto",
+	)
+	assertDoLintFile(
+		t,
+		false,
+		``,
+		"testdata/lint/notempty/foo/v1/hello_api.proto",
 	)
 
 	assertDoLintFile(
@@ -537,7 +552,7 @@ func TestLint(t *testing.T) {
 		t,
 		false,
 		`23:1:REQUEST_RESPONSE_TYPES_ONLY_IN_FILE
-		27:1:REQUEST_RESPONSE_TYPES_ONLY_IN_FILE`,
+		30:1:REQUEST_RESPONSE_TYPES_ONLY_IN_FILE`,
 		"testdata/lint/onlyinfile/foo/v1/hello_api.proto",
 	)
 

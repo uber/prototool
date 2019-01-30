@@ -14,19 +14,6 @@ service HelloAPI {
   rpc SendFoo(SendFooRequest) returns (SendFooResponse);
 }
 
-message SendFooRequest {
-  Foo foo = 1;
-}
+message SendFooRequest {}
 
 message SendFooResponse {}
-
-message Foo {
-  message NestedFoo {
-    int64 dummy = 1;
-  }
-  int64 dummy = 1;
-}
-
-enum Bar {
-  BAR_INVALID = 0;
-}
