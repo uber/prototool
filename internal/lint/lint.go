@@ -128,7 +128,7 @@ var (
 	}
 
 	// DefaultLinters is the slice of default Linters.
-	DefaultLinters = UberLinters
+	DefaultLinters = Uber1Linters
 
 	// GoogleLinters is the slice of linters for the google lint group.
 	GoogleLinters = []Linter{

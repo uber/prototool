@@ -32,7 +32,7 @@ option go_package = "uberpb";
 // java_multiple_files is always true.
 option java_multiple_files = true;
 // java_outer_classname is the CamelCased file name without the extension, followed by Proto.
-option java_outer_classname = "UberProto";
+option java_outer_classname = "Uber1Proto";
 // The java package is always com.PACKAGE.
 option java_package = "com.style.uber";
 
