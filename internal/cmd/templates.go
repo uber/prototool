@@ -432,20 +432,20 @@ $ cat input.json | prototool grpc example \
 
 google: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed.
 
-uber: This lint group follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. This is a very strict rule group and is meant to enforce consistent development patterns.
+uber1: This lint group follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber1/uber1.proto. This is a very strict rule group and is meant to enforce consistent development patterns.
 
 Configuration of your group can be done by setting the "lint.group" option in your "prototool.yaml" file:
 
 lint:
   group: google
 
-The "uber" lint group represents the default lint group, and will be used if no lint group is configured.
+The "uber1" lint group represents the default lint group, and will be used if no lint group is configured.
 
 Files must be valid Protobuf that can be compiled with protoc, so prior to linting, prototool lint will compile your using protoc.
 Note, however, this is very fast - for two files, compiling and linting only takes approximately
 3/100ths of a second:
 
-$ time prototool lint etc/style/uber
+$ time prototool lint etc/style/uber1
 
 real	0m0.037s
 user	0m0.026s

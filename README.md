@@ -6,7 +6,7 @@ Prototool lets you:
 
 - Handle installation of `protoc` and the import of all of the Well-Known Types behind the scenes in a platform-independent manner without any work on the part of the user.
 - Standardize building of your Protobuf files with a common [configuration](#configuration), abstracting away all of the pain of protoc for you.
-- [Lint](#prototool-lint) your Protobuf files with common linting rules according to [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style), [Uber's Style Guide](https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto), or your own set of configured lint rules.
+- [Lint](#prototool-lint) your Protobuf files with common linting rules according to [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style), [Uber's V1 Style Guide](https://github.com/uber/prototool/blob/master/etc/style/uber1/uber1.proto), or your own set of configured lint rules.
 - [Format](#prototool-format) your Protobuf files in a consistent manner.
 - [Create](#prototool-create) Protobuf files from a template that passes lint, taking care of package naming for you.
 - [Generate](#prototool-generate) stubs using any plugin based on a simple configuration file, including handling imports of all the Well-Known Types.
@@ -173,14 +173,14 @@ Lint your Protobuf files.
 Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for all available options. There are two pre-configured groups of rules:
 
 - `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](etc/style/google/google.proto).
-- `uber`: This lint group follows the Style Guide at [etc/style/uber/uber.proto](etc/style/uber/uber.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
-- `uber2`: This lint group is the v2 of the `uber` lint group, and makes some modifcations to more closely follow the Google Cloud APIs file
+- `uber1`: This lint group follows the V1 Style Guide at [etc/style/uber1/uber1.proto](etc/style/uber1/uber1.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
+- `uber2`: This lint group is the V2 Style Guide, and makes some modifcations to more closely follow the Google Cloud APIs file
   structure, as well as adding even more rules to enforce more consistent development patterns. This lint group is under development.
 
 To see the differences between lint groups, use the `--diff-lint-groups` flag:
 
 ```
-prototool lint --diff-lint-groups google,uber
+prototool lint --diff-lint-groups google,uber2
 ```
 
 Configuration of your group can be done by setting the `lint.group` option in your `prototool.yaml` file:
@@ -191,7 +191,7 @@ lint:
 ```
 
 See the `prototool.yaml` files at [etc/style/google/prototool.yaml](etc/style/google/prototool.yaml) and
-[etc/style/uber/prototool.yaml](etc/style/uber/prototool.yaml) for examples.
+[etc/style/uber1/prototool.yaml](etc/style/uber1/prototool.yaml) for examples.
 
 The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
 
@@ -215,11 +215,11 @@ If `lint.file_header.path` is set, `prototool create`, `prototool format --fix`,
 See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
 
 Files must be valid Protobuf that can be compiled with `protoc`, so prior to linting, `prototool lint` will compile your using `protoc`.
-Note, however, this is very fast - for the two files in [etc/uber/style](etc/uber/style), compiling and linting only takes approximately
+Note, however, this is very fast - for the two files in [etc/style/uber1](etc/style/uber1), compiling and linting only takes approximately
 3/100ths of a second:
 
 ```bash
-$ time prototool lint etc/style/uber
+$ time prototool lint etc/style/uber1
 
 real	0m0.037s
 user	0m0.026s

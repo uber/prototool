@@ -361,7 +361,7 @@ func (r *runner) listAllLintGroups() error {
 func (r *runner) diffLintGroups(groups string) error {
 	split := strings.Split(groups, ",")
 	if len(split) != 2 {
-		return fmt.Errorf("argument to --diff-lint-groups must be two lint groups separated by '.', for example google,uber")
+		return fmt.Errorf("argument to --diff-lint-groups must be two lint groups separated by '.', for example google,uber2")
 	}
 	firstLinterIDs, err := getLinterIDs(split[0])
 	if err != nil {
