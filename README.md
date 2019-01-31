@@ -180,7 +180,7 @@ Lint rules can be set using the configuration file. See the configuration at [et
 To see the differences between lint groups, use the `--diff-lint-groups` flag:
 
 ```
-prototool lint --diff-lint-groups google,uber
+prototool lint --diff-lint-groups google,uber2
 ```
 
 Configuration of your group can be done by setting the `lint.group` option in your `prototool.yaml` file:
