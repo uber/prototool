@@ -156,7 +156,7 @@ func TestLint(t *testing.T) {
 		t,
 		true,
 		"",
-		"../../etc/style/uber",
+		"../../etc/style/uber1",
 	)
 	assertDoLintFile(
 		t,
@@ -1194,7 +1194,7 @@ func TestInspectPackageImporters(t *testing.T) {
 
 func TestListLinters(t *testing.T) {
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters", "testdata/lint/base")
-	assertLinters(t, lint.UberLinters, "lint", "--list-linters", "testdata/lint/base")
+	assertLinters(t, lint.Uber1Linters, "lint", "--list-linters", "testdata/lint/base")
 }
 
 func TestListAllLinters(t *testing.T) {
@@ -1202,12 +1202,12 @@ func TestListAllLinters(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, true, 0, "google\nuber\nuber2", "lint", "--list-all-lint-groups")
+	assertExact(t, true, 0, "google\nuber1\nuber2", "lint", "--list-all-lint-groups")
 }
 
 func TestListLintGroup(t *testing.T) {
 	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google", "testdata/lint/base")
-	assertLinters(t, lint.UberLinters, "lint", "--list-lint-group", "uber", "testdata/lint/base")
+	assertLinters(t, lint.Uber1Linters, "lint", "--list-lint-group", "uber1", "testdata/lint/base")
 	assertLinters(t, lint.Uber2Linters, "lint", "--list-lint-group", "uber2", "testdata/lint/base")
 }
 
@@ -1240,7 +1240,7 @@ func TestDiffLintGroups(t *testing.T) {
 > REQUEST_RESPONSE_TYPES_UNIQUE
 > SYNTAX_PROTO3
 > WKT_DIRECTLY_IMPORTED`,
-		"lint", "--diff-lint-groups", "google,uber",
+		"lint", "--diff-lint-groups", "google,uber1",
 	)
 }
 

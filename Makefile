@@ -64,7 +64,7 @@ example: install
 	go build ./example/gen/go/uber/bar/v1
 	go build -o $(TMP_ETC)/excited ./example/cmd/excited/main.go
 	prototool lint etc/style/google
-	prototool lint etc/style/uber
+	prototool lint etc/style/uber1
 
 .PHONY: internalgen
 internalgen: install
@@ -103,10 +103,6 @@ golint:
 		fi; \
 	done
 
-.PHONY: vet
-vet:
-	go vet $(PKGS)
-
 .PHONY:
 errcheck:
 	@go install github.com/kisielk/errcheck
@@ -128,7 +124,7 @@ checklicense: install
 	fi
 
 .PHONY: lint
-lint: checknodiffgenerated golint vet errcheck staticcheck checklicense
+lint: checknodiffgenerated golint errcheck staticcheck checklicense
 
 .PHONY: test
 test:

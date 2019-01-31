@@ -95,7 +95,7 @@ func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindDiffLintGroups(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.diffLintGroups, "diff-lint-groups", "", "Diff the two lint groups separated by '.', for example google,uber.")
+	flagSet.StringVar(&f.diffLintGroups, "diff-lint-groups", "", "Diff the two lint groups separated by '.', for example google,uber2.")
 }
 
 func (f *flags) bindDiffMode(flagSet *pflag.FlagSet) {
