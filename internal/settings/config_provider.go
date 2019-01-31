@@ -28,7 +28,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"sort"
 	"strings"
 
@@ -433,25 +432,5 @@ func getPluginPath(path string) (string, error) {
 	if path == "" {
 		return "", nil
 	}
-	if filepath.IsAbs(path) {
-		return path, nil
-	}
-	return which(path)
-}
-
-func which(program string) (string, error) {
-	switch runtime.GOOS {
-	case "darwin", "linux":
-		// "command -v" is the POSIX command for "which"
-		output, err := exec.Command("command", "-v", program).Output()
-		if err != nil {
-			if errString := strings.TrimSpace(err.Error()); errString != "" {
-				return "", fmt.Errorf("could not find %q", program)
-			}
-			return "", fmt.Errorf("could not find %q: %v", program, err)
-		}
-		return strings.TrimSpace(string(output)), nil
-	default:
-		return "", fmt.Errorf("runtime.GOOS not supported: %s", runtime.GOOS)
-	}
+	return exec.LookPath(path)
 }
