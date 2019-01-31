@@ -171,7 +171,7 @@ type CreateConfig struct {
 type LintConfig struct {
 	// Group is the specific group of linters to use.
 	// The default group is the "default" lint group, which is equal
-	// to the "uber" lint group.
+	// to the "uber1" lint group.
 	// Setting this value will result in NoDefault being ignored.
 	Group string
 	// NoDefault is set to exclude the default set of linters.

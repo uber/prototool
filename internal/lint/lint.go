@@ -145,8 +145,8 @@ var (
 		serviceNamesCapitalizedLinter,
 	}
 
-	// UberLinters is the slice of linters for the uber lint group.
-	UberLinters = []Linter{
+	// Uber1Linters is the slice of linters for the uber1 lint group.
+	Uber1Linters = []Linter{
 		commentsNoCStyleLinter,
 		enumFieldNamesUpperSnakeCaseLinter,
 		enumFieldPrefixesLinter,
@@ -266,7 +266,7 @@ var (
 	// GroupToLinters is the map from linter group to the corresponding slice of linters.
 	GroupToLinters = map[string][]Linter{
 		"google": GoogleLinters,
-		"uber":   UberLinters,
+		"uber1":  Uber1Linters,
 		"uber2":  Uber2Linters,
 	}
 

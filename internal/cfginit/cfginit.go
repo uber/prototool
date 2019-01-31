@@ -67,11 +67,11 @@ protoc:
 # Lint directives.
 {{.V}}lint:
   # The lint group to use.
-  # The default group is the "default" lint group, which is equal to the "uber" lint group.
+  # The default group is the "default" lint group, which is equal to the "uber1" lint group.
   # Run prototool lint --list-all-lint-groups to see all available lint groups.
   # Run prototool lint --list-lint-group GROUP to list the linters in the given lint group.
   # Setting this value will result in lint.rules.no_default being ignored.
-{{.V}}  group: uber
+{{.V}}  group: uber2
 
   # Linter files to ignore.
 {{.V}}  ignores:
