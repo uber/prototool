@@ -46,6 +46,7 @@ go_library(
         "check_names.go",
         "check_oneof_names_lower_snake_case.go",
         "check_package_is_declared.go",
+        "check_package_lower_case.go",
         "check_package_lower_snake_case.go",
         "check_package_major_beta_versioned.go",
         "check_package_no_keywords.go",
