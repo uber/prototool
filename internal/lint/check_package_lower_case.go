@@ -59,7 +59,7 @@ func (v *packageLowerCaseVisitor) VisitPackage(pkg *proto.Package) {
 func (v *packageLowerCaseVisitor) Finally() error {
 	if v.pkg != nil {
 		if !isPackageLowerCase(v.pkg.Name) {
-			v.AddFailuref(v.pkg.Position, "Package only contain characters in the range a-z0-9 and periods but was %q.", v.pkg.Name)
+			v.AddFailuref(v.pkg.Position, "Packages should only contain characters in the range a-z0-9 and periods but was %q.", v.pkg.Name)
 		}
 	}
 	return nil
