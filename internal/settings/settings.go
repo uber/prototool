@@ -230,7 +230,14 @@ type GenPlugin struct {
 	// The path to the executable. For example, if the name is "grpc-cpp"
 	// but the path to the executable "protoc-gen-grpc-cpp" is "/usr/local/bin/grpc_cpp_plugin",
 	// then this will be "/usr/local/bin/grpc_cpp_plugin".
-	Path string
+	// This is a function so that we defer path lookups, there is functionality where we could
+	// e.g. have this point to an absolute path on the system but we don't want it for all
+	// calls, for example if you have a plugin installed in a Docker image but want to run
+	// prototool grpc locally.
+	// We could have made this a private field and attached a function to it but this keeps
+	// the style of all config structs only having public fields.
+	// https://github.com/uber/prototool/issues/325
+	GetPath func() (string, error)
 	// The type, if any. This will be GenPluginTypeNone if
 	// there is no specific type.
 	Type GenPluginType

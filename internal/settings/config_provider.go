@@ -256,13 +256,9 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 				return Config{}, fmt.Errorf("include_source_info is only valid for the descriptor_set plugin but set on %q", plugin.Name)
 			}
 		}
-		pluginPath, err := getPluginPath(plugin.Path)
-		if err != nil {
-			return Config{}, err
-		}
 		genPlugins[i] = GenPlugin{
 			Name:              plugin.Name,
-			Path:              pluginPath,
+			GetPath:           getPluginPathFunc(plugin.Path),
 			Type:              genPluginType,
 			Flags:             plugin.Flags,
 			FileSuffix:        plugin.FileSuffix,
@@ -428,9 +424,11 @@ func getFileHeaderLines(data []byte) []string {
 	return lines
 }
 
-func getPluginPath(path string) (string, error) {
-	if path == "" {
-		return "", nil
+func getPluginPathFunc(path string) func() (string, error) {
+	return func() (string, error) {
+		if path == "" {
+			return "", nil
+		}
+		return exec.LookPath(path)
 	}
-	return exec.LookPath(path)
 }
