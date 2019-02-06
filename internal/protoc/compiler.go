@@ -468,8 +468,12 @@ func getPluginFlagSet(protoSet *file.ProtoSet, dirPath string, genPlugin setting
 	if len(protoFlags) > 0 {
 		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, outputPath)}
 	}
-	if genPlugin.Path != "" {
-		flagSet = append(flagSet, fmt.Sprintf("--plugin=protoc-gen-%s=%s", genPlugin.Name, genPlugin.Path))
+	genPluginPath, err := genPlugin.GetPath()
+	if err != nil {
+		return nil, err
+	}
+	if genPluginPath != "" {
+		flagSet = append(flagSet, fmt.Sprintf("--plugin=protoc-gen-%s=%s", genPlugin.Name, genPluginPath))
 	}
 	if genPlugin.IncludeImports {
 		flagSet = append(flagSet, "--include_imports")
