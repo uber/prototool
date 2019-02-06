@@ -629,6 +629,13 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`3:1:PACKAGE_LOWER_CASE`,
+		"testdata/lint/packagelowercase/foo_bar/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`1:1:FILE_NAMES_LOWER_SNAKE_CASE`,
 		"testdata/lint/filename/fileNameInvalid.proto",
 	)
