@@ -7,4 +7,4 @@ build:
 
 .PHONY: run
 run: build
-	docker run -it $(DOCKER_IMAGE) /bin/bash
+	docker run -it $(DOCKER_IMAGE) /bin/sh

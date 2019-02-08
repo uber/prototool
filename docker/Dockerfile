@@ -99,6 +99,15 @@ RUN cp -R /tmp/protoc/include /builder/bin/include
 
 ARG PROTOTOOL_VERSION
 ENV PROTOTOOL_VERSION ${PROTOTOOL_VERSION}
-RUN git clone --depth 1 -b ${PROTOTOOL_VERSION} https://github.com/uber/prototool.git /tmp/prototool
+RUN git clone https://github.com/uber/prototool.git /tmp/prototool
+RUN cd /tmp/prototool && git checkout ${PROTOTOOL_VERSION}
 RUN cd /tmp/prototool && go install ./cmd/prototool
 RUN cp /go/bin/prototool /builder/bin/prototool
+
+FROM alpine:3.9
+
+RUN apk add --no-cache libstdc++ libc6-compat
+COPY --from=builder /builder /app
+ENV PATH /app/bin:${PATH}
+ENV PROTOTOOL_PROTOC_BIN_PATH /app/bin/protoc
+ENV PROTOTOOL_PROTOC_WKT_PATH /app/include
