@@ -38,14 +38,12 @@ RUN curl -sSL https://github.com/golang/dep/releases/download/v${DEP_VERSION}/de
 RUN chmod +x /tmp/bin/dep
 
 ENV GOLANG_PROTOBUF_VERSION 1.2.0
-RUN mkdir -p /go/src/github.com/golang
 RUN git clone --depth 1 -b v${GOLANG_PROTOBUF_VERSION} https://github.com/golang/protobuf.git /go/src/github.com/golang/protobuf
 RUN cd /go/src/github.com/golang/protobuf && go get -d -v ./... && \
   go install ./protoc-gen-go
 RUN cp /go/bin/protoc-gen-go /builder/bin/
 
 ENV GOGO_PROTOBUF_VERSION 1.2.0
-RUN mkdir -p /go/src/github.com/gogo
 RUN git clone --depth 1 -b v${GOGO_PROTOBUF_VERSION} https://github.com/gogo/protobuf.git /go/src/github.com/gogo/protobuf
 RUN cd /go/src/github.com/gogo/protobuf && go get -d -v ./... && \
   go install \
@@ -76,6 +74,12 @@ RUN curl -sSL \
   -o /builder/bin/protoc-gen-grpc-web
 RUN chmod +x /builder/bin/protoc-gen-grpc-web
 
+ENV YARPC_VERSION 1.36.1
+RUN git clone --depth 1 -b v${YARPC_VERSION} https://github.com/yarpc/yarpc-go.git /go/src/go.uber.org/yarpc
+RUN cd /go/src/go.uber.org/yarpc && glide install && \
+  go install ./encoding/protobuf/protoc-gen-yarpc-go
+RUN cp /go/bin/protoc-gen-yarpc-go /builder/bin/
+
 ENV TWIRP_VERSION 5.5.1
 RUN git clone --depth 1 -b v${TWIRP_VERSION} https://github.com/twitchtv/twirp.git /go/src/github.com/twitchtv/twirp
 RUN cd /go/src/github.com/twitchtv/twirp && dep ensure -v && \
@@ -84,3 +88,17 @@ RUN cd /go/src/github.com/twitchtv/twirp && dep ensure -v && \
     ./protoc-gen-twirp_python
 RUN cp /go/bin/protoc-gen-twirp /builder/bin/
 RUN cp /go/bin/protoc-gen-twirp_python /builder/bin/
+
+ENV PROTOC_VERSION 3.6.1
+RUN mkdir -p /tmp/protoc
+RUN curl -sSL \
+  https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip -o /tmp/protoc/protoc.zip
+RUN cd /tmp/protoc && unzip protoc.zip
+RUN cp /tmp/protoc/bin/protoc /builder/bin/
+RUN cp -R /tmp/protoc/include /builder/bin/include
+
+ARG PROTOTOOL_VERSION
+ENV PROTOTOOL_VERSION ${PROTOTOOL_VERSION}
+RUN git clone --depth 1 -b ${PROTOTOOL_VERSION} https://github.com/uber/prototool.git /tmp/prototool
+RUN cd /tmp/prototool && go install ./cmd/prototool
+RUN cp /go/bin/prototool /builder/bin/prototool
