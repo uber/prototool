@@ -183,11 +183,11 @@ func (f *flags) bindProtocURL(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindProtocBinPath(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.protocBinPath, "protoc-bin-path", "", "The path to the protoc binary. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-wkt-path and must not be used with the protoc-url flag.")
+	flagSet.StringVar(&f.protocBinPath, "protoc-bin-path", "", "The path to the protoc binary. Setting this option will ignore the config protoc.version setting.\nThis flag must be used with protoc-wkt-path and must not be used with the protoc-url flag.\nThis setting can also be controlled using the $PROTOTOOL_PROTOC_BIN_PATH environment variable, however this flag takes precedence.")
 }
 
 func (f *flags) bindProtocWKTPath(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.protocWKTPath, "protoc-wkt-path", "", "The path to the well-known types. Setting this option will ignore the config protoc.version setting. This flag must be used with protoc-bin-path and must not be used with the protoc-url flag.")
+	flagSet.StringVar(&f.protocWKTPath, "protoc-wkt-path", "", "The path to the well-known types. Setting this option will ignore the config protoc.version setting.\nThis flag must be used with protoc-bin-path and must not be used with the protoc-url flag.\nThis setting can also be controlled using the $PROTOTOOL_PROTOC_WKT_PATH environment variable, however this flag takes precedence.")
 }
 
 func (f *flags) bindStdin(flagSet *pflag.FlagSet) {
