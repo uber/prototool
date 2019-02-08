@@ -93,3 +93,5 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/local/include
 ENV PROTOTOOL_PROTOC_BIN_PATH /usr/bin/protoc
 ENV PROTOTOOL_PROTOC_WKT_PATH /usr/local/include
+
+WORKDIR /in
