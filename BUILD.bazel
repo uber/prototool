@@ -1,6 +1,7 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
 # gazelle:prefix github.com/uber/prototool
+# gazelle:exclude docker
 # gazelle:exclude etc
 # gazelle:exclude example
 # gazelle:exclude internal/breaking/testdata

@@ -3,6 +3,7 @@
 /.tmp
 /bazel-*
 /brew
+/docker/testing/gen
 /example/gen/java
 /cmd/prototool/prototool
 /internal/cmd/gen-prototool-bash-completion/gen-prototool-bash-completion

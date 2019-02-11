@@ -19,6 +19,8 @@ export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
 export PATH := $(GOBIN):$(PATH)
 
+.DEFAULT_GOAL := all
+
 .PHONY: all
 all: lint cover bazelbuild
 
