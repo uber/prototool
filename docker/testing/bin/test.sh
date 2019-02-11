@@ -56,7 +56,7 @@ check_which /usr/local/bin/protoc-gen-twirp_python
 check_which /usr/local/bin/protoc-gen-yarpc-go
 check_which /usr/local/bin/prototool
 check_command_output "libprotoc 3.6.1" protoc --version
-check_command_success protoc -I /usr/local/include -I proto -o /dev/null $(find proto -name '*.proto')
+check_command_success protoc -o /dev/null $(find proto -name '*.proto')
 check_command_success rm -rf gen
 check_command_success prototool compile proto
 check_command_success prototool lint proto

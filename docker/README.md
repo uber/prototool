@@ -10,6 +10,15 @@ This is in early development.
 
 | Name | Version | Binaries | Comments |
 | --- | --- | --- | --- |
-| [protoc] | 3.6.1 | `protoc` | Well-Known Types copied to `/usr/local/incluide` |
+| [protoc] | 3.6.1 | `protoc` | Well-Known Types copied to `/usr/local/include` |
+| [grpc] | 1.18.0 | `grpc_cpp_plugin`<br>`grpc_csharp_plugin`<br>`grpc_node_plugin`<br>`grpc_objective_c_plugin`<br>`grpc_php_plugin`<br>`grpc_python_plugin`<br>`grpc_ruby_plugin` | |
+| [golang/protobuf] | 1.2.0 | `protoc-gen-go` | |
+| [gogo/protobuf] | 1.2.0 | `protoc-gen-gofast`<br>`protoc-gen-gogo`<br>`protoc-gen-gogofast`<br>`protoc-gen-gogofaster`<br>`protoc-gen-gogoslick` | |
+| [grpc-gateway] | 1.7.0 | `protoc-gen-grpc-gateway`<br>`protoc-gen-swagger` | |
+
 
 [protoc]: https://github.com/protocolbuffers/protobuf
+[grpc]: https://github.com/grpc/grpc
+[golang/protobuf]: https://github.com/golang/protobuf
+[gogo/protobuf]: https://github.com/gogo/protobuf
+[grpc-gateway]: https://github.com/grpc-ecosystem/grpc-gateway
