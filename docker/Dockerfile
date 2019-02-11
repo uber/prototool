@@ -88,10 +88,10 @@ RUN cp /go/bin/prototool /usr/local/bin/prototool
 FROM alpine:edge
 
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
-RUN apk add --update --no-cache grpc=1.18.0-r0 protobuf=3.6.1-r1
+RUN apk add --update --no-cache bash grpc=1.18.0-r0 protobuf=3.6.1-r1
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/local/include
 ENV PROTOTOOL_PROTOC_BIN_PATH /usr/bin/protoc
 ENV PROTOTOOL_PROTOC_WKT_PATH /usr/local/include
 
-WORKDIR /in
+WORKDIR /work

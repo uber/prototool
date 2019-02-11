@@ -1,0 +1,6 @@
+lint:
+  group: uber2
+generate:
+  plugins:
+    - name: cpp
+      output: ../gen/cpp
