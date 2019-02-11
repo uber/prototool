@@ -10,11 +10,11 @@ This is in early development.
 
 | Name | Version | Binaries |
 | --- | --- | --- |
-| [protoc] | 3.6.1 | `protoc` |
-| [grpc] | 1.18.0 | `grpc_cpp_plugin`<br>`grpc_csharp_plugin`<br>`grpc_node_plugin`<br>`grpc_objective_c_plugin`<br>`grpc_php_plugin`<br>`grpc_python_plugin`<br>`grpc_ruby_plugin` |
-| [golang/protobuf] | 1.2.0 | `protoc-gen-go` |
-| [gogo/protobuf] | 1.2.0 | `protoc-gen-gofast`<br>`protoc-gen-gogo`<br>`protoc-gen-gogofast`<br>`protoc-gen-gogofaster`<br>`protoc-gen-gogoslick` |
-| [grpc-gateway] | 1.7.0 | `protoc-gen-grpc-gateway`<br>`protoc-gen-swagger` |
+| [protoc] | 3.6.1 | protoc |
+| [grpc] | 1.18.0 | grpc_cpp_plugin<br>grpc_csharp_plugin<br>grpc_node_plugin<br>grpc_objective_c_plugin<br>grpc_php_plugin<br>grpc_python_plugin<br>grpc_ruby_plugin |
+| [golang/protobuf] | 1.2.0 | protoc-gen-go |
+| [gogo/protobuf] | 1.2.0 | protoc-gen-gofast<br>protoc-gen-gogo<br>protoc-gen-gogofast<br>protoc-gen-gogofaster<br>protoc-gen-gogoslick |
+| [grpc-gateway] | 1.7.0 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
 
 The Well-Known Types are copied to `/usr/include`.
 
