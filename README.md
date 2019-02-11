@@ -548,61 +548,9 @@ Prototool just takes care of what it is good at (managing your Protobuf build) t
 external plugin management. Prototool does provide the ability to use the "built-in" output directives `cpp, csharp, java, js, objc, php, python, ruby`
 provided by `protoc` out of the box, however.
 
-If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. Here's an example `Dockerfile` that
-results in a Docker image around 33MB that contains `prototool`, a cached `protoc`, and `protoc-gen-go`:
-
-```dockerfile
-FROM golang:1.11.4-alpine3.8 AS build
-
-ARG PROTOTOOL_VERSION=1.3.0
-ARG PROTOC_VERSION=3.6.1
-ARG PROTOC_GEN_GO_VERSION=1.2.0
-
-RUN \
-  apk update && \
-  apk add curl git libc6-compat && \
-  rm -rf /var/cache/apk/*
-RUN \
-  curl -sSL https://github.com/uber/prototool/releases/download/v$PROTOTOOL_VERSION/prototool-Linux-x86_64 -o /bin/prototool && \
-  chmod +x /bin/prototool
-RUN \
-  mkdir /tmp/prototool-bootstrap && \
-  echo $'protoc:\n  version:' $PROTOC_VERSION > /tmp/prototool-bootstrap/prototool.yaml && \
-  echo 'syntax = "proto3";' > /tmp/prototool-bootstrap/tmp.proto && \
-  prototool compile /tmp/prototool-bootstrap && \
-  rm -rf /tmp/prototool-bootstrap
-RUN go get github.com/golang/protobuf/... && \
-  cd /go/src/github.com/golang/protobuf && \
-  git checkout v$PROTOC_GEN_GO_VERSION && \
-  go install ./protoc-gen-go
-
-FROM alpine:3.8
-
-WORKDIR /in
-
-RUN \
-  apk update && \
-  apk add libc6-compat && \
-  rm -rf /var/cache/apk/*
-
-COPY --from=build /bin/prototool /bin/prototool
-COPY --from=build /root/.cache/prototool /root/.cache/prototool
-COPY --from=build /go/bin/protoc-gen-go /bin/protoc-gen-go
-
-ENTRYPOINT ["/bin/prototool"]
-```
-
-Assuming this is in a file named `Dockerfile` in your current directory, build the image with:
-
-```bash
-docker build -t me/prototool-env .
-```
-
-Then, assuming you are in the directory you want to pass to Prototool and you want to run `prototool compile`, run:
-
-```bash
-docker run -v $(pwd):/in me/prototool-env compile
-```
+If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. We provide
+a basic Docker image at [hub.docker.com/r/uber/prototool](https://hub.docker.com/r/uber/prototool), defined in the [docker](docker)
+directory within this repository. See the [README.md][docker/README.md] for more details.
 
 ##### Lint/Format Choices
 
