@@ -6,7 +6,21 @@ stubs.
 
 This is in early development.
 
+## Usage
+
+Bind your input directory as a volume to `/work`, and call your command, for example `prototool generate`:
+
+```
+docker run -v $(pwd):/work uber/prototool prototool generate
+```
+
+You can build on top of this image as well if you have custom requirements.
+
 ## Included
+
+The following libraries are included. This is not meant to be exhaustive - these represent our view of the most
+commonly-used, stable, maintained libraries. If you think another library should be included, propose it in
+a GitHub issue and we will evaluate it.
 
 | Name | Version | Binaries |
 | --- | --- | --- |
@@ -21,7 +35,6 @@ This is in early development.
 | [yarpc] | 1.36.1 | protoc-gen-yarpc-go |
 
 The Well-Known Types are copied to `/usr/include`.
-
 
 [protoc]: https://github.com/protocolbuffers/protobuf
 [grpc]: https://github.com/grpc/grpc
