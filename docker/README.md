@@ -9,7 +9,7 @@ This is in early development.
 ## Included
 
 | Name | Version | Binaries |
-| --- | --- | --- | --- |
+| --- | --- | --- |
 | [protoc] | 3.6.1 | `protoc` |
 | [grpc] | 1.18.0 | `grpc_cpp_plugin`<br>`grpc_csharp_plugin`<br>`grpc_node_plugin`<br>`grpc_objective_c_plugin`<br>`grpc_php_plugin`<br>`grpc_python_plugin`<br>`grpc_ruby_plugin` |
 | [golang/protobuf] | 1.2.0 | `protoc-gen-go` |
