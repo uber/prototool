@@ -15,6 +15,8 @@ This is in early development.
 | [golang/protobuf] | 1.2.0 | protoc-gen-go |
 | [gogo/protobuf] | 1.2.0 | protoc-gen-gofast<br>protoc-gen-gogo<br>protoc-gen-gogofast<br>protoc-gen-gogofaster<br>protoc-gen-gogoslick |
 | [grpc-gateway] | 1.7.0 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
+| [grpc-web] | 1.0.3 | protoc-gen-grpc-web |
+| [yarpc] | 1.36.1 | protoc-gen-yarpc-go |
 
 The Well-Known Types are copied to `/usr/include`.
 
@@ -24,3 +26,5 @@ The Well-Known Types are copied to `/usr/include`.
 [golang/protobuf]: https://github.com/golang/protobuf
 [gogo/protobuf]: https://github.com/gogo/protobuf
 [grpc-gateway]: https://github.com/grpc-ecosystem/grpc-gateway
+[grpc-web]: https://github.com/grpc/grpc-web
+[yarpc]: https://github.com/yarpc/yarpc-go
