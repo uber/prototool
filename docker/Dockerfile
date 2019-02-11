@@ -52,7 +52,7 @@ RUN chmod +x /usr/local/bin/protoc-gen-swagger
 
 ENV GRPC_WEB_VERSION=1.0.3
 RUN curl -sSL \
-  https://github.com/grpc/grpc-web/releases/download/v${GRPC_WEB_VERSION}/protoc-gen-grpc-web-v${GRPC_WEB_VERSION}-linux-x86_64 \
+  https://github.com/grpc/grpc-web/releases/download/${GRPC_WEB_VERSION}/protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64 \
   -o /usr/local/bin/protoc-gen-grpc-web
 RUN chmod +x /usr/local/bin/protoc-gen-grpc-web
 
