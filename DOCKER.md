@@ -1,6 +1,6 @@
 # Prototool Docker Image
 
-This directory provides a Docker image with `prototool`, `protoc`, and common Protobuf plugins pre-installed. As of
+We provide a Docker image with `prototool`, `protoc`, and common Protobuf plugins pre-installed. As of
 this writing, the resulting image is around 141MB. This provides a consistent environment to generate your Protobuf
 stubs.
 

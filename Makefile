@@ -2,7 +2,8 @@ SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/examp
 PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb | grep -v \/gen\/uber\/proto\/reflect\/)
 BINS := ./cmd/prototool
 
-DOCKER_IMAGE := golang:1.11.4
+DOCKER_IMAGE := uber/prototool:latest
+DOCKER_RELEASE_IMAGE := golang:1.11.5
 
 SHELL := /bin/bash -o pipefail
 UNAME_OS := $(shell uname -s)
@@ -158,7 +159,7 @@ releasegen: internalgen
 	docker run \
 		--volume "$(CURDIR):/app" \
 		--workdir "/app" \
-		$(DOCKER_IMAGE) \
+		$(DOCKER_RELEASE_IMAGE) \
 		bash -x etc/bin/releasegen.sh
 
 .PHONY: brewgen
@@ -183,10 +184,17 @@ clean:
 .PHONY: cleanall
 cleanall: clean releaseclean
 
+.PHONY: dockerbuild
+dockerbuild:
+	docker build -t $(DOCKER_IMAGE) .
+
+.PHONY: dockertest
+dockertest:
+	docker run -v $(CURDIR):/work $(DOCKER_IMAGE) bash testing/bin/test.sh
+
+.PHONY: dockershell
+dockershell: dockerbuild
+	docker run -it -v $(CURDIR):/work $(DOCKER_IMAGE) bash
+
 .PHONY: dockerall
-dockerall:
-	docker run \
-		--volume "$(CURDIR):/app" \
-		--workdir "/app" \
-		$(DOCKER_IMAGE) \
-		make all
+dockerall: dockerbuild dockertest

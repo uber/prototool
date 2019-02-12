@@ -549,8 +549,8 @@ external plugin management. Prototool does provide the ability to use the "built
 provided by `protoc` out of the box, however.
 
 If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. We provide
-a basic Docker image at [hub.docker.com/r/uber/prototool](https://hub.docker.com/r/uber/prototool), defined in the [docker](docker)
-directory within this repository. See the [docker/README.md](docker/README.md) for more details.
+a basic Docker image at [hub.docker.com/r/uber/prototool](https://hub.docker.com/r/uber/prototool), defined in the [Dockerfile](Dockerfile)
+within this repository. See [DOCKER.md](DOCKER.md) for more details.
 
 ##### Lint/Format Choices
 
