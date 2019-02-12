@@ -38,7 +38,7 @@ a GitHub issue and we will evaluate it.
 | [twirp] | 5.5.1 | protoc-gen-twirp<br>protoc-gen-twirp_python |
 | [yarpc] | 1.36.1 | protoc-gen-yarpc-go |
 
-The Well-Known Types are copied to `/usr/include`.
+The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also installed.
 
 ## Versioning
 
