@@ -1,4 +1,4 @@
-FROM alpine:edge as base
+FROM golang:1.11.5-alpine3.9 as builder
 
 ENV GOGO_PROTOBUF_VERSION=1.2.0
 ENV GOLANG_PROTOBUF_VERSION=1.2.0
@@ -9,20 +9,13 @@ ENV PROTOBUF_VERSION=3.6.1
 ENV TWIRP_VERSION=5.5.1
 ENV YARPC_VERSION=1.36.1
 
-FROM base
-
 ENV DEP_VERSION=0.5.0
-ENV GO_VERSION=1.11.5
 ENV GLIDE_VERSION=0.13.2
-
-ENV ALPINE_GO_VERSION_SUFFIX=r0
-
-ENV CGO_ENABLED=0
 
 RUN mkdir -p /tmp/bin
 ENV PATH=/tmp/bin:${PATH}
 
-RUN apk add --update --no-cache build-base curl git go=${GO_VERSION}-${ALPINE_GO_VERSION_SUFFIX}
+RUN apk add --update --no-cache build-base curl git
 
 RUN mkdir -p /tmp/glide
 RUN curl -sSL \
@@ -82,23 +75,33 @@ RUN cp /go/bin/protoc-gen-twirp_python /usr/local/bin/
 
 RUN mkdir -p /tmp/protoc
 RUN curl -sSL \
-  https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip -o /tmp/protoc/protoc.zip
+  https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOBUF_VERSION}/protoc-${PROTOBUF_VERSION}-linux-x86_64.zip -o /tmp/protoc/protoc.zip
 RUN cd /tmp/protoc && unzip protoc.zip
 RUN cp -R /tmp/protoc/include /usr/local/include
 
 RUN mkdir -p /tmp/prototool
-COPY cmd internal go.mod go.sum /tmp/prototool/
-RUN ls -R /tmp/prototool && exit 1
+COPY go.mod go.sum /tmp/prototool/
+COPY cmd /tmp/prototool/cmd
+COPY internal /tmp/prototool/internal
 RUN cd /tmp/prototool && go install ./cmd/prototool
 RUN cp /go/bin/prototool /usr/local/bin/prototool
 
-FROM base
+FROM alpine:edge
+
+ENV GOGO_PROTOBUF_VERSION=1.2.0
+ENV GOLANG_PROTOBUF_VERSION=1.2.0
+ENV GRPC_VERSION=1.18.0
+ENV GRPC_GATEWAY_VERSION=1.7.0
+ENV GRPC_WEB_VERSION=1.0.3
+ENV PROTOBUF_VERSION=3.6.1
+ENV TWIRP_VERSION=5.5.1
+ENV YARPC_VERSION=1.36.1
 
 ENV ALPINE_GRPC_VERSION_SUFFIX=r0
 ENV ALPINE_PROTOBUF_VERSION_SUFFIX=r1
 
-ENV PROTOTOOL_PROTOC_BIN_PATH /usr/bin/protoc
-ENV PROTOTOOL_PROTOC_WKT_PATH /usr/include
+ENV PROTOTOOL_PROTOC_BIN_PATH=/usr/bin/protoc
+ENV PROTOTOOL_PROTOC_WKT_PATH=/usr/include
 
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
 RUN apk add --update --no-cache bash grpc=${GRPC_VERSION}-${ALPINE_GRPC_VERSION_SUFFIX} protobuf=${PROTOBUF_VERSION}-${ALPINE_PROTOBUF_VERSION_SUFFIX}

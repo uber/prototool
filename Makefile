@@ -190,7 +190,7 @@ dockerbuild:
 
 .PHONY: dockertest
 dockertest:
-	docker run -v $(CURDIR):/work $(DOCKER_IMAGE) bash testing/bin/test.sh
+	docker run -v $(CURDIR):/work $(DOCKER_IMAGE) bash etc/docker/testing/bin/test.sh
 
 .PHONY: dockershell
 dockershell: dockerbuild
