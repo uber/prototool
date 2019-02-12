@@ -17,4 +17,6 @@ message Bar {
     google.protobuf.Timestamp three = 3;
     google.protobuf.Duration four = 4;
   }
+  // Make sure this is allowed.
+  google.protobuf.Timestamp time = 5;
 }

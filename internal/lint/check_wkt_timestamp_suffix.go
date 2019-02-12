@@ -62,7 +62,7 @@ func (v wktTimestampSuffixVisitor) VisitOneofField(field *proto.OneOfField) {
 }
 
 func (v wktTimestampSuffixVisitor) visitField(field *proto.Field) {
-	if field.Type == "google.protobuf.Timestamp" && !strings.HasSuffix(field.Name, "_time") {
-		v.AddFailuref(field.Position, `Field %q of type "google.protobuf.Timestamp" must end in "_time".`, field.Name)
+	if field.Type == "google.protobuf.Timestamp" && !(field.Name == "time" || strings.HasSuffix(field.Name, "_time")) {
+		v.AddFailuref(field.Position, `Field %q of type "google.protobuf.Timestamp" must be "time" or end in "_time".`, field.Name)
 	}
 }
