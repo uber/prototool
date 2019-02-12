@@ -278,7 +278,7 @@ This matches what the linter expects. `SOME.PKG` will be computed as follows:
   `create` section (see [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for an example).
   If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml` or `prototool.json` file will be used.
 - Otherwise, if there is no `packages` directive, just use the relative path from the directory
-  with the `prototool.yaml` or `prototool.json` file. If the file is in the same directory as the `prototoo.yaml` file,
+  with the `prototool.yaml` or `prototool.json` file. If the file is in the same directory as the `prototool.yaml` file,
   use `uber.prototool.generated`
 
 For example, assume you have the following file at `repo/prototool.yaml`:
