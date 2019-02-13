@@ -205,12 +205,24 @@ lint:
     is_commented: true
 ```
 
-The `path` option specifies the path to the file that contains the header data.
-The `is_commented` option specifies whether the header data is already commented, and if not, `// ` will be added before all non-empty lines,
-and `//` will be added before all empty lines. `is_commented` is optional and generally will not be set if the file is not commented, for
-example if `path` points to a text LICENSE file.
+Alternatively, directly specify the content:
 
-If `lint.file_header.path` is set, `prototool create`, `prototool format --fix`, and `prototool lint` will all take the file header into account.
+```yaml
+lint:
+  file_header:
+    content: |
+      //
+      // Acme, Inc. (c) 2019
+      //
+    is_commented: true
+```
+
+The `path` option specifies the path to the file that contains the header data. The `content` option specifies the content directly.
+Only one of these can be specified. The `is_commented` option specifies whether the header data is already commented, and if not,
+`// ` will be added before all non-empty lines, and `//` will be added before all empty lines. `is_commented` is optional and
+generally will not be set if the file is not commented, for example if `path` points to a text LICENSE file.
+
+If `lint.file_header.path` or `lint.file_header.content` is set, `prototool create`, `prototool format --fix`, and `prototool lint` will all take the file header into account.
 
 See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
 
