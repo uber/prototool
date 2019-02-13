@@ -28,6 +28,5 @@ import (
 	_ "github.com/golang/lint/golint"      // tool
 	_ "github.com/kisielk/errcheck"        // tool
 	_ "go.uber.org/tools/update-license"   // tool
-	_ "golang.org/x/tools/cmd/cover"       // tool
 	_ "honnef.co/go/tools/cmd/staticcheck" // tool
 )

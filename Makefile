@@ -135,7 +135,6 @@ test:
 
 .PHONY: cover
 cover:
-	@go install golang.org/x/tools/cmd/cover
 	@mkdir -p $(TMP_ETC)
 	@rm -f $(TMP_ETC)/coverage.txt $(TMP_ETC)/coverage.html
 	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=$(shell echo $(PKGS) | tr ' ' ',') $(PKGS)
