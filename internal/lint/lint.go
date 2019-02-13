@@ -28,6 +28,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/bmatcuk/doublestar"
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/settings"
@@ -510,7 +511,12 @@ func shouldIgnore(linter Linter, descriptor *FileDescriptor, ignoreIDToFilePaths
 		return false, nil
 	}
 	for _, ignoreFilePath := range ignoreFilePaths {
-		if filePath == ignoreFilePath {
+		match, err := doublestar.PathMatch(ignoreFilePath, filePath)
+		if err != nil {
+			return false, err
+		}
+
+		if match {
 			return true, nil
 		}
 	}

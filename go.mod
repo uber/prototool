@@ -1,6 +1,7 @@
 module github.com/uber/prototool
 
 require (
+	github.com/bmatcuk/doublestar v1.1.1
 	github.com/cpuguy83/go-md2man v1.0.8 // indirect
 	github.com/emicklei/proto v1.6.7
 	github.com/fullstorydev/grpcurl v1.1.0
