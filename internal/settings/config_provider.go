@@ -293,15 +293,24 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 	}
 
 	var fileHeader string
-	if e.Lint.FileHeader.Path != "" {
-		if filepath.IsAbs(e.Lint.FileHeader.Path) {
-			return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeader.Path)
+	if e.Lint.FileHeader.Path != "" || e.Lint.FileHeader.Content != "" {
+		if e.Lint.FileHeader.Path != "" && e.Lint.FileHeader.Content != "" {
+			return Config{}, fmt.Errorf("must only specify either file header path or content")
 		}
-		fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeader.Path))
-		if err != nil {
-			return Config{}, err
+		var fileHeaderContent string
+		if e.Lint.FileHeader.Path != "" {
+			if filepath.IsAbs(e.Lint.FileHeader.Path) {
+				return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeader.Path)
+			}
+			fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeader.Path))
+			if err != nil {
+				return Config{}, err
+			}
+			fileHeaderContent = string(fileHeaderData)
+		} else { // if e.Lint.FileHeader.Content != ""
+			fileHeaderContent = e.Lint.FileHeader.Content
 		}
-		fileHeaderLines := getFileHeaderLines(fileHeaderData)
+		fileHeaderLines := getFileHeaderLines(fileHeaderContent)
 		if !e.Lint.FileHeader.IsCommented {
 			for i, fileHeaderLine := range fileHeaderLines {
 				if fileHeaderLine == "" {
@@ -312,6 +321,9 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			}
 		}
 		fileHeader = strings.Join(fileHeaderLines, "\n")
+		if fileHeader == "" {
+			return Config{}, fmt.Errorf("file header path or content specifed but result was empty file header")
+		}
 	}
 
 	if !develMode {
@@ -416,9 +428,9 @@ func jsonUnmarshalStrict(data []byte, v interface{}) error {
 	return decoder.Decode(v)
 }
 
-func getFileHeaderLines(data []byte) []string {
+func getFileHeaderLines(content string) []string {
 	var lines []string
-	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
+	for _, line := range strings.Split(strings.TrimSpace(content), "\n") {
 		lines = append(lines, strings.TrimSpace(line))
 	}
 	return lines

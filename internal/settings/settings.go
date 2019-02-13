@@ -299,6 +299,7 @@ type ExternalConfig struct {
 		}
 		FileHeader struct {
 			Path        string `json:"path,omitempty" yaml:"path,omitempty"`
+			Content     string `json:"content,omitempty" yaml:"content,omitempty"`
 			IsCommented bool   `json:"is_commented,omitempty" yaml:"is_commented,omitempty"`
 		} `json:"file_header,omitempty" yaml:"file_header,omitempty"`
 		// devel-mode only
