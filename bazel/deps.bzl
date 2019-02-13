@@ -7,6 +7,11 @@ def prototool_deps(**kwargs):
         importpath = "honnef.co/go/tools",
     )
     go_repository(
+        name = "com_github_bmatcuk_doublestar",
+        importpath = "github.com/bmatcuk/doublestar",
+        tag = "v1.1.1",
+    )
+    go_repository(
         name = "com_github_burntsushi_toml",
         importpath = "github.com/BurntSushi/toml",
         tag = "v0.3.1",

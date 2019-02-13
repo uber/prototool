@@ -84,6 +84,7 @@ go_library(
         "//internal/strs:go_default_library",
         "//internal/text:go_default_library",
         "//internal/wkt:go_default_library",
+        "@com_github_bmatcuk_doublestar//:go_default_library",
         "@com_github_emicklei_proto//:go_default_library",
         "@com_github_gobuffalo_flect//:go_default_library",
         "@org_uber_go_zap//:go_default_library",
