@@ -1,7 +1,10 @@
 lint:
   group: uber2
   file_header:
-    path: protobuf_file_header.txt
+    content: |
+      // this
+        // is a
+          // header
     is_commented: true
 create:
   packages:
