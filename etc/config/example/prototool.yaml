@@ -71,18 +71,27 @@ lint:
     remove:
       - ENUM_NAMES_CAMEL_CASE
 
-  # The path to the file header for all Protobuf files.
-  # If this is set and the FILE_HEADER linter is turned on, files will
-  # be checked to begin with the contents of this file, and format --fix
+  # The path to the file header or the file header content for all Protobuf files.
+  # If either path or content is set and the FILE_HEADER linter is turned on,
+  # files will be checked to begin with the given header, and format --fix
   # will place this header before the syntax declaration. Note that
   # format --fix will delete anything before the syntax declaration
   # if this is set.
+  #
+  # Set path to use a file's contents for the header. Path must be relative.
+  # Set content to directly specify the header.
+  # **Both path and content cannot be set at the same time. They are only done
+  # so here for example purposes.**
   #
   # If is_commented is set, this file is assumed to already have comments
   # and will be added directly. If is_commented is not set, "// " will be
   # added before every line.
   file_header:
     path: path/to/protobuf_file_header.txt
+    content: |
+      //
+      // Acme, Inc. (c) 2019
+      //
     is_commented: true
 
 # Code generation directives.
