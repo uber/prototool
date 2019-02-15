@@ -119,10 +119,8 @@ func NewDownloader(config settings.Config, options ...DownloaderOption) (Downloa
 type FileDescriptorSet struct {
 	*descriptor.FileDescriptorSet
 	// The containing ProtoSet.
-	// Absolute.
 	ProtoSet *file.ProtoSet
-	// The directory path for the built files in this FileDescriptorSet.
-	// Absolute.
+	// The absolute directory path for the built files in this FileDescriptorSet.
 	// This directory path will always reside within the ProtoSetDirPath,
 	// that is filepath.Rel(ProtoSetDirPath, DirPath) will never return
 	// error and always return a non-empty string. Note the string could be ".".
