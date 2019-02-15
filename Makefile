@@ -56,6 +56,12 @@ golden: install
 	for file in $(shell find internal/cmd/testdata/format-fix -name '*.proto'); do \
 		prototool format --fix $${file} > $${file}.golden || true; \
 	done
+	for file in $(shell find internal/cmd/testdata/format-fix-v2 -name '*.proto.golden'); do \
+		rm -f $${file}; \
+	done
+	for file in $(shell find internal/cmd/testdata/format-fix-v2 -name '*.proto'); do \
+		prototool format --fix $${file} > $${file}.golden || true; \
+	done
 
 .PHONY: example
 example: install

@@ -29,7 +29,7 @@ message Baz {
 
   // another unassociated comment
 
-  google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
+  google.protobuf.Timestamp timestamp = 3; // inline c-style comment
   map<string, int64> m = 11;
   oneof test_oneof {
     int64 foo1 = 8;

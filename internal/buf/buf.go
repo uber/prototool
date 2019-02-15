@@ -18,40 +18,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package format
+package buf
 
 import (
 	"bytes"
 	"fmt"
 	"strings"
+	"unicode"
 )
 
-const indentString = "  "
-
-// printer is a convenience struct that helps when printing proto files.
+// Printer is a convenience struct that helps when printing files.
+//
 // The concept was taken from the golang/protobuf plugin.
-type printer struct {
+type Printer struct {
+	indent      string
 	buffer      *bytes.Buffer
 	indentCount int
 }
 
-func newPrinter() *printer {
-	return &printer{bytes.NewBuffer(nil), 0}
+// NewPrinter returns a new Printer.
+func NewPrinter(indent string) *Printer {
+	return &Printer{
+		indent:      indent,
+		buffer:      bytes.NewBuffer(nil),
+		indentCount: 0,
+	}
 }
 
 // P prints the args concatenated on the same line after printing the current indent and then prints a newline.
-//
-// TODO: There is a lot of unnecessary memory allocation going on here, optimize
-func (p *printer) P(args ...interface{}) {
+func (p *Printer) P(args ...interface{}) {
+	if len(args) == 0 {
+		_, _ = p.buffer.WriteRune('\n')
+		return
+	}
 	lineBuffer := bytes.NewBuffer(nil)
 	if p.indentCount > 0 {
-		_, _ = fmt.Fprint(lineBuffer, strings.Repeat(indentString, p.indentCount))
+		_, _ = fmt.Fprint(lineBuffer, strings.Repeat(p.indent, p.indentCount))
 	}
 	for _, arg := range args {
 		_, _ = fmt.Fprint(lineBuffer, arg)
 	}
-	line := lineBuffer.Bytes()
-
+	line := bytes.TrimRightFunc(lineBuffer.Bytes(), unicode.IsSpace)
 	if len(bytes.TrimSpace(line)) != 0 {
 		_, _ = p.buffer.Write(line)
 	}
@@ -59,19 +66,24 @@ func (p *printer) P(args ...interface{}) {
 }
 
 // In adds one indent.
-func (p *printer) In() {
+func (p *Printer) In() {
 	p.indentCount++
 }
 
 // Out deletes one indent.
-func (p *printer) Out() {
+func (p *Printer) Out() {
 	// might want to error
 	if p.indentCount > 0 {
 		p.indentCount--
 	}
 }
 
+// String returns the printed string.
+func (p *Printer) String() string {
+	return p.buffer.String()
+}
+
 // Bytes returns the printed bytes.
-func (p *printer) Bytes() []byte {
+func (p *Printer) Bytes() []byte {
 	return p.buffer.Bytes()
 }
