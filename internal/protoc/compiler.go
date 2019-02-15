@@ -154,7 +154,7 @@ func (c *compiler) Compile(protoSet *file.ProtoSet) (*CompileResult, error) {
 		}, nil
 	}
 
-	fileDescriptorSets := make([]*descriptor.FileDescriptorSet, 0, len(cmdMetas))
+	fileDescriptorSets := make([]*FileDescriptorSet, 0, len(cmdMetas))
 	for _, cmdMeta := range cmdMetas {
 		// if doFileDescriptorSet is not set, we won't get a fileDescriptorSet anyways,
 		// so the end result will be an empty CompileResult at this point
@@ -360,6 +360,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 			cmdMetas = append(cmdMetas, &cmdMeta{
 				execCmd:    exec.Command(protocPath, iArgs...),
 				protoSet:   protoSet,
+				dirPath:    dirPath,
 				protoFiles: protoFiles,
 				// used for cleaning up the cmdMeta after everything is done
 				descriptorSetTempFilePath: descriptorSetTempFilePath,
@@ -377,6 +378,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 			cmdMetas = append(cmdMetas, &cmdMeta{
 				execCmd:    exec.Command(protocPath, iArgs...),
 				protoSet:   protoSet,
+				dirPath:    dirPath,
 				protoFiles: protoFiles,
 			})
 		}
@@ -768,7 +770,7 @@ func getDisplayFilePath(cmdMeta *cmdMeta, match string) (string, error) {
 	return matchingFile, nil
 }
 
-func getFileDescriptorSet(cmdMeta *cmdMeta) (*descriptor.FileDescriptorSet, error) {
+func getFileDescriptorSet(cmdMeta *cmdMeta) (*FileDescriptorSet, error) {
 	if cmdMeta.descriptorSetTempFilePath == "" {
 		return nil, nil
 	}
@@ -780,7 +782,12 @@ func getFileDescriptorSet(cmdMeta *cmdMeta) (*descriptor.FileDescriptorSet, erro
 	if err := proto.Unmarshal(data, fileDescriptorSet); err != nil {
 		return nil, err
 	}
-	return fileDescriptorSet, nil
+	return &FileDescriptorSet{
+		FileDescriptorSet: fileDescriptorSet,
+		ProtoSet:          cmdMeta.protoSet,
+		DirPath:           cmdMeta.dirPath,
+		ProtoFiles:        cmdMeta.protoFiles,
+	}, nil
 }
 
 func devNull() (string, error) {
@@ -811,6 +818,7 @@ func cleanCmdMetas(cmdMetas []*cmdMeta) {
 type cmdMeta struct {
 	execCmd                   *exec.Cmd
 	protoSet                  *file.ProtoSet
+	dirPath                   string
 	protoFiles                []*file.ProtoFile
 	descriptorSetTempFilePath string
 }

@@ -113,6 +113,41 @@ func NewDownloader(config settings.Config, options ...DownloaderOption) (Downloa
 	return newDownloader(config, options...)
 }
 
+// FileDescriptorSet is a wrapper for descriptor.FileDescriptorSet.
+//
+// This will contain both the files specified by ProtoFiles and all imports.
+type FileDescriptorSet struct {
+	*descriptor.FileDescriptorSet
+	// The containing ProtoSet.
+	ProtoSet *file.ProtoSet
+	// The absolute directory path for the built files in this FileDescriptorSet.
+	// This directory path will always reside within the ProtoSetDirPath,
+	// that is filepath.Rel(ProtoSetDirPath, DirPath) will never return
+	// error and always return a non-empty string. Note the string could be ".".
+	DirPath string
+	// The ProtoFiles for the built files in this FileDescriptorSet.
+	// The directory of Path will always be equal to DirPath.
+	ProtoFiles []*file.ProtoFile
+}
+
+// FileDescriptorSets are a slice of FileDescriptorSet objects.
+type FileDescriptorSets []*FileDescriptorSet
+
+// Unwrap converts f to []*descriptor.FileDescriptorSet.
+//
+// Used for backwards compatibility with existing code that is based on
+// descriptor.FileDescriptorSets.
+func (f FileDescriptorSets) Unwrap() []*descriptor.FileDescriptorSet {
+	if f == nil {
+		return nil
+	}
+	d := make([]*descriptor.FileDescriptorSet, len(f))
+	for i, e := range f {
+		d[i] = e.FileDescriptorSet
+	}
+	return d
+}
+
 // CompileResult is the result of a compile
 type CompileResult struct {
 	// The failures from all calls.
@@ -121,7 +156,7 @@ type CompileResult struct {
 	//
 	// Will only be set if the CompilerWithFileDescriptorSet
 	// option is used.
-	FileDescriptorSets []*descriptor.FileDescriptorSet
+	FileDescriptorSets FileDescriptorSets
 }
 
 // Compiler compiles protobuf files.

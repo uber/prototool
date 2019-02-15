@@ -37,7 +37,7 @@ import (
 var jsonMarshaler = &jsonpb.Marshaler{Indent: "  "}
 
 // RequireGetFileDescriptorSets calls GetDescriptorFileSets with require calls.
-func RequireGetFileDescriptorSets(t *testing.T, workDirPath string, dirPath string) []*descriptor.FileDescriptorSet {
+func RequireGetFileDescriptorSets(t *testing.T, workDirPath string, dirPath string) protoc.FileDescriptorSets {
 	fileDescriptorSets, err := GetFileDescriptorSets(workDirPath, dirPath)
 	require.NoError(t, err)
 	require.NotEmpty(t, fileDescriptorSets)
@@ -45,7 +45,7 @@ func RequireGetFileDescriptorSets(t *testing.T, workDirPath string, dirPath stri
 }
 
 // GetFileDescriptorSets gets the FileDescriptorSets that result from compiling the given dirPath.
-func GetFileDescriptorSets(workDirPath string, dirPath string) ([]*descriptor.FileDescriptorSet, error) {
+func GetFileDescriptorSets(workDirPath string, dirPath string) (protoc.FileDescriptorSets, error) {
 	protoSet, err := file.NewProtoSetProvider().GetForDir(workDirPath, dirPath)
 	if err != nil {
 		return nil, err

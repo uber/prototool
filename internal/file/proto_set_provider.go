@@ -117,6 +117,11 @@ func (c *protoSetProvider) getMultipleForDir(workDirPath string, dirPath string)
 		protoSet.WorkDirPath = workDirPath
 		protoSet.DirPath = absDirPath
 	}
+	for _, protoSet := range protoSets {
+		if err := validateProtoSet(protoSet); err != nil {
+			return nil, err
+		}
+	}
 	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.String("dirPath", dirPath), zap.Any("protoSets", protoSets))
 	return protoSets, nil
 }
@@ -295,6 +300,35 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 		}
 		return nil, fmt.Errorf("internal prototool error")
 	}
+}
+
+func validateProtoSet(protoSet *ProtoSet) error {
+	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		if err := validateIsRel(protoSet.DirPath, dirPath); err != nil {
+			return err
+		}
+		for _, protoFile := range protoFiles {
+			if filepath.Dir(protoFile.Path) != dirPath {
+				return fmt.Errorf("%s does not reside within %s, this is a system error", protoFile.Path, dirPath)
+			}
+			// This should always be true but just to make sure
+			if err := validateIsRel(protoSet.DirPath, protoFile.Path); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func validateIsRel(base string, dir string) error {
+	rel, err := filepath.Rel(base, dir)
+	if err != nil {
+		return fmt.Errorf("could not make %s relative to %s, this is a system error: %v", base, dir, err)
+	}
+	if rel == "" {
+		return fmt.Errorf("could not make %s relative to %s, this is a system error", base, dir)
+	}
+	return nil
 }
 
 func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {

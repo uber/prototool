@@ -364,7 +364,7 @@ func getPackageSets(subDirPath string) (*extract.PackageSet, *extract.PackageSet
 	if err != nil {
 		return nil, nil, err
 	}
-	fromReflectPackageSet, err := reflect.NewPackageSet(fromFileDescriptorSets...)
+	fromReflectPackageSet, err := reflect.NewPackageSet(fromFileDescriptorSets.Unwrap()...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -376,7 +376,7 @@ func getPackageSets(subDirPath string) (*extract.PackageSet, *extract.PackageSet
 	if err != nil {
 		return nil, nil, err
 	}
-	toReflectPackageSet, err := reflect.NewPackageSet(toFileDescriptorSets...)
+	toReflectPackageSet, err := reflect.NewPackageSet(toFileDescriptorSets.Unwrap()...)
 	if err != nil {
 		return nil, nil, err
 	}
