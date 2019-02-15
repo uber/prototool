@@ -27,17 +27,18 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/buf"
 	"github.com/uber/prototool/internal/text"
 )
 
 type baseVisitor struct {
-	*printer
+	*buf.Printer
 
 	Failures []*text.Failure
 }
 
 func newBaseVisitor() *baseVisitor {
-	return &baseVisitor{printer: newPrinter()}
+	return &baseVisitor{Printer: buf.NewPrinter("  ")}
 }
 
 func (v *baseVisitor) AddFailure(position scanner.Position, format string, args ...interface{}) {
