@@ -48,7 +48,7 @@ func getPackageSet(subDirPath string) (*PackageSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
+	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets.Unwrap()...)
 	if err != nil {
 		return nil, err
 	}

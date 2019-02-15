@@ -37,7 +37,6 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/breaking"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/create"
@@ -248,7 +247,7 @@ func (r *runner) Gen(args []string, dryRun bool) error {
 	return err
 }
 
-func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) ([]*descriptor.FileDescriptorSet, error) {
+func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) (protoc.FileDescriptorSets, error) {
 	if dryRun {
 		return nil, r.printCommands(doGen, meta.ProtoSet)
 	}
@@ -562,7 +561,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		parsedCallTimeout,
 		parsedConnectTimeout,
 		parsedKeepaliveTime,
-	).Invoke(fileDescriptorSets, address, method, reader, r.output)
+	).Invoke(fileDescriptorSets.Unwrap(), address, method, reader, r.output)
 }
 
 func (r *runner) InspectPackages(args []string) error {
@@ -665,7 +664,7 @@ func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
 	if err != nil {
 		return nil, err
 	}
-	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
+	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets.Unwrap()...)
 	if err != nil {
 		return nil, err
 	}

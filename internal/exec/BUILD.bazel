@@ -24,7 +24,6 @@ go_library(
         "//internal/settings:go_default_library",
         "//internal/text:go_default_library",
         "//internal/vars:go_default_library",
-        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
         "@org_uber_go_zap//:go_default_library",
     ],
 )
