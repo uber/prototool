@@ -41,13 +41,17 @@ type ProtoSet struct {
 	// Must be cleaned.
 	WorkDirPath string
 	// The given directory path.
-	// This will be the same as WorkDirPath if files were given.
 	// Must be absolute.
 	// Must be cleaned.
 	DirPath string
 	// The directory path to slice of .proto files.
 	// All paths must be absolute.
+	// All paths must reside within DirPath.
 	// Must be cleaned.
+	// The directory paths will always reside within DirPath,
+	// that is filepath.Rel(ProtoSetDirPath, DirPath) will never return
+	// error and always return a non-empty string. Note the string could be ".".
+	// The ProtoFiles will always be in the directory specified by the key.
 	DirPathToFiles map[string][]*ProtoFile
 	// The associated Config.
 	// Must be valid.
