@@ -29,21 +29,21 @@ import (
 func TestBasic(t *testing.T) {
 	testPrinter(
 		t,
-		"onetwothree",
+		"onetwothree\n",
 		func(p *Printer) {
 			p.P(`one`, `two`, `three`)
 		},
 	)
 	testPrinter(
 		t,
-		"one two three",
+		"one two three\n",
 		func(p *Printer) {
 			p.P(`one `, `two `, `three`)
 		},
 	)
 	testPrinter(
 		t,
-		"one\n  twothree\n   four\n\nfive",
+		"one\n  twothree\n   four\n\nfive\n\n",
 		func(p *Printer) {
 			// purposefully adding space
 			p.P(`one `)
