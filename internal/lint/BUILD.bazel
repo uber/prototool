@@ -33,6 +33,7 @@ go_library(
         "check_message_field_names_filepath.go",
         "check_message_field_names_lower_snake_case.go",
         "check_message_field_names_lowercase.go",
+        "check_message_field_names_no_descriptor.go",
         "check_message_fields_duration.go",
         "check_message_fields_no_json_name.go",
         "check_message_fields_not_floats.go",
