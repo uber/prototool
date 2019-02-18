@@ -1,4 +1,6 @@
 # Paths to exclude when searching for Protobuf files.
+# These can either be file or directory names.
+# If there is a directory name, that directory and all sub-directories will be excluded.
 excludes:
   - path/to/a
   - path/to/b/file.proto
@@ -44,6 +46,8 @@ lint:
   group: uber2
 
   # Linter files to ignore.
+  # These can either be file or directory names.
+  # If there is a directory name, that directory and all sub-directories will be ignored.
   ignores:
     - id: RPC_NAMES_CAMEL_CASE
       files:
@@ -51,7 +55,7 @@ lint:
         - path/to/bar.proto
     - id: SYNTAX_PROTO3
       files:
-        - path/to/foo.proto
+        - path/to/dir
 
   # Linter rules.
   # Run prototool lint --list-all-linters to see all available linters.

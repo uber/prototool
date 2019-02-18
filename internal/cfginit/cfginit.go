@@ -29,6 +29,8 @@ import (
 )
 
 var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when searching for Protobuf files.
+# These can either be file or directory names.
+# If there is a directory name, that directory and all sub-directories will be excluded.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
@@ -74,6 +76,8 @@ protoc:
 {{.V}}  group: uber2
 
   # Linter files to ignore.
+  # These can either be file or directory names.
+  # If there is a directory name, that directory and all sub-directories will be ignored.
 {{.V}}  ignores:
 {{.V}}    - id: RPC_NAMES_CAMEL_CASE
 {{.V}}      files:
@@ -81,7 +85,7 @@ protoc:
 {{.V}}        - path/to/bar.proto
 {{.V}}    - id: SYNTAX_PROTO3
 {{.V}}      files:
-{{.V}}        - path/to/foo.proto
+{{.V}}        - path/to/dir
 
   # Linter rules.
   # Run prototool lint --list-all-linters to see all available linters.
