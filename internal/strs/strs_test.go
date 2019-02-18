@@ -167,15 +167,22 @@ func TestToUpperCamelCase(t *testing.T) {
 	assert.Equal(t, "CAMELCase", ToUpperCamelCase("  CAMEL case"))
 }
 
-func TestDedupeSort(t *testing.T) {
-	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c"}, strings.ToLower))
-	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a"}, strings.ToLower))
-	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a", "B"}, strings.ToLower))
-	assert.Equal(t, []string{"a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a", "B", "b"}, strings.ToLower))
-	assert.Equal(t, []string{"A", "b", "c"}, DedupeSort([]string{"b", "A", "c"}, nil))
-	assert.Equal(t, []string{"A", "a", "b", "c"}, DedupeSort([]string{"b", "A", "c", "a"}, nil))
-	assert.Equal(t, []string{"A", "B", "b", "c"}, DedupeSort([]string{"b", "A", "c", "A", "B"}, nil))
-	assert.Equal(t, []string{"A", "B", "b", "c"}, DedupeSort([]string{"b", "A", "c", "", "A", "B"}, nil))
+func TestSortUniq(t *testing.T) {
+	assert.Equal(t, []string{"A", "b", "c"}, SortUniq([]string{"b", "A", "c"}))
+	assert.Equal(t, []string{"A", "a", "b", "c"}, SortUniq([]string{"b", "A", "c", "a"}))
+	assert.Equal(t, []string{"A", "B", "b", "c"}, SortUniq([]string{"b", "A", "c", "A", "B"}))
+	assert.Equal(t, []string{"A", "B", "b", "c"}, SortUniq([]string{"b", "A", "c", "", "A", "B"}))
+}
+
+func TestSortUniqModify(t *testing.T) {
+	assert.Equal(t, []string{"a", "b", "c"}, SortUniqModify([]string{"b", "A", "c"}, strings.ToLower))
+	assert.Equal(t, []string{"a", "b", "c"}, SortUniqModify([]string{"b", "A", "c", "a"}, strings.ToLower))
+	assert.Equal(t, []string{"a", "b", "c"}, SortUniqModify([]string{"b", "A", "c", "a", "B"}, strings.ToLower))
+	assert.Equal(t, []string{"a", "b", "c"}, SortUniqModify([]string{"b", "A", "c", "a", "B", "b"}, strings.ToLower))
+	assert.Equal(t, []string{"A", "b", "c"}, SortUniqModify([]string{"b", "A", "c"}, nil))
+	assert.Equal(t, []string{"A", "a", "b", "c"}, SortUniqModify([]string{"b", "A", "c", "a"}, nil))
+	assert.Equal(t, []string{"A", "B", "b", "c"}, SortUniqModify([]string{"b", "A", "c", "A", "B"}, nil))
+	assert.Equal(t, []string{"A", "B", "b", "c"}, SortUniqModify([]string{"b", "A", "c", "", "A", "B"}, nil))
 }
 
 func TestIntersection(t *testing.T) {

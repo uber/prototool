@@ -148,7 +148,7 @@ func populateDependencies(
 	}
 	for _, pkg := range packageNameToPackage {
 		if len(pkg.DependencyNames) != 0 {
-			pkg.DependencyNames = strs.DedupeSort(pkg.DependencyNames, nil)
+			pkg.DependencyNames = strs.SortUniq(pkg.DependencyNames)
 		}
 	}
 	return nil

@@ -125,7 +125,8 @@ func ParseGenPluginType(s string) (GenPluginType, error) {
 // all other internal packages should verify that all given paths are
 // absolute, except for the internal/text package.
 type Config struct {
-	// The working directory path.
+	// The directory path of the config file, or the working directory path.
+	// if no config file exists.
 	// Expected to be absolute path.
 	DirPath string
 	// The prefixes to exclude.
@@ -305,7 +306,7 @@ type ExternalConfig struct {
 		// devel-mode only
 		AllowSuppression bool `json:"allow_suppression,omitempty" yaml:"allow_suppression,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
-	Gen struct {
+	Generate struct {
 		GoOptions struct {
 			ImportPath     string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
 			ExtraModifiers map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`

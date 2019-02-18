@@ -167,27 +167,34 @@ func SplitSnakeCaseWord(s string) []string {
 	return words
 }
 
-// DedupeSort returns s with no duplicates and no empty strings, sorted.
+// SortUniq returns the unique sorted non-empty values of s.
+func SortUniq(s []string) []string {
+	return SortUniqModify(s, nil)
+}
+
+// SortUniqModify returns the unique sorted non-empty values of s.
 // If modifier is not nil, modifier will be applied to each element in s.
-func DedupeSort(s []string, modifier func(string) string) []string {
-	m := make(map[string]struct{}, len(s))
-	o := make([]string, 0, len(m))
+func SortUniqModify(s []string, modifier func(string) string) []string {
+	m := make(map[string]struct{})
 	for _, e := range s {
-		if e == "" {
-			continue
-		}
-		key := e
 		if modifier != nil {
-			key = modifier(e)
+			e = modifier(e)
 		}
-		if _, ok := m[key]; ok {
-			continue
+		if e != "" {
+			m[e] = struct{}{}
 		}
-		m[key] = struct{}{}
-		o = append(o, key)
 	}
-	sort.Strings(o)
-	return o
+	return MapToSortedSlice(m)
+}
+
+// MapToSortedSlice returns the sorted keys of m.
+func MapToSortedSlice(m map[string]struct{}) []string {
+	s := make([]string, 0, len(m))
+	for e := range m {
+		s = append(s, e)
+	}
+	sort.Strings(s)
+	return s
 }
 
 // Intersection return the intersection between one and

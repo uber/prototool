@@ -1,8 +1,6 @@
 language: go
 go:
   - "1.11.x"
-before_install:
-  - bash -x etc/bin/travis-before-install.sh
 script:
   - make lint cover
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then make codecov; fi

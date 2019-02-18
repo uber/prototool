@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/uber/prototool/internal/settings"
@@ -304,16 +305,12 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 
 func validateProtoSet(protoSet *ProtoSet) error {
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
-		if err := validateIsRel(protoSet.DirPath, dirPath); err != nil {
-			return err
-		}
 		for _, protoFile := range protoFiles {
 			if filepath.Dir(protoFile.Path) != dirPath {
 				return fmt.Errorf("%s does not reside within %s, this is a system error", protoFile.Path, dirPath)
 			}
-			// This should always be true but just to make sure
-			if err := validateIsRel(protoSet.DirPath, protoFile.Path); err != nil {
-				return err
+			if err := validateIsRel(protoSet.Config.DirPath, protoFile.Path); err != nil {
+				return fmt.Errorf("proto file %s not within config dirPath %s: %v", protoFile.Path, protoSet.Config.DirPath, err)
 			}
 		}
 	}
@@ -327,6 +324,9 @@ func validateIsRel(base string, dir string) error {
 	}
 	if rel == "" {
 		return fmt.Errorf("could not make %s relative to %s, this is a system error", base, dir)
+	}
+	if strings.HasPrefix(rel, "..") {
+		return fmt.Errorf("could not make %s within %s, got %s, this is a system error", base, dir, rel)
 	}
 	return nil
 }

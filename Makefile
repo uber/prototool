@@ -15,6 +15,25 @@ TMP_BIN = $(TMP)/bin
 TMP_ETC := $(TMP)/etc
 TMP_LIB := $(TMP)/lib
 
+BAZEL_VERSION := 0.22.0
+
+BAZEL_LIB := $(TMP_LIB)/bazel-$(BAZEL_VERSION)
+BAZEL := $(abspath $(BAZEL_LIB)/bin/bazel)
+ifeq ($(UNAME_OS),Darwin)
+BAZEL_OS := darwin
+else
+BAZEL_OS = linux
+endif
+BAZEL_ARCH := $(UNAME_ARCH)
+$(BAZEL):
+	$Q rm -f $(TMP_BIN)/bazel
+	$Q mkdir -p $(TMP_BIN)
+	$Q rm -rf $(BAZEL_LIB)
+	$Q mkdir -p $(BAZEL_LIB)
+	$Q curl -SSL https://github.com/bazelbuild/bazel/releases/download/$(BAZEL_VERSION)/bazel-$(BAZEL_VERSION)-installer-$(BAZEL_OS)-$(BAZEL_ARCH).sh -o $(BAZEL_LIB)/bazel-installer.sh
+	$Q chmod +x $(BAZEL_LIB)/bazel-installer.sh
+	$Q $(BAZEL_LIB)/bazel-installer.sh --base=$(abspath $(BAZEL_LIB)) --bin=$(abspath $(TMP_BIN))
+
 unexport GOPATH
 export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
@@ -85,7 +104,7 @@ internalgen: install
 	prototool config init etc/config/example --uncomment
 
 .PHONY: bazelgen
-bazelgen:
+bazelgen: $(BAZEL)
 	bash etc/bin/bazelgen.sh
 
 .PHONY: generate
@@ -156,7 +175,7 @@ codecov:
 	bash <(curl -s https://codecov.io/bash) -c -f $(TMP_ETC)/coverage.txt
 
 .PHONY: bazelbuild
-bazelbuild:
+bazelbuild: $(BAZEL)
 	bazel build //...:all
 
 .PHONY: releasegen
