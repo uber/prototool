@@ -123,6 +123,10 @@ protoc:
 {{.V}}      // Acme, Inc. (c) 2019
 {{.V}}      //
 {{.V}}    is_commented: true
+  # Override the default java_package file option prefix of "com".
+  # If this is set, this will affect lint, create, and format --fix to use.
+  # this prefix instead of "com".
+{{.V}}  java_package_prefix: au.com
 
 # Code generation directives.
 {{.V}}generate:

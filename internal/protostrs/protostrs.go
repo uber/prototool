@@ -107,6 +107,20 @@ func JavaPackage(packageName string) string {
 	return "com." + packageName
 }
 
+// JavaPackagePrefixOverride returns the value for the file option "java_package" given
+// a package name. This will be equal to "com." followed by the package.
+// If prefixOverride is set, this will be equal to prefixOveride.package.
+// If packageName is empty, this will return an empty string.
+func JavaPackagePrefixOverride(packageName string, prefixOverride string) string {
+	if packageName == "" {
+		return ""
+	}
+	if prefixOverride != "" {
+		return prefixOverride + "." + packageName
+	}
+	return "com." + packageName
+}
+
 // OBJCClassPrefix returns the value for the file option "objc_class_prefix"
 // given a package name. It takes the first letter of each package part
 // and capitalizes it, then concatenates these. If the length is 2, an "X"

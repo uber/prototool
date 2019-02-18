@@ -83,6 +83,14 @@ func TestJavaPackage(t *testing.T) {
 	assert.Equal(t, "com.foo.bar", JavaPackage("foo.bar"))
 }
 
+func TestJavaPackagePrefixOverride(t *testing.T) {
+	assert.Equal(t, "", JavaPackagePrefixOverride("", ""))
+	assert.Equal(t, "com.foo", JavaPackagePrefixOverride("foo", ""))
+	assert.Equal(t, "com.foo.bar", JavaPackagePrefixOverride("foo.bar", ""))
+	assert.Equal(t, "au.com.foo", JavaPackagePrefixOverride("foo", "au.com"))
+	assert.Equal(t, "au.com.foo.bar", JavaPackagePrefixOverride("foo.bar", "au.com"))
+}
+
 func TestOBJCClassPrefix(t *testing.T) {
 	assert.Equal(t, "", OBJCClassPrefix(""))
 	assert.Equal(t, "FXX", OBJCClassPrefix("foo"))

@@ -1,0 +1,7 @@
+lint:
+  group: uber2
+  java_package_prefix: au.com
+create:
+  packages:
+    - directory: .
+      name: foo.v1

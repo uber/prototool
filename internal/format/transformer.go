@@ -31,9 +31,10 @@ import (
 )
 
 type transformer struct {
-	logger     *zap.Logger
-	fix        int
-	fileHeader string
+	logger            *zap.Logger
+	fix               int
+	fileHeader        string
+	javaPackagePrefix string
 }
 
 func newTransformer(options ...TransformerOption) *transformer {
@@ -57,7 +58,7 @@ func (t *transformer) Transform(filename string, data []byte) ([]byte, []*text.F
 	}
 	descriptor.Filename = filename
 
-	firstPassVisitor := newFirstPassVisitor(filename, t.fix, t.fileHeader)
+	firstPassVisitor := newFirstPassVisitor(filename, t.fix, t.fileHeader, t.javaPackagePrefix)
 	for _, element := range descriptor.Elements {
 		element.Accept(firstPassVisitor)
 	}

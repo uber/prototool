@@ -43,6 +43,7 @@ type firstPassVisitor struct {
 	filename                 string
 	fix                      int
 	fileHeader               string
+	javaPackagePrefix        string
 	goPackageOption          *proto.Option
 	javaMultipleFilesOption  *proto.Option
 	javaOuterClassnameOption *proto.Option
@@ -52,8 +53,8 @@ type firstPassVisitor struct {
 	phpNamespaceOption       *proto.Option
 }
 
-func newFirstPassVisitor(filename string, fix int, fileHeader string) *firstPassVisitor {
-	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix, fileHeader: fileHeader}
+func newFirstPassVisitor(filename string, fix int, fileHeader string, javaPackagePrefix string) *firstPassVisitor {
+	return &firstPassVisitor{baseVisitor: newBaseVisitor(), filename: filename, fix: fix, fileHeader: fileHeader, javaPackagePrefix: javaPackagePrefix}
 }
 
 func (v *firstPassVisitor) Do() []*text.Failure {
@@ -119,7 +120,7 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 			IsString: true,
 		}
 		v.javaPackageOption.Constant = proto.Literal{
-			Source:   protostrs.JavaPackage(v.Package.Name),
+			Source:   protostrs.JavaPackagePrefixOverride(v.Package.Name, v.javaPackagePrefix),
 			IsString: true,
 		}
 		if v.fix == FixV2 {

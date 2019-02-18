@@ -13,7 +13,7 @@ option go_package = "barv1"; // inline comment4
 option java_multiple_files = true; //inline comment11
 // comment5
 option java_outer_classname = "FooProto"; // inline comment5
-option java_package = "com.foo.bar.v1";
+option java_package = "au.com.foo.bar.v1";
 option objc_class_prefix = "FBX";
 option php_namespace = "Foo\\Bar\\V1";
 

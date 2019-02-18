@@ -351,6 +351,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 			FileHeader:          fileHeader,
+			JavaPackagePrefix:   e.Lint.JavaPackagePrefix,
 			AllowSuppression:    e.Lint.AllowSuppression,
 		},
 		Gen: GenConfig{

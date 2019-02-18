@@ -76,6 +76,14 @@ var fileOptionsEqualJavaPackageComPrefixLinter = NewLinter(
 	}),
 )
 
+var fileOptionsEqualJavaPackagePrefixLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_JAVA_PACKAGE_PREFIX",
+	`Verifies that the file option "java_package" is equal to PREFIX.PACKAGE, with PREFIX defaulting to "com" and configurable in your configuration file.`,
+	newCheckFileOptionsEqual("java_package", func(descriptor *FileDescriptor, pkg *proto.Package) string {
+		return protostrs.JavaPackagePrefixOverride(pkg.Name, descriptor.ProtoSet.Config.Lint.JavaPackagePrefix)
+	}),
+)
+
 var fileOptionsEqualOBJCClassPrefixAbbrLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_OBJC_CLASS_PREFIX_ABBR",
 	`Verifies that the file option "objc_class_prefix" is the abbreviated version of the package.`,
