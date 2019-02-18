@@ -203,7 +203,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		return Config{}, err
 	}
 	includePaths := make([]string, 0, len(e.Protoc.Includes))
-	for _, includePath := range strs.DedupeSort(e.Protoc.Includes, nil) {
+	for _, includePath := range strs.SortUniq(e.Protoc.Includes) {
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -225,8 +225,8 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		}
 	}
 
-	genPlugins := make([]GenPlugin, len(e.Gen.Plugins))
-	for i, plugin := range e.Gen.Plugins {
+	genPlugins := make([]GenPlugin, len(e.Generate.Plugins))
+	for i, plugin := range e.Generate.Plugins {
 		genPluginType, err := ParseGenPluginType(plugin.Type)
 		if err != nil {
 			return Config{}, err
@@ -345,8 +345,8 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
-			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			IncludeIDs:          strs.SortUniqModify(e.Lint.Rules.Add, strings.ToUpper),
+			ExcludeIDs:          strs.SortUniqModify(e.Lint.Rules.Remove, strings.ToUpper),
 			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
@@ -356,8 +356,8 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
-				ImportPath:     e.Gen.GoOptions.ImportPath,
-				ExtraModifiers: e.Gen.GoOptions.ExtraModifiers,
+				ImportPath:     e.Generate.GoOptions.ImportPath,
+				ExtraModifiers: e.Generate.GoOptions.ExtraModifiers,
 			},
 			Plugins: genPlugins,
 		},
@@ -404,7 +404,7 @@ func getExcludePrefixesForDir(dirPath string) ([]string, error) {
 
 func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 	excludePrefixes := make([]string, 0, len(excludes))
-	for _, excludePrefix := range strs.DedupeSort(excludes, nil) {
+	for _, excludePrefix := range strs.SortUniq(excludes) {
 		if !filepath.IsAbs(excludePrefix) {
 			excludePrefix = filepath.Join(dirPath, excludePrefix)
 		}

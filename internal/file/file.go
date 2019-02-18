@@ -50,15 +50,14 @@ type ProtoSet struct {
 	// All paths must be absolute.
 	// All paths must reside within DirPath.
 	// Must be cleaned.
-	// The directory paths will always reside within DirPath,
-	// that is filepath.Rel(ProtoSetDirPath, DirPath) will never return
+	// The directory paths will always reside within the config DirPath,
+	// that is filepath.Rel(Config.DirPath, DirPath) will never return
 	// error and always return a non-empty string. Note the string could be ".".
 	// The ProtoFiles will always be in the directory specified by the key.
 	DirPathToFiles map[string][]*ProtoFile
 	// The associated Config.
 	// Must be valid.
-	// The DirPath on the config may differ from the DirPath
-	// on the ProtoSet.
+	// The DirPath on the config may differ from the DirPath on the ProtoSet.
 	Config settings.Config
 }
 
