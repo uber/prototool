@@ -156,6 +156,10 @@ func (h *handler) create(filePath string) error {
 	if err != nil {
 		return err
 	}
+	javaPackagePrefix, err := h.getJavaPackagePrefix(filePath)
+	if err != nil {
+		return err
+	}
 	var data []byte
 	if isV2 {
 		data, err = getDataV2(
@@ -165,7 +169,7 @@ func (h *handler) create(filePath string) error {
 				CSharpNamespace:    protostrs.CSharpNamespace(pkg),
 				GoPkg:              protostrs.GoPackageV2(pkg),
 				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
-				JavaPkg:            protostrs.JavaPackage(pkg),
+				JavaPkg:            protostrs.JavaPackagePrefixOverride(pkg, javaPackagePrefix),
 				OBJCClassPrefix:    protostrs.OBJCClassPrefix(pkg),
 				PHPNamespace:       protostrs.PHPNamespace(pkg),
 			},
@@ -180,7 +184,7 @@ func (h *handler) create(filePath string) error {
 				Pkg:                pkg,
 				GoPkg:              protostrs.GoPackage(pkg),
 				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
-				JavaPkg:            protostrs.JavaPackage(pkg),
+				JavaPkg:            protostrs.JavaPackagePrefixOverride(pkg, javaPackagePrefix),
 			},
 		)
 		if err != nil {
@@ -191,12 +195,7 @@ func (h *handler) create(filePath string) error {
 }
 
 func (h *handler) isV2(filePath string) (bool, error) {
-	absFilePath, err := filepath.Abs(filePath)
-	if err != nil {
-		return false, err
-	}
-	absDirPath := filepath.Dir(absFilePath)
-	config, err := h.getConfig(absDirPath)
+	config, err := h.getConfig(filePath)
 	if err != nil {
 		return false, err
 	}
@@ -208,12 +207,7 @@ func (h *handler) isV2(filePath string) (bool, error) {
 }
 
 func (h *handler) getFileHeader(filePath string) (string, error) {
-	absFilePath, err := filepath.Abs(filePath)
-	if err != nil {
-		return "", err
-	}
-	absDirPath := filepath.Dir(absFilePath)
-	config, err := h.getConfig(absDirPath)
+	config, err := h.getConfig(filePath)
 	if err != nil {
 		return "", err
 	}
@@ -224,16 +218,23 @@ func (h *handler) getFileHeader(filePath string) (string, error) {
 	return config.Lint.FileHeader, nil
 }
 
+func (h *handler) getJavaPackagePrefix(filePath string) (string, error) {
+	config, err := h.getConfig(filePath)
+	if err != nil {
+		return "", err
+	}
+	// no config file found
+	if config.DirPath == "" {
+		return "", nil
+	}
+	return config.Lint.JavaPackagePrefix, nil
+}
+
 func (h *handler) getPkg(filePath string, defaultPackage string) (string, error) {
 	if h.pkg != "" {
 		return h.pkg, nil
 	}
-	absFilePath, err := filepath.Abs(filePath)
-	if err != nil {
-		return "", err
-	}
-	absDirPath := filepath.Dir(absFilePath)
-	config, err := h.getConfig(absDirPath)
+	config, err := h.getConfig(filePath)
 	if err != nil {
 		return "", err
 	}
@@ -241,6 +242,11 @@ func (h *handler) getPkg(filePath string, defaultPackage string) (string, error)
 	if config.DirPath == "" {
 		return defaultPackage, nil
 	}
+	absFilePath, err := filepath.Abs(filePath)
+	if err != nil {
+		return "", err
+	}
+	absDirPath := filepath.Dir(absFilePath)
 	// we need to get all the matching directories and then choose the longest
 	// ie if you have a, a/b, we choose a/b
 	var longestCreateDirPath string
@@ -280,7 +286,12 @@ func (h *handler) getPkg(filePath string, defaultPackage string) (string, error)
 	return getPkgFromRel(rel, "", defaultPackage), nil
 }
 
-func (h *handler) getConfig(absDirPath string) (settings.Config, error) {
+func (h *handler) getConfig(filePath string) (settings.Config, error) {
+	absFilePath, err := filepath.Abs(filePath)
+	if err != nil {
+		return settings.Config{}, err
+	}
+	absDirPath := filepath.Dir(absFilePath)
 	if h.configData != "" {
 		return h.configProvider.GetForData(absDirPath, h.configData)
 	}

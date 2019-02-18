@@ -74,6 +74,16 @@ func TransformerWithFileHeader(fileHeader string) TransformerOption {
 	}
 }
 
+// TransformerWithJavaPackagePrefix returns a TransformerOption that will override
+// the Java package prefix.
+//
+// This is only valid if fix is set to a value other than FixNone.
+func TransformerWithJavaPackagePrefix(javaPackagePrefix string) TransformerOption {
+	return func(transformer *transformer) {
+		transformer.javaPackagePrefix = javaPackagePrefix
+	}
+}
+
 // NewTransformer returns a new Transformer.
 func NewTransformer(options ...TransformerOption) Transformer {
 	return newTransformer(options...)

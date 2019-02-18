@@ -23,6 +23,7 @@
 /internal/cmd/testdata/create/version2three/b/c/bar/v1beta1/baz.proto
 /internal/cmd/testdata/create/version2three/baz.proto
 /internal/cmd/testdata/create/version2four/baz.proto
+/internal/cmd/testdata/create/version2five/baz.proto
 /main
 /prototool.iml
 /release

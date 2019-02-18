@@ -1,2 +1,3 @@
 lint:
   group: uber2
+  java_package_prefix: au.com

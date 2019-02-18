@@ -1,0 +1,6 @@
+lint:
+  group: uber2
+  java_package_prefix: au.com
+  rules:
+    remove:
+      - PACKAGE_MAJOR_BETA_VERSIONED
