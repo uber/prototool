@@ -32,6 +32,8 @@ import (
 // DefaultWalkTimeout is the default walk timeout.
 const DefaultWalkTimeout time.Duration = 3 * time.Second
 
+var rootDirPath = filepath.Dir(string(filepath.Separator))
+
 // ProtoSet represents a set of .proto files and an associated config.
 //
 // ProtoSets will be validated if returned from this package.
@@ -150,4 +152,20 @@ func CheckAbs(path string) error {
 		return fmt.Errorf("expected absolute path but was %s", path)
 	}
 	return nil
+}
+
+// IsExcluded determines whether the given filePath should be excluded.
+//
+// absConfigDirPath represents the absolute path to the configuration file.
+// This is used to determine when we should stop checking for excludes.
+func IsExcluded(absFilePath string, absConfigDirPath string, absExcludePaths ...string) bool {
+	for _, absExcludePath := range absExcludePaths {
+		for curFilePath := absFilePath; curFilePath != absConfigDirPath && curFilePath != rootDirPath; curFilePath = filepath.Dir(curFilePath) {
+			if curFilePath == absExcludePath {
+				return true
+			}
+		}
+	}
+	return false
+
 }

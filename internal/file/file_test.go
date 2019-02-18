@@ -84,3 +84,20 @@ func TestCheckAbs(t *testing.T) {
 		assert.EqualError(t, CheckAbs("path/to/foo"), "expected absolute path but was path/to/foo")
 	})
 }
+
+func TestIsExcluded(t *testing.T) {
+	wd, err := os.Getwd()
+	require.NoError(t, err)
+	testIsExcluded(t, true, "/foo/bar", "/", "/foo")
+	testIsExcluded(t, true, "/foo", "/", "/foo")
+	testIsExcluded(t, false, filepath.Join(wd, "foo"), wd, filepath.Join(wd, "fooo"))
+	testIsExcluded(t, true, filepath.Join(wd, "foo/bar"), wd, filepath.Join(wd, "foo"))
+	testIsExcluded(t, false, filepath.Join(wd, "foo/bar"), wd, filepath.Join(wd, "bar"))
+	testIsExcluded(t, true, filepath.Join(wd, "foo.proto"), wd, filepath.Join(wd, "foo.proto"))
+	testIsExcluded(t, false, filepath.Join(wd, "bar"), wd, filepath.Join(wd, "bar/foo.proto"))
+	testIsExcluded(t, true, filepath.Join(wd, "bar/baz/foo.proto"), wd, filepath.Join(wd, "bar"))
+}
+
+func testIsExcluded(t *testing.T, expected bool, absFilePath string, absConfigDirPath string, absExcludePaths ...string) {
+	assert.Equal(t, expected, IsExcluded(absFilePath, absConfigDirPath, absExcludePaths...))
+}

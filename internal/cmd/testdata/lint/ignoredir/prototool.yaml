@@ -1,0 +1,14 @@
+lint:
+  group: uber2
+  rules:
+    remove:
+      - ENUMS_HAVE_SENTENCE_COMMENTS
+      - MESSAGES_HAVE_SENTENCE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+      - RPCS_HAVE_SENTENCE_COMMENTS
+      - SERVICES_HAVE_SENTENCE_COMMENTS
+  ignores:
+    - id: MESSAGE_FIELDS_NOT_FLOATS
+      files:
+        - bar/v1
+        - foo/v11
+

@@ -509,12 +509,7 @@ func shouldIgnore(linter Linter, descriptor *FileDescriptor, ignoreIDToFilePaths
 	if !ok {
 		return false, nil
 	}
-	for _, ignoreFilePath := range ignoreFilePaths {
-		if filePath == ignoreFilePath {
-			return true, nil
-		}
-	}
-	return false, nil
+	return file.IsExcluded(filePath, descriptor.ProtoSet.Config.DirPath, ignoreFilePaths...), nil
 }
 
 func checkLintID(lintID string) error {

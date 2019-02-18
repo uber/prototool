@@ -581,6 +581,19 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`14:3:MESSAGE_FIELDS_NOT_FLOATS`,
+		"testdata/lint/ignoredir/foo/v1/foo.proto",
+	)
+	assertDoLintFile(
+		t,
+		true,
+		``,
+		"testdata/lint/ignoredir/bar/v1/bar.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`23:1:REQUEST_RESPONSE_TYPES_ONLY_IN_FILE
 		30:1:REQUEST_RESPONSE_TYPES_ONLY_IN_FILE`,
 		"testdata/lint/onlyinfile/foo/v1/hello_api.proto",
