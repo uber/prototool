@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";
+
+message One {
+  int64 descriptor = 1;
+}
+
+message Two {
+  int64 Descriptor = 1;
+}
+
+message Three {
+  int64 _descriptor = 1;
+}
+
+message Four {
+  int64 descriptor_ = 1;
+}
+
+message Five {
+  int64 __descriptor = 1;
+}
+
+message Six {
+  int64 descriptor__ = 1;
+}
