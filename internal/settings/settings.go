@@ -22,6 +22,7 @@ package settings
 
 import (
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -254,6 +255,9 @@ type GenPlugin struct {
 	// The path to output to.
 	// Must be relative in a config file.
 	OutputPath OutputPath
+	// Input path regular expression pattern.
+	// Limits plugin use to paths matching specified pattern.
+	Regexp *regexp.Regexp
 	// If set, the output path will be set to "$OUTPUT_PATH/$(basename $OUTPUT_PATH).$FILE_SUFFIX"
 	// Used for e.g. JAR generation for java or descriptor_set file name.
 	FileSuffix string
@@ -324,6 +328,7 @@ type ExternalConfig struct {
 			Output            string `json:"output,omitempty" yaml:"output,omitempty"`
 			Path              string `json:"path,omitempty" yaml:"path,omitempty"`
 			FileSuffix        string `json:"file_suffix,omitempty" yaml:"file_suffix,omitempty"`
+			Regexp            string `json:"regexp,omitempty" yaml:"regexp,omitempty"`
 			IncludeImports    bool   `json:"include_imports,omitempty" yaml:"include_imports,omitempty"`
 			IncludeSourceInfo bool   `json:"include_source_info,omitempty" yaml:"include_source_info,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`

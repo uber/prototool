@@ -164,6 +164,12 @@ protoc:
       # The Mfile=package flags are automatically set.
       # ** Otherwise, generally do not set this unless you know what you are doing. **
 {{.V}}      flags: plugins=grpc
+      # Regular expression pattern.
+      # If specified, .proto absolute path should match the pattern,
+      # otherwise plugin is not applied.
+      # Multiple plugins with the same name and different match patterns
+      # and configurations can be specified.
+{{.V}}      regexp: .
 
       # The path to output generated files to.
       # If the directory does not exist, it will be created when running generation.

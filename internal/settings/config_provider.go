@@ -28,6 +28,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -256,6 +257,13 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 				return Config{}, fmt.Errorf("include_source_info is only valid for the descriptor_set plugin but set on %q", plugin.Name)
 			}
 		}
+		var re *regexp.Regexp
+		if plugin.Regexp != "" {
+			re, err = regexp.Compile(plugin.Regexp)
+			if err != nil {
+				return Config{}, fmt.Errorf("failed to compile regexp for plugin %q: %v", plugin.Name, err)
+			}
+		}
 		genPlugins[i] = GenPlugin{
 			Name:              plugin.Name,
 			GetPath:           getPluginPathFunc(plugin.Path),
@@ -264,6 +272,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			FileSuffix:        plugin.FileSuffix,
 			IncludeImports:    plugin.IncludeImports,
 			IncludeSourceInfo: plugin.IncludeSourceInfo,
+			Regexp:            re,
 			OutputPath: OutputPath{
 				RelPath: relPath,
 				AbsPath: absPath,

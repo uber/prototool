@@ -444,6 +444,9 @@ func (c *compiler) getPluginFlagSets(protoSet *file.ProtoSet, dirPath string) ([
 	}
 	pluginFlagSets := make([][]string, 0, len(protoSet.Config.Gen.Plugins))
 	for _, genPlugin := range protoSet.Config.Gen.Plugins {
+		if genPlugin.Regexp != nil && !genPlugin.Regexp.MatchString(dirPath) {
+			continue
+		}
 		pluginFlagSet, err := getPluginFlagSet(protoSet, dirPath, genPlugin)
 		if err != nil {
 			return nil, err
