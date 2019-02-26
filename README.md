@@ -346,7 +346,7 @@ All these steps take on the order of milliseconds, for example the overhead for 
 
 ## gRPC Example
 
-There is a full example for gRPC in the [example](example) directory. Run `make init example` to make sure everything is installed and generated.
+There is a full example for gRPC in the [example](example) directory. Run `make example` to make sure everything is installed and generated.
 
 Start the example server in a separate terminal by doing `go run example/cmd/excited/main.go`.
 
@@ -355,7 +355,7 @@ Start the example server in a separate terminal by doing `go run example/cmd/exc
 Either use `--data 'requestData'` as the the JSON data to input, or `--stdin` which will result in the input being read from stdin as JSON.
 
 ```bash
-$ make init example # make sure everything is built just in case
+$ make example # make sure everything is built just in case
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
@@ -510,7 +510,7 @@ Before filing an issue or submitting a PR, make sure to review the [Issue Guidel
 the [PR Guidelines](https://github.com/uber/prototool/blob/dev/.github/PULL_REQUEST_TEMPLATE.md). The Issue Guidelines will show up in the description field when filing a new issue, and the PR guidelines will show up in the
 description field when submitting a PR, but clear the description field of this pre-populated text once you've read it :-)
 
-Note that development of Prototool will only work with Golang 1.10 or newer. On initially cloning the repository, run `make init` if you have not already to download dependencies to `vendor`.
+Note that development of Prototool will only work with Golang 1.11 or newer.
 
 Before submitting a PR, make sure to:
 

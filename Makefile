@@ -44,14 +44,6 @@ export PATH := $(GOBIN):$(PATH)
 .PHONY: all
 all: lint cover bazelbuild
 
-.PHONY: init
-init:
-	go mod download
-
-.PHONY: vendor
-vendor:
-	go mod tidy -v
-
 .PHONY: install
 install:
 	go install $(BINS)
@@ -109,6 +101,7 @@ bazelgen: $(BAZEL)
 
 .PHONY: generate
 generate: license golden example internalgen bazelgen
+	go mod tidy -v
 
 .PHONY: checknodiffgenerated
 checknodiffgenerated:

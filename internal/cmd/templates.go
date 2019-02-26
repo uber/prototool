@@ -274,7 +274,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		Short: "Call a gRPC endpoint. Be sure to set the required flags address, method, and either data or stdin.",
 		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
 
-There is a full example for gRPC in the example directory of Prototool. Run "make init example" to make sure everything is installed and generated.
+There is a full example for gRPC in the example directory of Prototool. Run "make example" to make sure everything is installed and generated.
 
 Start the example server in a separate terminal by doing "go run example/cmd/excited/main.go".
 
@@ -285,7 +285,7 @@ prototool grpc [dirOrFile] \
 
 Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" which will result in the input being read from stdin as JSON.
 
-$ make init example # make sure everything is built just in case
+$ make example # make sure everything is built just in case
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
