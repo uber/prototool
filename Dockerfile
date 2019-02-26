@@ -1,4 +1,4 @@
-FROM golang:1.11.5-alpine3.9 as builder
+FROM golang:1.12.0-alpine3.9 as builder
 
 ENV GOGO_PROTOBUF_VERSION=1.2.0
 ENV GOLANG_PROTOBUF_VERSION=1.2.0
