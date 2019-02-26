@@ -1,9 +1,9 @@
-SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/ | grep -v \/gen\/uber\/proto\/reflect\/)
-PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb | grep -v \/gen\/uber\/proto\/reflect\/)
+SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/ | grep -v \/gen\/uber\/proto\/reflect\/ | grep -v ^\/.\/internal\/cmd\/gen-prototool)
+PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb | grep -v \/gen\/uber\/proto\/reflect\/ | grep -v \/internal\/cmd\/gen-prototool)
 BINS := ./cmd/prototool
 
 DOCKER_IMAGE := uber/prototool:latest
-DOCKER_RELEASE_IMAGE := golang:1.11.5
+DOCKER_RELEASE_IMAGE := golang:1.12.0-stretch
 
 SHELL := /bin/bash -o pipefail
 UNAME_OS := $(shell uname -s)
