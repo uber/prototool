@@ -40,9 +40,12 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 gazelle_dependencies()
 EOF
 
+go mod tidy -v
 bazel run //:gazelle
-bazel run //:gazelle -- update-repos -from_file=go.mod
 rm internal/cmd/testdata/grpc/BUILD.bazel
+
+go mod tidy -v
+bazel run //:gazelle -- update-repos -from_file=go.mod
 
 TMP_WORKSPACE="${TMPDIR}/WORKSPACE"
 FIRST_GO_REPOSITORY_LINE_NUMBER="$(grep -n ^go_repository WORKSPACE | head -1 | cut -f 1 -d :)"
