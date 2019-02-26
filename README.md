@@ -510,7 +510,7 @@ Before filing an issue or submitting a PR, make sure to review the [Issue Guidel
 the [PR Guidelines](https://github.com/uber/prototool/blob/dev/.github/PULL_REQUEST_TEMPLATE.md). The Issue Guidelines will show up in the description field when filing a new issue, and the PR guidelines will show up in the
 description field when submitting a PR, but clear the description field of this pre-populated text once you've read it :-)
 
-Note that development of Prototool will only work with Golang 1.11 or newer.
+Note that development of Prototool will only work with Golang 1.12 or newer.
 
 Before submitting a PR, make sure to:
 
