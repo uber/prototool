@@ -148,7 +148,7 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_x_net",
-        commit = "afe646ca25a4",
+        commit = "161cd47e91fd",
         importpath = "golang.org/x/net",
     )
     go_repository(

@@ -61,6 +61,12 @@ $(UPDATE_LICENSE):
 	@cd $(UPDATE_LICENSE_TMP); go get go.uber.org/tools/update-license@$(UPDATE_LICENSE_VERSION)
 	@rm -rf $(UPDATE_LICENSE_TMP)
 
+PROTOC_GEN_GO_VERSION := v1.3.0
+PROTOC_GEN_GO := $(TMP_BIN)/protoc-gen-go
+$(PROTOC_GEN_GO):
+	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
+	@cd $(PROTOC_GEN_GO_TMP); go get github.com/golang/protobuf/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	@rm -rf $(PROTOC_GEN_GO_TMP)
 
 unexport GOPATH
 export GO111MODULE := on
@@ -102,8 +108,7 @@ golden: install
 	done
 
 .PHONY: example
-example: install
-	@go install github.com/golang/protobuf/protoc-gen-go
+example: install $(PROTOC_GEN_GO)
 	@mkdir -p $(TMP_ETC)
 	rm -rf example/gen
 	prototool all --fix example/proto/uber
@@ -114,7 +119,7 @@ example: install
 	prototool lint etc/style/uber1
 
 .PHONY: internalgen
-internalgen: install
+internalgen: install $(PROTOC_GEN_GO)
 	rm -rf internal/cmd/testdata/grpc/gen
 	prototool generate internal/cmd/testdata/grpc
 	rm -rf internal/reflect/gen
