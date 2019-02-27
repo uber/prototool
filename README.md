@@ -43,7 +43,9 @@ Prototool accomplishes this by downloading and calling `protoc` on the fly for y
 
 ## Installation
 
-Prototool can be installed on Mac OS X or Linux through a variety of methods. See [docs/install.md](docs/install.md) for full instructions.
+Prototool can be installed on Mac OS X or Linux through a variety of methods.
+
+*See [docs/install.md](docs/install.md) for full instructions.*
 
 ## Quick Start
 
@@ -135,7 +137,7 @@ See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for a ful
 Lint your Protobuf files. Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available options.
 There are three pre-configured groups of rules: `google`, `uber1`, and `uber2`.
 
-See [docs/lint.md](docs/lint.md) for full instructions.
+*See [docs/lint.md](docs/lint.md) for full instructions.*
 
 ##### `prototool format`
 
@@ -184,7 +186,7 @@ Prototool is meant to help enforce a consistent development style for Protobuf, 
 
 This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). The Vim integration will currently compile, provide lint errors, do generation of your stubs, and format your files on save. It will also optionally create new files from a template when opened.
 
-See [docs/vim.md](docs/vim.md) for full instructions.
+*See [docs/vim.md](docs/vim.md) for full instructions.*
 
 ## Stability
 
@@ -266,7 +268,7 @@ If you want to have a consistent build environment for external plugins, we reco
 a basic Docker image at [hub.docker.com/r/uber/prototool](https://hub.docker.com/r/uber/prototool), defined in the [Dockerfile](Dockerfile)
 within this repository.
 
-See [docks/docker.md](docs/docker.md) for more details.
+*See [docks/docker.md](docs/docker.md) for more details.*
 
 ##### Lint/Format Choices
 
