@@ -41,6 +41,9 @@ Prototool accomplishes this by downloading and calling `protoc` on the fly for y
     * [Lint/Format Choices](#lintformat-choices)
   * [Special Thanks](#special-thanks)
 
+The [docs](docs) folder has additional documentation on specific topics and is referenced below when
+discussing a topic that has further instructions.
+
 ## Installation
 
 Prototool can be installed on Mac OS X or Linux through a variety of methods.
