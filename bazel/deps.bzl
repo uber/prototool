@@ -3,7 +3,7 @@ load("@bazel_gazelle//:deps.bzl", "go_repository")
 def prototool_deps(**kwargs):
     go_repository(
         name = "co_honnef_go_tools",
-        commit = "71123fcbb8fe",
+        commit = "c2f93a96b099",
         importpath = "honnef.co/go/tools",
     )
     go_repository(
@@ -44,17 +44,12 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_gofrs_flock",
         importpath = "github.com/gofrs/flock",
-        tag = "v0.7.0",
+        tag = "v0.7.1",
     )
     go_repository(
         name = "com_github_golang_glog",
         commit = "23def4e6c14b",
         importpath = "github.com/golang/glog",
-    )
-    go_repository(
-        name = "com_github_golang_lint",
-        commit = "8f45f776aaf1",
-        importpath = "github.com/golang/lint",
     )
     go_repository(
         name = "com_github_golang_mock",
@@ -64,7 +59,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_golang_protobuf",
         importpath = "github.com/golang/protobuf",
-        tag = "v1.2.0",
+        tag = "v1.3.0",
     )
     go_repository(
         name = "com_github_inconshreveable_mousetrap",
@@ -75,31 +70,6 @@ def prototool_deps(**kwargs):
         name = "com_github_jhump_protoreflect",
         importpath = "github.com/jhump/protoreflect",
         tag = "v1.1.0",
-    )
-    go_repository(
-        name = "com_github_kisielk_errcheck",
-        importpath = "github.com/kisielk/errcheck",
-        tag = "v1.2.0",
-    )
-    go_repository(
-        name = "com_github_kisielk_gotool",
-        importpath = "github.com/kisielk/gotool",
-        tag = "v1.0.0",
-    )
-    go_repository(
-        name = "com_github_kr_pretty",
-        importpath = "github.com/kr/pretty",
-        tag = "v0.1.0",
-    )
-    go_repository(
-        name = "com_github_kr_pty",
-        importpath = "github.com/kr/pty",
-        tag = "v1.1.1",
-    )
-    go_repository(
-        name = "com_github_kr_text",
-        importpath = "github.com/kr/text",
-        tag = "v0.1.0",
     )
     go_repository(
         name = "com_github_mitchellh_go_wordwrap",
@@ -148,7 +118,7 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "in_gopkg_check_v1",
-        commit = "788fd7840127",
+        commit = "20d25e280405",
         importpath = "gopkg.in/check.v1",
     )
     go_repository(
@@ -163,27 +133,22 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_google_genproto",
-        commit = "4b09977fb922",
+        commit = "11092d34479b",
         importpath = "google.golang.org/genproto",
     )
     go_repository(
         name = "org_golang_google_grpc",
         importpath = "google.golang.org/grpc",
-        tag = "v1.18.0",
-    )
-    go_repository(
-        name = "org_golang_x_exp",
-        commit = "509febef88a4",
-        importpath = "golang.org/x/exp",
+        tag = "v1.19.0",
     )
     go_repository(
         name = "org_golang_x_lint",
-        commit = "8f45f776aaf1",
+        commit = "c67002cb31c3",
         importpath = "golang.org/x/lint",
     )
     go_repository(
         name = "org_golang_x_net",
-        commit = "3a22650c66bd",
+        commit = "161cd47e91fd",
         importpath = "golang.org/x/net",
     )
     go_repository(
@@ -193,22 +158,22 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_x_sync",
-        commit = "37e7f081c4d4",
+        commit = "1d60e4601c6f",
         importpath = "golang.org/x/sync",
     )
     go_repository(
         name = "org_golang_x_sys",
-        commit = "983097b1a8a3",
+        commit = "49385e6e1522",
         importpath = "golang.org/x/sys",
     )
     go_repository(
         name = "org_golang_x_text",
         importpath = "golang.org/x/text",
-        tag = "v0.3.1-0.20180807135948-17ff2d5776d2",
+        tag = "v0.3.0",
     )
     go_repository(
         name = "org_golang_x_tools",
-        commit = "dbb4d4be5353",
+        commit = "bf090417da8b",
         importpath = "golang.org/x/tools",
     )
     go_repository(
@@ -220,11 +185,6 @@ def prototool_deps(**kwargs):
         name = "org_uber_go_multierr",
         importpath = "go.uber.org/multierr",
         tag = "v1.1.0",
-    )
-    go_repository(
-        name = "org_uber_go_tools",
-        commit = "ce2550dad714",
-        importpath = "go.uber.org/tools",
     )
     go_repository(
         name = "org_uber_go_zap",

@@ -3,9 +3,11 @@
 
 package barv1
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -16,7 +18,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Hello is a hello.
 type Hello struct {
@@ -30,16 +32,17 @@ func (m *Hello) Reset()         { *m = Hello{} }
 func (m *Hello) String() string { return proto.CompactTextString(m) }
 func (*Hello) ProtoMessage()    {}
 func (*Hello) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bar_7da55e4d7db32d57, []int{0}
+	return fileDescriptor_b2939c1cd7d8e6b8, []int{0}
 }
+
 func (m *Hello) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Hello.Unmarshal(m, b)
 }
 func (m *Hello) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Hello.Marshal(b, m, deterministic)
 }
-func (dst *Hello) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Hello.Merge(dst, src)
+func (m *Hello) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Hello.Merge(m, src)
 }
 func (m *Hello) XXX_Size() int {
 	return xxx_messageInfo_Hello.Size(m)
@@ -61,9 +64,9 @@ func init() {
 	proto.RegisterType((*Hello)(nil), "uber.bar.v1.Hello")
 }
 
-func init() { proto.RegisterFile("uber/bar/v1/bar.proto", fileDescriptor_bar_7da55e4d7db32d57) }
+func init() { proto.RegisterFile("uber/bar/v1/bar.proto", fileDescriptor_b2939c1cd7d8e6b8) }
 
-var fileDescriptor_bar_7da55e4d7db32d57 = []byte{
+var fileDescriptor_b2939c1cd7d8e6b8 = []byte{
 	// 138 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x2d, 0x4d, 0x4a, 0x2d,
 	0xd2, 0x4f, 0x4a, 0x2c, 0xd2, 0x2f, 0x33, 0x04, 0x51, 0x7a, 0x05, 0x45, 0xf9, 0x25, 0xf9, 0x42,

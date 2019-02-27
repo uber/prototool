@@ -3,12 +3,14 @@
 
 package foov1
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import duration "github.com/golang/protobuf/ptypes/duration"
-import timestamp "github.com/golang/protobuf/ptypes/timestamp"
-import v1 "github.com/uber/prototool/example/gen/go/uber/bar/v1"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	duration "github.com/golang/protobuf/ptypes/duration"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	v1 "github.com/uber/prototool/example/gen/go/uber/bar/v1"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -19,7 +21,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Hello is a hello.
 type Hello int32
@@ -37,6 +39,7 @@ var Hello_name = map[int32]string{
 	2: "HELLO_TREE",
 	3: "HELLO_BALLOON",
 }
+
 var Hello_value = map[string]int32{
 	"HELLO_INVALID": 0,
 	"HELLO_UNSET":   1,
@@ -47,8 +50,9 @@ var Hello_value = map[string]int32{
 func (x Hello) String() string {
 	return proto.EnumName(Hello_name, int32(x))
 }
+
 func (Hello) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{0}
+	return fileDescriptor_e4cff45982d67b5e, []int{0}
 }
 
 // Bar is a bar.
@@ -61,6 +65,7 @@ const (
 var Bar_name = map[int32]string{
 	0: "BAR_INVALID",
 }
+
 var Bar_value = map[string]int32{
 	"BAR_INVALID": 0,
 }
@@ -68,8 +73,9 @@ var Bar_value = map[string]int32{
 func (x Bar) String() string {
 	return proto.EnumName(Bar_name, int32(x))
 }
+
 func (Bar) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{1}
+	return fileDescriptor_e4cff45982d67b5e, []int{1}
 }
 
 // Baz is a baz.
@@ -82,6 +88,7 @@ const (
 var Foo_Bar_Baz_name = map[int32]string{
 	0: "BAZ_INVALID",
 }
+
 var Foo_Bar_Baz_value = map[string]int32{
 	"BAZ_INVALID": 0,
 }
@@ -89,8 +96,9 @@ var Foo_Bar_Baz_value = map[string]int32{
 func (x Foo_Bar_Baz) String() string {
 	return proto.EnumName(Foo_Bar_Baz_name, int32(x))
 }
+
 func (Foo_Bar_Baz) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{0, 0, 0}
+	return fileDescriptor_e4cff45982d67b5e, []int{0, 0, 0}
 }
 
 // Bat is a bat.
@@ -103,6 +111,7 @@ const (
 var Foo_Bar_Bat_name = map[int32]string{
 	0: "BAT_INVALID",
 }
+
 var Foo_Bar_Bat_value = map[string]int32{
 	"BAT_INVALID": 0,
 }
@@ -110,8 +119,9 @@ var Foo_Bar_Bat_value = map[string]int32{
 func (x Foo_Bar_Bat) String() string {
 	return proto.EnumName(Foo_Bar_Bat_name, int32(x))
 }
+
 func (Foo_Bar_Bat) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{0, 0, 1}
+	return fileDescriptor_e4cff45982d67b5e, []int{0, 0, 1}
 }
 
 // Foo is a foo.
@@ -126,16 +136,17 @@ func (m *Foo) Reset()         { *m = Foo{} }
 func (m *Foo) String() string { return proto.CompactTextString(m) }
 func (*Foo) ProtoMessage()    {}
 func (*Foo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{0}
+	return fileDescriptor_e4cff45982d67b5e, []int{0}
 }
+
 func (m *Foo) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo.Unmarshal(m, b)
 }
 func (m *Foo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Foo.Marshal(b, m, deterministic)
 }
-func (dst *Foo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Foo.Merge(dst, src)
+func (m *Foo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Foo.Merge(m, src)
 }
 func (m *Foo) XXX_Size() int {
 	return xxx_messageInfo_Foo.Size(m)
@@ -166,16 +177,17 @@ func (m *Foo_Bar) Reset()         { *m = Foo_Bar{} }
 func (m *Foo_Bar) String() string { return proto.CompactTextString(m) }
 func (*Foo_Bar) ProtoMessage()    {}
 func (*Foo_Bar) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{0, 0}
+	return fileDescriptor_e4cff45982d67b5e, []int{0, 0}
 }
+
 func (m *Foo_Bar) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Foo_Bar.Unmarshal(m, b)
 }
 func (m *Foo_Bar) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Foo_Bar.Marshal(b, m, deterministic)
 }
-func (dst *Foo_Bar) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Foo_Bar.Merge(dst, src)
+func (m *Foo_Bar) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Foo_Bar.Merge(m, src)
 }
 func (m *Foo_Bar) XXX_Size() int {
 	return xxx_messageInfo_Foo_Bar.Size(m)
@@ -214,16 +226,17 @@ func (m *Barr) Reset()         { *m = Barr{} }
 func (m *Barr) String() string { return proto.CompactTextString(m) }
 func (*Barr) ProtoMessage()    {}
 func (*Barr) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{1}
+	return fileDescriptor_e4cff45982d67b5e, []int{1}
 }
+
 func (m *Barr) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Barr.Unmarshal(m, b)
 }
 func (m *Barr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Barr.Marshal(b, m, deterministic)
 }
-func (dst *Barr) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Barr.Merge(dst, src)
+func (m *Barr) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Barr.Merge(m, src)
 }
 func (m *Barr) XXX_Size() int {
 	return xxx_messageInfo_Barr.Size(m)
@@ -278,16 +291,17 @@ func (m *Another) Reset()         { *m = Another{} }
 func (m *Another) String() string { return proto.CompactTextString(m) }
 func (*Another) ProtoMessage()    {}
 func (*Another) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{2}
+	return fileDescriptor_e4cff45982d67b5e, []int{2}
 }
+
 func (m *Another) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Another.Unmarshal(m, b)
 }
 func (m *Another) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Another.Marshal(b, m, deterministic)
 }
-func (dst *Another) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Another.Merge(dst, src)
+func (m *Another) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Another.Merge(m, src)
 }
 func (m *Another) XXX_Size() int {
 	return xxx_messageInfo_Another.Size(m)
@@ -391,69 +405,12 @@ func (m *Another) GetAnotherDuration() *duration.Duration {
 	return nil
 }
 
-// XXX_OneofFuncs is for the internal use of the proto package.
-func (*Another) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
-	return _Another_OneofMarshaler, _Another_OneofUnmarshaler, _Another_OneofSizer, []interface{}{
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*Another) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
 		(*Another_Seven)(nil),
 		(*Another_Eight)(nil),
 	}
-}
-
-func _Another_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
-	m := msg.(*Another)
-	// oneof_oneof
-	switch x := m.OneofOneof.(type) {
-	case *Another_Seven:
-		b.EncodeVarint(7<<3 | proto.WireVarint)
-		b.EncodeVarint(uint64(x.Seven))
-	case *Another_Eight:
-		b.EncodeVarint(8<<3 | proto.WireBytes)
-		b.EncodeStringBytes(x.Eight)
-	case nil:
-	default:
-		return fmt.Errorf("Another.OneofOneof has unexpected type %T", x)
-	}
-	return nil
-}
-
-func _Another_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
-	m := msg.(*Another)
-	switch tag {
-	case 7: // oneof_oneof.seven
-		if wire != proto.WireVarint {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeVarint()
-		m.OneofOneof = &Another_Seven{int64(x)}
-		return true, err
-	case 8: // oneof_oneof.eight
-		if wire != proto.WireBytes {
-			return true, proto.ErrInternalBadWireType
-		}
-		x, err := b.DecodeStringBytes()
-		m.OneofOneof = &Another_Eight{x}
-		return true, err
-	default:
-		return false, nil
-	}
-}
-
-func _Another_OneofSizer(msg proto.Message) (n int) {
-	m := msg.(*Another)
-	// oneof_oneof
-	switch x := m.OneofOneof.(type) {
-	case *Another_Seven:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(x.Seven))
-	case *Another_Eight:
-		n += 1 // tag and wire
-		n += proto.SizeVarint(uint64(len(x.Eight)))
-		n += len(x.Eight)
-	case nil:
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
-	}
-	return n
 }
 
 // HasWKT has Well-Known Types.
@@ -468,16 +425,17 @@ func (m *HasWKT) Reset()         { *m = HasWKT{} }
 func (m *HasWKT) String() string { return proto.CompactTextString(m) }
 func (*HasWKT) ProtoMessage()    {}
 func (*HasWKT) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{3}
+	return fileDescriptor_e4cff45982d67b5e, []int{3}
 }
+
 func (m *HasWKT) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_HasWKT.Unmarshal(m, b)
 }
 func (m *HasWKT) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_HasWKT.Marshal(b, m, deterministic)
 }
-func (dst *HasWKT) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_HasWKT.Merge(dst, src)
+func (m *HasWKT) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HasWKT.Merge(m, src)
 }
 func (m *HasWKT) XXX_Size() int {
 	return xxx_messageInfo_HasWKT.Size(m)
@@ -507,16 +465,17 @@ func (m *Bazz) Reset()         { *m = Bazz{} }
 func (m *Bazz) String() string { return proto.CompactTextString(m) }
 func (*Bazz) ProtoMessage()    {}
 func (*Bazz) Descriptor() ([]byte, []int) {
-	return fileDescriptor_foo_cdfe0650a637b36d, []int{4}
+	return fileDescriptor_e4cff45982d67b5e, []int{4}
 }
+
 func (m *Bazz) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Bazz.Unmarshal(m, b)
 }
 func (m *Bazz) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Bazz.Marshal(b, m, deterministic)
 }
-func (dst *Bazz) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Bazz.Merge(dst, src)
+func (m *Bazz) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Bazz.Merge(m, src)
 }
 func (m *Bazz) XXX_Size() int {
 	return xxx_messageInfo_Bazz.Size(m)
@@ -535,6 +494,10 @@ func (m *Bazz) GetOne() int64 {
 }
 
 func init() {
+	proto.RegisterEnum("uber.foo.v1.Hello", Hello_name, Hello_value)
+	proto.RegisterEnum("uber.foo.v1.Bar", Bar_name, Bar_value)
+	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Baz", Foo_Bar_Baz_name, Foo_Bar_Baz_value)
+	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Bat", Foo_Bar_Bat_name, Foo_Bar_Bat_value)
 	proto.RegisterType((*Foo)(nil), "uber.foo.v1.Foo")
 	proto.RegisterType((*Foo_Bar)(nil), "uber.foo.v1.Foo.Bar")
 	proto.RegisterType((*Barr)(nil), "uber.foo.v1.Barr")
@@ -542,15 +505,11 @@ func init() {
 	proto.RegisterMapType((map[string]int64)(nil), "uber.foo.v1.Another.MEntry")
 	proto.RegisterType((*HasWKT)(nil), "uber.foo.v1.HasWKT")
 	proto.RegisterType((*Bazz)(nil), "uber.foo.v1.Bazz")
-	proto.RegisterEnum("uber.foo.v1.Hello", Hello_name, Hello_value)
-	proto.RegisterEnum("uber.foo.v1.Bar", Bar_name, Bar_value)
-	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Baz", Foo_Bar_Baz_name, Foo_Bar_Baz_value)
-	proto.RegisterEnum("uber.foo.v1.Foo_Bar_Bat", Foo_Bar_Bat_name, Foo_Bar_Bat_value)
 }
 
-func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_foo_cdfe0650a637b36d) }
+func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_e4cff45982d67b5e) }
 
-var fileDescriptor_foo_cdfe0650a637b36d = []byte{
+var fileDescriptor_e4cff45982d67b5e = []byte{
 	// 630 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x53, 0xd1, 0x6e, 0x12, 0x4d,
 	0x14, 0xee, 0xb2, 0x40, 0xcb, 0xd9, 0xbf, 0x2d, 0xff, 0xa4, 0x36, 0x2b, 0x26, 0xda, 0x70, 0x61,
