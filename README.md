@@ -155,7 +155,7 @@ Uber Style Guide. By formatting, the linting for these values will pass by defau
 Create Protobuf files from a template. With the provided Vim integration, this will automatically create new files
 that pass lint when a new file is opened.
 
-See [docs/create.md](docs/create.md) for full instructions.
+*See [docs/create.md](docs/create.md) for full instructions.*
 
 ##### `prototool files`
 
@@ -170,7 +170,7 @@ Call a gRPC endpoint using a JSON input. What this does behind the scenes:
 - Calls the gRPC endpoint.
 - Uses the `FileDescriptorSet` to convert the resulting binary back to JSON, and prints it out for you.
 
-See [docs/grpc.md](docs/vim.md) for full instructions.
+*See [docs/grpc.md](docs/grpc.md) for full instructions.*
 
 ## Tips and Tricks
 
