@@ -43,43 +43,7 @@ Prototool accomplishes this by downloading and calling `protoc` on the fly for y
 
 ## Installation
 
-Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/) or Linux via [Linuxbrew](http://linuxbrew.sh/).
-
-```bash
-brew install prototool
-```
-
-This installs the `prototool` binary, along with bash completion, zsh completion, and man pages.
-You can also install all of the assets on Linux or without Homebrew from GitHub Releases.
-
-```bash
-curl -sSL https://github.com/uber/prototool/releases/download/v1.3.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
-  tar -C /usr/local --strip-components 1 -xz
-```
-
-If you do not want to install bash completion, zsh completion, or man mages, you can install just the
-`prototool` binary from GitHub Releases as well.
-
-```bash
-curl -sSL https://github.com/uber/prototool/releases/download/v1.3.0/prototool-$(uname -s)-$(uname -m) \
-  -o /usr/local/bin/prototool && \
-  chmod +x /usr/local/bin/prototool
-```
-
-You can also install the `prototool` binary using `go get` if using go1.11+ with module support enabled.
-
-```bash
-go get github.com/uber/prototool/cmd/prototool@dev
-```
-
-You may want to use [gobin](https://github.com/myitcv/gobin) to install `prototool` outside of a module.
-
-```bash
-# Install to $GOBIN, or $GOPATH/bin if $GOBIN is not set, or $HOME/go/bin if neither are set
-gobin github.com/uber/prototool/cmd/prototool@dev
-# Install to /path/to/bin
-GOBIN=/path/to/bin gobin github.com/uber/prototool/cmd/prototool@dev
-```
+Prototool can be installed on Mac OS X or Linux through a variety of methods. See [docs/install.md](docs/install.md) for full instructions.
 
 ## Quick Start
 
@@ -168,91 +132,10 @@ See [example/idl/uber/prototool.yaml](example/idl/uber/prototool.yaml) for a ful
 
 ##### `prototool lint`
 
-Lint your Protobuf files.
+Lint your Protobuf files. Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available options.
+There are three pre-configured groups of rules: `google`, `uber1`, and `uber2`.
 
-Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for all available options. There are two pre-configured groups of rules:
-
-- `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](etc/style/google/google.proto).
-- `uber1`: This lint group follows the V1 Style Guide at [etc/style/uber1/uber1.proto](etc/style/uber1/uber1.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
-- `uber2`: This lint group is the V2 Style Guide, and makes some modifcations to more closely follow the Google Cloud APIs file
-  structure, as well as adding even more rules to enforce more consistent development patterns. This lint group is under development.
-
-To see the differences between lint groups, use the `--diff-lint-groups` flag:
-
-```
-prototool lint --diff-lint-groups google,uber2
-```
-
-Configuration of your group can be done by setting the `lint.group` option in your `prototool.yaml` file:
-
-```yaml
-lint:
-  group: google
-```
-
-See the `prototool.yaml` files at [etc/style/google/prototool.yaml](etc/style/google/prototool.yaml) and
-[etc/style/uber1/prototool.yaml](etc/style/uber1/prototool.yaml) for examples.
-
-The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
-
-Linting also understands the concept of file headers, typically license headers. To specify a license header, add the following to your
-`prototool.yaml`:
-
-```yaml
-lint:
-  file_header:
-    path: path/to/header.txt
-    is_commented: true
-```
-
-Alternatively, directly specify the content:
-
-```yaml
-lint:
-  file_header:
-    content: |
-      //
-      // Acme, Inc. (c) 2019
-      //
-    is_commented: true
-```
-
-The `path` option specifies the path to the file that contains the header data. The `content` option specifies the content directly.
-Only one of these can be specified. The `is_commented` option specifies whether the header data is already commented, and if not,
-`// ` will be added before all non-empty lines, and `//` will be added before all empty lines. `is_commented` is optional and
-generally will not be set if the file is not commented, for example if `path` points to a text LICENSE file.
-
-If `lint.file_header.path` or `lint.file_header.content` is set, `prototool create`, `prototool format --fix`, and `prototool lint` will all take the file header into account.
-
-See [internal/cmd/testdata/lint](internal/cmd/testdata/lint) for additional examples of configurations, and run `prototool lint internal/cmd/testdata/lint/DIR` from a checkout of this repository to see example failures.
-
-Files must be valid Protobuf that can be compiled with `protoc`, so prior to linting, `prototool lint` will compile your using `protoc`.
-Note, however, this is very fast - for the two files in [etc/style/uber1](etc/style/uber1), compiling and linting only takes approximately
-3/100ths of a second:
-
-```bash
-$ time prototool lint etc/style/uber1
-
-real	0m0.037s
-user	0m0.026s
-sys	0m0.017s
-```
-
-For all 694 Protobuf files currently in [googleapis](https://github.com/googleapis/googleapis), this takes approximately 3/4ths of a second:
-
-```bash
-$ cat prototool.yaml
-protoc:
-  allow_unused_imports: true
-lint:
-  group: google
-
-$ time prototool lint .
-
-real	0m0.734s
-user	0m3.835s
-sys	0m0.924s
-```
+See [docs/lint.md](docs/lint.md) for full instructions.
 
 ##### `prototool format`
 
@@ -269,65 +152,10 @@ Uber Style Guide. By formatting, the linting for these values will pass by defau
 
 ##### `prototool create`
 
-Create a Protobuf file from a template that passes lint. Assuming the filename `example_create_file.proto`, the file will look like the following:
+Create Protobuf files from a template. With the provided Vim integration, this will automatically create new files
+that pass lint when a new file is opened.
 
-```proto
-syntax = "proto3";
-
-package SOME.PKG;
-
-option go_package = "PKGpb";
-option java_multiple_files = true;
-option java_outer_classname = "ExampleCreateFileProto";
-option java_package = "com.SOME.PKG.pb";
-```
-
-This matches what the linter expects. `SOME.PKG` will be computed as follows:
-
-- If `--package` is specified, `SOME.PKG` will be the value passed to `--package`.
-- Otherwise, if there is no `prototool.yaml` or `prototool.json` that would apply to the new file, use `uber.prototool.generated`.
-- Otherwise, if there is a `prototool.yaml` or `prototool.json` file, check if it has a `packages` setting under the
-  `create` section (see [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for an example).
-  If it does, this package, concatenated with the relative path from the directory with the `prototool.yaml` or `prototool.json` file will be used.
-- Otherwise, if there is no `packages` directive, just use the relative path from the directory
-  with the `prototool.yaml` or `prototool.json` file. If the file is in the same directory as the `prototool.yaml` file,
-  use `uber.prototool.generated`
-
-For example, assume you have the following file at `repo/prototool.yaml`:
-
-```yaml
-create:
-  packages:
-    - directory: idl
-      name: uber
-    - directory: idl/baz
-      name: special
-```
-
-- `prototool create repo/idl/foo/bar/bar.proto` will have the package `uber.foo.bar`.
-- `prototool create repo/idl/bar.proto` will have the package `uber`.
-- `prototool create repo/idl/baz/baz.proto` will have the package `special`.
-- `prototool create repo/idl/baz/bat/bat.proto` will have the package `special.bat`.
-- `prototool create repo/another/dir/bar.proto` will have the package `another.dir`.
-- `prototool create repo/bar.proto` will have the package `uber.prototool.generated`.
-
-This is meant to mimic what you generally want - a base package for your idl directory, followed
-by packages matching the directory structure.
-
-Note you can override the directory that the `prototool.yaml` or `prototool.json` file is in as well. If we update our
-file at `repo/prototool.yaml` to this:
-
-```yaml
-create:
-  packages:
-    - directory: .
-      name: foo.bar
-```
-
-Then `prototool create repo/bar.proto` will have the package `foo.bar`, and `prototool create repo/another/dir/bar.proto`
-will have the package `foo.bar.another.dir`.
-
-If [Vim integration](#vim-integration) is set up, files will be generated when you open a new Protobuf file.
+See [docs/create.md](docs/create.md) for full instructions.
 
 ##### `prototool files`
 
@@ -342,75 +170,7 @@ Call a gRPC endpoint using a JSON input. What this does behind the scenes:
 - Calls the gRPC endpoint.
 - Uses the `FileDescriptorSet` to convert the resulting binary back to JSON, and prints it out for you.
 
-All these steps take on the order of milliseconds, for example the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
-
-## gRPC Example
-
-There is a full example for gRPC in the [example](example) directory. Run `make example` to make sure everything is installed and generated.
-
-Start the example server in a separate terminal by doing `go run example/cmd/excited/main.go`.
-
-`prototool grpc [dirOrFile] --address serverAddress --method package.service/Method --data 'requestData'`
-
-Either use `--data 'requestData'` as the the JSON data to input, or `--stdin` which will result in the input being read from stdin as JSON.
-
-```bash
-$ make example # make sure everything is built just in case
-
-$ prototool grpc example \
-  --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/Exclamation \
-  --data '{"value":"hello"}'
-{
-  "value": "hello!"
-}
-
-$ prototool grpc example \
-  --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationServerStream \
-  --data '{"value":"hello"}'
-{
-  "value": "h"
-}
-{
-  "value": "e"
-}
-{
-  "value": "l"
-}
-{
-  "value": "l"
-}
-{
-  "value": "o"
-}
-{
-  "value": "!"
-}
-
-$ cat input.json
-{"value":"hello"}
-{"value":"salutations"}
-
-$ cat input.json | prototool grpc example \
-  --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationClientStream \
-  --stdin
-{
-  "value": "hellosalutations!"
-}
-
-$ cat input.json | prototool grpc example \
-  --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationBidiStream \
-  --stdin
-{
-  "value": "hello!"
-}
-{
-  "value": "salutations!"
-}
-```
+See [docs/grpc.md](docs/vim.md) for full instructions.
 
 ## Tips and Tricks
 
@@ -422,67 +182,9 @@ Prototool is meant to help enforce a consistent development style for Protobuf, 
 
 ## Vim Integration
 
-This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). It should be similarly easy to add support for Syntastic, Neomake, etc.
+This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). The Vim integration will currently compile, provide lint errors, do generation of your stubs, and format your files on save. It will also optionally create new files from a template when opened.
 
-The Vim integration will currently compile, provide lint errors, do generation of your stubs, and format your files on save. It will also optionally create new files from a template when opened.
-
-The plugin is under [vim/prototool](vim/prototool), so your plugin manager needs to point there instead of the base of this repository. Assuming you are using [vim-plug](https://github.com/junegunn/vim-plug), copy/paste the following into your vimrc and you should be good to go. If you are using [Vundle](https://github.com/VundleVim/Vundle.vim), just replace `Plug` with `Vundle` below.
-
-```vim
-" Prototool must be installed as a binary for the Vim integration to work.
-
-" Add ale and prototool with your package manager.
-" Note that Plug downloads from dev by default. There may be minor changes
-" to the Vim integration on dev between releases, but this won't be common.
-" To make sure you are on the same branch as your Prototool install, set
-" the branch field in the options for uber/prototool per the vim-plug
-" documentation. Vundle does not allow setting branches, so on Vundle,
-" go into plug directory and checkout the branch of the release you are on.
-Plug 'w0rp/ale'
-Plug 'uber/prototool', { 'rtp':'vim/prototool' }
-
-" We recommend setting just this for Golang, as well as the necessary set for proto.
-" Note the 'prototool' linter is still available, but deprecated in favor of individual linters.
-" Use the 'prototool-compile' linter to just compile, 'prototool-lint' to compile and lint,
-" 'prototool-all' to compile, do generation of your stubs, and then lint.
-let g:ale_linters = {
-\   'go': ['golint'],
-\   'proto': ['prototool-lint'],
-\}
-" We recommend you set this.
-let g:ale_lint_on_text_changed = 'never'
-
-" We generally have <leader> mapped to ",", uncomment this to set leader.
-"let mapleader=","
-
-" ,f will toggle formatting on and off.
-" Change to PrototoolFormatFixToggle to toggle with --fix instead.
-nnoremap <silent> <leader>f :call PrototoolFormatToggle()<CR>
-" ,c will toggle create on and off.
-nnoremap <silent> <leader>c :call PrototoolCreateToggle()<CR>
-
-" Uncomment this to enable formatting by default.
-"call PrototoolFormatEnable()
-" Uncomment this to enable formatting with --fix by default.
-"call PrototoolFormatFixEnable()
-" Uncomment this to disable creating Protobuf files from a template by default.
-"call PrototoolCreateDisable()
-```
-
-The recommended setup in short:
-
-```vim
-Plug 'w0rp/ale'
-Plug 'uber/prototool', { 'rtp':'vim/prototool' }
-let g:ale_linters = {
-\   'go': ['golint'],
-\   'proto': ['prototool-lint'],
-\}
-let g:ale_lint_on_text_changed = 'never'
-call PrototoolFormatFixEnable()
-```
-
-Editor integration is a key goal of Prototool. We've demonstrated support internally for Intellij, and hope that we have integration for more editors in the future.
+See [docs/vim.md](docs/vim.md) for full instructions.
 
 ## Stability
 
@@ -562,7 +264,9 @@ provided by `protoc` out of the box, however.
 
 If you want to have a consistent build environment for external plugins, we recommend creating a Docker image. We provide
 a basic Docker image at [hub.docker.com/r/uber/prototool](https://hub.docker.com/r/uber/prototool), defined in the [Dockerfile](Dockerfile)
-within this repository. See [DOCKER.md](DOCKER.md) for more details.
+within this repository.
+
+See [docks/docker.md](docs/docker.md) for more details.
 
 ##### Lint/Format Choices
 
