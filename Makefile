@@ -15,7 +15,7 @@ TMP_BIN = $(TMP)/bin
 TMP_ETC := $(TMP)/etc
 TMP_LIB := $(TMP)/lib
 
-BAZEL_VERSION := 0.22.0
+BAZEL_VERSION := 0.23.0
 BAZEL_LIB := $(TMP_LIB)/bazel-$(BAZEL_VERSION)
 BAZEL := $(abspath $(BAZEL_LIB)/bin/bazel)
 ifeq ($(UNAME_OS),Darwin)
