@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -89,6 +89,18 @@ func HandlerWithHeader(key string, value string) HandlerOption {
 		// it takes care of validation
 		// if we switch out grpcurl we will probably change to a metadata.MD object
 		handler.headers = append(handler.headers, fmt.Sprintf("%s:%s", key, value))
+	}
+}
+
+// HandlerWithTLS returns a HandlerOption that enables TLS connections to the remote host with the given configuration attributes.
+func HandlerWithTLS(insecure bool, cacert string, cert string, key string, serverName string) HandlerOption {
+	return func(handler *handler) {
+		handler.tls = true
+		handler.insecure = insecure
+		handler.cacert = cacert
+		handler.cert = cert
+		handler.key = key
+		handler.serverName = serverName
 	}
 }
 

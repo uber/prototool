@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -324,7 +324,7 @@ $ cat input.json | prototool grpc example \
 }`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
+			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.tls, flags.insecure, flags.cacert, flags.cert, flags.key, flags.serverName)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindConfigData(flagSet)
@@ -339,6 +339,12 @@ $ cat input.json | prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindTLS(flagSet)
+			flags.bindInsecure(flagSet)
+			flags.bindCacert(flagSet)
+			flags.bindCert(flagSet)
+			flags.bindKey(flagSet)
+			flags.bindSeverName(flagSet)
 		},
 	}
 

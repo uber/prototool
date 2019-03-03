@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc/credentials"
 	"io"
 	"strings"
 	"time"
@@ -43,6 +44,12 @@ type handler struct {
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
 	headers        []string
+	tls            bool
+	insecure       bool
+	cacert         string
+	cert           string
+	key            string
+	serverName     string
 
 	getter extract.Getter
 }
@@ -97,7 +104,20 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 func (h *handler) dial(address string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), h.connectTimeout)
 	defer cancel()
-	return grpcurl.BlockingDial(ctx, "tcp", address, nil, h.getDialOptions()...)
+	var creds credentials.TransportCredentials
+	if h.tls {
+		var err error
+		creds, err = grpcurl.ClientTransportCredentials(h.insecure, h.cacert, h.cert, h.key)
+		if err != nil {
+			return nil, err
+		}
+		if h.serverName != "" {
+			if err := creds.OverrideServerName(h.serverName); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return grpcurl.BlockingDial(ctx, "tcp", address, creds, h.getDialOptions()...)
 }
 
 func (h *handler) getDialOptions() []grpc.DialOption {

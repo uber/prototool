@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,12 @@ import (
 
 type flags struct {
 	address        string
+	tls            bool
+	insecure       bool
+	cacert         string
+	cert           string
+	key            string
+	serverName     string
 	cachePath      string
 	callTimeout    string
 	configData     string
@@ -161,3 +167,28 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 func (f *flags) bindFix(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
 }
+
+func (f *flags) bindTLS(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.tls, "tls", false, "Enable SSL/TLS connection to remote host")
+}
+
+func (f *flags) bindInsecure(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.insecure, "insecure", false, "Disable host certificate validation for TLS connections. Ignored if --tls is not specified.")
+}
+
+func (f *flags) bindCacert(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.cacert, "cacert", "", "File containing trusted root certificates for verifying the server. Ignored if --tls is not specified.")
+}
+
+func (f *flags) bindCert(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.cert, "cert", "", "File containing client certificate (public key), to present to the server. Ignored if --tls is not specified. Must also provide the --key.")
+}
+
+func (f *flags) bindKey(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.key, "key", "", "File containing client private key, to present to the server. Ignored if --tls is not specified. Must also provide the --cert option.")
+}
+
+func (f *flags) bindSeverName(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.serverName, "server-name", "", "Override server name when validating TLS certificate. Ignored if --tls is not specified.")
+}
+

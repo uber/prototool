@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ type Runner interface {
 	BinaryToJSON(args []string) error
 	JSONToBinary(args []string) error
 	All(args []string, disableFormat, disableLint, fix bool) error
-	GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool) error
+	GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, tls bool, insecure bool, cacert string, cert string, key string, serverName string) error
 }
 
 // RunnerOption is an option for a new Runner.

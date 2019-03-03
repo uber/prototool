@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -593,7 +593,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, fix bool) error 
 	return nil
 }
 
-func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool) error {
+func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, tls bool, insecure bool, cacert string, cert string, key string, serverName string) error {
 	if address == "" {
 		return newExitErrorf(255, "must set address")
 	}
@@ -605,6 +605,9 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	}
 	if data != "" && stdin {
 		return newExitErrorf(255, "must set only one of data or stdin")
+	}
+	if (cert != "") != (key != "") {
+		return newExitErrorf( 255, "If cert is specified, key must be specified")
 	}
 	reader := r.getInputReader(data, stdin)
 
@@ -656,6 +659,12 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		parsedCallTimeout,
 		parsedConnectTimeout,
 		parsedKeepaliveTime,
+		tls,
+		insecure,
+		cacert,
+		cert,
+		key,
+		serverName,
 	).Invoke(fileDescriptorSets, address, method, reader, r.output)
 }
 
@@ -772,6 +781,12 @@ func (r *runner) newGRPCHandler(
 	callTimeout time.Duration,
 	connectTimeout time.Duration,
 	keepaliveTime time.Duration,
+	tls bool,
+	insecure bool,
+	cacert string,
+	cert string,
+	key string,
+	serverName string,
 ) grpc.Handler {
 	handlerOptions := []grpc.HandlerOption{
 		grpc.HandlerWithLogger(r.logger),
@@ -787,6 +802,9 @@ func (r *runner) newGRPCHandler(
 	}
 	if keepaliveTime != 0 {
 		handlerOptions = append(handlerOptions, grpc.HandlerWithKeepaliveTime(keepaliveTime))
+	}
+	if tls {
+		handlerOptions = append(handlerOptions, grpc.HandlerWithTLS(insecure, cacert, cert, key, serverName))
 	}
 	return grpc.NewHandler(handlerOptions...)
 }
