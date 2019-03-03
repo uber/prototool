@@ -29,6 +29,8 @@ type flags struct {
 	address           string
 	cachePath         string
 	callTimeout       string
+	cacert            string
+	cert              string
 	configData        string
 	connectTimeout    string
 	data              string
@@ -43,9 +45,11 @@ type flags struct {
 	gitBranch         string
 	gitTag            string
 	headers           []string
+	insecure          bool
 	includeBeta       bool
 	keepaliveTime     string
 	json              bool
+	key               string
 	listAllLinters    bool
 	listLinters       bool
 	listAllLintGroups bool
@@ -58,7 +62,9 @@ type flags struct {
 	protocBinPath     string
 	protocWKTPath     string
 	protocURL         string
+	serverName        string
 	stdin             bool
+	tls               bool
 	uncomment         bool
 }
 
@@ -201,3 +207,28 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 func (f *flags) bindFix(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
 }
+
+func (f *flags) bindTLS(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.tls, "tls", false, "Enable SSL/TLS connection to remote host")
+}
+
+func (f *flags) bindInsecure(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.insecure, "insecure", false, "Disable host certificate validation for TLS connections. Ignored if --tls is not specified.")
+}
+
+func (f *flags) bindCacert(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.cacert, "cacert", "", "File containing trusted root certificates for verifying the server. Ignored if --tls is not specified.")
+}
+
+func (f *flags) bindCert(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.cert, "cert", "", "File containing client certificate (public key), to present to the server. Ignored if --tls is not specified. Must also provide the --key.")
+}
+
+func (f *flags) bindKey(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.key, "key", "", "File containing client private key, to present to the server. Ignored if --tls is not specified. Must also provide the --cert option.")
+}
+
+func (f *flags) bindServerName(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.serverName, "server-name", "", "Override server name when validating TLS certificate. Ignored if --tls is not specified.")
+}
+

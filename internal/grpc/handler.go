@@ -25,6 +25,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc/credentials"
 	"io"
 	"strings"
 	"time"
@@ -45,6 +46,12 @@ type handler struct {
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
 	headers        []string
+	tls            bool
+	insecure       bool
+	cacert         string
+	cert           string
+	key            string
+	serverName     string
 }
 
 func newHandler(options ...HandlerOption) *handler {
@@ -97,7 +104,11 @@ func (h *handler) dial(address string) (*grpc.ClientConn, error) {
 	if err != nil {
 		return nil, fmt.Errorf("grpc dial: %v", err)
 	}
-	return grpcurl.BlockingDial(ctx, network, address, nil, h.getDialOptions()...)
+	creds, err := h.getClientTransportCredentials()
+	if err != nil {
+		return nil, fmt.Errorf("grpc cred: %v", err)
+	}
+	return grpcurl.BlockingDial(ctx, network, address, creds, h.getDialOptions()...)
 }
 
 func getNetworkAddress(address string) (string, string, error) {
@@ -111,6 +122,23 @@ func getNetworkAddress(address string) (string, string, error) {
 	default:
 		return "", "", fmt.Errorf("invalid network, only tcp or unix allowed: %s", split[0])
 	}
+}
+
+func (h *handler) getClientTransportCredentials() (credentials.TransportCredentials, error) {
+	var creds credentials.TransportCredentials
+	if h.tls {
+		var err error
+		creds, err = grpcurl.ClientTransportCredentials(h.insecure, h.cacert, h.cert, h.key)
+		if err != nil {
+			return nil, err
+		}
+		if h.serverName != "" {
+			if err := creds.OverrideServerName(h.serverName); err != nil {
+				return nil, err
+			}
+		}
+	}
+	return creds, nil
 }
 
 func (h *handler) getDialOptions() []grpc.DialOption {
