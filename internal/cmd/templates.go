@@ -344,7 +344,7 @@ $ cat input.json | prototool grpc example \
 			flags.bindCacert(flagSet)
 			flags.bindCert(flagSet)
 			flags.bindKey(flagSet)
-			flags.bindSeverName(flagSet)
+			flags.bindServerName(flagSet)
 		},
 	}
 

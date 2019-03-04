@@ -188,7 +188,7 @@ func (f *flags) bindKey(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.key, "key", "", "File containing client private key, to present to the server. Ignored if --tls is not specified. Must also provide the --cert option.")
 }
 
-func (f *flags) bindSeverName(flagSet *pflag.FlagSet) {
+func (f *flags) bindServerName(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.serverName, "server-name", "", "Override server name when validating TLS certificate. Ignored if --tls is not specified.")
 }
 
