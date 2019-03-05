@@ -93,6 +93,8 @@ When specifying a directory or set of files for Prototool to operate on, Prototo
 
 If multiple `prototool.yaml` or `prototool.json` files are found that match the input directory or files, an error will be returned.
 
+See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) all available options.
+
 ## File Discovery
 
 In most Prototool commands, you will see help along the following lines:
