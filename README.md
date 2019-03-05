@@ -82,7 +82,7 @@ Recommended base config file:
 
 ```yaml
 protoc:
-  version: 3.6.1
+  version: 3.7.0
 ```
 
 The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc.version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
@@ -242,7 +242,7 @@ prototool cache update
 # Cache to a specific directory path/to/cache
 prototool cache update --cache-path path/to/cache
 # Cache using custom configuration data instead of finding a prototool.yaml file using the file discovery mechanism
-prototool cache update --config-data '{"protoc":{"version":"3.6.1"}}'
+prototool cache update --config-data '{"protoc":{"version":"3.7.0"}}'
 ```
 
 There is also a command `prototool cache delete` which will delete all cached assets of `prototool`,
