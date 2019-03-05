@@ -243,7 +243,7 @@ type GenPlugin struct {
 	// We could have made this a private field and attached a function to it but this keeps
 	// the style of all config structs only having public fields.
 	// https://github.com/uber/prototool/issues/325
-	GetPath func() (string, error)
+	GetPath func() (string, error) `json:"-"`
 	// The type, if any. This will be GenPluginTypeNone if
 	// there is no specific type.
 	Type GenPluginType
