@@ -28,7 +28,14 @@ import (
 	"html/template"
 )
 
-var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when searching for Protobuf files.
+var (
+	baseTmpl = template.Must(template.New("baseTmpl").Parse(`protoc:
+  version: {{.ProtocVersion}}
+lint:
+  group: uber2
+`))
+
+	documentTmpl = template.Must(template.New("documentTmpl").Parse(`# Paths to exclude when searching for Protobuf files.
 # These can either be file or directory names.
 # If there is a directory name, that directory and all sub-directories will be excluded.
 {{.V}}excludes:
@@ -73,7 +80,7 @@ protoc:
   # Run prototool lint --list-all-lint-groups to see all available lint groups.
   # Run prototool lint --list-lint-group GROUP to list the linters in the given lint group.
   # Setting this value will result in lint.rules.no_default being ignored.
-{{.V}}  group: uber2
+  group: uber2
 
   # Linter files to ignore.
   # These can either be file or directory names.
@@ -207,6 +214,7 @@ protoc:
 {{.V}}      file_suffix: bin
 {{.V}}      include_imports: true
 {{.V}}      include_source_info: true`))
+)
 
 type tmplData struct {
 	V             string
@@ -216,7 +224,10 @@ type tmplData struct {
 // Generate generates the data.
 //
 // Set uncomment to true to uncomment the example settings.
-func Generate(protocVersion string, uncomment bool) ([]byte, error) {
+func Generate(protocVersion string, uncomment bool, document bool) ([]byte, error) {
+	if uncomment {
+		document = true
+	}
 	tmplData := &tmplData{
 		ProtocVersion: protocVersion,
 	}
@@ -224,6 +235,10 @@ func Generate(protocVersion string, uncomment bool) ([]byte, error) {
 		tmplData.V = "#"
 	}
 	buffer := bytes.NewBuffer(nil)
+	tmpl := baseTmpl
+	if document {
+		tmpl = documentTmpl
+	}
 	if err := tmpl.Execute(buffer, tmplData); err != nil {
 		return nil, err
 	}
