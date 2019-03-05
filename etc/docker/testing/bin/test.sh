@@ -46,14 +46,14 @@ check_dir_not_exists() {
 check_env GOGO_PROTOBUF_VERSION 1.2.1
 check_env GOLANG_PROTOBUF_VERSION 1.3.0
 check_env GRPC_VERSION 1.18.0
-check_env GRPC_GATEWAY_VERSION 1.7.0
+check_env GRPC_GATEWAY_VERSION 1.8.1
 check_env GRPC_WEB_VERSION 1.0.3
-check_env PROTOBUF_VERSION 3.7.0
+check_env PROTOBUF_VERSION 3.6.1
 check_env TWIRP_VERSION 5.5.2
 check_env YARPC_VERSION 1.36.2
 check_env PROTOTOOL_PROTOC_BIN_PATH /usr/bin/protoc
 check_env PROTOTOOL_PROTOC_WKT_PATH /usr/include
-check_command_output "libprotoc 3.7.0" protoc --version
+check_command_output "libprotoc 3.6.1" protoc --version
 check_which /usr/bin/protoc
 check_which /usr/bin/grpc_cpp_plugin
 check_which /usr/bin/grpc_csharp_plugin
