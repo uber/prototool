@@ -247,11 +247,30 @@ func (r *runner) Gen(args []string, dryRun bool) error {
 	return err
 }
 
-func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) (protoc.FileDescriptorSets, error) {
+func (r *runner) compile(doGen bool, doFileDescriptorSet bool, dryRun bool, meta *meta) (protoc.FileDescriptorSets, error) {
 	if dryRun {
-		return nil, r.printCommands(doGen, meta.ProtoSet)
+		doFileDescriptorSet = false
 	}
-	compileResult, err := r.newCompiler(doGen, doFileDescriptorSet).Compile(meta.ProtoSet)
+	compiler, err := r.newCompiler(doGen, doFileDescriptorSet, false, false, false)
+	if err != nil {
+		return nil, err
+	}
+	if dryRun {
+		return nil, r.doProtocCommands(compiler, meta)
+	}
+	return r.doCompile(compiler, meta)
+}
+
+func (r *runner) compileFullControl(includeImports bool, includeSourceInfo bool, meta *meta) (protoc.FileDescriptorSets, error) {
+	compiler, err := r.newCompiler(false, false, true, includeImports, includeSourceInfo)
+	if err != nil {
+		return nil, err
+	}
+	return r.doCompile(compiler, meta)
+}
+
+func (r *runner) doCompile(compiler protoc.Compiler, meta *meta) (protoc.FileDescriptorSets, error) {
+	compileResult, err := compiler.Compile(meta.ProtoSet)
 	if err != nil {
 		return nil, err
 	}
@@ -265,8 +284,8 @@ func (r *runner) compile(doGen, doFileDescriptorSet, dryRun bool, meta *meta) (p
 	return compileResult.FileDescriptorSets, nil
 }
 
-func (r *runner) printCommands(doGen bool, protoSet *file.ProtoSet) error {
-	commands, err := r.newCompiler(doGen, false).ProtocCommands(protoSet)
+func (r *runner) doProtocCommands(compiler protoc.Compiler, meta *meta) error {
+	commands, err := compiler.ProtocCommands(meta.ProtoSet)
 	if err != nil {
 		return err
 	}
@@ -751,7 +770,21 @@ func (r *runner) newDownloader(config settings.Config) (protoc.Downloader, error
 	return protoc.NewDownloader(config, downloaderOptions...)
 }
 
-func (r *runner) newCompiler(doGen bool, doFileDescriptorSet bool) protoc.Compiler {
+func (r *runner) newCompiler(
+	doGen bool,
+	doFileDescriptorSet bool,
+	doFileDescriptorSetFullControl bool,
+	includeImports bool,
+	includeSourceInfo bool,
+) (protoc.Compiler, error) {
+	if doFileDescriptorSet && doFileDescriptorSetFullControl {
+		return nil, fmt.Errorf("cannot set doFileDescriptorSet and doFileDescriptorSetFullControl")
+	}
+	if !doFileDescriptorSetFullControl {
+		if includeImports || includeSourceInfo {
+			return nil, fmt.Errorf("cannot set includeImports or includeSourceInfo without doFileDescriptorSetFullControl")
+		}
+	}
 	compilerOptions := []protoc.CompilerOption{
 		protoc.CompilerWithLogger(r.logger),
 	}
@@ -791,7 +824,13 @@ func (r *runner) newCompiler(doGen bool, doFileDescriptorSet bool) protoc.Compil
 			protoc.CompilerWithFileDescriptorSet(),
 		)
 	}
-	return protoc.NewCompiler(compilerOptions...)
+	if doFileDescriptorSetFullControl {
+		compilerOptions = append(
+			compilerOptions,
+			protoc.CompilerWithFileDescriptorSetFullControl(includeImports, includeSourceInfo),
+		)
+	}
+	return protoc.NewCompiler(compilerOptions...), nil
 }
 
 func (r *runner) newLintRunner() lint.Runner {

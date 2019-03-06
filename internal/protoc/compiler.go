@@ -69,13 +69,16 @@ var (
 )
 
 type compiler struct {
-	logger              *zap.Logger
-	cachePath           string
-	protocBinPath       string
-	protocWKTPath       string
-	protocURL           string
-	doGen               bool
-	doFileDescriptorSet bool
+	logger                             *zap.Logger
+	cachePath                          string
+	protocBinPath                      string
+	protocWKTPath                      string
+	protocURL                          string
+	doGen                              bool
+	doFileDescriptorSet                bool
+	fileDescriptorSetFullControl       bool
+	fileDescriptorSetIncludeImports    bool
+	fileDescriptorSetIncludeSourceInfo bool
 }
 
 func newCompiler(options ...CompilerOption) *compiler {
@@ -350,9 +353,15 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 			// if its a temporary file, that means we actually care about the output
 			// so we do --include_imports to get all necessary info in the output file descriptor set
 			if descriptorSetTempFilePath != "" {
-				// TODO(pedge): we will need source info if we switch out emicklei/proto
-				//iArgs = append(iArgs, "--include_source_info")
-				iArgs = append(iArgs, "--include_imports")
+				// we included imports historically by default
+				// if fileDescriptorSetFullControl is not set, add include imports
+				// else, if fileDescriptorSetIncludeImports is set, still include imports
+				if !c.fileDescriptorSetFullControl || c.fileDescriptorSetIncludeImports {
+					iArgs = append(iArgs, "--include_imports")
+				}
+				if c.fileDescriptorSetIncludeSourceInfo {
+					iArgs = append(iArgs, "--include_source_info")
+				}
 			}
 			for _, protoFile := range protoFiles {
 				iArgs = append(iArgs, protoFile.Path)
