@@ -39,17 +39,17 @@ var jsonpbPrettyMarshaler = &jsonpb.Marshaler{Indent: "  "}
 var _ grpcurl.InvocationEventHandler = &invocationEventHandler{}
 
 type invocationEventHandler struct {
-	output     io.Writer
-	logger     *zap.Logger
-	jsonOutput bool
-	err        error
+	output io.Writer
+	logger *zap.Logger
+	json   bool
+	err    error
 }
 
-func newInvocationEventHandler(output io.Writer, logger *zap.Logger, jsonOutput bool) *invocationEventHandler {
+func newInvocationEventHandler(output io.Writer, logger *zap.Logger, json bool) *invocationEventHandler {
 	return &invocationEventHandler{
-		output:     output,
-		logger:     logger,
-		jsonOutput: jsonOutput,
+		output: output,
+		logger: logger,
+		json:   json,
 	}
 }
 
@@ -58,7 +58,7 @@ func (i *invocationEventHandler) OnResolveMethod(*desc.MethodDescriptor) {}
 func (i *invocationEventHandler) OnSendHeaders(metadata.MD) {}
 
 func (i *invocationEventHandler) OnReceiveHeaders(headers metadata.MD) {
-	if !i.jsonOutput {
+	if !i.json {
 		return
 	}
 	if len(headers) != 0 {
@@ -69,7 +69,7 @@ func (i *invocationEventHandler) OnReceiveHeaders(headers metadata.MD) {
 }
 
 func (i *invocationEventHandler) OnReceiveResponse(message proto.Message) {
-	if !i.jsonOutput {
+	if !i.json {
 		i.println(i.marshal(message, true))
 		return
 	}
@@ -82,7 +82,7 @@ func (i *invocationEventHandler) OnReceiveTrailers(s *status.Status, trailers me
 	if err := s.Err(); err != nil {
 		i.err = err
 	}
-	if !i.jsonOutput {
+	if !i.json {
 		return
 	}
 	ss := i.marshal(s.Proto(), false)

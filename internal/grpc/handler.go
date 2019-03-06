@@ -41,7 +41,7 @@ import (
 
 type handler struct {
 	logger         *zap.Logger
-	jsonOutput     bool
+	json           bool
 	callTimeout    time.Duration
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
@@ -74,7 +74,7 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 		return err
 	}
 	defer func() { _ = clientConn.Close() }()
-	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger, h.jsonOutput)
+	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger, h.json)
 	ctx, cancel := context.WithTimeout(context.Background(), h.callTimeout)
 	defer cancel()
 	if err := grpcurl.InvokeRPC(

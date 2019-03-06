@@ -844,7 +844,7 @@ func (r *runner) newGRPCHandler(
 	callTimeout time.Duration,
 	connectTimeout time.Duration,
 	keepaliveTime time.Duration,
-	jsonOutput bool,
+	json bool,
 ) grpc.Handler {
 	handlerOptions := []grpc.HandlerOption{
 		grpc.HandlerWithLogger(r.logger),
@@ -861,8 +861,8 @@ func (r *runner) newGRPCHandler(
 	if keepaliveTime != 0 {
 		handlerOptions = append(handlerOptions, grpc.HandlerWithKeepaliveTime(keepaliveTime))
 	}
-	if jsonOutput {
-		handlerOptions = append(handlerOptions, grpc.HandlerWithJSONOutput())
+	if json {
+		handlerOptions = append(handlerOptions, grpc.HandlerWithJSON())
 	}
 	return grpc.NewHandler(handlerOptions...)
 }
