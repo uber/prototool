@@ -25,7 +25,6 @@ import (
 )
 
 type flags struct {
-	allowBetaDeps     bool
 	address           string
 	cachePath         string
 	callTimeout       string
@@ -44,7 +43,6 @@ type flags struct {
 	fix               bool
 	gitBranch         string
 	headers           []string
-	includeBeta       bool
 	keepaliveTime     string
 	json              bool
 	listAllLinters    bool
@@ -61,10 +59,6 @@ type flags struct {
 	protocURL         string
 	stdin             bool
 	uncomment         bool
-}
-
-func (f *flags) bindAllowBetaDeps(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.allowBetaDeps, "allow-beta-deps", false, "Allow stable packages to depend on beta packages. This is implicitly set if --include-beta is set.")
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -133,10 +127,6 @@ func (f *flags) bindGitBranch(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 	flagSet.StringSliceVarP(&f.headers, "header", "H", []string{}, "Additional request headers in 'name:value' format.")
-}
-
-func (f *flags) bindIncludeBeta(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.includeBeta, "include-beta", false, "Include beta packages in breaking change detection.")
 }
 
 func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
