@@ -565,6 +565,10 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	).Invoke(fileDescriptorSets.Unwrap(), address, method, reader, r.output)
 }
 
+func (r *runner) DescriptorSet(args []string, includeImports bool, includeSourceInfo bool, outputPath string, tmp bool) error {
+	return nil
+}
+
 func (r *runner) InspectPackages(args []string) error {
 	packageSet, _, err := r.getPackageSetAndConfig(args)
 	if err != nil {
