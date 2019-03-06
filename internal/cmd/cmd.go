@@ -114,14 +114,16 @@ func getRootCommand(develMode bool, exitCodeAddr *int, args []string, stdin io.R
 	cacheCmd.AddCommand(cacheUpdateCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	cacheCmd.AddCommand(cacheDeleteCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(cacheCmd)
+	breakCmd := &cobra.Command{Use: "break", Short: "Top-level command for breaking change commands."}
+	breakCmd.AddCommand(breakCheckCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(breakCmd)
+	experimentalCmd := &cobra.Command{Use: "x", Short: "Top-level command for experimental commands. These may change between minor versions."}
 	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
 	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(inspectCmd)
-	breakCmd := &cobra.Command{Use: "break", Short: "Top-level command for breaking change commands."}
-	breakCmd.AddCommand(breakCheckCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(breakCmd)
+	experimentalCmd.AddCommand(inspectCmd)
+	rootCmd.AddCommand(experimentalCmd)
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())

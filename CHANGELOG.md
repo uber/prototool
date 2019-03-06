@@ -36,8 +36,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `generate.plugins.include_imports` and
   `generate.plugins.include_source_info` to be used with the built-in
   `descriptor_set` plugin.
-- Add `inspect` top-level command with Protobuf inspection capabilities.
 - Add `cache` top-level command to allow management of the `protoc` cache.
+- Add `x` top-level command for experimental functionality.
+- Add `inspect` command under `x` with Protobuf inspection capabilities.
 - Add `--error-format` flag to allow specific error fields to be printed.
 - Add file locking around the `protoc` downloader to eliminate concurrency
   issues where multiple `prototool` invocations may be accessing the cache

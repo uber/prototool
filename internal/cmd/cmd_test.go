@@ -1196,7 +1196,7 @@ func TestInspectPackages(t *testing.T) {
 		`bar
 foo
 google.protobuf`,
-		"inspect", "packages", "testdata/foo",
+		"x", "inspect", "packages", "testdata/foo",
 	)
 }
 
@@ -1207,21 +1207,21 @@ func TestInspectPackageDeps(t *testing.T) {
 		0,
 		`bar
 google.protobuf`,
-		"inspect", "package-deps", "testdata/foo", "--name", "foo",
+		"x", "inspect", "package-deps", "testdata/foo", "--name", "foo",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		``,
-		"inspect", "package-deps", "testdata/foo", "--name", "bar",
+		"x", "inspect", "package-deps", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		``,
-		"inspect", "package-deps", "testdata/foo", "--name", "google.protobuf",
+		"x", "inspect", "package-deps", "testdata/foo", "--name", "google.protobuf",
 	)
 }
 
@@ -1231,21 +1231,21 @@ func TestInspectPackageImporters(t *testing.T) {
 		true,
 		0,
 		``,
-		"inspect", "package-importers", "testdata/foo", "--name", "foo",
+		"x", "inspect", "package-importers", "testdata/foo", "--name", "foo",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		`foo`,
-		"inspect", "package-importers", "testdata/foo", "--name", "bar",
+		"x", "inspect", "package-importers", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		`foo`,
-		"inspect", "package-importers", "testdata/foo", "--name", "google.protobuf",
+		"x", "inspect", "package-importers", "testdata/foo", "--name", "google.protobuf",
 	)
 }
 
