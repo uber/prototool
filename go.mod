@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/cpuguy83/go-md2man v1.0.8 // indirect
-	github.com/emicklei/proto v1.6.8
+	github.com/emicklei/proto v1.6.9
 	github.com/fullstorydev/grpcurl v1.1.0
 	github.com/gobuffalo/flect v0.1.0
 	github.com/gofrs/flock v0.7.1
