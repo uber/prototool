@@ -43,7 +43,6 @@ type flags struct {
 	errorFormat       string
 	fix               bool
 	gitBranch         string
-	gitTag            string
 	headers           []string
 	includeBeta       bool
 	keepaliveTime     string
@@ -129,11 +128,7 @@ func (f *flags) bindErrorFormat(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindGitBranch(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.gitBranch, "git-branch", "", "The git branch to check against. The default is the default branch.")
-}
-
-func (f *flags) bindGitTag(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.gitTag, "git-tag", "", "The git tag to check against. The default is to not use tags and use the default branch.")
+	flagSet.StringVar(&f.gitBranch, "git-branch", "", "The git branch or tag to check against. The default is the default branch.")
 }
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
