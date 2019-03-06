@@ -1,0 +1,99 @@
+// Copyright (c) 2019 Uber Technologies, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+syntax = "proto3";
+
+package uber.foo.v1;
+
+option csharp_namespace = "Uber.Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.uber.foo.v1";
+option objc_class_prefix = "UFX";
+option php_namespace = "Uber\\Foo\\V1";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "uber/bar/v1/bar.proto";
+
+// Hello is a hello.
+enum Hello {
+  HELLO_INVALID = 0;
+  HELLO_UNSET = 1;
+  HELLO_TREE = 2;
+  HELLO_BALLOON = 3;
+}
+
+// Foo is a foo.
+message Foo {
+  // Bar is a bar.
+  message Bar {
+    // Baz is a baz.
+    enum Baz {
+      BAZ_INVALID = 0;
+    }
+    // Bat is a bat.
+    enum Bat {
+      BAT_INVALID = 0;
+    }
+    Baz baz = 1;
+    Bat bat = 2;
+  }
+  Bar bar = 1;
+}
+
+// Bar is a bar.
+enum Bar {
+  BAR_INVALID = 0;
+}
+
+// Barr is a barr.
+message Barr {
+  int64 hello = 1;
+  google.protobuf.Timestamp barr_time = 2;
+  bar.v1.Hello bar_hello = 3;
+}
+
+// Another is another message.
+message Another {
+  int64 one = 1;
+  string two = 2;
+  Another another = 3;
+  repeated string four = 4;
+  Hello hello = 5;
+  map<string, int64> m = 6;
+  oneof oneof_oneof {
+    int64 seven = 7;
+    string eight = 8;
+  }
+  repeated Another nine = 9;
+  google.protobuf.Duration another_duration = 10;
+}
+
+// HasWKT has Well-Known Types.
+message HasWKT {
+  google.protobuf.Duration wkt_duration = 1;
+}
+
+// Bazz is a bazzzz.
+message Bazz {
+  int64 one = 1;
+}

@@ -1,0 +1,26 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["reflect.go"],
+    importpath = "github.com/uber/prototool/internal/reflect",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/reflect/gen/uber/proto/reflect/v1:go_default_library",
+        "//internal/strs:go_default_library",
+        "@com_github_golang_protobuf//proto:go_default_library",
+        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["reflect_test.go"],
+    embed = [":go_default_library"],
+    deps = [
+        "//internal/reflect/gen/uber/proto/reflect/v1:go_default_library",
+        "//internal/testing:go_default_library",
+        "@com_github_golang_protobuf//jsonpb:go_default_library_gen",
+        "@com_github_stretchr_testify//require:go_default_library",
+    ],
+)

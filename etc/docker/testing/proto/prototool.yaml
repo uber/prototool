@@ -1,0 +1,77 @@
+lint:
+  group: uber2
+generate:
+  go_options:
+    import_path: github.com/uber/prototool/etc/docker/testing/proto
+  plugins:
+    - name: cpp
+      output: ../gen/cpp
+    - name: csharp
+      output: ../gen/csharp
+    - name: java
+      output: ../gen/java
+    - name: js
+      output: ../gen/js
+    - name: objc
+      output: ../gen/objc
+    - name: php
+      output: ../gen/php
+    - name: python
+      output: ../gen/python
+    - name: ruby
+      output: ../gen/ruby
+    - name: grpc-cpp
+      path: grpc_cpp_plugin
+      output: ../gen/cpp
+    - name: grpc-csharp
+      path: grpc_csharp_plugin
+      output: ../gen/csharp
+    - name: grpc-node
+      path: grpc_node_plugin
+      output: ../gen/node
+    - name: grpc-objective_c
+      path: grpc_objective_c_plugin
+      output: ../gen/objective_c
+    - name: grpc-php
+      path: grpc_php_plugin
+      output: ../gen/php
+    - name: grpc-python
+      path: grpc_python_plugin
+      output: ../gen/python
+    - name: grpc-ruby
+      path: grpc_ruby_plugin
+      output: ../gen/ruby
+    - name: go
+      type: go
+      output: ../gen/go
+    - name: gofast
+      type: go
+      output: ../gen/gofast
+    - name: gogo
+      type: gogo
+      output: ../gen/gogo
+    - name: gogofast
+      type: gogo
+      output: ../gen/gogofast
+    - name: gogofaster
+      type: gogo
+      output: ../gen/gogofaster
+    - name: gogoslick
+      type: gogo
+      output: ../gen/gogoslick
+    - name: grpc-gateway
+      type: go
+      output: ../gen/grpc-gateway
+    - name: grpc-web
+      flags: mode=grpcweb
+      output: ../gen/grpc-web
+    - name: swagger
+      output: ../gen/swagger
+    - name: twirp
+      type: go
+      output: ../gen/twirp
+    - name: twirp_python
+      output: ../gen/twirp_python
+    - name: yarpc-go
+      type: gogo
+      output: ../gen/yarpc-go

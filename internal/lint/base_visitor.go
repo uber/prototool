@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/text"
 )
 
@@ -31,9 +32,8 @@ var _ proto.Visitor = baseVisitor{}
 
 type baseVisitor struct{}
 
-func (baseVisitor) OnStart(*proto.Proto) error { return nil }
-func (baseVisitor) Finally() error             { return nil }
-
+func (baseVisitor) OnStart(*FileDescriptor) error         { return nil }
+func (baseVisitor) Finally() error                        { return nil }
 func (baseVisitor) VisitMessage(m *proto.Message)         {}
 func (baseVisitor) VisitService(s *proto.Service)         {}
 func (baseVisitor) VisitSyntax(s *proto.Syntax)           {}
@@ -65,6 +65,25 @@ func (v baseAddVisitor) AddFailuref(position scanner.Position, format string, ar
 	v.add(text.NewFailuref(position, "", format, args...))
 }
 
+type baseAddSuppressableVisitor struct {
+	baseVisitor
+	fileDescriptor *FileDescriptor
+	add            func(*file.ProtoSet, *proto.Comment, *text.Failure)
+}
+
+func newBaseAddSuppressableVisitor(add func(*file.ProtoSet, *proto.Comment, *text.Failure)) *baseAddSuppressableVisitor {
+	return &baseAddSuppressableVisitor{add: add}
+}
+
+func (v *baseAddSuppressableVisitor) OnStart(fileDescriptor *FileDescriptor) error {
+	v.fileDescriptor = fileDescriptor
+	return nil
+}
+
+func (v *baseAddSuppressableVisitor) AddFailuref(comment *proto.Comment, position scanner.Position, format string, args ...interface{}) {
+	v.add(v.fileDescriptor.ProtoSet, comment, text.NewFailuref(position, "", format, args...))
+}
+
 // extendedVisitor extends the proto.Visitor interface.
 // extendedVisitors are expected to be called with one file at a time,
 // and are not thread-safe.
@@ -72,12 +91,12 @@ type extendedVisitor interface {
 	proto.Visitor
 
 	// OnStart is called when visiting is started.
-	OnStart(*proto.Proto) error
+	OnStart(*FileDescriptor) error
 	// Finally is called when visiting is done.
 	Finally() error
 }
 
-func runVisitor(visitor extendedVisitor, descriptors []*proto.Proto) error {
+func runVisitor(visitor extendedVisitor, descriptors []*FileDescriptor) error {
 	for _, descriptor := range descriptors {
 		if err := visitor.OnStart(descriptor); err != nil {
 			return err

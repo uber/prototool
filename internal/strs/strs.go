@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -85,6 +85,11 @@ func IsUpperSnakeCase(s string) bool {
 	return true
 }
 
+// ToLowerSnakeCase converts s to lower_snake_case.
+func ToLowerSnakeCase(s string) string {
+	return strings.ToLower(toSnake(s))
+}
+
 // ToUpperSnakeCase converts s to UPPER_SNAKE_CASE.
 func ToUpperSnakeCase(s string) string {
 	return strings.ToUpper(toSnake(s))
@@ -114,27 +119,82 @@ func ToUpperCamelCase(s string) string {
 	return output
 }
 
-// DedupeSort returns s with no duplicates and no empty strings, sorted.
-// If modifier is not nil, modifier will be applied to each element in s.
-func DedupeSort(s []string, modifier func(string) string) []string {
-	m := make(map[string]struct{}, len(s))
-	o := make([]string, 0, len(m))
-	for _, e := range s {
-		if e == "" {
-			continue
-		}
-		key := e
-		if modifier != nil {
-			key = modifier(e)
-		}
-		if _, ok := m[key]; ok {
-			continue
-		}
-		m[key] = struct{}{}
-		o = append(o, key)
+// SplitCamelCaseWord splits a CamelCase word into its parts.
+//
+// If s is empty, returns nil.
+// If s is not CamelCase, returns nil.
+func SplitCamelCaseWord(s string) []string {
+	if s == "" {
+		return nil
 	}
-	sort.Strings(o)
-	return o
+	s = strings.TrimSpace(s)
+	if !IsCamelCase(s) {
+		return nil
+	}
+	return SplitSnakeCaseWord(toSnake(s))
+}
+
+// SplitSnakeCaseWord splits a snake_case word into its parts.
+//
+// If s is empty, returns nil.
+// If s is not snake_case, returns nil.
+func SplitSnakeCaseWord(s string) []string {
+	if s == "" {
+		return nil
+	}
+	s = strings.TrimSpace(s)
+	if !isSnake(s) {
+		return nil
+	}
+	var previous rune
+	var words []string
+	var curWord string
+	for _, c := range s {
+		if c != '_' {
+			if previous == '_' {
+				if curWord != "" {
+					words = append(words, curWord)
+				}
+				curWord = ""
+			}
+			curWord += string(c)
+		}
+		previous = c
+	}
+	if curWord != "" {
+		words = append(words, curWord)
+	}
+	return words
+}
+
+// SortUniq returns the unique sorted non-empty values of s.
+func SortUniq(s []string) []string {
+	return SortUniqModify(s, nil)
+}
+
+// SortUniqModify returns the unique sorted non-empty values of s.
+// If modifier is not nil, modifier will be applied to each element in s.
+func SortUniqModify(s []string, modifier func(string) string) []string {
+	m := make(map[string]struct{})
+	for _, e := range s {
+		if modifier != nil {
+			e = modifier(e)
+		}
+		if e != "" {
+			m[e] = struct{}{}
+		}
+	}
+	return MapToSortedSlice(m)
+}
+
+// MapToSortedSlice returns the sorted keys of m.
+func MapToSortedSlice(m map[string]struct{}) []string {
+	s := make([]string, 0, len(m))
+	for e := range m {
+		s = append(s, e)
+	}
+	sort.Strings(s)
+	return s
 }
 
 // Intersection return the intersection between one and
@@ -183,12 +243,27 @@ func IsUppercase(s string) bool {
 	return strings.ToUpper(s) == s
 }
 
+// isSnake returns true if s only contains letters, digits, and/or underscores.
+// s MUST NOT begin or end with an underscore.
+func isSnake(s string) bool {
+	if s == "" || s[0] == '_' || s[len(s)-1] == '_' {
+		return false
+	}
+	for _, r := range s {
+		if !(isLetter(r) || isDigit(r) || r == '_') {
+			return false
+		}
+	}
+	return true
+}
+
 // toSnake converts s to snake_case.
 // It is assumed s has no spaces.
 func toSnake(s string) string {
 	output := ""
+	s = strings.TrimSpace(s)
 	for i, c := range s {
-		if i > 0 && isUpper(c) && output[len(output)-1] != '_' && i < len(s)-1 && !isUpper(rune(s[i+1])) {
+		if i > 0 && isUpper(c) && output[len(output)-1] != '_' && ((i < len(s)-1 && !isUpper(rune(s[i+1]))) || (isLower(rune(s[i-1])))) {
 			output += "_" + string(c)
 		} else {
 			output += string(c)

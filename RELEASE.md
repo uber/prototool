@@ -122,3 +122,11 @@ This document outlines how to create a release of prototool.
     git commit -m 'Back to development'
     git push origin $BRANCH
     ```
+
+15. Update the Homebrew formula using `brew bump-formula-pr`. This will create
+    a fork of github.com/Homebrew/homebrew-core and create a PR with the
+    updated formula for Prototool.
+
+    ```
+    brew bump-formula-pr --url=https://github.com/uber/prototool/archive/v$VERSION.tar.gz prototool
+    ```

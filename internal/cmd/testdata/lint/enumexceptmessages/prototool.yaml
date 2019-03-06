@@ -1,0 +1,8 @@
+lint:
+  rules:
+    add:
+      - ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE
+      - ENUM_ZERO_VALUES_INVALID_EXCEPT_MESSAGE
+    remove:
+      - ENUM_FIELD_PREFIXES
+      - ENUM_ZERO_VALUES_INVALID

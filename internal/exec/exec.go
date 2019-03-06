@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,25 +45,22 @@ func (e *ExitError) Error() string {
 // The args given are the args from the command line.
 // Each additional parameter generally refers to a command-specific flag.
 type Runner interface {
-	Init(args []string, uncomment bool) error
+	Init(args []string, uncomment bool, document bool) error
 	Create(args []string, pkg string) error
 	Version() error
-	Download() error
-	Clean() error
+	CacheUpdate(args []string) error
+	CacheDelete() error
 	Files(args []string) error
 	Compile(args []string, dryRun bool) error
 	Gen(args []string, dryRun bool) error
-	DescriptorProto(args []string) error
-	FieldDescriptorProto(args []string) error
-	ServiceDescriptorProto(args []string) error
-	Lint(args []string, listAllLinters bool, listLinters bool) error
-	ListLintGroup(group string) error
-	ListAllLintGroups() error
+	Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string) error
 	Format(args []string, overwrite, diffMode, lintMode, fix bool) error
-	BinaryToJSON(args []string) error
-	JSONToBinary(args []string) error
 	All(args []string, disableFormat, disableLint, fix bool) error
-	GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, jsonOutput bool) error
+	GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, json bool) error
+	InspectPackages(args []string) error
+	InspectPackageDeps(args []string, name string) error
+	InspectPackageImporters(args []string, name string) error
+	BreakCheck(args []string, gitBranch string, gitTag string, includeBeta bool, allowBetaDeps bool) error
 }
 
 // RunnerOption is an option for a new Runner.
@@ -78,6 +75,13 @@ func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 	}
 }
 
+// RunnerWithDevelMode returns a RunnerOption that allows devel-mode.
+func RunnerWithDevelMode() RunnerOption {
+	return func(runner *runner) {
+		runner.develMode = true
+	}
+}
+
 // RunnerWithCachePath returns a RunnerOption that uses the given cache path.
 func RunnerWithCachePath(cachePath string) RunnerOption {
 	return func(runner *runner) {
@@ -85,18 +89,46 @@ func RunnerWithCachePath(cachePath string) RunnerOption {
 	}
 }
 
+// RunnerWithConfigData returns a RunnerOption that uses the given config path.
+func RunnerWithConfigData(configData string) RunnerOption {
+	return func(runner *runner) {
+		runner.configData = configData
+	}
+}
+
+// RunnerWithJSON returns a RunnerOption that will print failures as JSON.
+func RunnerWithJSON() RunnerOption {
+	return func(runner *runner) {
+		runner.json = true
+	}
+}
+
+// RunnerWithErrorFormat returns a RunnerOption that uses the given colon-separated
+// error format. The default is filename:line:column:message.
+func RunnerWithErrorFormat(errorFormat string) RunnerOption {
+	return func(runner *runner) {
+		runner.errorFormat = errorFormat
+	}
+}
+
+// RunnerWithProtocBinPath returns a RunnerOption that uses the given protoc binary path.
+func RunnerWithProtocBinPath(protocBinPath string) RunnerOption {
+	return func(runner *runner) {
+		runner.protocBinPath = protocBinPath
+	}
+}
+
+// RunnerWithProtocWKTPath returns a RunnerOption that uses the given path to include the well-known types.
+func RunnerWithProtocWKTPath(protocWKTPath string) RunnerOption {
+	return func(runner *runner) {
+		runner.protocWKTPath = protocWKTPath
+	}
+}
+
 // RunnerWithProtocURL returns a RunnerOption that uses the given protoc zip file URL.
 func RunnerWithProtocURL(protocURL string) RunnerOption {
 	return func(runner *runner) {
 		runner.protocURL = protocURL
-	}
-}
-
-// RunnerWithPrintFields returns a RunnerOption that uses the given colon-separated
-// print fields. The default is filename:line:column:message.
-func RunnerWithPrintFields(printFields string) RunnerOption {
-	return func(runner *runner) {
-		runner.printFields = printFields
 	}
 }
 

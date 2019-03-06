@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package foo;
+
+option go_package = "foopb";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+message Bar {
+  google.protobuf.Timestamp one = 1;
+  google.protobuf.Duration two = 2;
+  oneof test {
+    google.protobuf.Timestamp three = 3;
+    google.protobuf.Duration four = 4;
+  }
+  // Make sure this is allowed.
+  google.protobuf.Timestamp time = 5;
+}

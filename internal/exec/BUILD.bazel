@@ -1,0 +1,29 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "exec.go",
+        "runner.go",
+    ],
+    importpath = "github.com/uber/prototool/internal/exec",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/breaking:go_default_library",
+        "//internal/cfginit:go_default_library",
+        "//internal/create:go_default_library",
+        "//internal/diff:go_default_library",
+        "//internal/extract:go_default_library",
+        "//internal/file:go_default_library",
+        "//internal/format:go_default_library",
+        "//internal/git:go_default_library",
+        "//internal/grpc:go_default_library",
+        "//internal/lint:go_default_library",
+        "//internal/protoc:go_default_library",
+        "//internal/reflect:go_default_library",
+        "//internal/settings:go_default_library",
+        "//internal/text:go_default_library",
+        "//internal/vars:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
+)

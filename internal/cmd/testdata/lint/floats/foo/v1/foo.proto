@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";
+
+message One {
+  // This is a field we are ok with having floats.
+  //
+  // @suppresswarnings floats
+  float one = 1;
+  // @suppresswarnings floats
+  float two = 2;
+  float three = 3;
+  float four = 4;
+  double five = 5;
+}

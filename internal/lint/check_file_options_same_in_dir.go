@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,12 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var fileOptionsCSharpNamespaceSameInDirLinter = NewLinter(
+	"FILE_OPTIONS_CSHARP_NAMESPACE_SAME_IN_DIR",
+	`Verifies that the file option "csharp_namespace" of all files in a directory are the same.`,
+	newCheckFileOptionsSameInDir("csharp_namespace"),
+)
+
 var fileOptionsGoPackageSameInDirLinter = NewLinter(
 	"FILE_OPTIONS_GO_PACKAGE_SAME_IN_DIR",
 	`Verifies that the file option "go_package" of all files in a directory are the same.`,
@@ -47,8 +53,20 @@ var fileOptionsJavaPackageSameInDirLinter = NewLinter(
 	newCheckFileOptionsSameInDir("java_package"),
 )
 
-func newCheckFileOptionsSameInDir(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+var fileOptionsOBJCClassPrefixSameInDirLinter = NewLinter(
+	"FILE_OPTIONS_OBJC_CLASS_PREFIX_SAME_IN_DIR",
+	`Verifies that the file option "objc_class_prefix" of all files in a directory are the same.`,
+	newCheckFileOptionsSameInDir("objc_class_prefix"),
+)
+
+var fileOptionsPHPNamespaceSameInDirLinter = NewLinter(
+	"FILE_OPTIONS_PHP_NAMESPACE_SAME_IN_DIR",
+	`Verifies that the file option "php_namespace" of all files in a directory are the same.`,
+	newCheckFileOptionsSameInDir("php_namespace"),
+)
+
+func newCheckFileOptionsSameInDir(fileOption string) func(func(*text.Failure), string, []*FileDescriptor) error {
+	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		visitor := &fileOptionsSameInDirVisitor{
 			baseAddVisitor:   newBaseAddVisitor(add),
 			fileOption:       fileOption,
@@ -87,7 +105,7 @@ type fileOptionsSameInDirVisitor struct {
 	option *proto.Option
 }
 
-func (v *fileOptionsSameInDirVisitor) OnStart(*proto.Proto) error {
+func (v *fileOptionsSameInDirVisitor) OnStart(*FileDescriptor) error {
 	v.option = nil
 	return nil
 }

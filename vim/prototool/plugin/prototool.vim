@@ -65,6 +65,15 @@ function! PrototoolCreate() abort
     endif
 endfunction
 
+function! PrototoolCreateReadPost() abort
+    if exists('g:prototool_create_enable')
+      if line('$') == 1 && getline(1) == ''
+        silent! execute '!prototool create %'
+        silent! edit
+      endif
+    endif
+endfunction
+
 " default functionality below
 
 call PrototoolFormatDisable()
@@ -72,3 +81,4 @@ call PrototoolCreateEnable()
 
 autocmd BufEnter,BufWritePost *.proto :call PrototoolFormat()
 autocmd BufNewFile *.proto :call PrototoolCreate()
+autocmd BufReadPost *.proto :call PrototoolCreateReadPost()

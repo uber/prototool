@@ -1,14 +1,16 @@
 # Paths to exclude when searching for Protobuf files.
+# These can either be file or directory names.
+# If there is a directory name, that directory and all sub-directories will be excluded.
 excludes:
   - path/to/a
   - path/to/b/file.proto
 
 # Protoc directives.
 protoc:
-  # The Protobuf version to use from https://github.com/google/protobuf/releases.
-  # By default use 3.6.1.
+  # The Protobuf version to use from https://github.com/protocolbuffers/protobuf/releases.
+  # By default use 3.7.0.
   # You probably want to set this to make your builds completely reproducible.
-  version: 3.6.1
+  version: 3.7.0
 
   # Additional paths to include with -I to protoc.
   # By default, the directory of the config file is included,
@@ -36,7 +38,16 @@ create:
 
 # Lint directives.
 lint:
+  # The lint group to use.
+  # The default group is the "default" lint group, which is equal to the "uber1" lint group.
+  # Run prototool lint --list-all-lint-groups to see all available lint groups.
+  # Run prototool lint --list-lint-group GROUP to list the linters in the given lint group.
+  # Setting this value will result in lint.rules.no_default being ignored.
+  group: uber2
+
   # Linter files to ignore.
+  # These can either be file or directory names.
+  # If there is a directory name, that directory and all sub-directories will be ignored.
   ignores:
     - id: RPC_NAMES_CAMEL_CASE
       files:
@@ -44,12 +55,15 @@ lint:
         - path/to/bar.proto
     - id: SYNTAX_PROTO3
       files:
-        - path/to/foo.proto
+        - path/to/dir
 
   # Linter rules.
-  # Run prototool list-all-linters to see all available linters.
+  # Run prototool lint --list-all-linters to see all available linters.
+  # Run prototool lint --list-linters to see the currently configured linters.
   rules:
     # Determines whether or not to include the default set of linters.
+    # This allows all linters to be turned off except those explicitly specified in add.
+    # This value is ignored if lint.group is set.
     no_default: true
 
     # The specific linters to add.
@@ -60,6 +74,33 @@ lint:
     # The specific linters to remove.
     remove:
       - ENUM_NAMES_CAMEL_CASE
+
+  # The path to the file header or the file header content for all Protobuf files.
+  # If either path or content is set and the FILE_HEADER linter is turned on,
+  # files will be checked to begin with the given header, and format --fix
+  # will place this header before the syntax declaration. Note that
+  # format --fix will delete anything before the syntax declaration
+  # if this is set.
+  #
+  # Set path to use a file's contents for the header. Path must be relative.
+  # Set content to directly specify the header.
+  # **Both path and content cannot be set at the same time. They are only done
+  # so here for example purposes.**
+  #
+  # If is_commented is set, this file is assumed to already have comments
+  # and will be added directly. If is_commented is not set, "// " will be
+  # added before every line.
+  file_header:
+    path: path/to/protobuf_file_header.txt
+    content: |
+      //
+      // Acme, Inc. (c) 2019
+      //
+    is_commented: true
+  # Override the default java_package file option prefix of "com".
+  # If this is set, this will affect lint, create, and format --fix to use.
+  # this prefix instead of "com".
+  java_package_prefix: au.com
 
 # Code generation directives.
 generate:
@@ -102,7 +143,9 @@ generate:
       # Optional override for the plugin path. For example, if you set set path to
       # /usr/local/bin/gogo_plugin", prototool will add the
       # "--plugin=protoc-gen-gogo=/usr/local/bin/gogo_plugin" flag to protoc calls.
-      path: /usr/local/bin/gogo
+      # If set to "gogo_plugin", prototool will search your path for "gogo_plugin",.
+      # and fail if "gogo_plugin" cannot be found.
+      path: gogo_plugin
 
     - name: yarpc-go
       type: gogo
@@ -114,3 +157,23 @@ generate:
 
     - name: java
       output: ../../.gen/proto/java
+
+      # Optional file suffix for plugins that output a single file as opposed
+      # to writing a set of files to a directory. This is only valid in two
+      # known cases:
+      # - For the java plugin, set this to "jar" to produce jars
+      #   https://developers.google.com/protocol-buffers/docs/reference/java-generated#invocation
+      # - For the descriptor_set plugin, this is required as using descriptor_set
+      #   requires a file to be given instead of a directory.
+      file_suffix: jar
+
+      # descriptor_set is special, and uses the --descriptor_set_out flag on protoc.
+      # file_suffix is required, and the options include_imports and include_source_info
+      # can be optionally set to add the flags --include_imports and --include_source-info.
+      # The include_imports and include_source_info options are not valid for any
+      # other plugin name.
+    - name: descriptor_set
+      output: ../../.gen/proto/descriptor
+      file_suffix: bin
+      include_imports: true
+      include_source_info: true

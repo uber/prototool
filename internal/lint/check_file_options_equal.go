@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,18 +28,34 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var fileOptionsEqualCSharpNamespaceCapitalizedLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_CSHARP_NAMESPACE_CAPITALIZED",
+	`Verifies that the file option "csharp_namespace" is the capitalized version of the package.`,
+	newCheckFileOptionsEqual("csharp_namespace", func(_ *FileDescriptor, pkg *proto.Package) string {
+		return protostrs.CSharpNamespace(pkg.Name)
+	}),
+)
+
 var fileOptionsEqualGoPackagePbSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX",
 	`Verifies that the file option "go_package" is equal to $(basename PACKAGE)pb.`,
-	newCheckFileOptionsEqual("go_package", func(_ *proto.Proto, pkg *proto.Package) string {
+	newCheckFileOptionsEqual("go_package", func(_ *FileDescriptor, pkg *proto.Package) string {
 		return protostrs.GoPackage(pkg.Name)
+	}),
+)
+
+var fileOptionsEqualGoPackageV2SuffixLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_GO_PACKAGE_V2_SUFFIX",
+	`Verifies that the file option "go_package" is equal to the last two values of the package separated by "."s, or just the package name if there are no "."s.`,
+	newCheckFileOptionsEqual("go_package", func(_ *FileDescriptor, pkg *proto.Package) string {
+		return protostrs.GoPackageV2(pkg.Name)
 	}),
 )
 
 var fileOptionsEqualJavaMultipleFilesTrueLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE",
 	`Verifies that the file option "java_multiple_files" is equal to true.`,
-	newCheckFileOptionsEqual("java_multiple_files", func(*proto.Proto, *proto.Package) string {
+	newCheckFileOptionsEqual("java_multiple_files", func(*FileDescriptor, *proto.Package) string {
 		return "true"
 	}),
 )
@@ -47,7 +63,7 @@ var fileOptionsEqualJavaMultipleFilesTrueLinter = NewLinter(
 var fileOptionsEqualJavaOuterClassnameProtoSuffixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX",
 	`Verifies that the file option "java_outer_classname" is equal to $(upperCamelCase $(basename FILE))Proto.`,
-	newCheckFileOptionsEqual("java_outer_classname", func(descriptor *proto.Proto, _ *proto.Package) string {
+	newCheckFileOptionsEqual("java_outer_classname", func(descriptor *FileDescriptor, _ *proto.Package) string {
 		return protostrs.JavaOuterClassname(descriptor.Filename)
 	}),
 )
@@ -55,13 +71,37 @@ var fileOptionsEqualJavaOuterClassnameProtoSuffixLinter = NewLinter(
 var fileOptionsEqualJavaPackageComPrefixLinter = NewLinter(
 	"FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX",
 	`Verifies that the file option "java_package" is equal to com.PACKAGE.`,
-	newCheckFileOptionsEqual("java_package", func(_ *proto.Proto, pkg *proto.Package) string {
+	newCheckFileOptionsEqual("java_package", func(_ *FileDescriptor, pkg *proto.Package) string {
 		return protostrs.JavaPackage(pkg.Name)
 	}),
 )
 
-func newCheckFileOptionsEqual(fileOption string, expectedValueFunc func(*proto.Proto, *proto.Package) string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+var fileOptionsEqualJavaPackagePrefixLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_JAVA_PACKAGE_PREFIX",
+	`Verifies that the file option "java_package" is equal to PREFIX.PACKAGE, with PREFIX defaulting to "com" and configurable in your configuration file.`,
+	newCheckFileOptionsEqual("java_package", func(descriptor *FileDescriptor, pkg *proto.Package) string {
+		return protostrs.JavaPackagePrefixOverride(pkg.Name, descriptor.ProtoSet.Config.Lint.JavaPackagePrefix)
+	}),
+)
+
+var fileOptionsEqualOBJCClassPrefixAbbrLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_OBJC_CLASS_PREFIX_ABBR",
+	`Verifies that the file option "objc_class_prefix" is the abbreviated version of the package.`,
+	newCheckFileOptionsEqual("objc_class_prefix", func(_ *FileDescriptor, pkg *proto.Package) string {
+		return protostrs.OBJCClassPrefix(pkg.Name)
+	}),
+)
+
+var fileOptionsEqualPHPNamespaceCapitalizedLinter = NewLinter(
+	"FILE_OPTIONS_EQUAL_PHP_NAMESPACE_CAPITALIZED",
+	`Verifies that the file option "php_namespace" is the capitalized version of the package.`,
+	newCheckFileOptionsEqual("php_namespace", func(_ *FileDescriptor, pkg *proto.Package) string {
+		return protostrs.PHPNamespace(pkg.Name)
+	}),
+)
+
+func newCheckFileOptionsEqual(fileOption string, expectedValueFunc func(*FileDescriptor, *proto.Package) string) func(func(*text.Failure), string, []*FileDescriptor) error {
+	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		return runVisitor(&fileOptionsEqualVisitor{
 			baseAddVisitor:    newBaseAddVisitor(add),
 			fileOption:        fileOption,
@@ -74,14 +114,14 @@ type fileOptionsEqualVisitor struct {
 	baseAddVisitor
 
 	fileOption        string
-	expectedValueFunc func(*proto.Proto, *proto.Package) string
+	expectedValueFunc func(*FileDescriptor, *proto.Package) string
 
-	descriptor *proto.Proto
+	descriptor *FileDescriptor
 	pkg        *proto.Package
 	option     *proto.Option
 }
 
-func (v *fileOptionsEqualVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *fileOptionsEqualVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.descriptor = descriptor
 	v.pkg = nil
 	v.option = nil

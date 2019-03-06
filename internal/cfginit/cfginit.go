@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,14 +28,23 @@ import (
 	"html/template"
 )
 
-var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when searching for Protobuf files.
+var (
+	baseTmpl = template.Must(template.New("baseTmpl").Parse(`protoc:
+  version: {{.ProtocVersion}}
+lint:
+  group: uber2
+`))
+
+	documentTmpl = template.Must(template.New("documentTmpl").Parse(`# Paths to exclude when searching for Protobuf files.
+# These can either be file or directory names.
+# If there is a directory name, that directory and all sub-directories will be excluded.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
 
 # Protoc directives.
 protoc:
-  # The Protobuf version to use from https://github.com/google/protobuf/releases.
+  # The Protobuf version to use from https://github.com/protocolbuffers/protobuf/releases.
   # By default use {{.ProtocVersion}}.
   # You probably want to set this to make your builds completely reproducible.
   version: {{.ProtocVersion}}
@@ -66,7 +75,16 @@ protoc:
 
 # Lint directives.
 {{.V}}lint:
+  # The lint group to use.
+  # The default group is the "default" lint group, which is equal to the "uber1" lint group.
+  # Run prototool lint --list-all-lint-groups to see all available lint groups.
+  # Run prototool lint --list-lint-group GROUP to list the linters in the given lint group.
+  # Setting this value will result in lint.rules.no_default being ignored.
+  group: uber2
+
   # Linter files to ignore.
+  # These can either be file or directory names.
+  # If there is a directory name, that directory and all sub-directories will be ignored.
 {{.V}}  ignores:
 {{.V}}    - id: RPC_NAMES_CAMEL_CASE
 {{.V}}      files:
@@ -74,12 +92,15 @@ protoc:
 {{.V}}        - path/to/bar.proto
 {{.V}}    - id: SYNTAX_PROTO3
 {{.V}}      files:
-{{.V}}        - path/to/foo.proto
+{{.V}}        - path/to/dir
 
   # Linter rules.
-  # Run prototool list-all-linters to see all available linters.
+  # Run prototool lint --list-all-linters to see all available linters.
+  # Run prototool lint --list-linters to see the currently configured linters.
 {{.V}}  rules:
     # Determines whether or not to include the default set of linters.
+    # This allows all linters to be turned off except those explicitly specified in add.
+    # This value is ignored if lint.group is set.
 {{.V}}    no_default: true
 
     # The specific linters to add.
@@ -90,6 +111,33 @@ protoc:
     # The specific linters to remove.
 {{.V}}    remove:
 {{.V}}      - ENUM_NAMES_CAMEL_CASE
+
+  # The path to the file header or the file header content for all Protobuf files.
+  # If either path or content is set and the FILE_HEADER linter is turned on,
+  # files will be checked to begin with the given header, and format --fix
+  # will place this header before the syntax declaration. Note that
+  # format --fix will delete anything before the syntax declaration
+  # if this is set.
+  #
+  # Set path to use a file's contents for the header. Path must be relative.
+  # Set content to directly specify the header.
+  # **Both path and content cannot be set at the same time. They are only done
+  # so here for example purposes.**
+  #
+  # If is_commented is set, this file is assumed to already have comments
+  # and will be added directly. If is_commented is not set, "// " will be
+  # added before every line.
+{{.V}}  file_header:
+{{.V}}    path: path/to/protobuf_file_header.txt
+{{.V}}    content: |
+{{.V}}      //
+{{.V}}      // Acme, Inc. (c) 2019
+{{.V}}      //
+{{.V}}    is_commented: true
+  # Override the default java_package file option prefix of "com".
+  # If this is set, this will affect lint, create, and format --fix to use.
+  # this prefix instead of "com".
+{{.V}}  java_package_prefix: au.com
 
 # Code generation directives.
 {{.V}}generate:
@@ -132,7 +180,9 @@ protoc:
       # Optional override for the plugin path. For example, if you set set path to
       # /usr/local/bin/gogo_plugin", prototool will add the
       # "--plugin=protoc-gen-gogo=/usr/local/bin/gogo_plugin" flag to protoc calls.
-{{.V}}      path: /usr/local/bin/gogo
+      # If set to "gogo_plugin", prototool will search your path for "gogo_plugin",.
+      # and fail if "gogo_plugin" cannot be found.
+{{.V}}      path: gogo_plugin
 
 {{.V}}    - name: yarpc-go
 {{.V}}      type: gogo
@@ -143,7 +193,28 @@ protoc:
 {{.V}}      output: ../../.gen/proto/go
 
 {{.V}}    - name: java
-{{.V}}      output: ../../.gen/proto/java`))
+{{.V}}      output: ../../.gen/proto/java
+
+      # Optional file suffix for plugins that output a single file as opposed
+      # to writing a set of files to a directory. This is only valid in two
+      # known cases:
+      # - For the java plugin, set this to "jar" to produce jars
+      #   https://developers.google.com/protocol-buffers/docs/reference/java-generated#invocation
+      # - For the descriptor_set plugin, this is required as using descriptor_set
+      #   requires a file to be given instead of a directory.
+{{.V}}      file_suffix: jar
+
+      # descriptor_set is special, and uses the --descriptor_set_out flag on protoc.
+      # file_suffix is required, and the options include_imports and include_source_info
+      # can be optionally set to add the flags --include_imports and --include_source-info.
+      # The include_imports and include_source_info options are not valid for any
+      # other plugin name.
+{{.V}}    - name: descriptor_set
+{{.V}}      output: ../../.gen/proto/descriptor
+{{.V}}      file_suffix: bin
+{{.V}}      include_imports: true
+{{.V}}      include_source_info: true`))
+)
 
 type tmplData struct {
 	V             string
@@ -153,7 +224,10 @@ type tmplData struct {
 // Generate generates the data.
 //
 // Set uncomment to true to uncomment the example settings.
-func Generate(protocVersion string, uncomment bool) ([]byte, error) {
+func Generate(protocVersion string, uncomment bool, document bool) ([]byte, error) {
+	if uncomment {
+		document = true
+	}
 	tmplData := &tmplData{
 		ProtocVersion: protocVersion,
 	}
@@ -161,6 +235,10 @@ func Generate(protocVersion string, uncomment bool) ([]byte, error) {
 		tmplData.V = "#"
 	}
 	buffer := bytes.NewBuffer(nil)
+	tmpl := baseTmpl
+	if document {
+		tmpl = documentTmpl
+	}
 	if err := tmpl.Execute(buffer, tmplData); err != nil {
 		return nil, err
 	}

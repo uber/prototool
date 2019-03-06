@@ -41,6 +41,7 @@ message FooProto2 {
     required int64 bar = 3;
     optional int64 bar2 = 4;
   }
+  repeated int64 baz = 5;
 }
 
 message FooSomething {}

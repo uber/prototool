@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -49,13 +49,16 @@ var (
 	// special cased
 	pluginFailedRegexp       = regexp.MustCompile("^--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 	otherPluginFailureRegexp = regexp.MustCompile("^--(.*)_out: (.*)$")
+	// backup that does not require this to be at the beginning of the line
+	fullPluginFailedRegexp = regexp.MustCompile("(.*)--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 
-	extraImportRegexp  = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
-	fileNotFoundRegexp = regexp.MustCompile("^(.*): File not found.$")
+	extraImportRegexp     = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
+	recursiveImportRegexp = regexp.MustCompile("^(.*): File recursively imports itself: (.*)$")
+	fileNotFoundRegexp    = regexp.MustCompile("^(.*): File not found.$")
 	// protoc outputs both this line and fileNotFound, so we end up ignoring this one
 	// TODO figure out what the error is for errors in the import
 	importNotFoundRegexp              = regexp.MustCompile("^(.*): Import (.*) was not found or had errors.$")
-	noSyntaxSpecifiedRegexp           = regexp.MustCompile("No syntax specified for the proto file: (.*)\\. Please use")
+	noSyntaxSpecifiedRegexp           = regexp.MustCompile(`No syntax specified for the proto file: (.*)\. Please use`)
 	jsonCamelCaseRegexp               = regexp.MustCompile("^(.*): (The JSON camel-case name of field.*)$")
 	isNotDefinedRegexp                = regexp.MustCompile("^(.*): (.*) is not defined.$")
 	seemsToBeDefinedRegexp            = regexp.MustCompile(`^(.*): (".*" seems to be defined in ".*", which is not imported by ".*". To use it here, please add the necessary import.)$`)
@@ -68,6 +71,8 @@ var (
 type compiler struct {
 	logger              *zap.Logger
 	cachePath           string
+	protocBinPath       string
+	protocWKTPath       string
 	protocURL           string
 	doGen               bool
 	doFileDescriptorSet bool
@@ -149,7 +154,7 @@ func (c *compiler) Compile(protoSet *file.ProtoSet) (*CompileResult, error) {
 		}, nil
 	}
 
-	fileDescriptorSets := make([]*descriptor.FileDescriptorSet, 0, len(cmdMetas))
+	fileDescriptorSets := make([]*FileDescriptorSet, 0, len(cmdMetas))
 	for _, cmdMeta := range cmdMetas {
 		// if doFileDescriptorSet is not set, we won't get a fileDescriptorSet anyways,
 		// so the end result will be an empty CompileResult at this point
@@ -186,7 +191,25 @@ func (c *compiler) ProtocCommands(protoSet *file.ProtoSet) ([]string, error) {
 func (c *compiler) makeGenDirs(protoSet *file.ProtoSet) error {
 	genDirs := make(map[string]struct{})
 	for _, genPlugin := range protoSet.Config.Gen.Plugins {
-		genDirs[genPlugin.OutputPath.AbsPath] = struct{}{}
+		baseOutputPath := genPlugin.OutputPath.AbsPath
+		// If there is no single output file, protoc plugins take care of making
+		// sub-directories, so we only need to make the base directory.
+		// Otherwise, we need to make all sub-directories of the output file.
+		if genPlugin.FileSuffix == "" {
+			genDirs[baseOutputPath] = struct{}{}
+		} else {
+			for dirPath := range protoSet.DirPathToFiles {
+				// skip those files not under the directory
+				if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+					continue
+				}
+				relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
+				if err != nil {
+					return err
+				}
+				genDirs[filepath.Dir(filepath.Join(baseOutputPath, relOutputFilePath))] = struct{}{}
+			}
+		}
 	}
 	for genDir := range genDirs {
 		// we could choose a different permission set, but this seems reasonable
@@ -266,13 +289,20 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 			cmdMetas = nil
 		}
 	}()
-	// you need a new downloader for every ProtoSet as each prototool.yaml could
+	// you need a new downloader for every ProtoSet as each configuration file could
 	// have a different protoc.version value
-	downloader := c.newDownloader(protoSet.Config)
+	downloader, err := c.newDownloader(protoSet.Config)
+	if err != nil {
+		return nil, err
+	}
 	if _, err := downloader.Download(); err != nil {
 		return cmdMetas, err
 	}
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		// skip those files not under the directory
+		if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+			continue
+		}
 		// you want your proto files to be in at least one of the -I directories
 		// or otherwise things can get weird
 		// we make best effort to make sure we have the a parent directory of the file
@@ -280,10 +310,10 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 		//
 		// This does what I'd expect `prototool` to do out of the box:
 		//
-		// - If a prototool.yaml file is present, use that as the root for your imports.
+		// - If a configuration file is present, use that as the root for your imports.
 		//   So if you have a/b/prototool.yaml and a/b/c/d/one.proto, a/b/c/e/two.proto,
 		//   you'd import c/d/one.proto in two.proto.
-		// - If there's no prototool.yaml file, I expect my imports to start with the current directory.
+		// - If there's no configuration file, I expect my imports to start with the current directory.
 		configDirPath := protoSet.Config.DirPath
 		if configDirPath == "" {
 			configDirPath = protoSet.WorkDirPath
@@ -330,6 +360,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 			cmdMetas = append(cmdMetas, &cmdMeta{
 				execCmd:    exec.Command(protocPath, iArgs...),
 				protoSet:   protoSet,
+				dirPath:    dirPath,
 				protoFiles: protoFiles,
 				// used for cleaning up the cmdMeta after everything is done
 				descriptorSetTempFilePath: descriptorSetTempFilePath,
@@ -347,6 +378,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 			cmdMetas = append(cmdMetas, &cmdMeta{
 				execCmd:    exec.Command(protocPath, iArgs...),
 				protoSet:   protoSet,
+				dirPath:    dirPath,
 				protoFiles: protoFiles,
 			})
 		}
@@ -354,7 +386,7 @@ func (c *compiler) getCmdMetas(protoSet *file.ProtoSet) (cmdMetas []*cmdMeta, re
 	return cmdMetas, nil
 }
 
-func (c *compiler) newDownloader(config settings.Config) Downloader {
+func (c *compiler) newDownloader(config settings.Config) (Downloader, error) {
 	downloaderOptions := []DownloaderOption{
 		DownloaderWithLogger(c.logger),
 	}
@@ -362,6 +394,18 @@ func (c *compiler) newDownloader(config settings.Config) Downloader {
 		downloaderOptions = append(
 			downloaderOptions,
 			DownloaderWithCachePath(c.cachePath),
+		)
+	}
+	if c.protocBinPath != "" {
+		downloaderOptions = append(
+			downloaderOptions,
+			DownloaderWithProtocBinPath(c.protocBinPath),
+		)
+	}
+	if c.protocWKTPath != "" {
+		downloaderOptions = append(
+			downloaderOptions,
+			DownloaderWithProtocWKTPath(c.protocWKTPath),
 		)
 	}
 	if c.protocURL != "" {
@@ -414,14 +458,42 @@ func getPluginFlagSet(protoSet *file.ProtoSet, dirPath string, genPlugin setting
 	if err != nil {
 		return nil, err
 	}
-	flagSet := []string{fmt.Sprintf("--%s_out=%s", genPlugin.Name, genPlugin.OutputPath.AbsPath)}
-	if len(protoFlags) > 0 {
-		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, genPlugin.OutputPath.AbsPath)}
+	outputPath := genPlugin.OutputPath.AbsPath
+	if genPlugin.FileSuffix != "" {
+		relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
+		if err != nil {
+			return nil, err
+		}
+		outputPath = filepath.Join(outputPath, relOutputFilePath)
 	}
-	if genPlugin.Path != "" {
-		flagSet = append(flagSet, fmt.Sprintf("--plugin=protoc-gen-%s=%s", genPlugin.Name, genPlugin.Path))
+	flagSet := []string{fmt.Sprintf("--%s_out=%s", genPlugin.Name, outputPath)}
+	if len(protoFlags) > 0 {
+		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, outputPath)}
+	}
+	genPluginPath, err := genPlugin.GetPath()
+	if err != nil {
+		return nil, err
+	}
+	if genPluginPath != "" {
+		flagSet = append(flagSet, fmt.Sprintf("--plugin=protoc-gen-%s=%s", genPlugin.Name, genPluginPath))
+	}
+	if genPlugin.IncludeImports {
+		flagSet = append(flagSet, "--include_imports")
+	}
+	if genPlugin.IncludeSourceInfo {
+		flagSet = append(flagSet, "--include_source_info")
 	}
 	return flagSet, nil
+}
+
+func getRelOutputFilePath(protoSet *file.ProtoSet, dirPath string, fileSuffix string) (string, error) {
+	relPath, err := filepath.Rel(protoSet.Config.DirPath, dirPath)
+	if err != nil {
+		// if we cannot find the relative path, we have a real problem
+		// this should never happen, but could in a bad case with links
+		return "", fmt.Errorf("could not find relative path for %q to %q, this is a system error, please file a bug at github.com/uber/prototool/issues/new: %v", dirPath, protoSet.Config.DirPath, err)
+	}
+	return filepath.Join(relPath, filepath.Base(relPath)+"."+fileSuffix), nil
 }
 
 // the return value corresponds to CodeGeneratorRequest.Parameter
@@ -446,6 +518,8 @@ func getPluginFlagSetProtoFlags(protoSet *file.ProtoSet, dirPath string, genPlug
 		// you cannot include the files in the same package in the Mfile=package map
 		// or otherwise protoc-gen-go, protoc-gen-gogo, etc freak out and put
 		// these packages in as imports
+		// but, unlike other usages of DirPathToFiles, you MUST include all directories
+		// under control of the prototool.yaml to make sure all modifiers are added
 		if subDirPath != dirPath {
 			for _, protoFile := range protoFiles {
 				path, err := filepath.Rel(protoSet.Config.DirPath, protoFile.Path)
@@ -541,6 +615,11 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 			Message: fmt.Sprintf("protoc-gen-%s: %s", matches[1], matches[2]),
 		}
 	}
+	if matches := fullPluginFailedRegexp.FindStringSubmatch(protocLine); len(matches) > 3 {
+		return &text.Failure{
+			Message: fmt.Sprintf("protoc-gen-%s failed with status code %s: %s", matches[2], matches[3], matches[1]),
+		}
+	}
 	split := strings.Split(protocLine, ":")
 	if len(split) != 4 {
 		if matches := noSyntaxSpecifiedRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
@@ -556,6 +635,12 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 			return &text.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
 				Message:  fmt.Sprintf(`Import "%s" was not used.`, matches[2]),
+			}
+		}
+		if matches := recursiveImportRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
+			return &text.Failure{
+				Filename: bestFilePath(cmdMeta, matches[1]),
+				Message:  fmt.Sprintf(`File recursively imports itself %s.`, matches[2]),
 			}
 		}
 		if matches := fileNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
@@ -685,7 +770,7 @@ func getDisplayFilePath(cmdMeta *cmdMeta, match string) (string, error) {
 	return matchingFile, nil
 }
 
-func getFileDescriptorSet(cmdMeta *cmdMeta) (*descriptor.FileDescriptorSet, error) {
+func getFileDescriptorSet(cmdMeta *cmdMeta) (*FileDescriptorSet, error) {
 	if cmdMeta.descriptorSetTempFilePath == "" {
 		return nil, nil
 	}
@@ -697,7 +782,12 @@ func getFileDescriptorSet(cmdMeta *cmdMeta) (*descriptor.FileDescriptorSet, erro
 	if err := proto.Unmarshal(data, fileDescriptorSet); err != nil {
 		return nil, err
 	}
-	return fileDescriptorSet, nil
+	return &FileDescriptorSet{
+		FileDescriptorSet: fileDescriptorSet,
+		ProtoSet:          cmdMeta.protoSet,
+		DirPath:           cmdMeta.dirPath,
+		ProtoFiles:        cmdMeta.protoFiles,
+	}, nil
 }
 
 func devNull() (string, error) {
@@ -728,6 +818,7 @@ func cleanCmdMetas(cmdMetas []*cmdMeta) {
 type cmdMeta struct {
 	execCmd                   *exec.Cmd
 	protoSet                  *file.ProtoSet
+	dirPath                   string
 	protoFiles                []*file.ProtoFile
 	descriptorSetTempFilePath string
 }

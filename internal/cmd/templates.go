@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,28 +45,83 @@ var (
 			return runner.All(args, flags.disableFormat, flags.disableLint, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
 			flags.bindDisableFormat(flagSet)
 			flags.bindDisableLint(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
-	binaryToJSONCmdTemplate = &cmdTemplate{
-		Use:   "binary-to-json [dirOrFile] messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.RangeArgs(2, 3),
+	breakCheckCmdTemplate = &cmdTemplate{
+		Use:   "check [dir]",
+		Short: "Check for breaking changes.",
+		Long: `This command must be run from the root of a git repository.
+
+The input directory must be relative.`,
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.BinaryToJSON(args)
+			return runner.BreakCheck(args, flags.gitBranch, flags.gitTag, flags.includeBeta, flags.allowBetaDeps)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindAllowBetaDeps(flagSet)
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindGitBranch(flagSet)
+			flags.bindGitTag(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindIncludeBeta(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
-	cleanCmdTemplate = &cmdTemplate{
-		Use:   "clean",
-		Short: "Delete the cache.",
-		Args:  cobra.NoArgs,
+	cacheUpdateCmdTemplate = &cmdTemplate{
+		Use:   "update [dirOrFile]",
+		Short: "Update the cache by downloading all artifacts.",
+		Long: `This will download artifacts to a cache directory before running any commands. Note that calling this command is not necessary, all artifacts are automatically downloaded when required by other commands. This just provides a mechanism to pre-cache artifacts during your build.
+
+Artifacts are downloaded to the following directories based on flags and environment variables:
+
+- If --cache-path is set, then this directory will be used. The user is
+  expected to manually manage this directory, and the "delete" subcommand
+  will have no effect on it.
+- Otherwise, if $PROTOTOOL_CACHE_PATH is set, then this directory will be used.
+  The user is expected to manually manage this directory, and the "delete"
+  subcommand will have no effect on it.
+- Otherwise, if $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool
+  will be used.
+- Otherwise, if on Linux, $HOME/.cache/prototool will be used, or on Darwin,
+  $HOME/Library/Caches/prototool will be used.`,
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Clean()
+			return runner.CacheUpdate(args)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+		},
+	}
+
+	cacheDeleteCmdTemplate = &cmdTemplate{
+		Use:   "delete",
+		Short: "Delete all artifacts in the default cache.",
+		Long: `The following directory will be deleted based on environment variables:
+
+- If $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool will be deleted.
+- Otherwise, if on Linux, $HOME/.cache/prototool will be deleted, or on Darwin,
+  $HOME/Library/Caches/prototool will be deleted.
+
+  This will not delete any custom caches created using the --cache-path flag or PROTOTOOL_CACHE_PATH environment variable.`,
+		Args: cobra.NoArgs,
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.CacheDelete()
 		},
 	}
 
@@ -79,8 +134,14 @@ var (
 			return runner.Compile(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -102,16 +163,16 @@ This matches what the linter expects. "SOME.PKG" will be computed as follows:
 
 - If "--package" is specified, "SOME.PKG" will be the value passed to
   "--package".
-- Otherwise, if there is no "prototool.yaml" that would apply to the new file,
-  use "uber.prototool.generated".
-- Otherwise, if there is a "prototool.yaml" file, check if it has a
-  "packages" setting under the "create" section. If it does, this
+- Otherwise, if there is no "prototool.yaml" or "prototool.json" that would
+  apply to the new file, use "uber.prototool.generated".
+- Otherwise, if there is a "prototool.yaml" or "prototool.json" file, check if
+  it has a "packages" setting under the "create" section. If it does, this
   package, concatenated with the relative path from the directory with the
- "prototool.yaml" will be used.
+ "prototool.yaml" or "prototool.json" will be used.
 - Otherwise, if there is no "packages" directive, just use the
-  relative path from the directory with the "prototool.yaml" file. If the file
-  is in the same directory as the "prototool.yaml" file, use
-  "uber.prototool.generated".
+  relative path from the directory with the "prototool.yaml" or
+  "prototool.json" file. If the file is in the same directory as the
+  "prototool.yaml" or "prototool.json" file, use "uber.prototool.generated".
 
 For example, assume you have the following file at "repo/prototool.yaml":
 
@@ -135,7 +196,7 @@ create:
 
 This is meant to mimic what you generally want - a base package for your idl directory, followed by packages matching the directory structure.
 
-Note you can override the directory that the "prototool.yaml" file is in as well. If we update our file at "repo/prototool.yaml" to this:
+Note you can override the directory that the "prototool.yaml" or "prototool.json" file is in as well. If we update our file at "repo/prototool.yaml" to this:
 
 create:
   packages:
@@ -150,34 +211,8 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.Create(args, flags.pkg)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindConfigData(flagSet)
 			flags.bindPackage(flagSet)
-		},
-	}
-
-	descriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "descriptor-proto [dirOrFile] messagePath",
-		Short: "Get the descriptor proto for the message path.",
-		Args:  cobra.MaximumNArgs(2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.DescriptorProto(args)
-		},
-	}
-
-	downloadCmdTemplate = &cmdTemplate{
-		Use:   "download",
-		Short: "Download the protobuf artifacts to a cache.",
-		Args:  cobra.NoArgs,
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Download()
-		},
-	}
-
-	fieldDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "field-descriptor-proto [dirOrFile] fieldPath",
-		Short: "Get the field descriptor proto for the field path.",
-		Args:  cobra.RangeArgs(1, 2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.FieldDescriptorProto(args)
 		},
 	}
 
@@ -187,6 +222,9 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Files(args)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindConfigData(flagSet)
 		},
 	}
 
@@ -198,11 +236,17 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.Format(args, flags.overwrite, flags.diffMode, flags.lintMode, flags.fix)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
 			flags.bindDiffMode(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindLintMode(flagSet)
 			flags.bindOverwrite(flagSet)
 			flags.bindFix(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -214,17 +258,23 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			return runner.Gen(args, flags.dryRun)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
 			flags.bindDryRun(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
 	grpcCmdTemplate = &cmdTemplate{
 		Use:   "grpc [dirOrFile]",
-		Short: "Call a gRPC endpoint. Be sure to set required flags address, method, and either data or stdin.",
+		Short: "Call a gRPC endpoint. Be sure to set the required flags address, method, and either data or stdin.",
 		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
 
-There is a full example for gRPC in the example directory of Prototool. Run "make init example" to make sure everything is installed and generated.
+There is a full example for gRPC in the example directory of Prototool. Run "make example" to make sure everything is installed and generated.
 
 Start the example server in a separate terminal by doing "go run example/cmd/excited/main.go".
 
@@ -235,7 +285,7 @@ prototool grpc [dirOrFile] \
 
 Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" which will result in the input being read from stdin as JSON.
 
-$ make init example # make sure everything is built just in case
+$ make example # make sure everything is built just in case
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
@@ -292,83 +342,151 @@ $ cat input.json | prototool grpc example \
 }`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.jsonOutput)
+			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.json)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
 			flags.bindAddress(flagSet)
 			flags.bindCallTimeout(flagSet)
 			flags.bindConnectTimeout(flagSet)
 			flags.bindData(flagSet)
+			flags.bindErrorFormat(flagSet)
 			flags.bindHeaders(flagSet)
-			flags.bindJSONOutput(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindKeepaliveTime(flagSet)
 			flags.bindMethod(flagSet)
 			flags.bindStdin(flagSet)
 			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackagesCmdTemplate = &cmdTemplate{
+		Use:   "packages [dirOrFile]",
+		Short: "List all packages.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackages(args)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageDepsCmdTemplate = &cmdTemplate{
+		Use:   "package-deps [dirOrFile]",
+		Short: "Print the given package dependencies. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackageDeps(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindName(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	inspectPackageImportersCmdTemplate = &cmdTemplate{
+		Use:   "package-importers [dirOrFile]",
+		Short: "Print the given package importers. Be sure to set the required flag name.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.InspectPackageImporters(args, flags.name)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindName(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
 	configInitCmdTemplate = &cmdTemplate{
 		Use:   "init [dirPath]",
 		Short: "Generate an initial config file in the current or given directory.",
-		Long:  `All available options will be generated and commented out except for "protoc.version". Pass the "--uncomment" flag to uncomment all options.`,
+		Long:  `The currently recommended options will be set.`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Init(args, flags.uncomment)
+			return runner.Init(args, flags.uncomment, flags.document)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindDocument(flagSet)
 			flags.bindUncomment(flagSet)
-		},
-	}
-
-	jsonToBinaryCmdTemplate = &cmdTemplate{
-		Use:   "json-to-binary [dirOrFile] messagePath data",
-		Short: "Convert the data from json to binary for the message path and data.",
-		Args:  cobra.RangeArgs(2, 3),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.JSONToBinary(args)
 		},
 	}
 
 	lintCmdTemplate = &cmdTemplate{
 		Use:   "lint [dirOrFile]",
 		Short: "Lint proto files and compile with protoc to check for failures.",
-		Long:  `The default rule set follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber/uber.proto. You can add or exclude lint rules in your "prototool.yaml" file. The default rule set is very strict and is meant to enforce consistent development patterns.`,
-		Args:  cobra.MaximumNArgs(1),
+		Long: `Lint rules can be set using the configuration file. See the configuration at https://github.com/uber/prototool/blob/dev/etc/config/example/prototool.yaml for all available options. There are two pre-configured groups of rules:
+
+google: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed.
+
+uber1: This lint group follows the Style Guide at https://github.com/uber/prototool/blob/master/etc/style/uber1/uber1.proto. This is a very strict rule group and is meant to enforce consistent development patterns.
+
+Configuration of your group can be done by setting the "lint.group" option in your "prototool.yaml" file:
+
+lint:
+  group: google
+
+The "uber1" lint group represents the default lint group, and will be used if no lint group is configured.
+
+Files must be valid Protobuf that can be compiled with protoc, so prior to linting, prototool lint will compile your using protoc.
+Note, however, this is very fast - for two files, compiling and linting only takes approximately
+3/100ths of a second:
+
+$ time prototool lint etc/style/uber1
+
+real	0m0.037s
+user	0m0.026s
+sys	0m0.017s
+
+For all 694 Protobuf files currently in https://github.com/googleapis/googleapis, this takes approximately 3/4ths of a second:
+
+$ cat prototool.yaml
+protoc:
+  allow_unused_imports: true
+lint:
+  group: google
+
+$ time prototool lint .
+
+real	0m0.734s
+user	0m3.835s
+sys	0m0.924s`,
+
+		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Lint(args, flags.listAllLinters, flags.listLinters)
+			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup, flags.diffLintGroups)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
 			flags.bindListAllLinters(flagSet)
 			flags.bindListLinters(flagSet)
+			flags.bindListAllLintGroups(flagSet)
+			flags.bindListLintGroup(flagSet)
+			flags.bindDiffLintGroups(flagSet)
 			flags.bindProtocURL(flagSet)
-		},
-	}
-
-	listAllLintGroupsCmdTemplate = &cmdTemplate{
-		Use:   "list-all-lint-groups",
-		Short: "List all the available lint groups.",
-		Args:  cobra.NoArgs,
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.ListAllLintGroups()
-		},
-	}
-
-	listLintGroupCmdTemplate = &cmdTemplate{
-		Use:   "list-lint-group group",
-		Short: "List the linters in the given lint group.",
-		Args:  cobra.ExactArgs(1),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.ListLintGroup(args[0])
-		},
-	}
-
-	serviceDescriptorProtoCmdTemplate = &cmdTemplate{
-		Use:   "service-descriptor-proto [dirOrFile] servicePath",
-		Short: "Get the service descriptor proto for the service path.",
-		Args:  cobra.RangeArgs(1, 2),
-		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.ServiceDescriptorProto(args)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
 		},
 	}
 
@@ -376,6 +494,9 @@ $ cat input.json | prototool grpc example \
 		Use:   "version",
 		Short: "Print the version.",
 		Args:  cobra.NoArgs,
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindJSON(flagSet)
+		},
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.Version()
 		},
@@ -419,7 +540,7 @@ type cmdTemplate struct {
 }
 
 // Build builds a *cobra.Command from the cmdTemplate.
-func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) *cobra.Command {
+func (c *cmdTemplate) Build(develMode bool, exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) *cobra.Command {
 	command := &cobra.Command{}
 	command.Use = c.Use
 	command.Short = strings.TrimSpace(c.Short)
@@ -428,7 +549,7 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	}
 	command.Args = c.Args
 	command.Run = func(_ *cobra.Command, args []string) {
-		checkCmd(exitCodeAddr, stdin, stdout, stderr, args, flags, c.Run)
+		checkCmd(develMode, exitCodeAddr, stdin, stdout, stderr, args, flags, c.Run)
 	}
 	if c.BindFlags != nil {
 		c.BindFlags(command.PersistentFlags(), flags)
@@ -436,8 +557,8 @@ func (c *cmdTemplate) Build(exitCodeAddr *int, stdin io.Reader, stdout io.Writer
 	return command
 }
 
-func checkCmd(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, args []string, flags *flags, f func(exec.Runner, []string, *flags) error) {
-	runner, err := getRunner(stdin, stdout, stderr, flags)
+func checkCmd(develMode bool, exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Writer, args []string, flags *flags, f func(exec.Runner, []string, *flags) error) {
+	runner, err := getRunner(develMode, stdin, stdout, stderr, flags)
 	if err != nil {
 		*exitCodeAddr = printAndGetErrorExitCode(err, stdout)
 		return
@@ -447,7 +568,7 @@ func checkCmd(exitCodeAddr *int, stdin io.Reader, stdout io.Writer, stderr io.Wr
 	}
 }
 
-func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) (exec.Runner, error) {
+func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags) (exec.Runner, error) {
 	logger, err := getLogger(stderr, flags.debug)
 	if err != nil {
 		return nil, err
@@ -460,17 +581,62 @@ func getRunner(stdin io.Reader, stdout io.Writer, stderr io.Writer, flags *flags
 			runnerOptions,
 			exec.RunnerWithCachePath(flags.cachePath),
 		)
-	}
-	if flags.printFields != "" {
+	} else if envCachePath := os.Getenv("PROTOTOOL_CACHE_PATH"); envCachePath != "" {
 		runnerOptions = append(
 			runnerOptions,
-			exec.RunnerWithPrintFields(flags.printFields),
+			exec.RunnerWithCachePath(envCachePath),
+		)
+	}
+	if flags.configData != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithConfigData(flags.configData),
+		)
+	}
+	if flags.json {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithJSON(),
+		)
+	}
+	if flags.protocBinPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocBinPath(flags.protocBinPath),
+		)
+	} else if envProtocBinPath := os.Getenv("PROTOTOOL_PROTOC_BIN_PATH"); envProtocBinPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocBinPath(envProtocBinPath),
+		)
+	}
+	if flags.protocWKTPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocWKTPath(flags.protocWKTPath),
+		)
+	} else if envProtocWKTPath := os.Getenv("PROTOTOOL_PROTOC_WKT_PATH"); envProtocWKTPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocWKTPath(envProtocWKTPath),
+		)
+	}
+	if flags.errorFormat != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithErrorFormat(flags.errorFormat),
 		)
 	}
 	if flags.protocURL != "" {
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithProtocURL(flags.protocURL),
+		)
+	}
+	if develMode {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithDevelMode(),
 		)
 	}
 	workDirPath, err := os.Getwd()

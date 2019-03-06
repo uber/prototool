@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,29 +19,15 @@
 // THE SOFTWARE.
 
 // Package vars contains static variables used in Prototool.
-//
-// Some variables are populated at build time using ldflags.
 package vars
 
 const (
 	// Version is the current version.
-	Version = "1.0.0-dev"
+	Version = "1.4.0-dev"
 
 	// DefaultProtocVersion is the default version of protoc from
-	// github.com/google/protobuf to use.
+	// github.com/protocolbuffers/protobuf to use.
 	//
-	// See https://github.com/google/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.6.1"
-)
-
-var (
-	// GitCommit is the git commit used to build the binary.
-	//
-	// This is populated at build time using ldflags.
-	GitCommit string
-
-	// BuiltTimestamp is the time at which the binary was built.
-	//
-	// This is populated at build time using ldflags.
-	BuiltTimestamp string
+	// See https://github.com/protocolbuffers/protobuf/releases for the latest release.
+	DefaultProtocVersion = "3.7.0"
 )

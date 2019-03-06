@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,14 @@ package create
 
 import "go.uber.org/zap"
 
-// DefaultPackage is the default package to use in lieu of one being able to be
-// derived.
-const DefaultPackage = "uber.prototool.generated"
+const (
+	// DefaultPackage is the default package to use in lieu of one being able
+	// to be derived.
+	DefaultPackage = "uber.prototool.generated"
+	// DefaultPackageV2 is the default package to use in lieu of one being able
+	// to be derived if the lint group is "uber2".
+	DefaultPackageV2 = "uber.prototool.generated.v1"
+)
 
 // Handler handles creation of Protobuf files from a template.
 type Handler interface {
@@ -44,6 +49,13 @@ func HandlerWithLogger(logger *zap.Logger) HandlerOption {
 	}
 }
 
+// HandlerWithDevelMode returns a HandlerOption that allows devel-mode.
+func HandlerWithDevelMode() HandlerOption {
+	return func(handler *handler) {
+		handler.develMode = true
+	}
+}
+
 // HandlerWithPackage returns a HandlerOption that uses the given package for
 // new Protobuf files.
 //
@@ -51,6 +63,15 @@ func HandlerWithLogger(logger *zap.Logger) HandlerOption {
 func HandlerWithPackage(pkg string) HandlerOption {
 	return func(handler *handler) {
 		handler.pkg = pkg
+	}
+}
+
+// HandlerWithConfigData returns a HandlerOption that uses the given configuration
+// data instead of using configuration files that are found. This acts as if there is only one
+// configuration file at the current working directory. All found configuration files are ignored.
+func HandlerWithConfigData(configData string) HandlerOption {
+	return func(handler *handler) {
+		handler.configData = configData
 	}
 }
 

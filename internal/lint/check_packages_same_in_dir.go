@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ var packagesSameInDirLinter = NewLinter(
 	checkPackagesSameInDir,
 )
 
-func checkPackagesSameInDir(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackagesSameInDir(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	visitor := &packagesSameInDirVisitor{baseAddVisitor: newBaseAddVisitor(add), pkgs: make(map[string]struct{})}
 	if err := runVisitor(visitor, descriptors); err != nil {
 		return err
@@ -61,7 +61,7 @@ type packagesSameInDirVisitor struct {
 	pkg *proto.Package
 }
 
-func (v *packagesSameInDirVisitor) OnStart(*proto.Proto) error {
+func (v *packagesSameInDirVisitor) OnStart(*FileDescriptor) error {
 	v.pkg = nil
 	return nil
 }

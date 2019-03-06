@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,12 @@ import (
 	"github.com/uber/prototool/internal/text"
 )
 
+var fileOptionsRequireCSharpNamespaceLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_CSHARP_NAMESPACE",
+	`Verifies that the file option "csharp_namespace" is set.`,
+	newCheckFileOptionsRequire("csharp_namespace"),
+)
+
 var fileOptionsRequireGoPackageLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_GO_PACKAGE",
 	`Verifies that the file option "go_package" is set.`,
@@ -51,8 +57,20 @@ var fileOptionsRequireJavaPackageLinter = NewLinter(
 	newCheckFileOptionsRequire("java_package"),
 )
 
-func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*proto.Proto) error {
-	return func(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+var fileOptionsRequireOBJCClassPrefixLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_OBJC_CLASS_PREFIX",
+	`Verifies that the file option "objc_class_prefix" is set.`,
+	newCheckFileOptionsRequire("objc_class_prefix"),
+)
+
+var fileOptionsRequirePHPNamespaceLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_PHP_NAMESPACE",
+	`Verifies that the file option "php_namespace" is set.`,
+	newCheckFileOptionsRequire("php_namespace"),
+)
+
+func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*FileDescriptor) error {
+	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		return runVisitor(&fileOptionsRequireVisitor{
 			baseAddVisitor: newBaseAddVisitor(add),
 			fileOption:     fileOption,
@@ -69,7 +87,7 @@ type fileOptionsRequireVisitor struct {
 	seen     bool
 }
 
-func (v *fileOptionsRequireVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *fileOptionsRequireVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.filename = descriptor.Filename
 	v.seen = false
 	return nil

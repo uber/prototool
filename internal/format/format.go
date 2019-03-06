@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,15 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	// FixNone says to not do fixing.
+	FixNone = 0
+	// FixV1 says to do V1 fixing.
+	FixV1 = 1
+	// FixV2 says to do V2 fixing.
+	FixV2 = 2
+)
+
 // Transformer transforms an input file into an output file.
 type Transformer interface {
 	// Transform transforms the data.
@@ -48,10 +57,30 @@ func TransformerWithLogger(logger *zap.Logger) TransformerOption {
 }
 
 // TransformerWithFix returns a TransformerOption that will update the file options
-// go_package, java_package to match the package per the guidelines of the style guide.
-func TransformerWithFix() TransformerOption {
+// to match the package per the guidelines of the style guide.
+func TransformerWithFix(fix int) TransformerOption {
 	return func(transformer *transformer) {
-		transformer.fix = true
+		transformer.fix = fix
+	}
+}
+
+// TransformerWithFileHeader returns a TransformerOption that will update the file
+// header to match the given file header.
+//
+// This is only valid if fix is set to a value other than FixNone.
+func TransformerWithFileHeader(fileHeader string) TransformerOption {
+	return func(transformer *transformer) {
+		transformer.fileHeader = fileHeader
+	}
+}
+
+// TransformerWithJavaPackagePrefix returns a TransformerOption that will override
+// the Java package prefix.
+//
+// This is only valid if fix is set to a value other than FixNone.
+func TransformerWithJavaPackagePrefix(javaPackagePrefix string) TransformerOption {
+	return func(transformer *transformer) {
+		transformer.javaPackagePrefix = javaPackagePrefix
 	}
 }
 

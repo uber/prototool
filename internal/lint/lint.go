@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,11 @@ package lint
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+	"unicode"
 
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/file"
@@ -36,14 +39,125 @@ var (
 	// AllLinters is the slice of all known Linters.
 	AllLinters = []Linter{
 		commentsNoCStyleLinter,
+		commentsNoInlineLinter,
 		enumFieldNamesUppercaseLinter,
+		enumFieldNamesUpperSnakeCaseLinter,
+		enumFieldPrefixesLinter,
+		enumFieldPrefixesExceptMessageLinter,
+		enumNamesCamelCaseLinter,
+		enumNamesCapitalizedLinter,
+		enumZeroValuesInvalidLinter,
+		enumZeroValuesInvalidExceptMessageLinter,
+		enumsHaveCommentsLinter,
+		enumsHaveSentenceCommentsLinter,
+		enumsNoAllowAliasLinter,
+		fieldsNotReservedLinter,
+		fileHeaderLinter,
+		fileNamesLowerSnakeCaseLinter,
+		fileOptionsCSharpNamespaceSameInDirLinter,
+		fileOptionsEqualCSharpNamespaceCapitalizedLinter,
+		fileOptionsEqualGoPackageV2SuffixLinter,
+		fileOptionsEqualGoPackagePbSuffixLinter,
+		fileOptionsEqualJavaMultipleFilesTrueLinter,
+		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
+		fileOptionsEqualJavaPackageComPrefixLinter,
+		fileOptionsEqualJavaPackagePrefixLinter,
+		fileOptionsEqualOBJCClassPrefixAbbrLinter,
+		fileOptionsEqualPHPNamespaceCapitalizedLinter,
+		fileOptionsGoPackageNotLongFormLinter,
+		fileOptionsGoPackageSameInDirLinter,
+		fileOptionsJavaMultipleFilesSameInDirLinter,
+		fileOptionsJavaPackageSameInDirLinter,
+		fileOptionsOBJCClassPrefixSameInDirLinter,
+		fileOptionsPHPNamespaceSameInDirLinter,
+		fileOptionsRequireCSharpNamespaceLinter,
+		fileOptionsRequireGoPackageLinter,
+		fileOptionsRequireJavaMultipleFilesLinter,
+		fileOptionsRequireJavaOuterClassnameLinter,
+		fileOptionsRequireJavaPackageLinter,
+		fileOptionsRequireOBJCClassPrefixLinter,
+		fileOptionsRequirePHPNamespaceLinter,
+		fileOptionsUnsetJavaMultipleFilesLinter,
+		fileOptionsUnsetJavaOuterClassnameLinter,
+		gogoNotImportedLinter,
+		importsNotPublicLinter,
+		importsNotWeakLinter,
+		messageFieldsDurationLinter,
+		messageFieldsNotFloatsLinter,
+		messageFieldsNoJSONNameLinter,
+		messageFieldsTimeLinter,
+		messageFieldNamesFilenameLinter,
+		messageFieldNamesFilepathLinter,
+		messageFieldNamesLowerSnakeCaseLinter,
+		messageFieldNamesLowercaseLinter,
+		messageFieldNamesNoDescriptorLinter,
+		messageNamesCamelCaseLinter,
+		messageNamesCapitalizedLinter,
+		messagesHaveCommentsLinter,
+		messagesHaveCommentsExceptRequestResponseTypesLinter,
+		messagesHaveSentenceCommentsExceptRequestResponseTypesLinter,
+		messagesNotEmptyExceptRequestResponseTypesLinter,
+		namesNoCommonLinter,
+		namesNoDataLinter,
+		namesNoUUIDLinter,
+		oneofNamesLowerSnakeCaseLinter,
+		packageIsDeclaredLinter,
+		packageLowerCaseLinter,
+		packageLowerSnakeCaseLinter,
+		packageMajorBetaVersionedLinter,
+		packageNoKeywordsLinter,
+		packagesSameInDirLinter,
+		rpcsHaveCommentsLinter,
+		rpcsHaveSentenceCommentsLinter,
+		rpcNamesCamelCaseLinter,
+		rpcNamesCapitalizedLinter,
+		rpcOptionsNoGoogleAPIHTTPLinter,
+		requestResponseTypesAfterServiceLinter,
+		requestResponseTypesInSameFileLinter,
+		requestResponseTypesOnlyInFileLinter,
+		requestResponseTypesUniqueLinter,
+		requestResponseNamesMatchRPCLinter,
+		servicesHaveCommentsLinter,
+		servicesHaveSentenceCommentsLinter,
+		serviceNamesAPISuffixLinter,
+		serviceNamesCamelCaseLinter,
+		serviceNamesCapitalizedLinter,
+		serviceNamesMatchFileNameLinter,
+		serviceNamesNoPluralsLinter,
+		syntaxProto3Linter,
+		wktDirectlyImportedLinter,
+		wktDurationSuffixLinter,
+		wktTimestampSuffixLinter,
+	}
+
+	// DefaultLinters is the slice of default Linters.
+	DefaultLinters = Uber1Linters
+
+	// GoogleLinters is the slice of linters for the google lint group.
+	GoogleLinters = []Linter{
+		enumFieldNamesUpperSnakeCaseLinter,
+		enumNamesCamelCaseLinter,
+		enumNamesCapitalizedLinter,
+		fileHeaderLinter,
+		messageFieldNamesLowerSnakeCaseLinter,
+		messageNamesCamelCaseLinter,
+		messageNamesCapitalizedLinter,
+		rpcNamesCamelCaseLinter,
+		rpcNamesCapitalizedLinter,
+		serviceNamesCamelCaseLinter,
+		serviceNamesCapitalizedLinter,
+	}
+
+	// Uber1Linters is the slice of linters for the uber1 lint group.
+	Uber1Linters = []Linter{
+		commentsNoCStyleLinter,
 		enumFieldNamesUpperSnakeCaseLinter,
 		enumFieldPrefixesLinter,
 		enumNamesCamelCaseLinter,
 		enumNamesCapitalizedLinter,
 		enumZeroValuesInvalidLinter,
-		enumsHaveCommentsLinter,
 		enumsNoAllowAliasLinter,
+		fileHeaderLinter,
 		fileOptionsEqualGoPackagePbSuffixLinter,
 		fileOptionsEqualJavaMultipleFilesTrueLinter,
 		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
@@ -56,68 +170,112 @@ var (
 		fileOptionsRequireJavaMultipleFilesLinter,
 		fileOptionsRequireJavaOuterClassnameLinter,
 		fileOptionsRequireJavaPackageLinter,
-		fileOptionsUnsetJavaMultipleFilesLinter,
-		fileOptionsUnsetJavaOuterClassnameLinter,
-		messageFieldsNotFloatsLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
-		messageFieldNamesLowercaseLinter,
 		messageNamesCamelCaseLinter,
 		messageNamesCapitalizedLinter,
-		messagesHaveCommentsLinter,
-		messagesHaveCommentsExceptRequestResponseTypesLinter,
 		oneofNamesLowerSnakeCaseLinter,
 		packageIsDeclaredLinter,
 		packageLowerSnakeCaseLinter,
 		packagesSameInDirLinter,
-		rpcsHaveCommentsLinter,
 		rpcNamesCamelCaseLinter,
 		rpcNamesCapitalizedLinter,
 		requestResponseTypesInSameFileLinter,
 		requestResponseTypesUniqueLinter,
-		requestResponseNamesMatchRPCLinter,
-		servicesHaveCommentsLinter,
 		serviceNamesCamelCaseLinter,
 		serviceNamesCapitalizedLinter,
 		syntaxProto3Linter,
 		wktDirectlyImportedLinter,
 	}
 
-	// DefaultLinters is the slice of default Linters.
-	DefaultLinters = copyLintersWithout(
-		AllLinters,
-		enumFieldNamesUppercaseLinter,
-		enumsHaveCommentsLinter,
-		fileOptionsUnsetJavaMultipleFilesLinter,
-		fileOptionsUnsetJavaOuterClassnameLinter,
-		messageFieldsNotFloatsLinter,
-		messagesHaveCommentsLinter,
-		messagesHaveCommentsExceptRequestResponseTypesLinter,
-		messageFieldNamesLowercaseLinter,
+	// Uber2Linters is the slice of linters for the uber2 lint group.
+	Uber2Linters = []Linter{
+		commentsNoCStyleLinter,
+		commentsNoInlineLinter,
+		enumFieldNamesUpperSnakeCaseLinter,
+		enumFieldPrefixesExceptMessageLinter,
+		enumNamesCamelCaseLinter,
+		enumNamesCapitalizedLinter,
+		enumZeroValuesInvalidExceptMessageLinter,
+		enumsHaveSentenceCommentsLinter,
+		enumsNoAllowAliasLinter,
+		fieldsNotReservedLinter,
+		fileHeaderLinter,
+		fileNamesLowerSnakeCaseLinter,
+		fileOptionsCSharpNamespaceSameInDirLinter,
+		fileOptionsEqualCSharpNamespaceCapitalizedLinter,
+		fileOptionsEqualGoPackageV2SuffixLinter,
+		fileOptionsEqualJavaMultipleFilesTrueLinter,
+		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
+		fileOptionsEqualJavaPackagePrefixLinter,
+		fileOptionsEqualOBJCClassPrefixAbbrLinter,
+		fileOptionsEqualPHPNamespaceCapitalizedLinter,
+		fileOptionsGoPackageNotLongFormLinter,
+		fileOptionsGoPackageSameInDirLinter,
+		fileOptionsJavaMultipleFilesSameInDirLinter,
+		fileOptionsJavaPackageSameInDirLinter,
+		fileOptionsOBJCClassPrefixSameInDirLinter,
+		fileOptionsPHPNamespaceSameInDirLinter,
+		fileOptionsRequireCSharpNamespaceLinter,
+		fileOptionsRequireGoPackageLinter,
+		fileOptionsRequireJavaMultipleFilesLinter,
+		fileOptionsRequireJavaOuterClassnameLinter,
+		fileOptionsRequireJavaPackageLinter,
+		fileOptionsRequireOBJCClassPrefixLinter,
+		fileOptionsRequirePHPNamespaceLinter,
+		importsNotPublicLinter,
+		importsNotWeakLinter,
+		messagesHaveSentenceCommentsExceptRequestResponseTypesLinter,
+		messageFieldNamesFilenameLinter,
+		messageFieldNamesFilepathLinter,
+		messageFieldNamesLowerSnakeCaseLinter,
+		messageFieldNamesNoDescriptorLinter,
+		messageFieldsNoJSONNameLinter,
+		messageNamesCamelCaseLinter,
+		messageNamesCapitalizedLinter,
+		namesNoCommonLinter,
+		namesNoDataLinter,
+		namesNoUUIDLinter,
+		oneofNamesLowerSnakeCaseLinter,
+		packageIsDeclaredLinter,
+		packageLowerCaseLinter,
+		packageMajorBetaVersionedLinter,
+		packageNoKeywordsLinter,
+		packagesSameInDirLinter,
+		rpcsHaveSentenceCommentsLinter,
+		rpcNamesCamelCaseLinter,
+		rpcNamesCapitalizedLinter,
 		requestResponseNamesMatchRPCLinter,
-		rpcsHaveCommentsLinter,
-		servicesHaveCommentsLinter,
-	)
-
-	// DefaultGroup is the default group.
-	DefaultGroup = "default"
-
-	// AllGroup is the group of all known linters.
-	AllGroup = "all"
+		requestResponseTypesAfterServiceLinter,
+		requestResponseTypesInSameFileLinter,
+		requestResponseTypesOnlyInFileLinter,
+		requestResponseTypesUniqueLinter,
+		servicesHaveSentenceCommentsLinter,
+		serviceNamesAPISuffixLinter,
+		serviceNamesCamelCaseLinter,
+		serviceNamesCapitalizedLinter,
+		serviceNamesMatchFileNameLinter,
+		syntaxProto3Linter,
+		wktDirectlyImportedLinter,
+		wktDurationSuffixLinter,
+		wktTimestampSuffixLinter,
+	}
 
 	// GroupToLinters is the map from linter group to the corresponding slice of linters.
 	GroupToLinters = map[string][]Linter{
-		DefaultGroup: DefaultLinters,
-		AllGroup:     AllLinters,
+		"google": GoogleLinters,
+		"uber1":  Uber1Linters,
+		"uber2":  Uber2Linters,
 	}
+
+	allLintIDs = make(map[string]struct{})
 )
 
 func init() {
-	ids := make(map[string]struct{})
 	for _, linter := range AllLinters {
-		if _, ok := ids[linter.ID()]; ok {
+		if _, ok := allLintIDs[linter.ID()]; ok {
 			panic(fmt.Sprintf("duplicate linter id %s", linter.ID()))
 		}
-		ids[linter.ID()] = struct{}{}
+		allLintIDs[linter.ID()] = struct{}{}
 	}
 }
 
@@ -143,6 +301,14 @@ func NewRunner(options ...RunnerOption) Runner {
 	return newRunner(options...)
 }
 
+// FileDescriptor is a wrapper for proto.Proto.
+type FileDescriptor struct {
+	*proto.Proto
+
+	ProtoSet *file.ProtoSet
+	FileData string
+}
+
 // The below should not be needed in the CLI
 // TODO make private
 
@@ -151,13 +317,13 @@ type Linter interface {
 	// Return the ID of this Linter. This should be all UPPER_SNAKE_CASE.
 	ID() string
 	// Return the purpose of this Linter. This should be a human-readable string.
-	Purpose() string
-	// Check the file data for the descriptors in a common directgory.
+	Purpose(config settings.LintConfig) string
+	// Check the file data for the descriptors in a common directory.
 	// If there is a lint failure, this returns it in the
 	// slice and does not return an error. An error is returned if something
 	// unexpected happens. Callers should verify the files are compilable
 	// before running this.
-	Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error)
+	Check(dirPath string, descriptors []*FileDescriptor) ([]*text.Failure, error)
 }
 
 // NewLinter is a convenience function that returns a new Linter for the
@@ -166,11 +332,24 @@ type Linter interface {
 // The ID will be upper-cased.
 //
 // Failures returned from check do not need to set the ID, this will be overwritten.
-func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*proto.Proto) error) Linter {
+func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), string, []*FileDescriptor) error) Linter {
 	return newBaseLinter(id, purpose, addCheck)
 }
 
+// NewSuppressableLinter is a convenience function that returns a new Linter for the
+// given parameters, using a function to record failures. This linter can be
+// suppressed given the annotation.
+//
+// The ID will be upper-cased.
+//
+// Failures returned from check do not need to set the ID, this will be overwritten.
+func NewSuppressableLinter(id string, purpose string, suppressableAnnotation string, addCheck func(func(*file.ProtoSet, *proto.Comment, *text.Failure), string, []*FileDescriptor) error) Linter {
+	return newBaseSuppressableLinter(id, purpose, suppressableAnnotation, addCheck)
+}
+
 // GetLinters returns the Linters for the LintConfig.
+//
+// The group, if set, is expected to be lower-case.
 //
 // The configuration is expected to be valid, deduplicated, and all upper-case.
 // IncludeIDs and ExcludeIDs MUST NOT have an intersection.
@@ -178,8 +357,30 @@ func NewLinter(id string, purpose string, addCheck func(func(*text.Failure), str
 // If the config came from the settings package, this is already validated.
 func GetLinters(config settings.LintConfig) ([]Linter, error) {
 	var linters []Linter
-	if !config.NoDefault {
+	var ok bool
+	if config.Group != "" {
+		linters, ok = GroupToLinters[config.Group]
+		if !ok {
+			return nil, fmt.Errorf("unknown lint group: %s", config.Group)
+		}
+	} else if !config.NoDefault {
+		// we ignore NoDefault if Group is set
 		linters = DefaultLinters
+	}
+	for _, id := range config.IncludeIDs {
+		if err := checkLintID(id); err != nil {
+			return nil, err
+		}
+	}
+	for _, excludeID := range config.ExcludeIDs {
+		if err := checkLintID(excludeID); err != nil {
+			return nil, err
+		}
+	}
+	for ignoreID := range config.IgnoreIDToFilePaths {
+		if err := checkLintID(ignoreID); err != nil {
+			return nil, err
+		}
 	}
 	if len(config.IncludeIDs) == 0 && len(config.ExcludeIDs) == 0 {
 		return linters, nil
@@ -212,10 +413,14 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 
 // GetDirPathToDescriptors is a convenience function that gets the
 // descriptors for the given ProtoSet.
-func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto, error) {
-	dirPathToDescriptors := make(map[string][]*proto.Proto, len(protoSet.DirPathToFiles))
+func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*FileDescriptor, error) {
+	dirPathToDescriptors := make(map[string][]*FileDescriptor, len(protoSet.DirPathToFiles))
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
-		descriptors := make([]*proto.Proto, len(protoFiles))
+		// skip those files not under the directory
+		if !strings.HasPrefix(dirPath, protoSet.DirPath) {
+			continue
+		}
+		descriptors := make([]*FileDescriptor, len(protoFiles))
 		for i, protoFile := range protoFiles {
 			file, err := os.Open(protoFile.Path)
 			if err != nil {
@@ -224,11 +429,25 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto
 			parser := proto.NewParser(file)
 			parser.Filename(protoFile.DisplayPath)
 			descriptor, err := parser.Parse()
-			_ = file.Close()
 			if err != nil {
+				_ = file.Close()
 				return nil, err
 			}
-			descriptors[i] = descriptor
+			if _, err := file.Seek(0, 0); err != nil {
+				_ = file.Close()
+				return nil, err
+			}
+			fileData, err := ioutil.ReadAll(file)
+			if err != nil {
+				_ = file.Close()
+				return nil, err
+			}
+			_ = file.Close()
+			descriptors[i] = &FileDescriptor{
+				Proto:    descriptor,
+				ProtoSet: protoSet,
+				FileData: string(fileData),
+			}
 		}
 		dirPathToDescriptors[dirPath] = descriptors
 	}
@@ -236,7 +455,7 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*proto.Proto
 }
 
 // CheckMultiple is a convenience function that checks multiple linters and multiple descriptors.
-func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
+func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
 	var allFailures []*text.Failure
 	for dirPath, descriptors := range dirPathToDescriptors {
 		for _, linter := range linters {
@@ -251,7 +470,7 @@ func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*proto.Pr
 	return allFailures, nil
 }
 
-func checkOne(linter Linter, dirPath string, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
+func checkOne(linter Linter, dirPath string, descriptors []*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
 	filteredDescriptors, err := filterIgnores(linter, descriptors, ignoreIDToFilePaths)
 	if err != nil {
 		return nil, err
@@ -259,8 +478,8 @@ func checkOne(linter Linter, dirPath string, descriptors []*proto.Proto, ignoreI
 	return linter.Check(dirPath, filteredDescriptors)
 }
 
-func filterIgnores(linter Linter, descriptors []*proto.Proto, ignoreIDToFilePaths map[string][]string) ([]*proto.Proto, error) {
-	var filteredDescriptors []*proto.Proto
+func filterIgnores(linter Linter, descriptors []*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*FileDescriptor, error) {
+	var filteredDescriptors []*FileDescriptor
 	for _, descriptor := range descriptors {
 		ignore, err := shouldIgnore(linter, descriptor, ignoreIDToFilePaths)
 		if err != nil {
@@ -273,7 +492,7 @@ func filterIgnores(linter Linter, descriptors []*proto.Proto, ignoreIDToFilePath
 	return filteredDescriptors, nil
 }
 
-func shouldIgnore(linter Linter, descriptor *proto.Proto, ignoreIDToFilePaths map[string][]string) (bool, error) {
+func shouldIgnore(linter Linter, descriptor *FileDescriptor, ignoreIDToFilePaths map[string][]string) (bool, error) {
 	filePath := descriptor.Filename
 	var err error
 	if !filepath.IsAbs(filePath) {
@@ -286,27 +505,43 @@ func shouldIgnore(linter Linter, descriptor *proto.Proto, ignoreIDToFilePaths ma
 	if !ok {
 		return false, nil
 	}
-	for _, ignoreFilePath := range ignoreFilePaths {
-		if filePath == ignoreFilePath {
-			return true, nil
-		}
-	}
-	return false, nil
+	return file.IsExcluded(filePath, descriptor.ProtoSet.Config.DirPath, ignoreFilePaths...), nil
 }
 
-func copyLintersWithout(linters []Linter, remove ...Linter) []Linter {
-	c := make([]Linter, 0, len(linters))
-	for _, linter := range linters {
-		if !linterIn(linter, remove) {
-			c = append(c, linter)
-		}
+func checkLintID(lintID string) error {
+	if _, ok := allLintIDs[lintID]; !ok {
+		return fmt.Errorf("unknown lint id in configuration file: %s", lintID)
 	}
-	return c
+	return nil
 }
 
-func linterIn(linter Linter, s []Linter) bool {
-	for _, e := range s {
-		if e == linter {
+func hasGolangStyleComment(comment *proto.Comment, name string) bool {
+	return comment != nil && len(comment.Lines) > 0 && strings.HasPrefix(comment.Lines[0], fmt.Sprintf(" %s ", name))
+}
+
+func hasCompleteSentenceComment(comment *proto.Comment) bool {
+	return commentStartsWithUppercaseLetter(comment) && commentContainsPeriod(comment)
+}
+
+func commentStartsWithUppercaseLetter(comment *proto.Comment) bool {
+	if comment == nil || len(comment.Lines) == 0 {
+		return false
+	}
+	firstLine := strings.TrimSpace(comment.Lines[0])
+	if firstLine == "" {
+		return false
+	}
+	return unicode.IsUpper(rune(firstLine[0])) || unicode.IsDigit(rune(firstLine[0]))
+}
+
+func commentContainsPeriod(comment *proto.Comment) bool {
+	if comment == nil || len(comment.Lines) == 0 {
+		return false
+	}
+	// very primitive check, could make better with NLP but this is hard with comments
+	// since comments can contain code examples, links, etc.
+	for _, line := range comment.Lines {
+		if strings.Contains(line, ".") {
 			return true
 		}
 	}

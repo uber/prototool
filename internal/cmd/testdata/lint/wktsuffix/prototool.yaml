@@ -1,0 +1,5 @@
+lint:
+  rules:
+    add:
+      - WKT_DURATION_SUFFIX
+      - WKT_TIMESTAMP_SUFFIX

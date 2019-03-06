@@ -1,0 +1,35 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "compiler.go",
+        "downloader.go",
+        "protoc.go",
+    ],
+    importpath = "github.com/uber/prototool/internal/protoc",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/file:go_default_library",
+        "//internal/settings:go_default_library",
+        "//internal/text:go_default_library",
+        "//internal/vars:go_default_library",
+        "//internal/wkt:go_default_library",
+        "@com_github_gofrs_flock//:go_default_library",
+        "@com_github_golang_protobuf//proto:go_default_library",
+        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
+        "@org_uber_go_multierr//:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["downloader_test.go"],
+    embed = [":go_default_library"],
+    deps = [
+        "//internal/settings:go_default_library",
+        "@com_github_stretchr_testify//assert:go_default_library",
+        "@com_github_stretchr_testify//require:go_default_library",
+    ],
+)

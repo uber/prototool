@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 package lint
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
@@ -34,7 +31,7 @@ var enumsHaveCommentsLinter = NewLinter(
 	checkEnumsHaveComments,
 )
 
-func checkEnumsHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumsHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(enumsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -50,7 +47,7 @@ func (v enumsHaveCommentsVisitor) VisitMessage(message *proto.Message) {
 }
 
 func (v enumsHaveCommentsVisitor) VisitEnum(enum *proto.Enum) {
-	if enum.Comment == nil || len(enum.Comment.Lines) == 0 || !strings.HasPrefix(enum.Comment.Lines[0], fmt.Sprintf(" %s ", enum.Name)) {
+	if !hasGolangStyleComment(enum.Comment, enum.Name) {
 		v.AddFailuref(enum.Position, `Enum %q needs a comment of the form "// %s ..."`, enum.Name, enum.Name)
 	}
 }

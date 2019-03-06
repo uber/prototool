@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,6 @@
 package lint
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/emicklei/proto"
@@ -34,7 +33,7 @@ var messagesHaveCommentsExceptRequestResponseTypesLinter = NewLinter(
 	checkMessagesHaveCommentsExceptRequestResponseTypes,
 )
 
-func checkMessagesHaveCommentsExceptRequestResponseTypes(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkMessagesHaveCommentsExceptRequestResponseTypes(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&messagesHaveCommentsExceptRequestResponseTypesVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -45,7 +44,7 @@ type messagesHaveCommentsExceptRequestResponseTypesVisitor struct {
 	nestedMessageNames   []string
 }
 
-func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) OnStart(*proto.Proto) error {
+func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) OnStart(*FileDescriptor) error {
 	v.messageNameToMessage = nil
 	v.requestResponseTypes = nil
 	v.nestedMessageNames = nil
@@ -90,7 +89,7 @@ func (v *messagesHaveCommentsExceptRequestResponseTypesVisitor) Finally() error 
 	for messageName, message := range v.messageNameToMessage {
 		if !message.IsExtend {
 			if _, ok := v.requestResponseTypes[messageName]; !ok {
-				if message.Comment == nil || len(message.Comment.Lines) == 0 || !strings.HasPrefix(message.Comment.Lines[0], fmt.Sprintf(" %s ", message.Name)) {
+				if !hasGolangStyleComment(message.Comment, message.Name) {
 					v.AddFailuref(message.Position, `Message %q needs a comment of the form "// %s ..."`, message.Name, message.Name)
 				}
 			}

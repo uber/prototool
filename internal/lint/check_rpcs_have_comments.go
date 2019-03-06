@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,6 @@
 package lint
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/emicklei/proto"
 	"github.com/uber/prototool/internal/text"
 )
@@ -34,7 +31,7 @@ var rpcsHaveCommentsLinter = NewLinter(
 	checkRPCsHaveComments,
 )
 
-func checkRPCsHaveComments(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRPCsHaveComments(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(rpcsHaveCommentsVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -49,7 +46,7 @@ func (v rpcsHaveCommentsVisitor) VisitService(service *proto.Service) {
 }
 
 func (v rpcsHaveCommentsVisitor) VisitRPC(rpc *proto.RPC) {
-	if rpc.Comment == nil || len(rpc.Comment.Lines) == 0 || !strings.HasPrefix(rpc.Comment.Lines[0], fmt.Sprintf(" %s ", rpc.Name)) {
+	if !hasGolangStyleComment(rpc.Comment, rpc.Name) {
 		v.AddFailuref(rpc.Position, `RPC %q needs a comment of the form "// %s ..."`, rpc.Name, rpc.Name)
 	}
 }

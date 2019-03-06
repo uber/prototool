@@ -48,7 +48,7 @@ message Baz {
 
   // dep comment
   bar.Dep dep = 2;
-  google.protobuf.Timestamp timestamp = 3; // inline c-style comment 
+  google.protobuf.Timestamp timestamp = 3; // inline c-style comment
   int64 woot = 5 [(bar.field_option) = true];
   // comment17
   int64 woot2 = 6 [

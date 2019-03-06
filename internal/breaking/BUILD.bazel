@@ -1,0 +1,52 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "breaking.go",
+        "check_enum_values_not_deleted.go",
+        "check_enum_values_same_name.go",
+        "check_enums_not_deleted.go",
+        "check_message_fields_not_deleted.go",
+        "check_message_fields_same_label.go",
+        "check_message_fields_same_name.go",
+        "check_message_fields_same_oneof.go",
+        "check_message_fields_same_type.go",
+        "check_message_oneofs_fields_not_removed.go",
+        "check_message_oneofs_not_deleted.go",
+        "check_messages_not_deleted.go",
+        "check_packages_no_beta_deps.go",
+        "check_packages_not_deleted.go",
+        "check_service_methods_not_deleted.go",
+        "check_service_methods_same_client_streaming.go",
+        "check_service_methods_same_request_type.go",
+        "check_service_methods_same_response_type.go",
+        "check_service_methods_same_server_streaming.go",
+        "check_services_not_deleted.go",
+        "helpers.go",
+        "runner.go",
+        "strings.go",
+    ],
+    importpath = "github.com/uber/prototool/internal/breaking",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/extract:go_default_library",
+        "//internal/protostrs:go_default_library",
+        "//internal/reflect/gen/uber/proto/reflect/v1:go_default_library",
+        "//internal/text:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["breaking_test.go"],
+    embed = [":go_default_library"],
+    deps = [
+        "//internal/extract:go_default_library",
+        "//internal/reflect:go_default_library",
+        "//internal/testing:go_default_library",
+        "//internal/text:go_default_library",
+        "@com_github_stretchr_testify//require:go_default_library",
+    ],
+)

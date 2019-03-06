@@ -1,0 +1,242 @@
+syntax = "proto3";
+
+package foo.v1beta2;
+
+option csharp_namespace = "Foo.V1Beta2";
+option go_package = "foov1beta2";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo.v1beta2";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1Beta2";
+
+import "bar/v1beta1/bar.proto";
+import "bar/v2/bar.proto";
+
+message Deps {
+  bar.v1beta1.One v1beta1_one = 2;
+  bar.v2.One v2_one = 1;
+}
+
+enum EnumOne {
+  ENUM_ONE_INVALID = 0;
+  ENUM_ONE_ONE = 1;
+  ENUM_ONE_TWO = 2;
+}
+
+enum EnumTwo {
+  ENUM_TWO_INVALID = 0;
+  ENUM_TWO_ONE = 1;
+  ENUM_TWO_TWO = 2;
+}
+
+enum EnumThree {
+  ENUM_THREE_INVALID = 0;
+  ENUM_THREE_ONE = 1;
+  ENUM_THREE_TWO = 2;
+}
+
+message One {
+  message NestedOne {
+    message NestedNestedOne{}
+    message NestedNestedTwo{}
+  }
+  message NestedTwo {}
+}
+
+message Two {}
+
+message Three {
+  message NestedThree {
+    message NestedNestedThree {
+      int64 one = 1;
+      string two = 2;
+    }
+    int64 one = 1;
+    string two = 2;
+    NestedNestedThree three = 3;
+  }
+  int64 one = 1;
+  string two = 2;
+  NestedThree three = 3;
+}
+
+message Four {
+  message NestedFour {
+    message NestedNestedFour {
+      int64 one = 1;
+      string two = 2;
+      EnumOne four = 4;
+      EnumThree five = 5;
+      repeated int64 six = 6;
+      map<int64, string> seven = 7;
+    }
+    int64 one = 1;
+    string two = 2;
+    NestedNestedFour three = 3;
+    EnumOne four = 4;
+    EnumThree five = 5;
+    repeated int64 six = 6;
+    map<int64, string> seven = 7;
+  }
+  int64 one = 1;
+  string two = 2;
+  NestedFour three = 3;
+  EnumOne four = 4;
+  EnumThree five = 5;
+  repeated int64 six = 6;
+  map<int64, string> seven = 7;
+}
+
+message Five {
+  int64 one = 1;
+  string two = 2;
+  repeated int64 three = 3;
+  map<int64, string> four = 4;
+}
+
+message Six {
+  message NestedSix {
+    message NestedNestedSix {
+      enum Foo {
+        FOO_INVALID = 0;
+      }
+    }
+    message NestedNestedSixDelete {
+      enum Foo {
+        FOO_INVALID = 0;
+      }
+    }
+    enum Foo {
+      FOO_INVALID = 0;
+    }
+  }
+  enum Foo {
+    FOO_INVALID = 0;
+  }
+}
+
+enum EnumSeven {
+  ENUM_SEVEN_INVALID = 0;
+  ENUM_SEVEN_ONE = 1;
+  ENUM_SEVEN_TWO = 2;
+}
+
+message Seven {
+  message NestedSeven {
+    message NestedNestedSeven {
+      enum EnumSeven {
+        ENUM_SEVEN_INVALID = 0;
+        ENUM_SEVEN_ONE = 1;
+        ENUM_SEVEN_TWO = 2;
+      }
+    }
+    enum EnumSeven {
+      ENUM_SEVEN_INVALID = 0;
+      ENUM_SEVEN_ONE = 1;
+      ENUM_SEVEN_TWO = 2;
+    }
+  }
+  enum EnumSeven {
+    ENUM_SEVEN_INVALID = 0;
+    ENUM_SEVEN_ONE = 1;
+    ENUM_SEVEN_TWO = 2;
+  }
+}
+
+message Eight {
+  message NestedEight {
+    message NestedNestedEight {
+      int64 one = 1;
+      oneof test {
+        string two = 2;
+        bytes three = 3;
+      }
+    }
+    int64 one = 1;
+    oneof test {
+      string two = 2;
+      bytes three = 3;
+    }
+  }
+  int64 one = 1;
+  oneof test {
+    string two = 2;
+    bytes three = 3;
+  }
+}
+
+message Nine {
+  message NestedNine {
+    message NestedNestedNine {
+      int64 one = 1;
+    }
+    int64 one = 1;
+  }
+  int64 one = 1;
+}
+
+message Ten {
+  message NestedTen {
+    message NestedNestedTen {
+      int64 one = 1;
+      oneof test {
+        string two = 2;
+        bytes three = 3;
+      }
+    }
+    int64 one = 1;
+    oneof test {
+      string two = 2;
+      bytes three = 3;
+    }
+  }
+  int64 one = 1;
+  oneof test {
+    string two = 2;
+    bytes three = 3;
+  }
+}
+
+service OneAPI {
+  rpc OneOne(OneOneRequest) returns (OneOneResponse);
+  rpc OneTwo(OneTwoRequest) returns (OneTwoResponse);
+}
+
+message OneOneRequest {}
+
+message OneOneResponse {}
+
+message OneTwoRequest {}
+
+message OneTwoResponse {}
+
+service TwoAPI {}
+
+service ThreeAPI {
+  rpc ThreeOne(ThreeOneRequest) returns (ThreeOneResponse);
+  rpc ThreeTwo(stream ThreeTwoRequest) returns (ThreeTwoResponse);
+  rpc ThreeThree(ThreeThreeRequest) returns (ThreeThreeResponse);
+  rpc ThreeFour(ThreeFourRequest) returns (stream ThreeFourResponse);
+  rpc ThreeFive(ThreeFiveRequest) returns (ThreeFiveResponse);
+}
+
+message ThreeOneRequest {}
+
+message ThreeOneResponse {}
+
+message ThreeTwoRequest {}
+
+message ThreeTwoResponse {}
+
+message ThreeThreeRequest {}
+
+message ThreeThreeResponse {}
+
+message ThreeFourRequest {}
+
+message ThreeFourResponse {}
+
+message ThreeFiveRequest {}
+
+message ThreeFiveResponse {}

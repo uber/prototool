@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,58 @@
 package lint
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/file"
+	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 )
 
 type baseLinter struct {
-	id       string
-	purpose  string
-	addCheck func(func(*text.Failure), string, []*proto.Proto) error
+	id                     string
+	purpose                string
+	suppressableAnnotation string
+	addCheck               func(func(*file.ProtoSet, *proto.Comment, *text.Failure), string, []*FileDescriptor) error
 }
 
 func newBaseLinter(
 	id string,
 	purpose string,
-	addCheck func(func(*text.Failure), string, []*proto.Proto) error,
+	addCheck func(func(*text.Failure), string, []*FileDescriptor) error,
+) *baseLinter {
+	return newBaseSuppressableLinter(
+		id,
+		purpose,
+		"",
+		func(
+			f func(*file.ProtoSet, *proto.Comment, *text.Failure),
+			dirPath string,
+			descriptors []*FileDescriptor,
+		) error {
+			return addCheck(
+				func(failure *text.Failure) {
+					f(nil, nil, failure)
+				},
+				dirPath,
+				descriptors,
+			)
+		},
+	)
+}
+
+func newBaseSuppressableLinter(
+	id string,
+	purpose string,
+	suppressableAnnotation string,
+	addCheck func(func(*file.ProtoSet, *proto.Comment, *text.Failure), string, []*FileDescriptor) error,
 ) *baseLinter {
 	return &baseLinter{
-		id:       strings.ToUpper(id),
-		purpose:  purpose,
-		addCheck: addCheck,
+		id:                     strings.ToUpper(id),
+		purpose:                purpose,
+		suppressableAnnotation: suppressableAnnotation,
+		addCheck:               addCheck,
 	}
 }
 
@@ -49,21 +80,53 @@ func (c *baseLinter) ID() string {
 	return c.id
 }
 
-func (c *baseLinter) Purpose() string {
+func (c *baseLinter) Purpose(config settings.LintConfig) string {
+	if c.suppressableAnnotation != "" && config.AllowSuppression {
+		return fmt.Sprintf(`Suppressable with "@suppresswarnings %s". %s`, c.suppressableAnnotation, c.purpose)
+	}
 	return c.purpose
 }
 
-func (c *baseLinter) Check(dirPath string, descriptors []*proto.Proto) ([]*text.Failure, error) {
+func (c *baseLinter) Check(dirPath string, descriptors []*FileDescriptor) ([]*text.Failure, error) {
 	var failures []*text.Failure
 	err := c.addCheck(
-		func(failure *text.Failure) {
-			failures = append(failures, failure)
+		func(protoSet *file.ProtoSet, comment *proto.Comment, failure *text.Failure) {
+			if !c.isSuppressed(protoSet, comment) {
+				if c.allowSuppression(protoSet) && failure.Message != "" {
+					suppressionMessage := fmt.Sprintf(`This can be suppressed by adding "@suppresswarnings %s" to the comment.`, c.suppressableAnnotation)
+					if failure.Message != "" {
+						suppressionMessage = " " + suppressionMessage
+					}
+					failure.Message = failure.Message + suppressionMessage
+				}
+				failures = append(failures, failure)
+			}
 		},
 		dirPath,
 		descriptors,
 	)
 	for _, failure := range failures {
-		failure.ID = c.id
+		failure.LintID = c.id
 	}
 	return failures, err
+}
+
+func (c *baseLinter) allowSuppression(protoSet *file.ProtoSet) bool {
+	return c.suppressableAnnotation != "" && protoSet != nil && protoSet.Config.Lint.AllowSuppression
+}
+
+func (c *baseLinter) isSuppressed(protoSet *file.ProtoSet, comment *proto.Comment) bool {
+	if !c.allowSuppression(protoSet) {
+		return false
+	}
+	if comment == nil {
+		return false
+	}
+	annotation := "@suppresswarnings " + c.suppressableAnnotation
+	for _, line := range comment.Lines {
+		if strings.Contains(line, annotation) {
+			return true
+		}
+	}
+	return false
 }

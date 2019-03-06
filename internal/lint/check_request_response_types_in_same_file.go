@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ var requestResponseTypesInSameFileLinter = NewLinter(
 	checkRequestResponseTypesInSameFile,
 )
 
-func checkRequestResponseTypesInSameFile(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseTypesInSameFile(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&requestResponseTypesInSameFileVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -45,7 +45,7 @@ type requestResponseTypesInSameFileVisitor struct {
 	nestedMessageNames []string
 }
 
-func (v *requestResponseTypesInSameFileVisitor) OnStart(*proto.Proto) error {
+func (v *requestResponseTypesInSameFileVisitor) OnStart(*FileDescriptor) error {
 	v.messageTypes = nil
 	v.rpcs = nil
 	v.nestedMessageNames = nil

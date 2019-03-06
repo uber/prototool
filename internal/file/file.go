@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,8 @@ import (
 // DefaultWalkTimeout is the default walk timeout.
 const DefaultWalkTimeout time.Duration = 3 * time.Second
 
+var rootDirPath = filepath.Dir(string(filepath.Separator))
+
 // ProtoSet represents a set of .proto files and an associated config.
 //
 // ProtoSets will be validated if returned from this package.
@@ -41,18 +43,21 @@ type ProtoSet struct {
 	// Must be cleaned.
 	WorkDirPath string
 	// The given directory path.
-	// This will be the same as WorkDirPath if files were given.
 	// Must be absolute.
 	// Must be cleaned.
 	DirPath string
 	// The directory path to slice of .proto files.
 	// All paths must be absolute.
+	// All paths must reside within DirPath.
 	// Must be cleaned.
+	// The directory paths will always reside within the config DirPath,
+	// that is filepath.Rel(Config.DirPath, DirPath) will never return
+	// error and always return a non-empty string. Note the string could be ".".
+	// The ProtoFiles will always be in the directory specified by the key.
 	DirPathToFiles map[string][]*ProtoFile
 	// The associated Config.
 	// Must be valid.
-	// The DirPath on the config may differ from the DirPath
-	// on the ProtoSet.
+	// The DirPath on the config may differ from the DirPath on the ProtoSet.
 	Config settings.Config
 }
 
@@ -70,41 +75,18 @@ type ProtoFile struct {
 
 // ProtoSetProvider provides ProtoSets.
 type ProtoSetProvider interface {
-	// GetMultipleForDir gets the ProtoSets for the given dirPath.
-	// Each ProtoSet will have the config assocated with all files associated with
+	// GetForDir gets the ProtoSet for the given dirPath.
+	// The ProtoSet will have the config assocated with all files associated with
 	// the ProtoSet.
 	//
 	// This will return all .proto files in the directory of the associated config file
 	// and all it's subdirectories, or the given directory and its subdirectories
 	// if there is no config file.
 	//
-	// Configs will be searched for starting at the directory of each .proto file
+	// Config will be searched for starting at the directory of each .proto file
 	// and going up a directory until hitting root.
-	GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error)
-
-	// GetMultipleForFiles gets the ProtoSets for the given filePaths.
-	// Each ProtoSet will have the config assocated with all files associated with
-	// the ProtoSet.
-	//
-	// Configs will be searched for starting at the directory of each .proto file
-	// and going up a directory until hitting root.
-	//
-	// This ignores excludes, all files given will be included.
-	GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error)
-
-	// GetForDir does the same logic as GetMultipleForDir, but returns an error if there
-	// is not exactly one ProtoSet. We keep the original logic and testing for multiple
-	// ProtoSets around as we are still discussing this pre-v1.0.
-	// https://github.com/uber/prototool/issues/10
-	// https://github.com/uber/prototool/issues/93
+	// Returns an error if there is not exactly one ProtoSet.
 	GetForDir(workDirPath string, dirPath string) (*ProtoSet, error)
-
-	// GetForFiles does the same logic as GetMultipleForFiles, but returns an error if there
-	// is not exactly one ProtoSet. We keep the original logic and testing for multiple
-	// ProtoSets around as we are still discussing this pre-v1.0.
-	// https://github.com/uber/prototool/issues/10
-	// https://github.com/uber/prototool/issues/93
-	GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error)
 }
 
 // ProtoSetProviderOption is an option for a new ProtoSetProvider.
@@ -116,6 +98,22 @@ type ProtoSetProviderOption func(*protoSetProvider)
 func ProtoSetProviderWithLogger(logger *zap.Logger) ProtoSetProviderOption {
 	return func(protoSetProvider *protoSetProvider) {
 		protoSetProvider.logger = logger
+	}
+}
+
+// ProtoSetProviderWithDevelMode returns a ProtoSetProviderOption that allows devel-mode.
+func ProtoSetProviderWithDevelMode() ProtoSetProviderOption {
+	return func(protoSetProvider *protoSetProvider) {
+		protoSetProvider.develMode = true
+	}
+}
+
+// ProtoSetProviderWithConfigData returns a ProtoSetProviderOption that uses the given configuration
+// data instead of using configuration files that are found. This acts as if there is only one
+// configuration file at the current working directory. All found configuration files are ignored.
+func ProtoSetProviderWithConfigData(configData string) ProtoSetProviderOption {
+	return func(protoSetProvider *protoSetProvider) {
+		protoSetProvider.configData = configData
 	}
 }
 
@@ -153,4 +151,20 @@ func CheckAbs(path string) error {
 		return fmt.Errorf("expected absolute path but was %s", path)
 	}
 	return nil
+}
+
+// IsExcluded determines whether the given filePath should be excluded.
+//
+// absConfigDirPath represents the absolute path to the configuration file.
+// This is used to determine when we should stop checking for excludes.
+func IsExcluded(absFilePath string, absConfigDirPath string, absExcludePaths ...string) bool {
+	for _, absExcludePath := range absExcludePaths {
+		for curFilePath := absFilePath; curFilePath != absConfigDirPath && curFilePath != rootDirPath; curFilePath = filepath.Dir(curFilePath) {
+			if curFilePath == absExcludePath {
+				return true
+			}
+		}
+	}
+	return false
+
 }

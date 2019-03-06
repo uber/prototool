@@ -1,5 +1,6 @@
 language: go
 go:
-  - "1.10"
+  - "1.12.x"
 script:
-  - make ci
+  - make lint cover
+  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then make codecov; fi

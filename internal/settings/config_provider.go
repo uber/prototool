@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,24 @@
 package settings
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/uber/prototool/internal/strs"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 type configProvider struct {
-	logger *zap.Logger
+	logger    *zap.Logger
+	develMode bool
 }
 
 func newConfigProvider(options ...ConfigProviderOption) *configProvider {
@@ -53,7 +57,7 @@ func (c *configProvider) GetForDir(dirPath string) (Config, error) {
 		return Config{}, err
 	}
 	if filePath == "" {
-		return Config{}, nil
+		return getDefaultConfig(c.develMode, dirPath)
 	}
 	return c.Get(filePath)
 }
@@ -62,9 +66,7 @@ func (c *configProvider) GetFilePathForDir(dirPath string) (string, error) {
 	if !filepath.IsAbs(dirPath) {
 		return "", fmt.Errorf("%s is not an absolute path", dirPath)
 	}
-	dirPath = filepath.Clean(dirPath)
-	filePath, _ := getFilePathForDir(dirPath)
-	return filePath, nil
+	return getFilePathForDir(filepath.Clean(dirPath))
 }
 
 func (c *configProvider) Get(filePath string) (Config, error) {
@@ -72,7 +74,19 @@ func (c *configProvider) Get(filePath string) (Config, error) {
 		return Config{}, fmt.Errorf("%s is not an absolute path", filePath)
 	}
 	filePath = filepath.Clean(filePath)
-	return get(filePath)
+	return get(c.develMode, filePath)
+}
+
+func (c *configProvider) GetForData(dirPath string, externalConfigData string) (Config, error) {
+	if !filepath.IsAbs(dirPath) {
+		return Config{}, fmt.Errorf("%s is not an absolute path", dirPath)
+	}
+	dirPath = filepath.Clean(dirPath)
+	var externalConfig ExternalConfig
+	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
+		return Config{}, err
+	}
+	return externalConfigToConfig(c.develMode, externalConfig, dirPath)
 }
 
 func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, error) {
@@ -83,53 +97,113 @@ func (c *configProvider) GetExcludePrefixesForDir(dirPath string) ([]string, err
 	return getExcludePrefixesForDir(dirPath)
 }
 
-// getFilePathForDir tries to find a file named DefaultConfigFilename starting in the
+func (c *configProvider) GetExcludePrefixesForData(dirPath string, externalConfigData string) ([]string, error) {
+	if !filepath.IsAbs(dirPath) {
+		return nil, fmt.Errorf("%s is not an absolute path", dirPath)
+	}
+	dirPath = filepath.Clean(dirPath)
+	var externalConfig ExternalConfig
+	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
+		return nil, err
+	}
+	return getExcludePrefixes(externalConfig.Excludes, dirPath)
+}
+
+// getFilePathForDir tries to find a file named by one of the ConfigFilenames starting in the
 // given directory, and going up a directory until hitting root.
 //
 // The directory must be an absolute path.
 //
 // If no such file is found, "" is returned.
-// Also returns all the directories this Config applies to.
-func getFilePathForDir(dirPath string) (string, []string) {
-	var dirPaths []string
+// If multiple files named by one of the ConfigFilenames are found in the same
+// directory, error is returned.
+func getFilePathForDir(dirPath string) (string, error) {
 	for {
-		dirPaths = append(dirPaths, dirPath)
-		filePath := filepath.Join(dirPath, DefaultConfigFilename)
-		if _, err := os.Stat(filePath); err == nil {
-			return filePath, dirPaths
+		filePath, err := getSingleFilePathForDir(dirPath)
+		if err != nil {
+			return "", err
+		}
+		if filePath != "" {
+			return filePath, nil
 		}
 		if dirPath == "/" {
-			return "", dirPaths
+			return "", nil
 		}
 		dirPath = filepath.Dir(dirPath)
 	}
 }
 
+// getSingleFilePathForDir gets the file named by one of the ConfigFilenames in the
+// given directory. Having multiple such files results in an error being returned. If no file is
+// found, this returns "".
+func getSingleFilePathForDir(dirPath string) (string, error) {
+	var filePaths []string
+	for _, configFilename := range ConfigFilenames {
+		filePath := filepath.Join(dirPath, configFilename)
+		if _, err := os.Stat(filePath); err == nil {
+			filePaths = append(filePaths, filePath)
+		}
+	}
+	switch len(filePaths) {
+	case 0:
+		return "", nil
+	case 1:
+		return filePaths[0], nil
+	default:
+		return "", fmt.Errorf("multiple configuration files in the same directory: %v", filePaths)
+	}
+}
+
 // get reads the config at the given path.
 //
-// This is expected to be in YAML format.
-func get(filePath string) (Config, error) {
-	data, err := ioutil.ReadFile(filePath)
+// This is expected to be in YAML or JSON format, which is denoted by the file extension.
+func get(develMode bool, filePath string) (Config, error) {
+	externalConfig, err := getExternalConfig(filePath)
 	if err != nil {
 		return Config{}, err
 	}
-	externalConfig := ExternalConfig{}
-	if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
-		return Config{}, err
+	return externalConfigToConfig(develMode, externalConfig, filepath.Dir(filePath))
+}
+
+func getDefaultConfig(develMode bool, dirPath string) (Config, error) {
+	return externalConfigToConfig(develMode, ExternalConfig{}, dirPath)
+}
+
+func getExternalConfig(filePath string) (ExternalConfig, error) {
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return ExternalConfig{}, err
 	}
-	return externalConfigToConfig(externalConfig, filepath.Dir(filePath))
+	if len(data) == 0 {
+		return ExternalConfig{}, nil
+	}
+	externalConfig := ExternalConfig{}
+	switch filepath.Ext(filePath) {
+	case ".json":
+		if err := jsonUnmarshalStrict(data, &externalConfig); err != nil {
+			return ExternalConfig{}, err
+		}
+		return externalConfig, nil
+	case ".yaml":
+		if err := yaml.UnmarshalStrict(data, &externalConfig); err != nil {
+			return ExternalConfig{}, err
+		}
+		return externalConfig, nil
+	default:
+		return ExternalConfig{}, fmt.Errorf("unknown config file extension, must be .json or .yaml: %s", filePath)
+	}
 }
 
 // externalConfigToConfig converts an ExternalConfig to a Config.
 //
 // This will return a valid Config, or an error.
-func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
+func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (Config, error) {
 	excludePrefixes, err := getExcludePrefixes(e.Excludes, dirPath)
 	if err != nil {
 		return Config{}, err
 	}
 	includePaths := make([]string, 0, len(e.Protoc.Includes))
-	for _, includePath := range strs.DedupeSort(e.Protoc.Includes, nil) {
+	for _, includePath := range strs.SortUniq(e.Protoc.Includes) {
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -151,8 +225,8 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		}
 	}
 
-	genPlugins := make([]GenPlugin, len(e.Gen.Plugins))
-	for i, plugin := range e.Gen.Plugins {
+	genPlugins := make([]GenPlugin, len(e.Generate.Plugins))
+	for i, plugin := range e.Generate.Plugins {
 		genPluginType, err := ParseGenPluginType(plugin.Type)
 		if err != nil {
 			return Config{}, err
@@ -171,11 +245,25 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			relPath = plugin.Output
 			absPath = filepath.Clean(filepath.Join(dirPath, relPath))
 		}
+		if plugin.FileSuffix != "" && plugin.FileSuffix[0] == '.' {
+			return Config{}, fmt.Errorf("file_suffix begins with '.' but should not include the '.': %s", plugin.FileSuffix)
+		}
+		if plugin.Name != "descriptor_set" {
+			if plugin.IncludeImports {
+				return Config{}, fmt.Errorf("include_imports is only valid for the descriptor_set plugin but set on %q", plugin.Name)
+			}
+			if plugin.IncludeSourceInfo {
+				return Config{}, fmt.Errorf("include_source_info is only valid for the descriptor_set plugin but set on %q", plugin.Name)
+			}
+		}
 		genPlugins[i] = GenPlugin{
-			Name:  plugin.Name,
-			Path:  plugin.Path,
-			Type:  genPluginType,
-			Flags: plugin.Flags,
+			Name:              plugin.Name,
+			GetPath:           getPluginPathFunc(plugin.Path),
+			Type:              genPluginType,
+			Flags:             plugin.Flags,
+			FileSuffix:        plugin.FileSuffix,
+			IncludeImports:    plugin.IncludeImports,
+			IncludeSourceInfo: plugin.IncludeSourceInfo,
 			OutputPath: OutputPath{
 				RelPath: relPath,
 				AbsPath: absPath,
@@ -204,6 +292,46 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 		createDirPathToBasePackage = nil
 	}
 
+	var fileHeader string
+	if e.Lint.FileHeader.Path != "" || e.Lint.FileHeader.Content != "" {
+		if e.Lint.FileHeader.Path != "" && e.Lint.FileHeader.Content != "" {
+			return Config{}, fmt.Errorf("must only specify either file header path or content")
+		}
+		var fileHeaderContent string
+		if e.Lint.FileHeader.Path != "" {
+			if filepath.IsAbs(e.Lint.FileHeader.Path) {
+				return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeader.Path)
+			}
+			fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeader.Path))
+			if err != nil {
+				return Config{}, err
+			}
+			fileHeaderContent = string(fileHeaderData)
+		} else { // if e.Lint.FileHeader.Content != ""
+			fileHeaderContent = e.Lint.FileHeader.Content
+		}
+		fileHeaderLines := getFileHeaderLines(fileHeaderContent)
+		if !e.Lint.FileHeader.IsCommented {
+			for i, fileHeaderLine := range fileHeaderLines {
+				if fileHeaderLine == "" {
+					fileHeaderLines[i] = "//"
+				} else {
+					fileHeaderLines[i] = "// " + fileHeaderLine
+				}
+			}
+		}
+		fileHeader = strings.Join(fileHeaderLines, "\n")
+		if fileHeader == "" {
+			return Config{}, fmt.Errorf("file header path or content specifed but result was empty file header")
+		}
+	}
+
+	if !develMode {
+		if e.Lint.AllowSuppression {
+			return Config{}, fmt.Errorf("allow_suppression is not allowed outside of internal prototool tests")
+		}
+	}
+
 	config := Config{
 		DirPath:         dirPath,
 		ExcludePrefixes: excludePrefixes,
@@ -217,15 +345,19 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
-			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			IncludeIDs:          strs.SortUniqModify(e.Lint.Rules.Add, strings.ToUpper),
+			ExcludeIDs:          strs.SortUniqModify(e.Lint.Rules.Remove, strings.ToUpper),
+			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
+			FileHeader:          fileHeader,
+			JavaPackagePrefix:   e.Lint.JavaPackagePrefix,
+			AllowSuppression:    e.Lint.AllowSuppression,
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
-				ImportPath:     e.Gen.GoOptions.ImportPath,
-				ExtraModifiers: e.Gen.GoOptions.ExtraModifiers,
+				ImportPath:     e.Generate.GoOptions.ImportPath,
+				ExtraModifiers: e.Generate.GoOptions.ExtraModifiers,
 			},
 			Plugins: genPlugins,
 		},
@@ -256,26 +388,23 @@ func externalConfigToConfig(e ExternalConfig, dirPath string) (Config, error) {
 }
 
 func getExcludePrefixesForDir(dirPath string) ([]string, error) {
-	filePath := filepath.Join(dirPath, DefaultConfigFilename)
-	if _, err := os.Stat(filePath); err != nil {
-		return []string{}, nil
-	}
-	data, err := ioutil.ReadFile(filePath)
+	filePath, err := getSingleFilePathForDir(dirPath)
 	if err != nil {
 		return nil, err
 	}
-	s := struct {
-		ExcludePaths []string `json:"excludes,omitempty" yaml:"excludes,omitempty"`
-	}{}
-	if err := yaml.Unmarshal(data, &s); err != nil {
+	if filePath == "" {
+		return []string{}, nil
+	}
+	externalConfig, err := getExternalConfig(filePath)
+	if err != nil {
 		return nil, err
 	}
-	return getExcludePrefixes(s.ExcludePaths, dirPath)
+	return getExcludePrefixes(externalConfig.Excludes, dirPath)
 }
 
 func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 	excludePrefixes := make([]string, 0, len(excludes))
-	for _, excludePrefix := range strs.DedupeSort(excludes, nil) {
+	for _, excludePrefix := range strs.SortUniq(excludes) {
 		if !filepath.IsAbs(excludePrefix) {
 			excludePrefix = filepath.Join(dirPath, excludePrefix)
 		}
@@ -289,4 +418,30 @@ func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 		excludePrefixes = append(excludePrefixes, excludePrefix)
 	}
 	return excludePrefixes, nil
+}
+
+// jsonUnmarshalStrict makes sure there are no unknown fields when unmarshalling.
+// This matches what yaml.UnmarshalStrict does basically.
+// json.Unmarshal allows unknown fields.
+func jsonUnmarshalStrict(data []byte, v interface{}) error {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	return decoder.Decode(v)
+}
+
+func getFileHeaderLines(content string) []string {
+	var lines []string
+	for _, line := range strings.Split(strings.TrimSpace(content), "\n") {
+		lines = append(lines, strings.TrimSpace(line))
+	}
+	return lines
+}
+
+func getPluginPathFunc(path string) func() (string, error) {
+	return func() (string, error) {
+		if path == "" {
+			return "", nil
+		}
+		return exec.LookPath(path)
+	}
 }

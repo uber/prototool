@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,13 +31,16 @@ import (
 )
 
 type transformer struct {
-	logger *zap.Logger
-	fix    bool
+	logger            *zap.Logger
+	fix               int
+	fileHeader        string
+	javaPackagePrefix string
 }
 
 func newTransformer(options ...TransformerOption) *transformer {
 	transformer := &transformer{
 		logger: zap.NewNop(),
+		fix:    FixNone,
 	}
 	for _, option := range options {
 		option(transformer)
@@ -46,13 +49,16 @@ func newTransformer(options ...TransformerOption) *transformer {
 }
 
 func (t *transformer) Transform(filename string, data []byte) ([]byte, []*text.Failure, error) {
+	if err := checkFix(t.fix); err != nil {
+		return nil, nil, err
+	}
 	descriptor, err := proto.NewParser(bytes.NewReader(data)).Parse()
 	if err != nil {
 		return nil, nil, err
 	}
 	descriptor.Filename = filename
 
-	firstPassVisitor := newFirstPassVisitor(filename, t.fix)
+	firstPassVisitor := newFirstPassVisitor(filename, t.fix, t.fileHeader, t.javaPackagePrefix)
 	for _, element := range descriptor.Elements {
 		element.Accept(firstPassVisitor)
 	}
@@ -87,4 +93,13 @@ func (t *transformer) Transform(filename string, data []byte) ([]byte, []*text.F
 		return []byte(s + "\n"), failures, nil
 	}
 	return nil, failures, nil
+}
+
+func checkFix(fix int) error {
+	switch fix {
+	case FixNone, FixV1, FixV2:
+		return nil
+	default:
+		return fmt.Errorf("unknown format fix value: %d", fix)
+	}
 }

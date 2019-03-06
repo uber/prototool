@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package foo;
+
+option go_package = "foopb";
+option java_multiple_files = true;
+option java_outer_classname = "FooProto";
+option java_package = "com.foo";
+
+message Foo {
+  reserved 1 to 3, 4;
+  reserved "bar";
+  enum Bar {
+    reserved 4 to 6, 7;
+    reserved "foobar", "barfoo";
+    FOO_BAR_INVALID = 0;
+    FOO_BAR_UNSET = 1;
+  }
+  message FooFoo {
+    reserved 1;
+  }
+}

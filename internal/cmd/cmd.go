@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,58 +80,53 @@ func GenManpages(args []string, stdin io.Reader, stdout io.Writer, stderr io.Wri
 	})
 }
 
-// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
 func runRootCommandOutput(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command, io.Writer) error) int {
 	return runRootCommand(develMode, args, stdin, stdout, stderr, func(cmd *cobra.Command) error { return f(cmd, stdout) })
 }
 
-// develMode turns on sub-commands and potentially flags that we do not expose during the build of the prototool binary
 func runRootCommand(develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer, f func(*cobra.Command) error) (exitCode int) {
 	if err := checkOS(); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
-	if err := f(getRootCommand(&exitCode, develMode, args, stdin, stdout, stderr)); err != nil {
+	if err := f(getRootCommand(develMode, &exitCode, args, stdin, stdout, stderr)); err != nil {
 		return printAndGetErrorExitCode(err, stdout)
 	}
 	return exitCode
 }
 
-func getRootCommand(exitCodeAddr *int, develMode bool, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
+func getRootCommand(develMode bool, exitCodeAddr *int, args []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) *cobra.Command {
 	flags := &flags{}
 
 	rootCmd := &cobra.Command{Use: "prototool"}
-	rootCmd.AddCommand(allCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(compileCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(createCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(filesCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(formatCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(generateCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(grpcCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	configCmd := &cobra.Command{Use: "config"}
-	configCmd.AddCommand(configInitCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(allCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(compileCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(createCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(filesCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(formatCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(generateCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(grpcCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	configCmd := &cobra.Command{Use: "config", Short: "Interact with configuration files."}
+	configCmd.AddCommand(configInitCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(configCmd)
-	rootCmd.AddCommand(lintCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-	rootCmd.AddCommand(versionCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(lintCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(versionCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	cacheCmd := &cobra.Command{Use: "cache", Short: "Interact with the cache."}
+	cacheCmd.AddCommand(cacheUpdateCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	cacheCmd.AddCommand(cacheDeleteCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(cacheCmd)
+	breakCmd := &cobra.Command{Use: "break", Short: "Top-level command for breaking change commands."}
+	breakCmd.AddCommand(breakCheckCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(breakCmd)
+	experimentalCmd := &cobra.Command{Use: "x", Short: "Top-level command for experimental commands. These may change between minor versions."}
+	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
+	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	inspectCmd.AddCommand(inspectPackageImportersCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	experimentalCmd.AddCommand(inspectCmd)
+	rootCmd.AddCommand(experimentalCmd)
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())
-
-	if develMode {
-		rootCmd.AddCommand(binaryToJSONCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(cleanCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(descriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(downloadCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(fieldDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(jsonToBinaryCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(listAllLintGroupsCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(listLintGroupCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-		rootCmd.AddCommand(serviceDescriptorProtoCmdTemplate.Build(exitCodeAddr, stdin, stdout, stderr, flags))
-
-		// we may or may not want to expose these to users
-		// but will not build them into the binary for v1.0
-		flags.bindCachePath(rootCmd.PersistentFlags())
-		flags.bindPrintFields(rootCmd.PersistentFlags())
-	}
 
 	rootCmd.SetArgs(args)
 	rootCmd.SetOutput(stdout)

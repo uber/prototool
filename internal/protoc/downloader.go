@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@ package protoc
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"crypto/sha512"
 	"encoding/base64"
 	"fmt"
@@ -34,7 +35,9 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/gofrs/flock"
 	"github.com/uber/prototool/internal/file"
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
@@ -42,18 +45,30 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	fileLockRetryDelay = 250 * time.Millisecond
+	fileLockTimeout    = 10 * time.Second
+)
+
 type downloader struct {
+	lock sync.RWMutex
+
 	logger    *zap.Logger
 	cachePath string
 	protocURL string
 	config    settings.Config
 
-	lock sync.RWMutex
 	// the looked-up and verified to exist base path
 	cachedBasePath string
+
+	// If set, Prototool will invoke protoc and include
+	// the well-known-types, from the configured binPath
+	// and wktPath.
+	protocBinPath string
+	protocWKTPath string
 }
 
-func newDownloader(config settings.Config, options ...DownloaderOption) *downloader {
+func newDownloader(config settings.Config, options ...DownloaderOption) (*downloader, error) {
 	downloader := &downloader{
 		config: config,
 		logger: zap.NewNop(),
@@ -64,7 +79,33 @@ func newDownloader(config settings.Config, options ...DownloaderOption) *downloa
 	if downloader.config.Compile.ProtobufVersion == "" {
 		downloader.config.Compile.ProtobufVersion = vars.DefaultProtocVersion
 	}
-	return downloader
+	if downloader.protocBinPath != "" || downloader.protocWKTPath != "" {
+		if downloader.protocURL != "" {
+			return nil, fmt.Errorf("cannot use protoc-url in combination with either protoc-bin-path or protoc-wkt-path")
+		}
+		if downloader.protocBinPath == "" || downloader.protocWKTPath == "" {
+			return nil, fmt.Errorf("both protoc-bin-path and protoc-wkt-path must be set")
+		}
+		cleanBinPath := filepath.Clean(downloader.protocBinPath)
+		if _, err := os.Stat(cleanBinPath); os.IsNotExist(err) {
+			return nil, err
+		}
+		cleanWKTPath := filepath.Clean(downloader.protocWKTPath)
+		if _, err := os.Stat(cleanWKTPath); os.IsNotExist(err) {
+			return nil, err
+		}
+		protobufPath := filepath.Join(cleanWKTPath, "google", "protobuf")
+		info, err := os.Stat(protobufPath)
+		if os.IsNotExist(err) {
+			return nil, err
+		}
+		if !info.IsDir() {
+			return nil, fmt.Errorf("%q is not a valid well-known types directory", protobufPath)
+		}
+		downloader.protocBinPath = cleanBinPath
+		downloader.protocWKTPath = cleanWKTPath
+	}
+	return downloader, nil
 }
 
 func (d *downloader) Download() (string, error) {
@@ -78,6 +119,9 @@ func (d *downloader) Download() (string, error) {
 }
 
 func (d *downloader) ProtocPath() (string, error) {
+	if d.protocBinPath != "" {
+		return d.protocBinPath, nil
+	}
 	basePath, err := d.Download()
 	if err != nil {
 		return "", err
@@ -86,6 +130,9 @@ func (d *downloader) ProtocPath() (string, error) {
 }
 
 func (d *downloader) WellKnownTypesIncludePath() (string, error) {
+	if d.protocWKTPath != "" {
+		return d.protocWKTPath, nil
+	}
 	basePath, err := d.Download()
 	if err != nil {
 		return "", err
@@ -94,7 +141,7 @@ func (d *downloader) WellKnownTypesIncludePath() (string, error) {
 }
 
 func (d *downloader) Delete() error {
-	basePath, err := d.getBasePathNoVersion()
+	basePath, err := d.getBasePathNoVersionOSARCH()
 	if err != nil {
 		return err
 	}
@@ -103,7 +150,11 @@ func (d *downloader) Delete() error {
 	return os.RemoveAll(basePath)
 }
 
-func (d *downloader) cache() (string, error) {
+func (d *downloader) cache() (_ string, retErr error) {
+	if d.protocBinPath != "" {
+		return d.protocBinPath, nil
+	}
+
 	d.lock.Lock()
 	defer d.lock.Unlock()
 
@@ -111,6 +162,16 @@ func (d *downloader) cache() (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	lock, err := newFlock(basePath)
+	if err != nil {
+		return "", err
+	}
+	if err := flockLock(lock); err != nil {
+		return "", err
+	}
+	defer func() { retErr = multierr.Append(retErr, flockUnlock(lock)) }()
+
 	if err := d.checkDownloaded(basePath); err != nil {
 		if err := d.download(basePath); err != nil {
 			return "", err
@@ -221,7 +282,7 @@ func (d *downloader) getDownloadData(goos string, goarch string) (_ []byte, retE
 			// download this from GitHub Releases, so add
 			// extra context to the error message
 			if d.protocURL == "" {
-				return nil, fmt.Errorf("error downloading %s: %v\nMake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/google/protobuf/releases/v%s\nNote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
+				return nil, fmt.Errorf("error downloading %s: %v\nMake sure GitHub Releases has a proper protoc zip file of the form protoc-VERSION-OS-ARCH.zip at https://github.com/protocolbuffers/protobuf/releases/v%s\nNote that many micro versions do not have this, and no version before 3.0.0-beta-2 has this", url, err, d.config.Compile.ProtobufVersion)
 			}
 			return nil, err
 		}
@@ -250,7 +311,7 @@ func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf(
-		"https://github.com/google/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
+		"https://github.com/protocolbuffers/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
 		d.config.Compile.ProtobufVersion,
 		d.config.Compile.ProtobufVersion,
 		protocS,
@@ -264,6 +325,26 @@ func (d *downloader) getBasePath() (string, error) {
 		return "", err
 	}
 	return filepath.Join(basePathNoVersion, d.getBasePathVersionPart()), nil
+}
+
+func (d *downloader) getBasePathNoVersionOSARCH() (string, error) {
+	basePath := d.cachePath
+	var err error
+	if basePath == "" {
+		basePath, err = getDefaultBasePathNoOSARCH()
+		if err != nil {
+			return "", err
+		}
+	} else {
+		basePath, err = file.AbsClean(basePath)
+		if err != nil {
+			return "", err
+		}
+	}
+	if err := file.CheckAbs(basePath); err != nil {
+		return "", err
+	}
+	return basePath, nil
 }
 
 func (d *downloader) getBasePathNoVersion() (string, error) {
@@ -301,13 +382,29 @@ func getDefaultBasePath() (string, error) {
 }
 
 func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(string) string) (string, error) {
+	basePathNoOSARCH, err := getDefaultBasePathInternalNoOSARCH(goos, goarch, getenvFunc)
+	if err != nil {
+		return "", err
+	}
 	unameS, unameM, err := getUnameSUnameMPaths(goos, goarch)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(basePathNoOSARCH, unameS, unameM), nil
+}
+
+func getDefaultBasePathNoOSARCH() (string, error) {
+	return getDefaultBasePathInternalNoOSARCH(runtime.GOOS, runtime.GOARCH, os.Getenv)
+}
+
+func getDefaultBasePathInternalNoOSARCH(goos string, goarch string, getenvFunc func(string) string) (string, error) {
+	unameS, _, err := getUnameSUnameMPaths(goos, goarch)
 	if err != nil {
 		return "", err
 	}
 	xdgCacheHome := getenvFunc("XDG_CACHE_HOME")
 	if xdgCacheHome != "" {
-		return filepath.Join(xdgCacheHome, "prototool", unameS, unameM), nil
+		return filepath.Join(xdgCacheHome, "prototool"), nil
 	}
 	home := getenvFunc("HOME")
 	if home == "" {
@@ -315,9 +412,9 @@ func getDefaultBasePathInternal(goos string, goarch string, getenvFunc func(stri
 	}
 	switch unameS {
 	case "Darwin":
-		return filepath.Join(home, "Library", "Caches", "prototool", unameS, unameM), nil
+		return filepath.Join(home, "Library", "Caches", "prototool"), nil
 	case "Linux":
-		return filepath.Join(home, ".cache", "prototool", unameS, unameM), nil
+		return filepath.Join(home, ".cache", "prototool"), nil
 	default:
 		return "", fmt.Errorf("invalid value for uname -s: %v", unameS)
 	}
@@ -352,4 +449,33 @@ func getUnameSUnameMPaths(goos string, goarch string) (string, string, error) {
 		return "", "", fmt.Errorf("unsupported value for runtime.GOARCH: %v", goarch)
 	}
 	return unameS, unameM, nil
+}
+
+func newFlock(basePath string) (*flock.Flock, error) {
+	fileLockPath := basePath + ".lock"
+	// mkdir is atomic
+	if err := os.MkdirAll(filepath.Dir(fileLockPath), 0755); err != nil {
+		return nil, err
+	}
+	return flock.New(fileLockPath), nil
+}
+
+func flockLock(lock *flock.Flock) error {
+	ctx, cancel := context.WithTimeout(context.Background(), fileLockTimeout)
+	defer cancel()
+	locked, err := lock.TryLockContext(ctx, fileLockRetryDelay)
+	if err != nil {
+		return fmt.Errorf("error acquiring file lock at %s - if you think this is in error, remove %s: %v", lock.Path(), lock.Path(), err)
+	}
+	if !locked {
+		return fmt.Errorf("could not acquire file lock at %s after %v - if you think this is in error, remove %s", lock.Path(), fileLockTimeout, lock.Path())
+	}
+	return nil
+}
+
+func flockUnlock(lock *flock.Flock) error {
+	if err := lock.Unlock(); err != nil {
+		return fmt.Errorf("error unlocking file lock at %s: %v", lock.Path(), err)
+	}
+	return nil
 }

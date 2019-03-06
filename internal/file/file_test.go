@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,55 +32,38 @@ import (
 func TestAbsClean(t *testing.T) {
 	wd, err := os.Getwd()
 	require.NoError(t, err)
+	testAbsClean(t, "", "")
+	testAbsClean(t, "/", "/")
+	testAbsClean(t, "/path/to/foo", "/path/to/foo")
+	testAbsClean(t, "/path/to/foo", "/path//to//foo")
+	testAbsClean(t, filepath.Join(wd, "path/to/foo"), "path/to/foo")
+	testAbsClean(t, filepath.Join(wd, "path/to/foo"), "path//to//foo")
+}
 
-	tests := []struct {
-		desc string
-		give string
-		want string
-	}{
-		{
-			desc: "Empty path",
-		},
-		{
-			desc: "Root path",
-			give: "/",
-			want: "/",
-		},
-		{
-			desc: "Clean absolute path",
-			give: "/path/to/foo",
-			want: "/path/to/foo",
-		},
-		{
-			desc: "Messy absolute path",
-			give: "/path//to///foo",
-			want: "/path/to/foo",
-		},
-		{
-			desc: "Clean relative path",
-			give: "path/to/foo",
-			want: filepath.Join(wd, "path/to/foo"),
-		},
-		{
-			desc: "Messy relative path",
-			give: "path//to///foo",
-			want: filepath.Join(wd, "path/to/foo"),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.desc, func(t *testing.T) {
-			res, err := AbsClean(tt.give)
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, res)
-		})
-	}
+func testAbsClean(t *testing.T, expected string, input string) {
+	actual, err := AbsClean(input)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, actual)
 }
 
 func TestCheckAbs(t *testing.T) {
-	t.Run("Absolute path", func(t *testing.T) {
-		assert.NoError(t, CheckAbs("/path/to/foo"))
-	})
-	t.Run("Relative path", func(t *testing.T) {
-		assert.EqualError(t, CheckAbs("path/to/foo"), "expected absolute path but was path/to/foo")
-	})
+	assert.NoError(t, CheckAbs("/path/to/foo"))
+	assert.Error(t, CheckAbs("path/to/foo"))
+}
+
+func TestIsExcluded(t *testing.T) {
+	wd, err := os.Getwd()
+	require.NoError(t, err)
+	testIsExcluded(t, true, "/foo/bar", "/", "/foo")
+	testIsExcluded(t, true, "/foo", "/", "/foo")
+	testIsExcluded(t, false, filepath.Join(wd, "foo"), wd, filepath.Join(wd, "fooo"))
+	testIsExcluded(t, true, filepath.Join(wd, "foo/bar"), wd, filepath.Join(wd, "foo"))
+	testIsExcluded(t, false, filepath.Join(wd, "foo/bar"), wd, filepath.Join(wd, "bar"))
+	testIsExcluded(t, true, filepath.Join(wd, "foo.proto"), wd, filepath.Join(wd, "foo.proto"))
+	testIsExcluded(t, false, filepath.Join(wd, "bar"), wd, filepath.Join(wd, "bar/foo.proto"))
+	testIsExcluded(t, true, filepath.Join(wd, "bar/baz/foo.proto"), wd, filepath.Join(wd, "bar"))
+}
+
+func testIsExcluded(t *testing.T, expected bool, absFilePath string, absConfigDirPath string, absExcludePaths ...string) {
+	assert.Equal(t, expected, IsExcluded(absFilePath, absConfigDirPath, absExcludePaths...))
 }

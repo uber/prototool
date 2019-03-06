@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ var packageIsDeclaredLinter = NewLinter(
 	checkPackageIsDeclared,
 )
 
-func checkPackageIsDeclared(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackageIsDeclared(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&packageIsDeclaredVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -44,7 +44,7 @@ type packageIsDeclaredVisitor struct {
 	pkg      *proto.Package
 }
 
-func (v *packageIsDeclaredVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *packageIsDeclaredVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.filename = descriptor.Filename
 	v.pkg = nil
 	return nil

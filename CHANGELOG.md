@@ -5,7 +5,70 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- No changes yet.
+- Add concept of lint groups. The default lint group is named `uber1`. The lint
+  group can be specified with the `lint.group` option.
+- New `uber2` lint group and associated V2 Style Guide representing the second
+  version of our lint rules. These rules are almost entirely a superset of the
+  V1 Style guide lint rules. If `lint.group` is set to `uber2`, this also will
+  affect the `create` and `format` commands, as the `uber2` lint group adds
+  more file options to more closely match the [Google Cloud APIs File Structure](https://cloud.google.com/apis/design/file_structure).
+  In total, 39 lint rules have been added as compared to the `uber1` lint
+  group.
+  and changes the value of `go_package` to take versions into account.
+- New `google` lint group representing Google's minimal [Style Guide](https://developers.google.com/protocol-buffers/docs/style).
+- Add `--list-lint-group` flag to the `lint` command to list a lint group's
+  rules.
+- Add `--diff-lint-groups` flag to the `lint` command to print the diff
+  between two lint groups
+- Breaking change detector added as the `break check` command.
+- A Docker image is now provided on Docker Hub as [uber/prototool](https://hub.docker.com/r/uber/prototool)
+  which provides an environment with commonly-used plugins.
+- Switch to Golang Modules for dependency management.
+- Add Bazel build files and `bazel/deps.bzl` to allow Prototool to be easily
+  built within a Bazel workspace.
+- Add `lint.file_header` option to allow a file header to be specified. This
+  affects `lint`, `format`, and `create`.
+- Allow `generate.plugins.path` to be relative. If a relative path is given,
+  Prototool will search your `PATH` for the specified executable.
+- Add `generate.plugins.file_suffix` option that allows for JAR generation with
+  the built-in `java` plugin, and `FileDescriptorSet` generation with the
+  built-in `descriptor_set` plugin.
+- Add `generate.plugins.include_imports` and
+  `generate.plugins.include_source_info` to be used with the built-in
+  `descriptor_set` plugin.
+- Add `cache` top-level command to allow management of the `protoc` cache.
+- Add `x` top-level command for experimental functionality.
+- Add `inspect` command under `x` with Protobuf inspection capabilities.
+- Add `--error-format` flag to allow specific error fields to be printed.
+- Add file locking around the `protoc` downloader to eliminate concurrency
+  issues where multiple `prototool` invocations may be accessing the cache
+  at the same time.
+- Unix domain sockets can now be specified for the `--address` flag of the
+  `grpc` command via the prefix `unix://`.
+
+
+## [1.3.0] - 2018-09-17
+### Added
+- Accept `prototool.json` files for configuation in addition to
+  `prototool.yaml` files.
+- Add `--config-data` flag.
+- Add `--protoc-bin-path` and `--protoc-wkt-path` flags to manually
+  set the paths for where `protoc` is run and where the
+  Well-Known Types are included from.
+
+
+## [1.2.0] - 2018-08-29
+### Added
+- Add `json` flag to `all`, `compile`, `format`, `generate` and `lint` commands.
+
+
+## [1.1.0] - 2018-08-24
+### Added
+- Add support for Homebrew builds.
+
+
+## [1.0.0] - 2018-08-23
+- Initial release.
 
 
 ## [1.0.0-rc1] 2018-08-16
@@ -138,7 +201,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/uber/prototool/compare/v1.0.0-rc1...HEAD
+[Unreleased]: https://github.com/uber/prototool/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/uber/prototool/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/uber/prototool/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/uber/prototool/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/uber/prototool/compare/v1.0.0-rc1...v1.0.0
 [1.0.0-rc1]: https://github.com/uber/prototool/compare/v0.7.1...v1.0.0-rc1
 [0.7.1]: https://github.com/uber/prototool/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/uber/prototool/compare/v0.6.0...v0.7.0

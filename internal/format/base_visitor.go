@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,17 +27,18 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
+	"github.com/uber/prototool/internal/buf"
 	"github.com/uber/prototool/internal/text"
 )
 
 type baseVisitor struct {
-	*printer
+	*buf.Printer
 
 	Failures []*text.Failure
 }
 
 func newBaseVisitor() *baseVisitor {
-	return &baseVisitor{printer: newPrinter()}
+	return &baseVisitor{Printer: buf.NewPrinter("  ")}
 }
 
 func (v *baseVisitor) AddFailure(position scanner.Position, format string, args ...interface{}) {

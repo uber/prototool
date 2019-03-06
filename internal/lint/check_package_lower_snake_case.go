@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ var packageLowerSnakeCaseLinter = NewLinter(
 	checkPackageLowerSnakeCase,
 )
 
-func checkPackageLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkPackageLowerSnakeCase(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&packageLowerSnakeCaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -45,7 +45,7 @@ type packageLowerSnakeCaseVisitor struct {
 	pkg      *proto.Package
 }
 
-func (v *packageLowerSnakeCaseVisitor) OnStart(descriptor *proto.Proto) error {
+func (v *packageLowerSnakeCaseVisitor) OnStart(descriptor *FileDescriptor) error {
 	v.filename = descriptor.Filename
 	v.pkg = nil
 	return nil

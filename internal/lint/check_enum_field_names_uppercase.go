@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ var enumFieldNamesUppercaseLinter = NewLinter(
 	checkEnumFieldNamesUppercase,
 )
 
-func checkEnumFieldNamesUppercase(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkEnumFieldNamesUppercase(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(enumFieldNamesUppercaseVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 

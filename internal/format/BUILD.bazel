@@ -1,0 +1,21 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "base_visitor.go",
+        "first_pass_visitor.go",
+        "format.go",
+        "main_visitor.go",
+        "transformer.go",
+    ],
+    importpath = "github.com/uber/prototool/internal/format",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/buf:go_default_library",
+        "//internal/protostrs:go_default_library",
+        "//internal/text:go_default_library",
+        "@com_github_emicklei_proto//:go_default_library",
+        "@org_uber_go_zap//:go_default_library",
+    ],
+)

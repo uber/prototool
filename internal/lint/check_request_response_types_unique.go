@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ var requestResponseTypesUniqueLinter = NewLinter(
 	checkRequestResponseTypesUnique,
 )
 
-func checkRequestResponseTypesUnique(add func(*text.Failure), dirPath string, descriptors []*proto.Proto) error {
+func checkRequestResponseTypesUnique(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 	return runVisitor(&requestResponseTypesUniqueVisitor{baseAddVisitor: newBaseAddVisitor(add)}, descriptors)
 }
 
@@ -40,7 +40,7 @@ type requestResponseTypesUniqueVisitor struct {
 	seenTypes map[string]struct{}
 }
 
-func (v *requestResponseTypesUniqueVisitor) OnStart(*proto.Proto) error {
+func (v *requestResponseTypesUniqueVisitor) OnStart(*FileDescriptor) error {
 	v.seenTypes = nil
 	return nil
 }

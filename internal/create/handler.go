@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,8 @@ import (
 	"go.uber.org/zap"
 )
 
-var tmpl = template.Must(template.New("tmpl").Parse(`syntax = "proto3";
+var (
+	tmplV1 = template.Must(template.New("tmplV1").Parse(`{{.Header}}syntax = "proto3";
 
 package {{.Pkg}};
 
@@ -44,17 +45,36 @@ option java_multiple_files = true;
 option java_outer_classname = "{{.JavaOuterClassname}}";
 option java_package = "{{.JavaPkg}}";`))
 
+	tmplV2 = template.Must(template.New("tmplV2").Parse(`{{.Header}}syntax = "proto3";
+
+package {{.Pkg}};
+
+option csharp_namespace = "{{.CSharpNamespace}}";
+option go_package = "{{.GoPkg}}";
+option java_multiple_files = true;
+option java_outer_classname = "{{.JavaOuterClassname}}";
+option java_package = "{{.JavaPkg}}";
+option objc_class_prefix = "{{.OBJCClassPrefix}}";
+option php_namespace = "{{.PHPNamespace}}";`))
+)
+
 type tmplData struct {
+	Header             string
 	Pkg                string
+	CSharpNamespace    string
 	GoPkg              string
 	JavaOuterClassname string
 	JavaPkg            string
+	OBJCClassPrefix    string
+	PHPNamespace       string
 }
 
 type handler struct {
 	logger         *zap.Logger
+	develMode      bool
 	configProvider settings.ConfigProvider
 	pkg            string
+	configData     string
 }
 
 func newHandler(options ...HandlerOption) *handler {
@@ -64,9 +84,16 @@ func newHandler(options ...HandlerOption) *handler {
 	for _, option := range options {
 		option(handler)
 	}
-	handler.configProvider = settings.NewConfigProvider(
+	configProviderOptions := []settings.ConfigProviderOption{
 		settings.ConfigProviderWithLogger(handler.logger),
-	)
+	}
+	if handler.develMode {
+		configProviderOptions = append(
+			configProviderOptions,
+			settings.ConfigProviderWithDevelMode(),
+		)
+	}
+	handler.configProvider = settings.NewConfigProvider(configProviderOptions...)
 	return handler
 }
 
@@ -98,47 +125,128 @@ func (h *handler) checkFilePath(filePath string) error {
 		return fmt.Errorf("%q is not a directory somehow", dirPath)
 	}
 	if _, err := os.Stat(filePath); err == nil {
-		return fmt.Errorf("%q already exists", filePath)
+		data, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			return err
+		}
+		if len(data) > 0 {
+			return fmt.Errorf("%q already exists", filePath)
+		}
 	}
 	return nil
 }
 
 func (h *handler) create(filePath string) error {
-	pkg, err := h.getPkg(filePath)
+	isV2, err := h.isV2(filePath)
 	if err != nil {
 		return err
 	}
-	data, err := getData(
-		&tmplData{
-			Pkg:                pkg,
-			GoPkg:              protostrs.GoPackage(pkg),
-			JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
-			JavaPkg:            protostrs.JavaPackage(pkg),
-		},
-	)
+	defaultPackage := DefaultPackage
+	if isV2 {
+		defaultPackage = DefaultPackageV2
+	}
+	fileHeader, err := h.getFileHeader(filePath)
 	if err != nil {
 		return err
+	}
+	if fileHeader != "" {
+		fileHeader = fileHeader + "\n\n"
+	}
+	pkg, err := h.getPkg(filePath, defaultPackage)
+	if err != nil {
+		return err
+	}
+	javaPackagePrefix, err := h.getJavaPackagePrefix(filePath)
+	if err != nil {
+		return err
+	}
+	var data []byte
+	if isV2 {
+		data, err = getDataV2(
+			&tmplData{
+				Header:             fileHeader,
+				Pkg:                pkg,
+				CSharpNamespace:    protostrs.CSharpNamespace(pkg),
+				GoPkg:              protostrs.GoPackageV2(pkg),
+				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
+				JavaPkg:            protostrs.JavaPackagePrefixOverride(pkg, javaPackagePrefix),
+				OBJCClassPrefix:    protostrs.OBJCClassPrefix(pkg),
+				PHPNamespace:       protostrs.PHPNamespace(pkg),
+			},
+		)
+		if err != nil {
+			return err
+		}
+	} else {
+		data, err = getDataV1(
+			&tmplData{
+				Header:             fileHeader,
+				Pkg:                pkg,
+				GoPkg:              protostrs.GoPackage(pkg),
+				JavaOuterClassname: protostrs.JavaOuterClassname(filePath),
+				JavaPkg:            protostrs.JavaPackagePrefixOverride(pkg, javaPackagePrefix),
+			},
+		)
+		if err != nil {
+			return err
+		}
 	}
 	return ioutil.WriteFile(filePath, data, 0644)
 }
 
-func (h *handler) getPkg(filePath string) (string, error) {
+func (h *handler) isV2(filePath string) (bool, error) {
+	config, err := h.getConfig(filePath)
+	if err != nil {
+		return false, err
+	}
+	// no config file found
+	if config.DirPath == "" {
+		return false, nil
+	}
+	return strings.ToLower(config.Lint.Group) == "uber2", nil
+}
+
+func (h *handler) getFileHeader(filePath string) (string, error) {
+	config, err := h.getConfig(filePath)
+	if err != nil {
+		return "", err
+	}
+	// no config file found
+	if config.DirPath == "" {
+		return "", nil
+	}
+	return config.Lint.FileHeader, nil
+}
+
+func (h *handler) getJavaPackagePrefix(filePath string) (string, error) {
+	config, err := h.getConfig(filePath)
+	if err != nil {
+		return "", err
+	}
+	// no config file found
+	if config.DirPath == "" {
+		return "", nil
+	}
+	return config.Lint.JavaPackagePrefix, nil
+}
+
+func (h *handler) getPkg(filePath string, defaultPackage string) (string, error) {
 	if h.pkg != "" {
 		return h.pkg, nil
+	}
+	config, err := h.getConfig(filePath)
+	if err != nil {
+		return "", err
+	}
+	// no config file found, can't compute package
+	if config.DirPath == "" {
+		return defaultPackage, nil
 	}
 	absFilePath, err := filepath.Abs(filePath)
 	if err != nil {
 		return "", err
 	}
 	absDirPath := filepath.Dir(absFilePath)
-	config, err := h.configProvider.GetForDir(absDirPath)
-	if err != nil {
-		return "", err
-	}
-	// no config file found, can't compute package
-	if config.DirPath == "" {
-		return DefaultPackage, nil
-	}
 	// we need to get all the matching directories and then choose the longest
 	// ie if you have a, a/b, we choose a/b
 	var longestCreateDirPath string
@@ -161,7 +269,7 @@ func (h *handler) getPkg(filePath string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return getPkgFromRel(rel, longestBasePkg), nil
+		return getPkgFromRel(rel, longestBasePkg, defaultPackage), nil
 	}
 
 	// no package mapping found, do default logic
@@ -169,19 +277,31 @@ func (h *handler) getPkg(filePath string) (string, error) {
 	// TODO: cannot do rel right away because it will do ../.. if necessary
 	// strings.HasPrefix is not OS independent however
 	if !strings.HasPrefix(absDirPath, config.DirPath) {
-		return DefaultPackage, nil
+		return defaultPackage, nil
 	}
 	rel, err := filepath.Rel(config.DirPath, absDirPath)
 	if err != nil {
 		return "", err
 	}
-	return getPkgFromRel(rel, ""), nil
+	return getPkgFromRel(rel, "", defaultPackage), nil
 }
 
-func getPkgFromRel(rel string, basePkg string) string {
+func (h *handler) getConfig(filePath string) (settings.Config, error) {
+	absFilePath, err := filepath.Abs(filePath)
+	if err != nil {
+		return settings.Config{}, err
+	}
+	absDirPath := filepath.Dir(absFilePath)
+	if h.configData != "" {
+		return h.configProvider.GetForData(absDirPath, h.configData)
+	}
+	return h.configProvider.GetForDir(absDirPath)
+}
+
+func getPkgFromRel(rel string, basePkg string, defaultPackage string) string {
 	if rel == "." {
 		if basePkg == "" {
-			return DefaultPackage
+			return defaultPackage
 		}
 		return basePkg
 	}
@@ -192,9 +312,17 @@ func getPkgFromRel(rel string, basePkg string) string {
 	return basePkg + "." + relPkg
 }
 
-func getData(tmplData *tmplData) ([]byte, error) {
+func getDataV1(tmplData *tmplData) ([]byte, error) {
 	buffer := bytes.NewBuffer(nil)
-	if err := tmpl.Execute(buffer, tmplData); err != nil {
+	if err := tmplV1.Execute(buffer, tmplData); err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
+}
+
+func getDataV2(tmplData *tmplData) ([]byte, error) {
+	buffer := bytes.NewBuffer(nil)
+	if err := tmplV2.Execute(buffer, tmplData); err != nil {
 		return nil, err
 	}
 	return buffer.Bytes(), nil

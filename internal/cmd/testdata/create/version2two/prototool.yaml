@@ -1,0 +1,12 @@
+lint:
+  group: uber2
+  file_header:
+    content: |
+      // this
+        // is a
+          // header
+    is_commented: true
+create:
+  packages:
+    - directory: .
+      name: foo

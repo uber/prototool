@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,9 +84,24 @@ func DownloaderWithCachePath(cachePath string) DownloaderOption {
 	}
 }
 
+// DownloaderWithProtocBinPath returns a DownloaderOption that uses the given protoc binary path.
+func DownloaderWithProtocBinPath(protocBinPath string) DownloaderOption {
+	return func(downloader *downloader) {
+		downloader.protocBinPath = protocBinPath
+	}
+}
+
+// DownloaderWithProtocWKTPath returns a DownloaderOption that uses the given path to include
+// the well-known types.
+func DownloaderWithProtocWKTPath(protocWKTPath string) DownloaderOption {
+	return func(downloader *downloader) {
+		downloader.protocWKTPath = protocWKTPath
+	}
+}
+
 // DownloaderWithProtocURL returns a DownloaderOption that uses the given protoc zip file URL.
 //
-// The default is https://github.com/google/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
+// The default is https://github.com/protocolbuffers/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
 func DownloaderWithProtocURL(protocURL string) DownloaderOption {
 	return func(downloader *downloader) {
 		downloader.protocURL = protocURL
@@ -94,8 +109,43 @@ func DownloaderWithProtocURL(protocURL string) DownloaderOption {
 }
 
 // NewDownloader returns a new Downloader for the given config and DownloaderOptions.
-func NewDownloader(config settings.Config, options ...DownloaderOption) Downloader {
+func NewDownloader(config settings.Config, options ...DownloaderOption) (Downloader, error) {
 	return newDownloader(config, options...)
+}
+
+// FileDescriptorSet is a wrapper for descriptor.FileDescriptorSet.
+//
+// This will contain both the files specified by ProtoFiles and all imports.
+type FileDescriptorSet struct {
+	*descriptor.FileDescriptorSet
+	// The containing ProtoSet.
+	ProtoSet *file.ProtoSet
+	// The absolute directory path for the built files in this FileDescriptorSet.
+	// This directory path will always reside within the ProtoSetDirPath,
+	// that is filepath.Rel(ProtoSetDirPath, DirPath) will never return
+	// error and always return a non-empty string. Note the string could be ".".
+	DirPath string
+	// The ProtoFiles for the built files in this FileDescriptorSet.
+	// The directory of Path will always be equal to DirPath.
+	ProtoFiles []*file.ProtoFile
+}
+
+// FileDescriptorSets are a slice of FileDescriptorSet objects.
+type FileDescriptorSets []*FileDescriptorSet
+
+// Unwrap converts f to []*descriptor.FileDescriptorSet.
+//
+// Used for backwards compatibility with existing code that is based on
+// descriptor.FileDescriptorSets.
+func (f FileDescriptorSets) Unwrap() []*descriptor.FileDescriptorSet {
+	if f == nil {
+		return nil
+	}
+	d := make([]*descriptor.FileDescriptorSet, len(f))
+	for i, e := range f {
+		d[i] = e.FileDescriptorSet
+	}
+	return d
 }
 
 // CompileResult is the result of a compile
@@ -106,7 +156,7 @@ type CompileResult struct {
 	//
 	// Will only be set if the CompilerWithFileDescriptorSet
 	// option is used.
-	FileDescriptorSets []*descriptor.FileDescriptorSet
+	FileDescriptorSets FileDescriptorSets
 }
 
 // Compiler compiles protobuf files.
@@ -146,9 +196,25 @@ func CompilerWithCachePath(cachePath string) CompilerOption {
 	}
 }
 
+// CompilerWithProtocBinPath returns a CompilerOption that uses the given protoc binary path.
+//
+func CompilerWithProtocBinPath(protocBinPath string) CompilerOption {
+	return func(compiler *compiler) {
+		compiler.protocBinPath = protocBinPath
+	}
+}
+
+// CompilerWithProtocWKTPath returns a CompilerOption that uses the given path to include the
+// well-known types.
+func CompilerWithProtocWKTPath(protocWKTPath string) CompilerOption {
+	return func(compiler *compiler) {
+		compiler.protocWKTPath = protocWKTPath
+	}
+}
+
 // CompilerWithProtocURL returns a CompilerOption that uses the given protoc zip file URL.
 //
-// The default is https://github.com/google/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
+// The default is https://github.com/protocolbuffers/protobuf/releases/download/vVERSION/protoc-VERSION-OS-ARCH.zip.
 func CompilerWithProtocURL(protocURL string) CompilerOption {
 	return func(compiler *compiler) {
 		compiler.protocURL = protocURL

@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/uber/prototool/internal/settings"
@@ -33,6 +34,8 @@ import (
 
 type protoSetProvider struct {
 	logger         *zap.Logger
+	develMode      bool
+	configData     string
 	walkTimeout    time.Duration
 	configProvider settings.ConfigProvider
 }
@@ -45,20 +48,27 @@ func newProtoSetProvider(options ...ProtoSetProviderOption) *protoSetProvider {
 	for _, option := range options {
 		option(protoSetProvider)
 	}
-	protoSetProvider.configProvider = settings.NewConfigProvider(
+	configProviderOptions := []settings.ConfigProviderOption{
 		settings.ConfigProviderWithLogger(protoSetProvider.logger),
-	)
+	}
+	if protoSetProvider.develMode {
+		configProviderOptions = append(
+			configProviderOptions,
+			settings.ConfigProviderWithDevelMode(),
+		)
+	}
+	protoSetProvider.configProvider = settings.NewConfigProvider(configProviderOptions...)
 	return protoSetProvider
 }
 
 func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*ProtoSet, error) {
-	protoSets, err := c.GetMultipleForDir(workDirPath, dirPath)
+	protoSets, err := c.getMultipleForDir(workDirPath, dirPath)
 	if err != nil {
 		return nil, err
 	}
 	switch len(protoSets) {
 	case 0:
-		return nil, fmt.Errorf("no proto files found for dirPath %q", dirPath)
+		return nil, fmt.Errorf("no ProtoSet returned, this is a system error")
 	case 1:
 		return protoSets[0], nil
 	default:
@@ -70,26 +80,7 @@ func (c *protoSetProvider) GetForDir(workDirPath string, dirPath string) (*Proto
 	}
 }
 
-func (c *protoSetProvider) GetForFiles(workDirPath string, filePaths ...string) (*ProtoSet, error) {
-	protoSets, err := c.GetMultipleForFiles(workDirPath, filePaths...)
-	if err != nil {
-		return nil, err
-	}
-	switch len(protoSets) {
-	case 0:
-		return nil, fmt.Errorf("no proto files found for filePaths %v", filePaths)
-	case 1:
-		return protoSets[0], nil
-	default:
-		configDirPaths := make([]string, 0, len(protoSets))
-		for _, protoSet := range protoSets {
-			configDirPaths = append(configDirPaths, protoSet.Config.DirPath)
-		}
-		return nil, fmt.Errorf("expected exactly one configuration file for filePaths %v, but found multiple in directories: %v", filePaths, configDirPaths)
-	}
-}
-
-func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
+func (c *protoSetProvider) getMultipleForDir(workDirPath string, dirPath string) ([]*ProtoSet, error) {
 	workDirPath, err := AbsClean(workDirPath)
 	if err != nil {
 		return nil, err
@@ -98,23 +89,28 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 	if err != nil {
 		return nil, err
 	}
-	configFilePath, err := c.configProvider.GetFilePathForDir(absDirPath)
-	if err != nil {
-		return nil, err
-	}
-	// we need everything for generation, not just the files in the given directory
-	// so we go back to the config file if it is shallower
-	// display path will be unaffected as this is based on workDirPath
-	configDirPath := absDirPath
-	if configFilePath != "" {
-		configDirPath = filepath.Dir(configFilePath)
+	// If c.configData != ", the user has specified configuration via the command line.
+	// Set the configuration directory to the current working directory.
+	configDirPath := workDirPath
+	if c.configData == "" {
+		configFilePath, err := c.configProvider.GetFilePathForDir(absDirPath)
+		if err != nil {
+			return nil, err
+		}
+		// we need everything for generation, not just the files in the given directory
+		// so we go back to the config file if it is shallower
+		// display path will be unaffected as this is based on workDirPath
+		configDirPath = absDirPath
+		if configFilePath != "" {
+			configDirPath = filepath.Dir(configFilePath)
+		}
 	}
 	protoFiles, err := c.walkAndGetAllProtoFiles(workDirPath, configDirPath)
 	if err != nil {
 		return nil, err
 	}
 	dirPathToProtoFiles := getDirPathToProtoFiles(protoFiles)
-	protoSets, err := c.getBaseProtoSets(dirPathToProtoFiles)
+	protoSets, err := c.getBaseProtoSets(workDirPath, dirPathToProtoFiles)
 	if err != nil {
 		return nil, err
 	}
@@ -122,38 +118,34 @@ func (c *protoSetProvider) GetMultipleForDir(workDirPath string, dirPath string)
 		protoSet.WorkDirPath = workDirPath
 		protoSet.DirPath = absDirPath
 	}
+	for _, protoSet := range protoSets {
+		if err := validateProtoSet(protoSet); err != nil {
+			return nil, err
+		}
+	}
 	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.String("dirPath", dirPath), zap.Any("protoSets", protoSets))
 	return protoSets, nil
 }
 
-func (c *protoSetProvider) GetMultipleForFiles(workDirPath string, filePaths ...string) ([]*ProtoSet, error) {
-	workDirPath, err := AbsClean(workDirPath)
-	if err != nil {
-		return nil, err
-	}
-	protoFiles, err := getProtoFiles(filePaths)
-	if err != nil {
-		return nil, err
-	}
-	dirPathToProtoFiles := getDirPathToProtoFiles(protoFiles)
-	protoSets, err := c.getBaseProtoSets(dirPathToProtoFiles)
-	if err != nil {
-		return nil, err
-	}
-	for _, protoSet := range protoSets {
-		protoSet.WorkDirPath = workDirPath
-		protoSet.DirPath = workDirPath
-	}
-	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.Strings("filePaths", filePaths), zap.Any("protoSets", protoSets))
-	return protoSets, nil
-}
-
-func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*ProtoFile) ([]*ProtoSet, error) {
-	filePathToProtoSet := make(map[string]*ProtoSet)
-	for dirPath, protoFiles := range dirPathToProtoFiles {
-		configFilePath, err := c.configProvider.GetFilePathForDir(dirPath)
+func (c *protoSetProvider) getBaseProtoSets(absWorkDirPath string, dirPathToProtoFiles map[string][]*ProtoFile) ([]*ProtoSet, error) {
+	if len(dirPathToProtoFiles) == 0 {
+		protoSet, err := c.getDefaultBaseProtoSet(absWorkDirPath)
 		if err != nil {
 			return nil, err
+		}
+		return []*ProtoSet{protoSet}, nil
+	}
+	filePathToProtoSet := make(map[string]*ProtoSet)
+	for dirPath, protoFiles := range dirPathToProtoFiles {
+		var configFilePath string
+		var err error
+		// we only want one ProtoSet if we have set configData
+		// since we are overriding all configuration files
+		if c.configData == "" {
+			configFilePath, err = c.configProvider.GetFilePathForDir(dirPath)
+			if err != nil {
+				return nil, err
+			}
 		}
 		protoSet, ok := filePathToProtoSet[configFilePath]
 		if !ok {
@@ -164,9 +156,20 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 		}
 		protoSet.DirPathToFiles[dirPath] = append(protoSet.DirPathToFiles[dirPath], protoFiles...)
 		var config settings.Config
-		// configFilePath is empty if no config file is found
-		if configFilePath != "" {
+		if c.configData != "" {
+			config, err = c.configProvider.GetForData(absWorkDirPath, c.configData)
+			if err != nil {
+				return nil, err
+			}
+		} else if configFilePath != "" {
+			// configFilePath is empty if no config file is found
 			config, err = c.configProvider.Get(configFilePath)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			// still want default config
+			config, err = c.configProvider.GetForDir(absWorkDirPath)
 			if err != nil {
 				return nil, err
 			}
@@ -183,18 +186,45 @@ func (c *protoSetProvider) getBaseProtoSets(dirPathToProtoFiles map[string][]*Pr
 	return protoSets, nil
 }
 
+// getDefaultBaseProtoSet gets a ProtoSet with no files for the given working directory path.
+func (c *protoSetProvider) getDefaultBaseProtoSet(absWorkDirPath string) (*ProtoSet, error) {
+	protoSet := &ProtoSet{
+		DirPathToFiles: make(map[string][]*ProtoFile),
+	}
+	config, err := c.getConfig(absWorkDirPath)
+	if err != nil {
+		return nil, err
+	}
+	protoSet.Config = config
+	return protoSet, nil
+}
+
+func (c *protoSetProvider) getConfig(absDirPath string) (settings.Config, error) {
+	if c.configData == "" {
+		return c.configProvider.GetForDir(absDirPath)
+	}
+	return c.configProvider.GetForData(absDirPath, c.configData)
+}
+
 // walkAndGetAllProtoFiles collects the .proto files nested under the given absDirPath.
-// absDirPath represents the absolute path at which the prototool.yaml configuration is
+// absDirPath represents the absolute path at which the configuration file is
 // found, whereas absWorkDirPath represents absolute path at which prototool was invoked.
 // absWorkDirPath is only used to determine the ProtoFile.DisplayPath, also known as
 // the relative path from where prototool was invoked.
 func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDirPath string) ([]*ProtoFile, error) {
-	var (
-		protoFiles     []*ProtoFile
-		numWalkedFiles int
-		timedOut       bool
-	)
-	allExcludes := make(map[string]struct{})
+	var protoFiles []*ProtoFile
+	var numWalkedFiles int
+	var timedOut bool
+	var excludes []string
+	var err error
+	// if we have a configData, we compute the exclude prefixes once
+	// from this dirPath and data, and do not do it again in the below walk function
+	if c.configData != "" {
+		excludes, err = c.configProvider.GetExcludePrefixesForData(absWorkDirPath, c.configData)
+		if err != nil {
+			return nil, err
+		}
+	}
 	walkErrC := make(chan error)
 	go func() {
 		walkErrC <- filepath.Walk(
@@ -212,14 +242,15 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 				// Verify if we should skip this directory/file.
 				if fileInfo.IsDir() {
 					// Add the excluded files with respect to the current file path.
-					excludes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
-					if err != nil {
-						return err
+					// Do not add if we have configData.
+					if c.configData == "" {
+						iExcludes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
+						if err != nil {
+							return err
+						}
+						excludes = append(excludes, iExcludes...)
 					}
-					for _, exclude := range excludes {
-						allExcludes[exclude] = struct{}{}
-					}
-					if isExcluded(filePath, absDirPath, allExcludes) {
+					if IsExcluded(filePath, absDirPath, excludes...) {
 						return filepath.SkipDir
 					}
 					return nil
@@ -227,7 +258,7 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 				if filepath.Ext(filePath) != ".proto" {
 					return nil
 				}
-				if isExcluded(filePath, absDirPath, allExcludes) {
+				if IsExcluded(filePath, absDirPath, excludes...) {
 					return nil
 				}
 
@@ -266,6 +297,34 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 	}
 }
 
+func validateProtoSet(protoSet *ProtoSet) error {
+	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		for _, protoFile := range protoFiles {
+			if filepath.Dir(protoFile.Path) != dirPath {
+				return fmt.Errorf("%s does not reside within %s, this is a system error", protoFile.Path, dirPath)
+			}
+			if err := validateIsRel(protoSet.Config.DirPath, protoFile.Path); err != nil {
+				return fmt.Errorf("proto file %s not within config dirPath %s: %v", protoFile.Path, protoSet.Config.DirPath, err)
+			}
+		}
+	}
+	return nil
+}
+
+func validateIsRel(base string, dir string) error {
+	rel, err := filepath.Rel(base, dir)
+	if err != nil {
+		return fmt.Errorf("could not make %s relative to %s, this is a system error: %v", base, dir, err)
+	}
+	if rel == "" {
+		return fmt.Errorf("could not make %s relative to %s, this is a system error", base, dir)
+	}
+	if strings.HasPrefix(rel, "..") {
+		return fmt.Errorf("could not make %s within %s, got %s, this is a system error", base, dir, rel)
+	}
+	return nil
+}
+
 func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
 	dirPathToProtoFiles := make(map[string][]*ProtoFile)
 	for _, protoFile := range protoFiles {
@@ -273,48 +332,4 @@ func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
 		dirPathToProtoFiles[dir] = append(dirPathToProtoFiles[dir], protoFile)
 	}
 	return dirPathToProtoFiles
-}
-
-func getProtoFiles(filePaths []string) ([]*ProtoFile, error) {
-	protoFiles := make([]*ProtoFile, 0, len(filePaths))
-	for _, filePath := range filePaths {
-		absFilePath, err := AbsClean(filePath)
-		if err != nil {
-			return nil, err
-		}
-		protoFiles = append(protoFiles, &ProtoFile{
-			Path:        absFilePath,
-			DisplayPath: filePath,
-		})
-	}
-	return protoFiles, nil
-}
-
-// isExcluded determines whether the given filePath should be excluded.
-// Note that all excludes are assumed to be cleaned absolute paths at
-// this point.
-// stopPath represents the absolute path to the prototool configuration.
-// This is used to determine when we should stop checking for excludes.
-func isExcluded(filePath, stopPath string, excludes map[string]struct{}) bool {
-	// Use the root as a fallback so that we don't loop forever.
-	root := filepath.Dir(string(filepath.Separator))
-
-	isNested := func(curr, exclude string) bool {
-		for {
-			if curr == stopPath || curr == root {
-				return false
-			}
-			if curr == exclude {
-				return true
-			}
-			curr = filepath.Dir(curr)
-		}
-	}
-	for exclude := range excludes {
-		if isNested(filePath, exclude) {
-			return true
-		}
-	}
-	return false
-
 }

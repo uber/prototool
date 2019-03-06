@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "HelloProto";
+option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";
+
+message Foo {
+  message NestedFoo {
+    message NestedNestedFoo {
+      string stime = 1;
+      oneof hello {
+        string time = 2;
+      }
+    }
+    string stimes = 1;
+  }
+  string times = 1;
+  map<string, int64> map_time = 2;
+}
+
+message Bar {
+  message NestedBar {
+    message NestedNestedBar {
+      string sfile_duration = 1;
+      oneof hello {
+        string file_duration = 2;
+      }
+    }
+    string sfile_durations = 1;
+  }
+  string file_durations = 1;
+  map<string, int64> map_file_duration = 2;
+}

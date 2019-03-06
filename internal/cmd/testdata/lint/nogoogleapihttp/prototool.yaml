@@ -1,0 +1,16 @@
+lint:
+  # allow_suppression is an option that is only allowed in tests, this is not exposed as part of the prototool command
+  allow_suppression: true
+  group: uber2
+  ignores:
+    - id: PACKAGE_MAJOR_BETA_VERSIONED
+      files:
+        - google/api/api.proto
+  rules:
+    add:
+      - RPC_OPTIONS_NO_GOOGLE_API_HTTP
+    remove:
+      - ENUMS_HAVE_SENTENCE_COMMENTS
+      - MESSAGES_HAVE_SENTENCE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES
+      - RPCS_HAVE_SENTENCE_COMMENTS
+      - SERVICES_HAVE_SENTENCE_COMMENTS

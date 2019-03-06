@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Uber Technologies, Inc.
+// Copyright (c) 2019 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
 package grpc
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -29,9 +30,10 @@ import (
 	"time"
 
 	"github.com/fullstorydev/grpcurl"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/desc"
-	"github.com/uber/prototool/internal/extract"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -44,8 +46,6 @@ type handler struct {
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
 	headers        []string
-
-	getter extract.Getter
 }
 
 func newHandler(options ...HandlerOption) *handler {
@@ -61,10 +61,6 @@ func newHandler(options ...HandlerOption) *handler {
 	if handler.connectTimeout == 0 {
 		handler.connectTimeout = DefaultConnectTimeout
 	}
-	// TODO(pedge): composition
-	handler.getter = extract.NewGetter(
-		extract.GetterWithLogger(handler.logger),
-	)
 	return handler
 }
 
@@ -81,7 +77,7 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger, h.jsonOutput)
 	ctx, cancel := context.WithTimeout(context.Background(), h.callTimeout)
 	defer cancel()
-	if err := grpcurl.InvokeRpc(
+	if err := grpcurl.InvokeRPC(
 		ctx,
 		descriptorSource,
 		clientConn,
@@ -98,7 +94,24 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 func (h *handler) dial(address string) (*grpc.ClientConn, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), h.connectTimeout)
 	defer cancel()
-	return grpcurl.BlockingDial(ctx, "tcp", address, nil, h.getDialOptions()...)
+	network, address, err := getNetworkAddress(address)
+	if err != nil {
+		return nil, fmt.Errorf("grpc dial: %v", err)
+	}
+	return grpcurl.BlockingDial(ctx, network, address, nil, h.getDialOptions()...)
+}
+
+func getNetworkAddress(address string) (string, string, error) {
+	split := strings.SplitN(address, "://", 2)
+	if len(split) != 2 {
+		return "tcp", address, nil
+	}
+	switch split[0] {
+	case "tcp", "unix":
+		return split[0], split[1], nil
+	default:
+		return "", "", fmt.Errorf("invalid network, only tcp or unix allowed: %s", split[0])
+	}
 }
 
 func (h *handler) getDialOptions() []grpc.DialOption {
@@ -122,11 +135,11 @@ func (h *handler) getDescriptorSourceForMethod(fileDescriptorSets []*descriptor.
 	if err != nil {
 		return nil, err
 	}
-	service, err := h.getter.GetService(fileDescriptorSets, servicePath)
+	serviceInfo, err := getServiceInfo(fileDescriptorSets, servicePath)
 	if err != nil {
 		return nil, err
 	}
-	fileDescriptorSet, err := desc.SortFileDescriptorSet(service.FileDescriptorSet, service.FileDescriptorProto)
+	fileDescriptorSet, err := desc.SortFileDescriptorSet(serviceInfo.FileDescriptorSet, serviceInfo.FileDescriptorProto)
 	if err != nil {
 		return nil, err
 	}
@@ -141,13 +154,80 @@ func getServiceForMethod(method string) (string, error) {
 	return split[0], nil
 }
 
-func decodeFunc(reader io.Reader) func() ([]byte, error) {
+func decodeFunc(reader io.Reader) func(proto.Message) error {
 	decoder := json.NewDecoder(reader)
-	return func() ([]byte, error) {
+	return func(message proto.Message) error {
 		var rawMessage json.RawMessage
 		if err := decoder.Decode(&rawMessage); err != nil {
-			return nil, err
+			return err
 		}
-		return rawMessage, nil
+		return jsonpb.Unmarshal(bytes.NewReader(rawMessage), message)
 	}
+}
+
+type serviceInfo struct {
+	ServiceDescriptorProto *descriptor.ServiceDescriptorProto
+	FileDescriptorProto    *descriptor.FileDescriptorProto
+	FileDescriptorSet      *descriptor.FileDescriptorSet
+}
+
+func getServiceInfo(fileDescriptorSets []*descriptor.FileDescriptorSet, path string) (*serviceInfo, error) {
+	if len(path) == 0 {
+		return nil, fmt.Errorf("empty path")
+	}
+	if path[0] == '.' {
+		path = path[1:]
+	}
+	var serviceDescriptorProto *descriptor.ServiceDescriptorProto
+	var fileDescriptorProto *descriptor.FileDescriptorProto
+	var fileDescriptorSet *descriptor.FileDescriptorSet
+	for _, iFileDescriptorSet := range fileDescriptorSets {
+		for _, iFileDescriptorProto := range iFileDescriptorSet.File {
+			iServiceDescriptorProto, err := findServiceDescriptorProto(path, iFileDescriptorProto)
+			if err != nil {
+				return nil, err
+			}
+			if iServiceDescriptorProto != nil {
+				if serviceDescriptorProto != nil {
+					return nil, fmt.Errorf("duplicate services for path %s", path)
+				}
+				serviceDescriptorProto = iServiceDescriptorProto
+				fileDescriptorProto = iFileDescriptorProto
+			}
+		}
+		// return first fileDescriptorSet that matches
+		// as opposed to duplicate check within fileDescriptorSet, we easily could
+		// have multiple fileDescriptorSets that match
+		if serviceDescriptorProto != nil {
+			fileDescriptorSet = iFileDescriptorSet
+			break
+		}
+	}
+	if serviceDescriptorProto == nil {
+		return nil, fmt.Errorf("no service for path %s", path)
+	}
+	return &serviceInfo{
+		ServiceDescriptorProto: serviceDescriptorProto,
+		FileDescriptorProto:    fileDescriptorProto,
+		FileDescriptorSet:      fileDescriptorSet,
+	}, nil
+}
+
+func findServiceDescriptorProto(path string, fileDescriptorProto *descriptor.FileDescriptorProto) (*descriptor.ServiceDescriptorProto, error) {
+	if fileDescriptorProto.GetPackage() == "" {
+		return nil, fmt.Errorf("no package on FileDescriptorProto")
+	}
+	if !strings.HasPrefix(path, fileDescriptorProto.GetPackage()) {
+		return nil, nil
+	}
+	var foundServiceDescriptorProto *descriptor.ServiceDescriptorProto
+	for _, serviceDescriptorProto := range fileDescriptorProto.GetService() {
+		if fileDescriptorProto.GetPackage()+"."+serviceDescriptorProto.GetName() == path {
+			if foundServiceDescriptorProto != nil {
+				return nil, fmt.Errorf("duplicate services for path %s", path)
+			}
+			foundServiceDescriptorProto = serviceDescriptorProto
+		}
+	}
+	return foundServiceDescriptorProto, nil
 }
