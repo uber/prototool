@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `--list-lint-group` flag to the `lint` command to list a lint group's
   rules.
 - Add `--diff-lint-groups` flag to the `lint` command to print the diff
-  between two lint groups
+  between two lint groups.
 - Breaking change detector added as the `break check` command.
 - A Docker image is now provided on Docker Hub as [uber/prototool](https://hub.docker.com/r/uber/prototool)
   which provides an environment with commonly-used plugins.
@@ -43,6 +43,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add file locking around the `protoc` downloader to eliminate concurrency
   issues where multiple `prototool` invocations may be accessing the cache
   at the same time.
+- Add `--details` flag to the `grpc` command to output headers, trailers,
+  and statuses as well as the responses.
 - Unix domain sockets can now be specified for the `--address` flag of the
   `grpc` command via the prefix `unix://`.
 

@@ -286,37 +286,24 @@ prototool grpc [dirOrFile] \
 Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" which will result in the input being read from stdin as JSON.
 
 $ make example # make sure everything is built just in case
+$ go run example/cmd/excited/main.go # run in another terminal
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/Exclamation \
+  --method uber.foo.v1.ExcitedAPI/Exclamation \
   --data '{"value":"hello"}'
-{
-  "value": "hello!"
-}
+{"value": "hello!"}
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationServerStream \
+  --method uber.foo.v1.ExcitedAPI/ExclamationServerStream \
   --data '{"value":"hello"}'
-{
-  "value": "h"
-}
-{
-  "value": "e"
-}
-{
-  "value": "l"
-}
-{
-  "value": "l"
-}
-{
-  "value": "o"
-}
-{
-  "value": "!"
-}
+{"value": "h"}
+{"value": "e"}
+{"value": "l"}
+{"value": "l"}
+{"value": "o"}
+{"value": "!"}
 
 $ cat input.json
 {"value":"hello"}
@@ -324,25 +311,32 @@ $ cat input.json
 
 $ cat input.json | prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationClientStream \
+  --method uber.foo.v1.ExcitedAPI/ExclamationClientStream \
   --stdin
-{
-  "value": "hellosalutations!"
-}
+{"value": "hellosalutations!"}
 
 $ cat input.json | prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationBidiStream \
+  --method uber.foo.v1.ExcitedAPI/ExclamationBidiStream \
   --stdin
-{
-  "value": "hello!"
-}
-{
-  "value": "salutations!"
-}`,
+{"value": "hello!"}
+{"value": "salutations!"}
+
+$ prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method uber.foo.v1.ExcitedAPI/ExclamationServerStream \
+  --data '{"value":"hello"}' \
+  --details
+{"headers":{"content-type":["application/grpc"]}}
+{"response":{"value":"h"}}
+{"response":{"value":"e"}}
+{"response":{"value":"l"}}
+{"response":{"value":"l"}}
+{"response":{"value":"o"}}
+{"response":{"value":"!"}}`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin)
+			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.details)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
@@ -351,6 +345,7 @@ $ cat input.json | prototool grpc example \
 			flags.bindCallTimeout(flagSet)
 			flags.bindConnectTimeout(flagSet)
 			flags.bindData(flagSet)
+			flags.bindDetails(flagSet)
 			flags.bindErrorFormat(flagSet)
 			flags.bindHeaders(flagSet)
 			flags.bindKeepaliveTime(flagSet)
