@@ -29,7 +29,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_emicklei_proto",
         importpath = "github.com/emicklei/proto",
-        tag = "v1.6.8",
+        tag = "v1.6.9",
     )
     go_repository(
         name = "com_github_fullstorydev_grpcurl",
