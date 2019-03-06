@@ -566,7 +566,7 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 }
 
 func (r *runner) InspectPackages(args []string) error {
-	packageSet, err := r.getPackageSet(args)
+	packageSet, _, err := r.getPackageSetAndConfig(args)
 	if err != nil {
 		return err
 	}
@@ -592,7 +592,7 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
-func (r *runner) BreakCheck(args []string, gitBranch string, includeBeta bool, allowBetaDeps bool) error {
+func (r *runner) BreakCheck(args []string, gitBranch string) error {
 	relDirPath := "."
 	// we check length 0 or 1 in cmd, similar to other commands
 	if len(args) == 1 {
@@ -614,7 +614,7 @@ func (r *runner) BreakCheck(args []string, gitBranch string, includeBeta bool, a
 		return fmt.Errorf("input directory must be within working directory: %s", relDirPath)
 	}
 
-	toPackageSet, err := r.getPackageSetForRelDirPath(relDirPath)
+	toPackageSet, config, err := r.getPackageSetAndConfigForRelDirPath(relDirPath)
 	if err != nil {
 		return err
 	}
@@ -629,12 +629,12 @@ func (r *runner) BreakCheck(args []string, gitBranch string, includeBeta bool, a
 		_ = os.RemoveAll(cloneDirPath)
 	}()
 
-	fromPackageSet, err := r.cloneForWorkDirPath(cloneDirPath).getPackageSetForRelDirPath(relDirPath)
+	fromPackageSet, _, err := r.cloneForWorkDirPath(cloneDirPath).getPackageSetAndConfigForRelDirPath(relDirPath)
 	if err != nil {
 		return err
 	}
 
-	failures, err := r.newBreakingRunner(includeBeta, allowBetaDeps).Run(fromPackageSet, toPackageSet)
+	failures, err := r.newBreakingRunner().Run(config.Break, fromPackageSet, toPackageSet)
 	if err != nil {
 		return err
 	}
@@ -647,28 +647,36 @@ func (r *runner) BreakCheck(args []string, gitBranch string, includeBeta bool, a
 	return nil
 }
 
-func (r *runner) getPackageSet(args []string) (*extract.PackageSet, error) {
+func (r *runner) getPackageSetAndConfig(args []string) (*extract.PackageSet, settings.Config, error) {
 	meta, err := r.getMeta(args)
 	if err != nil {
-		return nil, err
+		return nil, settings.Config{}, err
 	}
 	r.printAffectedFiles(meta)
 	fileDescriptorSets, err := r.compile(false, true, false, meta)
 	if err != nil {
-		return nil, err
+		return nil, settings.Config{}, err
 	}
 	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets.Unwrap()...)
 	if err != nil {
-		return nil, err
+		return nil, settings.Config{}, err
 	}
-	return extract.NewPackageSet(reflectPackageSet)
+	packageSet, err := extract.NewPackageSet(reflectPackageSet)
+	if err != nil {
+		return nil, settings.Config{}, err
+	}
+	var config settings.Config
+	if meta != nil && meta.ProtoSet != nil {
+		config = meta.ProtoSet.Config
+	}
+	return packageSet, config, nil
 }
 
 func (r *runner) getPackage(args []string, name string) (*extract.Package, error) {
 	if name == "" {
 		return nil, newExitErrorf(255, "must set name")
 	}
-	packageSet, err := r.getPackageSet(args)
+	packageSet, _, err := r.getPackageSetAndConfig(args)
 	if err != nil {
 		return nil, err
 	}
@@ -693,29 +701,17 @@ func (r *runner) printPackageNames(m map[string]*extract.Package) error {
 
 // we require a relative path (or no path) to be passed
 // this is largely because getMeta has special handling for "."
-func (r *runner) getPackageSetForRelDirPath(relDirPath string) (*extract.PackageSet, error) {
+func (r *runner) getPackageSetAndConfigForRelDirPath(relDirPath string) (*extract.PackageSet, settings.Config, error) {
 	dirPath := r.workDirPath
 	if relDirPath != "" && relDirPath != "." {
 		dirPath = filepath.Join(dirPath, relDirPath)
 	}
-	return r.getPackageSet([]string{dirPath})
+	return r.getPackageSetAndConfig([]string{dirPath})
 }
 
-func (r *runner) newBreakingRunner(includeBeta bool, allowBetaDeps bool) breaking.Runner {
+func (r *runner) newBreakingRunner() breaking.Runner {
 	runnerOptions := []breaking.RunnerOption{
 		breaking.RunnerWithLogger(r.logger),
-	}
-	if includeBeta {
-		runnerOptions = append(
-			runnerOptions,
-			breaking.RunnerWithIncludeBeta(),
-		)
-	}
-	if allowBetaDeps {
-		runnerOptions = append(
-			runnerOptions,
-			breaking.RunnerWithAllowBetaDeps(),
-		)
 	}
 	return breaking.NewRunner(runnerOptions...)
 }

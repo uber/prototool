@@ -354,6 +354,10 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			JavaPackagePrefix:   e.Lint.JavaPackagePrefix,
 			AllowSuppression:    e.Lint.AllowSuppression,
 		},
+		Break: BreakConfig{
+			IncludeBeta:   e.Break.IncludeBeta,
+			AllowBetaDeps: e.Break.AllowBetaDeps,
+		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
 				ImportPath:     e.Generate.GoOptions.ImportPath,

@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/extract"
 	"github.com/uber/prototool/internal/reflect"
+	"github.com/uber/prototool/internal/settings"
 	ptesting "github.com/uber/prototool/internal/testing"
 	"github.com/uber/prototool/internal/text"
 )
@@ -343,13 +344,11 @@ func testRun(t *testing.T, subDirPath string, includeBeta bool, allowBetaDeps bo
 	fromPackageSet, toPackageSet, err := getPackageSets(subDirPath)
 	require.NoError(t, err)
 	runner := NewRunner()
-	if includeBeta {
-		runner = NewRunner(RunnerWithIncludeBeta())
+	config := settings.BreakConfig{
+		IncludeBeta:   includeBeta,
+		AllowBetaDeps: allowBetaDeps,
 	}
-	if allowBetaDeps {
-		runner = NewRunner(RunnerWithAllowBetaDeps())
-	}
-	failures, err := runner.Run(fromPackageSet, toPackageSet)
+	failures, err := runner.Run(config, fromPackageSet, toPackageSet)
 	require.NoError(t, err)
 	for _, failure := range failures {
 		failure.LintID = ""

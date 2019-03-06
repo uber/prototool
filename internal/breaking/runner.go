@@ -22,15 +22,14 @@ package breaking
 
 import (
 	"github.com/uber/prototool/internal/extract"
+	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"go.uber.org/zap"
 )
 
 type runner struct {
-	logger        *zap.Logger
-	includeBeta   bool
-	allowBetaDeps bool
-	checkers      []Checker
+	logger   *zap.Logger
+	checkers []Checker
 }
 
 func newRunner(options ...RunnerOption) *runner {
@@ -44,9 +43,9 @@ func newRunner(options ...RunnerOption) *runner {
 	return runner
 }
 
-func (r *runner) Run(from *extract.PackageSet, to *extract.PackageSet) ([]*text.Failure, error) {
+func (r *runner) Run(config settings.BreakConfig, from *extract.PackageSet, to *extract.PackageSet) ([]*text.Failure, error) {
 	var err error
-	if !r.includeBeta {
+	if !config.IncludeBeta {
 		from, err = from.WithoutBeta()
 		if err != nil {
 			return nil, err
@@ -59,7 +58,7 @@ func (r *runner) Run(from *extract.PackageSet, to *extract.PackageSet) ([]*text.
 	checkers := r.checkers
 	// if includeBeta, do not do the check
 	// else if not including beta, unless allow beta deps, do not do the check
-	if !r.includeBeta && !r.allowBetaDeps {
+	if !config.IncludeBeta && !config.AllowBetaDeps {
 		checkers = append(checkers, PackagesNoBetaDepsChecker)
 	}
 	var failures []*text.Failure
