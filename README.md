@@ -198,11 +198,11 @@ major version, with some exceptions:
 
 - The output of the formatter may change between minor versions. This has not happened yet, but we may change the format in the future to
   reflect things such as max line lengths.
+- The breaking change detector's output format currently does not output filename, line, or column. This is an expected upgrade in the
+  future, so the output will likely change. This is viewed as purely an upgrade, so until this is done, do not parse
+  `prototool break check` output in scripts.
 - The breaking change detector may have additional checks added between minor versions, and therefore a change that might not have been
   breaking previously might become a breaking change.
-- The `PACKAGE_NO_KEYWORDS` linter on the `uber2` lint group may have additional keywords added.
-- The `SERVICE_NAMES_NO_PLURALS` linter on the `uber2` lint group ignores certain plurals such as "data". We may add additional ignored
-  plurals in the future, so plurals that are not ignored now may be ignored later.
 
 ## Development
 
