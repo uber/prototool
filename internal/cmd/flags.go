@@ -33,6 +33,7 @@ type flags struct {
 	connectTimeout    string
 	data              string
 	debug             bool
+	details           bool
 	diffLintGroups    string
 	diffMode          bool
 	disableFormat     bool
@@ -93,6 +94,10 @@ func (f *flags) bindData(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.debug, "debug", false, "Run in debug mode, which will print out debug logging.")
+}
+
+func (f *flags) bindDetails(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.details, "details", false, "Output headers, trailers, and status as well as the responses.")
 }
 
 func (f *flags) bindDiffLintGroups(flagSet *pflag.FlagSet) {

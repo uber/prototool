@@ -41,11 +41,11 @@ import (
 
 type handler struct {
 	logger         *zap.Logger
-	json           bool
 	callTimeout    time.Duration
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
 	headers        []string
+	details        bool
 }
 
 func newHandler(options ...HandlerOption) *handler {
@@ -74,7 +74,7 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 		return err
 	}
 	defer func() { _ = clientConn.Close() }()
-	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger, h.json)
+	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger, h.details)
 	ctx, cancel := context.WithTimeout(context.Background(), h.callTimeout)
 	defer cancel()
 	if err := grpcurl.InvokeRPC(

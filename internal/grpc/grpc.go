@@ -53,13 +53,13 @@ func HandlerWithLogger(logger *zap.Logger) HandlerOption {
 	}
 }
 
-// HandlerWithJSON returns a HandlerOption that outputs responses
+// HandlerWithDetails returns a HandlerOption that outputs responses
 // in a structured JSON message that includes headers, trailers, and statuses.
 //
 // The default is to just print the responses.
-func HandlerWithJSON() HandlerOption {
+func HandlerWithDetails() HandlerOption {
 	return func(handler *handler) {
-		handler.json = true
+		handler.details = true
 	}
 }
 

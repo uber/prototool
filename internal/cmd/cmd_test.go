@@ -1116,22 +1116,14 @@ func TestGRPC(t *testing.T) {
 	t.Parallel()
 	assertGRPC(t,
 		0,
-		`
-		{
-			"value": "hello!"
-		}
-		`,
+		`{"value":"hello!"}`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/Exclamation",
 		`{"value":"hello"}`,
 	)
 	assertGRPC(t,
 		0,
-		`
-		{
-			"value": "hellosalutations!"
-		}
-		`,
+		`{"value":"hellosalutations!"}`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationClientStream",
 		`{"value":"hello"}
@@ -1139,26 +1131,12 @@ func TestGRPC(t *testing.T) {
 	)
 	assertGRPC(t,
 		0,
-		`
-		{
-			"value": "h"
-		}
-		{
-			"value": "e"
-		}
-		{
-			"value": "l"
-		}
-		{
-			"value": "l"
-		}
-		{
-			"value": "o"
-		}
-		{
-			"value": "!"
-		}
-		`,
+		`{"value":"h"}
+		{"value":"e"}
+		{"value":"l"}
+		{"value":"l"}
+		{"value":"o"}
+		{"value":"!"}`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationServerStream",
 		`{"value":"hello"}`,
@@ -1166,17 +1144,27 @@ func TestGRPC(t *testing.T) {
 	assertGRPC(t,
 		0,
 		`
-		{
-			"value": "hello!"
-		}
-		{
-			"value": "salutations!"
-		}
+		{"value":"hello!"}
+		{"value":"salutations!"}
 		`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationBidiStream",
 		`{"value":"hello"}
 		{"value":"salutations"}`,
+	)
+	assertGRPC(t,
+		0,
+		`{"headers":{"content-type":["application/grpc"]}}
+		{"response":{"value":"h"}}
+		{"response":{"value":"e"}}
+		{"response":{"value":"l"}}
+		{"response":{"value":"l"}}
+		{"response":{"value":"o"}}
+		{"response":{"value":"!"}}`,
+		"testdata/grpc/grpc.proto",
+		"grpc.ExcitedService/ExclamationServerStream",
+		`{"value":"hello"}`,
+		`--details`,
 	)
 }
 
@@ -1381,10 +1369,10 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 	assert.Equal(t, strings.TrimSpace(string(golden)), output)
 }
 
-func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string) {
+func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, "grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin")
+	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin"}, extraFlags...)...)
 }
 
 func assertRegexp(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedRegexp string, args ...string) {
