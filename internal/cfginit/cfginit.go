@@ -139,6 +139,18 @@ protoc:
   # this prefix instead of "com".
 {{.V}}  java_package_prefix: au.com
 
+# Breaking change detector directives.
+{{.V}}break:
+  # Include beta packages in breaking change detection.
+  # Beta packages have the form "foo.bar.vMAJORbetaBETA" where MAJOR > 0 and BETA > 0.
+  # By default, beta packages are ignored.
+  {{.V}}include_beta: true
+  # Allow stable packages to depend on beta packages.
+  # By default, the breaking change detector will error if a stable package
+  # depends on a breaking package.
+  # If include_beta is true, this is implicitly set.
+  {{.V}}allow_beta_deps: true
+
 # Code generation directives.
 {{.V}}generate:
   # Options that will apply to all plugins of type go and gogo.
