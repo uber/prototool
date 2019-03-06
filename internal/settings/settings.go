@@ -141,6 +141,8 @@ type Config struct {
 	// or Group/IncludeIDs/ExcludeIDs can be set, but not both. There can be no overlap
 	// between IncludeIDs and ExcludeIDs.
 	Lint LintConfig
+	// The break config.
+	Break BreakConfig
 	// The gen config.
 	Gen GenConfig
 }
@@ -206,6 +208,15 @@ type LintConfig struct {
 	JavaPackagePrefix string
 	// AllowSuppression says to honor @suppresswarnings annotations.
 	AllowSuppression bool
+}
+
+// BreakConfig is the break config.
+type BreakConfig struct {
+	// Include beta packages in breaking change detection.
+	IncludeBeta bool
+	// Allow stable packages to depend on beta packages.
+	// This is implicitly set if IncludeBeta is set.
+	AllowBetaDeps bool
 }
 
 // GenConfig is the gen config.
@@ -300,8 +311,8 @@ type ExternalConfig struct {
 		} `json:"ignores,omitempty" yaml:"ignores,omitempty"`
 		Rules struct {
 			NoDefault bool     `json:"no_default,omitempty" yaml:"no_default,omitempty"`
-			Add       []string `json:"add" yaml:"add"`
-			Remove    []string `json:"remove" yaml:"remove"`
+			Add       []string `json:"add,omitempty" yaml:"add,omitempty"`
+			Remove    []string `json:"remove,omitempty" yaml:"remove,omitempty"`
 		} `json:"rules,omitempty" yaml:"rules,omitempty"`
 		FileHeader struct {
 			Path        string `json:"path,omitempty" yaml:"path,omitempty"`
@@ -312,6 +323,10 @@ type ExternalConfig struct {
 		// devel-mode only
 		AllowSuppression bool `json:"allow_suppression,omitempty" yaml:"allow_suppression,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
+	Break struct {
+		IncludeBeta   bool `json:"include_beta,omitempty" yaml:"include_beta,omitempty"`
+		AllowBetaDeps bool `json:"allow_beta_deps,omitempty" yaml:"allow_beta_deps,omitempty"`
+	}
 	Generate struct {
 		GoOptions struct {
 			ImportPath     string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
