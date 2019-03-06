@@ -6,8 +6,8 @@ github.com/cpuguy83/go-md2man v1.0.8/go.mod h1:N6JayAiVKtlHSnuTCeuLSQVs75hb8q+dY
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/emicklei/proto v1.6.8 h1:TgJKjY0I1cec7Xtj0dJGnxXHP0TJRGaqGW44waWqaLA=
-github.com/emicklei/proto v1.6.8/go.mod h1:Dqn751twH9SasYqvA59Lb9Hz+itoJgmMoivX6k7OPZc=
+github.com/emicklei/proto v1.6.9 h1:0k3w22Ls4DdDzf9qOoW0iKlBRteMo2ge3VZ7zUKQQAw=
+github.com/emicklei/proto v1.6.9/go.mod h1:rn1FgRS/FANiZdD2djyH7TMA9jdRDcYQ9IEN9yvjX0A=
 github.com/fullstorydev/grpcurl v1.1.0 h1:LHhWyQ7WMuZIlf6zGV1D8VcnK28ax9tVDTxC39yM0Ns=
 github.com/fullstorydev/grpcurl v1.1.0/go.mod h1:NL+liwXeENyQf/LXGuuovgoAE4/oYnjOepYgse4weuc=
 github.com/gobuffalo/flect v0.1.0 h1:EJvbvZlo9exJk5UK02lz5pTs3XEpIM5/4o691KfvtkM=
