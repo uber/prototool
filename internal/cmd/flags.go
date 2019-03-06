@@ -37,6 +37,7 @@ type flags struct {
 	diffMode          bool
 	disableFormat     bool
 	disableLint       bool
+	document          bool
 	dryRun            bool
 	errorFormat       string
 	fix               bool
@@ -112,6 +113,10 @@ func (f *flags) bindDisableLint(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDryRun(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.dryRun, "dry-run", false, "Print the protoc commands that would have been run without actually running them.")
+}
+
+func (f *flags) bindDocument(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.document, "document", false, "Document all available options. Automatically set if --uncomment is set.")
 }
 
 func (f *flags) bindErrorFormat(flagSet *pflag.FlagSet) {
@@ -195,7 +200,7 @@ func (f *flags) bindStdin(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings.")
+	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings. Automatically sets --document.")
 }
 
 func (f *flags) bindFix(flagSet *pflag.FlagSet) {

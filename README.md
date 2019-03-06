@@ -83,13 +83,17 @@ Recommended base config file:
 ```yaml
 protoc:
   version: 3.7.0
+lint:
+  group: uber2
 ```
 
-The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc.version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
+The command `prototool config init` will generate a config file in the current directory with the currently recommended options set.
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
 If multiple `prototool.yaml` or `prototool.json` files are found that match the input directory or files, an error will be returned.
+
+See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) all available options.
 
 ## File Discovery
 
@@ -117,7 +121,13 @@ Let's go over some of the basic commands.
 
 ##### `prototool config init`
 
-Create a `prototool.yaml` file in the current directory, with all options except `protoc.version` commented out.
+Create a `prototool.yaml` file in the current directory with the currently recommended options set.
+
+Pass the `--document` flag to generate a `prototool.yaml` file with all other options documented and commented out.
+
+Pass the `--uncomment` flag to generate `prototool.yaml` file with all options documented but uncommented.
+
+See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
 
 ##### `prototool compile`
 
