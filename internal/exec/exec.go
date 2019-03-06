@@ -45,7 +45,7 @@ func (e *ExitError) Error() string {
 // The args given are the args from the command line.
 // Each additional parameter generally refers to a command-specific flag.
 type Runner interface {
-	Init(args []string, uncomment bool) error
+	Init(args []string, uncomment bool, document bool) error
 	Create(args []string, pkg string) error
 	Version() error
 	CacheUpdate(args []string) error

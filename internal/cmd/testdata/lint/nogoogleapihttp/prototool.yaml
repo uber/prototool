@@ -7,6 +7,8 @@ lint:
       files:
         - google/api/api.proto
   rules:
+    add:
+      - RPC_OPTIONS_NO_GOOGLE_API_HTTP
     remove:
       - ENUMS_HAVE_SENTENCE_COMMENTS
       - MESSAGES_HAVE_SENTENCE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES

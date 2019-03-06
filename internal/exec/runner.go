@@ -155,7 +155,7 @@ func (r *runner) Version() error {
 	return tabWriter.Flush()
 }
 
-func (r *runner) Init(args []string, uncomment bool) error {
+func (r *runner) Init(args []string, uncomment bool, document bool) error {
 	if len(args) > 1 {
 		return errors.New("must provide one arg dirPath")
 	}
@@ -171,7 +171,7 @@ func (r *runner) Init(args []string, uncomment bool) error {
 	if _, err := os.Stat(filePath); err == nil {
 		return fmt.Errorf("%s already exists", filePath)
 	}
-	data, err := cfginit.Generate(vars.DefaultProtocVersion, uncomment)
+	data, err := cfginit.Generate(vars.DefaultProtocVersion, uncomment, document)
 	if err != nil {
 		return err
 	}

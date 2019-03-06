@@ -82,14 +82,18 @@ Recommended base config file:
 
 ```yaml
 protoc:
-  version: 3.6.1
+  version: 3.7.0
+lint:
+  group: uber2
 ```
 
-The command `prototool config init` will generate a config file in the current directory with all available configuration options commented out except `protoc.version`. See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
+The command `prototool config init` will generate a config file in the current directory with the currently recommended options set.
 
 When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
 
 If multiple `prototool.yaml` or `prototool.json` files are found that match the input directory or files, an error will be returned.
+
+See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) all available options.
 
 ## File Discovery
 
@@ -117,7 +121,13 @@ Let's go over some of the basic commands.
 
 ##### `prototool config init`
 
-Create a `prototool.yaml` file in the current directory, with all options except `protoc.version` commented out.
+Create a `prototool.yaml` file in the current directory with the currently recommended options set.
+
+Pass the `--document` flag to generate a `prototool.yaml` file with all other options documented and commented out.
+
+Pass the `--uncomment` flag to generate `prototool.yaml` file with all options documented but uncommented.
+
+See [etc/config/example/prototool.yaml](etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
 
 ##### `prototool compile`
 
@@ -223,11 +233,11 @@ major version, with some exceptions:
 
 - The output of the formatter may change between minor versions. This has not happened yet, but we may change the format in the future to
   reflect things such as max line lengths.
+- The breaking change detector's output format currently does not output filename, line, or column. This is an expected upgrade in the
+  future, so the output will likely change. This is viewed as purely an upgrade, so until this is done, do not parse
+  `prototool break check` output in scripts.
 - The breaking change detector may have additional checks added between minor versions, and therefore a change that might not have been
   breaking previously might become a breaking change.
-- The `PACKAGE_NO_KEYWORDS` linter on the `uber2` lint group may have additional keywords added.
-- The `SERVICE_NAMES_NO_PLURALS` linter on the `uber2` lint group ignores certain plurals such as "data". We may add additional ignored
-  plurals in the future, so plurals that are not ignored now may be ignored later.
 
 ## Development
 
@@ -267,7 +277,7 @@ prototool cache update
 # Cache to a specific directory path/to/cache
 prototool cache update --cache-path path/to/cache
 # Cache using custom configuration data instead of finding a prototool.yaml file using the file discovery mechanism
-prototool cache update --config-data '{"protoc":{"version":"3.6.1"}}'
+prototool cache update --config-data '{"protoc":{"version":"3.7.0"}}'
 ```
 
 There is also a command `prototool cache delete` which will delete all cached assets of `prototool`,

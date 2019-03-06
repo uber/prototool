@@ -424,12 +424,13 @@ $ cat input.json | prototool grpc example \
 	configInitCmdTemplate = &cmdTemplate{
 		Use:   "init [dirPath]",
 		Short: "Generate an initial config file in the current or given directory.",
-		Long:  `All available options will be generated and commented out except for "protoc.version". Pass the "--uncomment" flag to uncomment all options.`,
+		Long:  `The currently recommended options will be set.`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Init(args, flags.uncomment)
+			return runner.Init(args, flags.uncomment, flags.document)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindDocument(flagSet)
 			flags.bindUncomment(flagSet)
 		},
 	}
