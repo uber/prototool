@@ -592,15 +592,7 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
-func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, includeBeta bool, allowBetaDeps bool) error {
-	if moreThanOneSet(gitBranch != "", gitTag != "") {
-		return newExitErrorf(255, "can only set one of git-branch, git-tag")
-	}
-	branchOrTag := gitBranch
-	if branchOrTag == "" {
-		branchOrTag = gitTag
-	}
-
+func (r *runner) BreakCheck(args []string, gitBranch string, includeBeta bool, allowBetaDeps bool) error {
 	relDirPath := "."
 	// we check length 0 or 1 in cmd, similar to other commands
 	if len(args) == 1 {
@@ -628,7 +620,7 @@ func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, incl
 	}
 
 	// this will purposefully fail if we are not at a git repository
-	cloneDirPath, err := git.TemporaryClone(r.logger, r.workDirPath, branchOrTag)
+	cloneDirPath, err := git.TemporaryClone(r.logger, r.workDirPath, gitBranch)
 	if err != nil {
 		return err
 	}
