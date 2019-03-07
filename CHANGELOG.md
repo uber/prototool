@@ -51,6 +51,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `x` top-level command for experimental functionality.
 - Add `inspect` command under `x` with Protobuf inspection capabilities.
 - Add `--error-format` flag to allow specific error fields to be printed.
+- Allow the `protoc` binary and WKT paths to be controlled by the environment
+  variables `PROTOTOOL_PROTOC_BIN_PATH` and `PROTOTOOL_PROTOC_WKT_PATH` in
+  addition to the existing `--protoc-bin-path` and `--protoc-wkt-path` flags.
+  The flags take precedence. This is especially useful for Docker images.
 - Add file locking around the `protoc` downloader to eliminate concurrency
   issues where multiple `prototool` invocations may be accessing the cache
   at the same time.
