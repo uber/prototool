@@ -61,21 +61,39 @@ var (
 	breakCheckCmdTemplate = &cmdTemplate{
 		Use:   "check [dir]",
 		Short: "Check for breaking changes.",
-		Long: `This command must be run from the root of a git repository.
-
-The input directory must be relative.`,
-		Args: cobra.MaximumNArgs(1),
+		Long:  `This command must be run from the root of a git repository, and the input directory must be relative, unless --descriptor-set-path is specified.`,
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.BreakCheck(args, flags.gitBranch)
+			return runner.BreakCheck(args, flags.gitBranch, flags.descriptorSetPath)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindDescriptorSetPath(flagSet)
 			flags.bindGitBranch(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	breakDescriptorSetCmdTemplate = &cmdTemplate{
+		Use:   "descriptor-set [dir]",
+		Short: "Generate a FileDescriptorSet file that stores the current state of your Protobuf definitions for use with break check --descriptor-set-path. The -o flag is required.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.BreakDescriptorSet(args, flags.outputPath)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+			flags.bindOutputPathBreakDescriptorSet(flagSet)
 		},
 	}
 

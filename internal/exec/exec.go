@@ -60,7 +60,8 @@ type Runner interface {
 	InspectPackages(args []string) error
 	InspectPackageDeps(args []string, name string) error
 	InspectPackageImporters(args []string, name string) error
-	BreakCheck(args []string, gitBranch string) error
+	BreakCheck(args []string, gitBranch string, descriptorSetPath string) error
+	BreakDescriptorSet(args []string, outputPath string) error
 	DescriptorSet(args []string, includeImports bool, includeSourceInfo bool, outputPath string, tmp bool) error
 }
 

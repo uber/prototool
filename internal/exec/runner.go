@@ -39,6 +39,7 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/uber/prototool/internal/breaking"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/create"
@@ -589,6 +590,13 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	).Invoke(fileDescriptorSets.Unwrap(), address, method, reader, r.output)
 }
 
+func (r *runner) BreakDescriptorSet(args []string, outputPath string) error {
+	if outputPath == "" {
+		return newExitErrorf(255, "must set output-path")
+	}
+	return r.DescriptorSet(args, true, false, outputPath, false)
+}
+
 func (r *runner) DescriptorSet(args []string, includeImports bool, includeSourceInfo bool, outputPath string, tmp bool) (retErr error) {
 	if outputPath != "" && tmp {
 		return newExitErrorf(255, "can only set one of output-path, tmp")
@@ -671,46 +679,58 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
-func (r *runner) BreakCheck(args []string, gitBranch string) error {
-	relDirPath := "."
-	// we check length 0 or 1 in cmd, similar to other commands
-	if len(args) == 1 {
-		relDirPath = args[0]
-	}
-	if filepath.IsAbs(relDirPath) {
-		return fmt.Errorf("input argument must be relative directory path: %s", relDirPath)
+func (r *runner) BreakCheck(args []string, gitBranch string, descriptorSetPath string) error {
+	if gitBranch != "" && descriptorSetPath != "" {
+		return newExitErrorf(255, "can only set one of git-branch, descriptor-set-path")
 	}
 
-	absDirPath, err := file.AbsClean(relDirPath)
-	if err != nil {
-		return err
-	}
-	absWorkDirPath, err := file.AbsClean(r.workDirPath)
-	if err != nil {
-		return err
-	}
-	if !strings.HasPrefix(absDirPath, absWorkDirPath) {
-		return fmt.Errorf("input directory must be within working directory: %s", relDirPath)
-	}
-
-	toPackageSet, config, err := r.getPackageSetAndConfigForRelDirPath(relDirPath)
+	toPackageSet, config, err := r.getPackageSetAndConfig(args)
 	if err != nil {
 		return err
 	}
 
-	// this will purposefully fail if we are not at a git repository
-	cloneDirPath, err := git.TemporaryClone(r.logger, r.workDirPath, gitBranch)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		r.logger.Sugar().Debugf("removing %s", cloneDirPath)
-		_ = os.RemoveAll(cloneDirPath)
-	}()
+	var fromPackageSet *extract.PackageSet
+	if descriptorSetPath != "" {
+		fromPackageSet, err = r.getPackageSetForDescriptorSetPath(descriptorSetPath)
+		if err != nil {
+			return err
+		}
+	} else {
+		relDirPath := "."
+		// we check length 0 or 1 in cmd, similar to other commands
+		if len(args) == 1 {
+			relDirPath = args[0]
+		}
+		if filepath.IsAbs(relDirPath) {
+			return fmt.Errorf("input argument must be relative directory path: %s", relDirPath)
+		}
 
-	fromPackageSet, _, err := r.cloneForWorkDirPath(cloneDirPath).getPackageSetAndConfigForRelDirPath(relDirPath)
-	if err != nil {
-		return err
+		absDirPath, err := file.AbsClean(relDirPath)
+		if err != nil {
+			return err
+		}
+		absWorkDirPath, err := file.AbsClean(r.workDirPath)
+		if err != nil {
+			return err
+		}
+		if !strings.HasPrefix(absDirPath, absWorkDirPath) {
+			return fmt.Errorf("input directory must be within working directory: %s", relDirPath)
+		}
+
+		// this will purposefully fail if we are not at a git repository
+		cloneDirPath, err := git.TemporaryClone(r.logger, r.workDirPath, gitBranch)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			r.logger.Sugar().Debugf("removing %s", cloneDirPath)
+			_ = os.RemoveAll(cloneDirPath)
+		}()
+
+		fromPackageSet, _, err = r.cloneForWorkDirPath(cloneDirPath).getPackageSetAndConfigForRelDirPath(relDirPath)
+		if err != nil {
+			return err
+		}
 	}
 
 	failures, err := r.newBreakingRunner().Run(config.Break, fromPackageSet, toPackageSet)
@@ -736,11 +756,7 @@ func (r *runner) getPackageSetAndConfig(args []string) (*extract.PackageSet, set
 	if err != nil {
 		return nil, settings.Config{}, err
 	}
-	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets.Unwrap()...)
-	if err != nil {
-		return nil, settings.Config{}, err
-	}
-	packageSet, err := extract.NewPackageSet(reflectPackageSet)
+	packageSet, err := r.getPackageSetForFileDescriptorSets(fileDescriptorSets.Unwrap()...)
 	if err != nil {
 		return nil, settings.Config{}, err
 	}
@@ -749,6 +765,26 @@ func (r *runner) getPackageSetAndConfig(args []string) (*extract.PackageSet, set
 		config = meta.ProtoSet.Config
 	}
 	return packageSet, config, nil
+}
+
+func (r *runner) getPackageSetForDescriptorSetPath(descriptorSetPath string) (*extract.PackageSet, error) {
+	data, err := ioutil.ReadFile(descriptorSetPath)
+	if err != nil {
+		return nil, err
+	}
+	fileDescriptorSet := &descriptor.FileDescriptorSet{}
+	if err := proto.Unmarshal(data, fileDescriptorSet); err != nil {
+		return nil, err
+	}
+	return r.getPackageSetForFileDescriptorSets(fileDescriptorSet)
+}
+
+func (r *runner) getPackageSetForFileDescriptorSets(fileDescriptorSets ...*descriptor.FileDescriptorSet) (*extract.PackageSet, error) {
+	reflectPackageSet, err := reflect.NewPackageSet(fileDescriptorSets...)
+	if err != nil {
+		return nil, err
+	}
+	return extract.NewPackageSet(reflectPackageSet)
 }
 
 func (r *runner) getPackage(args []string, name string) (*extract.Package, error) {

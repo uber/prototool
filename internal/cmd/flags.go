@@ -32,6 +32,7 @@ type flags struct {
 	connectTimeout    string
 	data              string
 	debug             bool
+	descriptorSetPath string
 	details           bool
 	diffLintGroups    string
 	diffMode          bool
@@ -91,6 +92,10 @@ func (f *flags) bindData(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.debug, "debug", false, "Run in debug mode, which will print out debug logging.")
+}
+
+func (f *flags) bindDescriptorSetPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVarP(&f.descriptorSetPath, "descriptor-set-path", "f", "", "The path to the file containing a serialized FileDescriptorSet to check against.\nFileDescriptorSet files can be produced using the descriptor-set sub-command.\nThe default behavior is to check against a git branch or tag. This cannot be used with the --git-branch flag.")
 }
 
 func (f *flags) bindDetails(flagSet *pflag.FlagSet) {
@@ -183,6 +188,10 @@ func (f *flags) bindName(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindOutputPath(flagSet *pflag.FlagSet) {
 	flagSet.StringVarP(&f.outputPath, "output-path", "o", "", "Write the FileDescriptorSet to the given file path instead of outputting to stdout.")
+}
+
+func (f *flags) bindOutputPathBreakDescriptorSet(flagSet *pflag.FlagSet) {
+	flagSet.StringVarP(&f.outputPath, "output-path", "o", "", "The file path to write the FileDescriptorSet to. This is required.")
 }
 
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
