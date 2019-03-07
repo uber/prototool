@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package uber.trip.v1;
+
+option csharp_namespace = "Uber.Trip.V1";
+option go_package = "tripv1";
+option java_multiple_files = true;
+option java_outer_classname = "TripProto";
+option java_package = "com.uber.trip.v1";
+option objc_class_prefix = "UTX";
+option php_namespace = "Uber\\Trip\\V1";
+
+import "uber/user/v1/user.proto";
+import "google/protobuf/timestamp.proto";
+
+// A trip taken by a rider.
+message Trip {
+  string id = 1;
+  user.v1.User user = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  repeated Waypoint waypoints = 5;
+}
+
+// A given waypoint.
+message Waypoint {
+  // In the real world, addresses would be normalized into
+  // a PostalAddress message or such, but for brevity we simplify
+  // this to a freeform string.
+  string postal_address = 1;
+  // The nickname of this waypoint, if any.
+  string nickname = 2;
+}

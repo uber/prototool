@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package uber.user.v1;
+
+option csharp_namespace = "Uber.User.V1";
+option go_package = "userv1";
+option java_multiple_files = true;
+option java_outer_classname = "UserProto";
+option java_package = "com.uber.user.v1";
+option objc_class_prefix = "UUX";
+option php_namespace = "Uber\\User\\V1";
+
+// A user.
+message User {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  repeated string middle_names = 4;
+}
