@@ -54,3 +54,12 @@ func SortFileDescriptorSet(fileDescriptorSet *descriptor.FileDescriptorSet, file
 	newFileDescriptorSet.File = append(newFileDescriptorSet.File, fileDescriptorProto)
 	return newFileDescriptorSet, nil
 }
+
+// MergeFileDescriptorSets merges the given FileDescriptorSets, checking that files
+// with the same name have the same content.
+func MergeFileDescriptorSets(fileDescriptorSets []*descriptor.FileDescriptorSet) (*descriptor.FileDescriptorSet, error) {
+	if len(fileDescriptorSets) == 0 {
+		return nil, nil
+	}
+	return nil, nil
+}

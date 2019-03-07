@@ -37,9 +37,12 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/uber/prototool/internal/breaking"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/create"
+	"github.com/uber/prototool/internal/desc"
 	"github.com/uber/prototool/internal/diff"
 	"github.com/uber/prototool/internal/extract"
 	"github.com/uber/prototool/internal/file"
@@ -52,8 +55,11 @@ import (
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"github.com/uber/prototool/internal/vars"
+	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
+
+var jsonpbMarshaler = &jsonpb.Marshaler{}
 
 type runner struct {
 	protoSetProvider file.ProtoSetProvider
@@ -280,7 +286,6 @@ func (r *runner) doCompile(compiler protoc.Compiler, meta *meta) (protoc.FileDes
 	if len(compileResult.Failures) > 0 {
 		return nil, newExitErrorf(255, "")
 	}
-	r.logger.Debug("protoc command exited without errors")
 	return compileResult.FileDescriptorSets, nil
 }
 
@@ -584,7 +589,58 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	).Invoke(fileDescriptorSets.Unwrap(), address, method, reader, r.output)
 }
 
-func (r *runner) DescriptorSet(args []string, includeImports bool, includeSourceInfo bool, outputPath string, tmp bool) error {
+func (r *runner) DescriptorSet(args []string, includeImports bool, includeSourceInfo bool, outputPath string, tmp bool) (retErr error) {
+	if outputPath != "" && tmp {
+		return newExitErrorf(255, "can only set one of output-path, tmp")
+	}
+	meta, err := r.getMeta(args)
+	if err != nil {
+		return err
+	}
+	r.printAffectedFiles(meta)
+	fileDescriptorSets, err := r.compileFullControl(includeImports, includeSourceInfo, meta)
+	if err != nil {
+		return err
+	}
+	fileDescriptorSet, err := desc.MergeFileDescriptorSets(fileDescriptorSets.Unwrap())
+	if err != nil {
+		return err
+	}
+	var data []byte
+	if r.json {
+		buffer := bytes.NewBuffer(nil)
+		err = jsonpbMarshaler.Marshal(buffer, fileDescriptorSet)
+		data = buffer.Bytes()
+	} else {
+		data, err = proto.Marshal(fileDescriptorSet)
+	}
+	if err != nil {
+		return err
+	}
+	if outputPath == "" && !tmp {
+		_, err := r.output.Write(data)
+		return err
+	}
+	var file *os.File
+	if outputPath != "" {
+		file, err = os.Create(outputPath)
+	} else { // if tmp
+		file, err = ioutil.TempFile("", "prototool")
+	}
+	if err != nil {
+		return err
+	}
+	defer func() {
+		retErr = multierr.Append(retErr, file.Close())
+	}()
+	if _, err := file.Write(data); err != nil {
+		return err
+	}
+	if tmp {
+		if err := r.println(file.Name()); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
