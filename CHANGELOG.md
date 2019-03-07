@@ -20,7 +20,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   rules.
 - Add `--diff-lint-groups` flag to the `lint` command to print the diff
   between two lint groups.
-- Breaking change detector added as the `break check` command.
+- Add `descriptor-set` command to output a merged `FileDescriptorSet`
+  with all files compiled to either stdout, a given file, or a temporary file.
+  Useful with external tools that use FileDescriptorSets, and also useful for
+  inspection if the `--json` flag is given.
+- Add breaking change detector as the `break check` command. By default, this
+  compiles your existing Protobuf definitions, and then does a shallow clone
+  of your git repository against the default branch and compiles the
+  definitions on that branch, and compares the existing versus the branch.
+  The branch can be controlled with the `--git-branch` flag, and one can
+  use a `FileDescriptorSet` instead of a shallow clone by generating a
+  file with `break descriptor-set` and then passing the path to this file
+  to `break check` with the `--descriptor-set-path` flag.
 - A Docker image is now provided on Docker Hub as [uber/prototool](https://hub.docker.com/r/uber/prototool)
   which provides an environment with commonly-used plugins.
 - Switch to Golang Modules for dependency management.
@@ -38,9 +49,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `descriptor_set` plugin.
 - Add `cache` top-level command to allow management of the `protoc` cache.
 - Add `x` top-level command for experimental functionality.
-- Add `descriptor-set` command under `x` to output a merged FileDescriptorSet
-  with all files compiled to either stdout, a given file, or a temporary file.
-  Useful with external tools that use FileDescriptorSets.
 - Add `inspect` command under `x` with Protobuf inspection capabilities.
 - Add `--error-format` flag to allow specific error fields to be printed.
 - Add file locking around the `protoc` downloader to eliminate concurrency

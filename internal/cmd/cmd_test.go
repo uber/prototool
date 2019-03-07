@@ -1412,7 +1412,7 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 }
 
 func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, includeImports bool, includeSourceInfo bool, expectedNames ...string) {
-	args := []string{"x", "descriptor-set"}
+	args := []string{"descriptor-set"}
 	if includeImports {
 		args = append(args, "--include-imports")
 	}
