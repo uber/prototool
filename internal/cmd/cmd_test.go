@@ -34,6 +34,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
@@ -1176,6 +1178,46 @@ func TestVersionJSON(t *testing.T) {
 	assertRegexp(t, false, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
+func TestDescriptorSet(t *testing.T) {
+	for _, includeSourceInfo := range []bool{false, true} {
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo",
+			false,
+			includeSourceInfo,
+			"success.proto",
+			"bar/dep.proto",
+		)
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo/bar",
+			false,
+			includeSourceInfo,
+			"bar/dep.proto",
+		)
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo",
+			true,
+			includeSourceInfo,
+			"success.proto",
+			"bar/dep.proto",
+			"google/protobuf/timestamp.proto",
+		)
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo/bar",
+			true,
+			includeSourceInfo,
+			"bar/dep.proto",
+		)
+	}
+}
+
 func TestInspectPackages(t *testing.T) {
 	assertExact(
 		t,
@@ -1367,6 +1409,34 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 	golden, err := ioutil.ReadFile(filePath + ".golden")
 	assert.NoError(t, err)
 	assert.Equal(t, strings.TrimSpace(string(golden)), output)
+}
+
+func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, includeImports bool, includeSourceInfo bool, expectedNames ...string) {
+	args := []string{"x", "descriptor-set"}
+	if includeImports {
+		args = append(args, "--include-imports")
+	}
+	if includeSourceInfo {
+		args = append(args, "--include-source-info")
+	}
+	args = append(args, dirOrFile)
+	expectedExitCode := 0
+	if !expectSuccess {
+		expectedExitCode = 255
+	}
+	buffer := bytes.NewBuffer(nil)
+	exitCode := do(true, args, os.Stdin, buffer, buffer)
+	assert.Equal(t, expectedExitCode, exitCode)
+
+	fileDescriptorSet := &descriptor.FileDescriptorSet{}
+	assert.NoError(t, proto.Unmarshal(buffer.Bytes(), fileDescriptorSet))
+	names := make([]string, 0, len(fileDescriptorSet.File))
+	for _, fileDescriptorProto := range fileDescriptorSet.File {
+		names = append(names, fileDescriptorProto.GetName())
+	}
+	sort.Strings(expectedNames)
+	sort.Strings(names)
+	assert.Equal(t, expectedNames, names)
 }
 
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
