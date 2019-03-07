@@ -95,7 +95,7 @@ func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindDescriptorSetPath(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.descriptorSetPath, "descriptor-set-path", "", "The path to the file containing a serialized FileDescriptorSet to check against.\nFileDescriptorSet files can be produced using the descriptor-set sub-command.\nThe default behavior is to check against a git branch or tag. This cannot be used with the --git-branch flag.")
+	flagSet.StringVarP(&f.descriptorSetPath, "descriptor-set-path", "f", "", "The path to the file containing a serialized FileDescriptorSet to check against.\nFileDescriptorSet files can be produced using the descriptor-set sub-command.\nThe default behavior is to check against a git branch or tag. This cannot be used with the --git-branch flag.")
 }
 
 func (f *flags) bindDetails(flagSet *pflag.FlagSet) {
