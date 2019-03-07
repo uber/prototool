@@ -21,8 +21,12 @@
 package desc
 
 import (
+	"bytes"
+	"crypto/sha256"
 	"fmt"
+	"sort"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 )
 
@@ -58,8 +62,50 @@ func SortFileDescriptorSet(fileDescriptorSet *descriptor.FileDescriptorSet, file
 // MergeFileDescriptorSets merges the given FileDescriptorSets, checking that files
 // with the same name have the same content.
 func MergeFileDescriptorSets(fileDescriptorSets []*descriptor.FileDescriptorSet) (*descriptor.FileDescriptorSet, error) {
-	if len(fileDescriptorSets) == 0 {
-		return nil, nil
+	result := &descriptor.FileDescriptorSet{
+		File: make([]*descriptor.FileDescriptorProto, 0),
 	}
-	return nil, nil
+	if len(fileDescriptorSets) == 0 {
+		return result, nil
+	}
+	nameToSum := make(map[string][]byte)
+	for _, fileDescriptorSet := range fileDescriptorSets {
+		if fileDescriptorSet == nil {
+			return nil, fmt.Errorf("nil FileDescriptorSet")
+		}
+		for _, fileDescriptorProto := range fileDescriptorSet.File {
+			if fileDescriptorProto == nil {
+				return nil, fmt.Errorf("nil FileDescriptorProto")
+			}
+			name := fileDescriptorProto.GetName()
+			if name == "" {
+				return nil, fmt.Errorf("no name on FileDescriptorProto")
+			}
+			sum, err := sha256ProtoMessage(fileDescriptorProto)
+			if err != nil {
+				return nil, err
+			}
+			if existingSum, ok := nameToSum[name]; ok {
+				if !bytes.Equal(existingSum, sum) {
+					return nil, fmt.Errorf("mismatched sums %x %x for file %q", existingSum, sum, name)
+				}
+			} else {
+				nameToSum[name] = sum
+				result.File = append(result.File, fileDescriptorProto)
+			}
+		}
+	}
+	sort.Slice(result.File, func(i int, j int) bool {
+		return result.File[i].GetName() < result.File[j].GetName()
+	})
+	return result, nil
+}
+
+func sha256ProtoMessage(message proto.Message) ([]byte, error) {
+	data, err := proto.Marshal(message)
+	if err != nil {
+		return nil, err
+	}
+	array := sha256.Sum256(data)
+	return array[:], nil
 }
