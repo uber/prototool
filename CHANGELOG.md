@@ -11,10 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   version of our lint rules. These rules are almost entirely a superset of the
   V1 Style guide lint rules. If `lint.group` is set to `uber2`, this also will
   affect the `create` and `format` commands, as the `uber2` lint group adds
-  more file options to more closely match the [Google Cloud APIs File Structure](https://cloud.google.com/apis/design/file_structure).
+  more file options to more closely match the [Google Cloud APIs File Structure](https://cloud.google.com/apis/design/file_structure)
+  and changes the value of `go_package` to take versions into account.
   In total, 39 lint rules have been added as compared to the `uber1` lint
   group.
-  and changes the value of `go_package` to take versions into account.
 - New `google` lint group representing Google's minimal [Style Guide](https://developers.google.com/protocol-buffers/docs/style).
 - Add `--list-lint-group` flag to the `lint` command to list a lint group's
   rules.
