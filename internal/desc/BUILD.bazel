@@ -5,5 +5,8 @@ go_library(
     srcs = ["desc.go"],
     importpath = "github.com/uber/prototool/internal/desc",
     visibility = ["//:__subpackages__"],
-    deps = ["@io_bazel_rules_go//proto/wkt:descriptor_go_proto"],
+    deps = [
+        "@com_github_golang_protobuf//proto:go_default_library",
+        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
+    ],
 )
