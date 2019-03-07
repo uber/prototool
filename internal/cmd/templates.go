@@ -213,6 +213,28 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 	}
 
+	descriptorSetCmdTemplate = &cmdTemplate{
+		Use:   "descriptor-set [dirOrFile]",
+		Short: "Generate a FileDescriptorSet containing all files.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.DescriptorSet(args, flags.includeImports, flags.includeSourceInfo, flags.outputPath, flags.tmp)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindIncludeImports(flagSet)
+			flags.bindIncludeSourceInfo(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+			flags.bindOutputPath(flagSet)
+			flags.bindTmp(flagSet)
+		},
+	}
+
 	filesCmdTemplate = &cmdTemplate{
 		Use:   "files [dirOrFile]",
 		Short: "Print all files that match the input arguments.",

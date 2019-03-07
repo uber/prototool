@@ -118,6 +118,7 @@ func getRootCommand(develMode bool, exitCodeAddr *int, args []string, stdin io.R
 	breakCmd.AddCommand(breakCheckCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(breakCmd)
 	experimentalCmd := &cobra.Command{Use: "x", Short: "Top-level command for experimental commands. These may change between minor versions."}
+	experimentalCmd.AddCommand(descriptorSetCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd := &cobra.Command{Use: "inspect", Short: "Top-level command for inspection commands."}
 	inspectCmd.AddCommand(inspectPackagesCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	inspectCmd.AddCommand(inspectPackageDepsCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))

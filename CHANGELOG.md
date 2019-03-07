@@ -38,6 +38,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   `descriptor_set` plugin.
 - Add `cache` top-level command to allow management of the `protoc` cache.
 - Add `x` top-level command for experimental functionality.
+- Add `descriptor-set` command under `x` to output a merged FileDescriptorSet
+  with all files compiled to either stdout, a given file, or a temporary file.
+  Useful with external tools that use FileDescriptorSets.
 - Add `inspect` command under `x` with Protobuf inspection capabilities.
 - Add `--error-format` flag to allow specific error fields to be printed.
 - Add file locking around the `protoc` downloader to eliminate concurrency

@@ -61,6 +61,7 @@ type Runner interface {
 	InspectPackageDeps(args []string, name string) error
 	InspectPackageImporters(args []string, name string) error
 	BreakCheck(args []string, gitBranch string) error
+	DescriptorSet(args []string, includeImports bool, includeSourceInfo bool, outputPath string, tmp bool) error
 }
 
 // RunnerOption is an option for a new Runner.

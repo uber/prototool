@@ -43,8 +43,10 @@ type flags struct {
 	fix               bool
 	gitBranch         string
 	headers           []string
-	keepaliveTime     string
+	includeImports    bool
+	includeSourceInfo bool
 	json              bool
+	keepaliveTime     string
 	listAllLinters    bool
 	listLinters       bool
 	listAllLintGroups bool
@@ -57,7 +59,9 @@ type flags struct {
 	protocBinPath     string
 	protocWKTPath     string
 	protocURL         string
+	outputPath        string
 	stdin             bool
+	tmp               bool
 	uncomment         bool
 }
 
@@ -121,6 +125,10 @@ func (f *flags) bindErrorFormat(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.errorFormat, "error-format", "filename:line:column:message", `The colon-separated fields to print out on error. Valid values are "filename:line:column:id:message".`)
 }
 
+func (f *flags) bindFix(flagSet *pflag.FlagSet) {
+	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
+}
+
 func (f *flags) bindGitBranch(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.gitBranch, "git-branch", "", "The git branch or tag to check against. The default is the default branch.")
 }
@@ -129,12 +137,20 @@ func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 	flagSet.StringSliceVarP(&f.headers, "header", "H", []string{}, "Additional request headers in 'name:value' format.")
 }
 
-func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.keepaliveTime, "keepalive-time", "", "The maximum idle time after which a keepalive probe is sent.")
+func (f *flags) bindIncludeImports(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.includeImports, "include-imports", false, "Include all dependencies of the input files in the set, so that the set is self-contained.")
+}
+
+func (f *flags) bindIncludeSourceInfo(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.includeSourceInfo, "include-source-info", false, "Do not strip SourceCodeInfo from the FileDescriptorProto. This results in vastly larger descriptors that include information about the original location of each decl in the source file as well as surrounding comments.")
 }
 
 func (f *flags) bindJSON(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.json, "json", false, "Output as JSON.")
+}
+
+func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.keepaliveTime, "keepalive-time", "", "The maximum idle time after which a keepalive probe is sent.")
 }
 
 func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {
@@ -165,6 +181,10 @@ func (f *flags) bindName(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.name, "name", "", "The package name. This is required.")
 }
 
+func (f *flags) bindOutputPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVarP(&f.outputPath, "output-path", "o", "", "Write the FileDescriptorSet to the given file path instead of outputting to stdout.")
+}
+
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.overwrite, "overwrite", "w", false, "Overwrite the existing file instead of writing the formatted file to stdout.")
 }
@@ -193,6 +213,6 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings. Automatically sets --document.")
 }
 
-func (f *flags) bindFix(flagSet *pflag.FlagSet) {
-	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
+func (f *flags) bindTmp(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.tmp, "tmp", false, "Write the FileDescriptorSet to a temporary file and print the file path instead of outputting to stdout.")
 }
