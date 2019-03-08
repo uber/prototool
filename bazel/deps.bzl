@@ -34,7 +34,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_fullstorydev_grpcurl",
         importpath = "github.com/fullstorydev/grpcurl",
-        tag = "v1.1.0",
+        tag = "v1.2.1",
     )
     go_repository(
         name = "com_github_gobuffalo_flect",
@@ -69,7 +69,22 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_jhump_protoreflect",
         importpath = "github.com/jhump/protoreflect",
-        tag = "v1.1.0",
+        tag = "v1.2.0",
+    )
+    go_repository(
+        name = "com_github_kr_pretty",
+        importpath = "github.com/kr/pretty",
+        tag = "v0.1.0",
+    )
+    go_repository(
+        name = "com_github_kr_pty",
+        importpath = "github.com/kr/pty",
+        tag = "v1.1.1",
+    )
+    go_repository(
+        name = "com_github_kr_text",
+        importpath = "github.com/kr/text",
+        tag = "v0.1.0",
     )
     go_repository(
         name = "com_github_mitchellh_go_wordwrap",
@@ -118,7 +133,7 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "in_gopkg_check_v1",
-        commit = "20d25e280405",
+        commit = "788fd7840127",
         importpath = "gopkg.in/check.v1",
     )
     go_repository(
@@ -129,11 +144,11 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_google_appengine",
         importpath = "google.golang.org/appengine",
-        tag = "v1.1.0",
+        tag = "v1.4.0",
     )
     go_repository(
         name = "org_golang_google_genproto",
-        commit = "11092d34479b",
+        commit = "5fe7a883aa19",
         importpath = "google.golang.org/genproto",
     )
     go_repository(
@@ -142,13 +157,18 @@ def prototool_deps(**kwargs):
         tag = "v1.19.0",
     )
     go_repository(
+        name = "org_golang_x_exp",
+        commit = "509febef88a4",
+        importpath = "golang.org/x/exp",
+    )
+    go_repository(
         name = "org_golang_x_lint",
-        commit = "c67002cb31c3",
+        commit = "5b3e6a55c961",
         importpath = "golang.org/x/lint",
     )
     go_repository(
         name = "org_golang_x_net",
-        commit = "161cd47e91fd",
+        commit = "16b79f2e4e95",
         importpath = "golang.org/x/net",
     )
     go_repository(
@@ -158,22 +178,22 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_x_sync",
-        commit = "1d60e4601c6f",
+        commit = "e225da77a7e6",
         importpath = "golang.org/x/sync",
     )
     go_repository(
         name = "org_golang_x_sys",
-        commit = "49385e6e1522",
+        commit = "584f3b12f43e",
         importpath = "golang.org/x/sys",
     )
     go_repository(
         name = "org_golang_x_text",
+        commit = "17ff2d5776d2",
         importpath = "golang.org/x/text",
-        tag = "v0.3.0",
     )
     go_repository(
         name = "org_golang_x_tools",
-        commit = "bf090417da8b",
+        commit = "f727befe758c",
         importpath = "golang.org/x/tools",
     )
     go_repository(
