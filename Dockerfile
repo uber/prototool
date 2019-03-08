@@ -5,18 +5,6 @@ ENV PATH=/tmp/bin:${PATH}
 
 RUN apk add --update --no-cache build-base curl git
 
-ENV GLIDE_VERSION=0.13.2
-RUN mkdir -p /tmp/glide
-RUN curl -sSL \
-  https://github.com/Masterminds/glide/releases/download/v${GLIDE_VERSION}/glide-v${GLIDE_VERSION}-linux-amd64.tar.gz \
-  -o /tmp/glide/glide.tar.gz
-RUN cd /tmp/glide && tar xvzf glide.tar.gz
-RUN cp /tmp/glide/linux-amd64/glide /tmp/bin/glide
-
-ENV DEP_VERSION=0.5.0
-RUN curl -sSL https://github.com/golang/dep/releases/download/v${DEP_VERSION}/dep-linux-amd64 -o /tmp/bin/dep
-RUN chmod +x /tmp/bin/dep
-
 ENV GOLANG_PROTOBUF_VERSION=1.3.0
 RUN GO111MODULE=on go get github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION}
 RUN cp /go/bin/protoc-gen-go /usr/local/bin/
@@ -52,16 +40,12 @@ RUN chmod +x /usr/local/bin/protoc-gen-grpc-web
 
 ENV YARPC_VERSION=1.36.2
 RUN git clone --depth 1 -b v${YARPC_VERSION} https://github.com/yarpc/yarpc-go.git /go/src/go.uber.org/yarpc
-RUN cd /go/src/go.uber.org/yarpc && glide install && \
-  go install ./encoding/protobuf/protoc-gen-yarpc-go
+RUN cd /go/src/go.uber.org/yarpc && GO111MODULE=on go mod init && GO111MODULE=on go install ./encoding/protobuf/protoc-gen-yarpc-go
 RUN cp /go/bin/protoc-gen-yarpc-go /usr/local/bin/
 
 ENV TWIRP_VERSION=5.5.2
 RUN git clone --depth 1 -b v${TWIRP_VERSION} https://github.com/twitchtv/twirp.git /go/src/github.com/twitchtv/twirp
-RUN cd /go/src/github.com/twitchtv/twirp && dep ensure -v && \
-  go install \
-    ./protoc-gen-twirp \
-    ./protoc-gen-twirp_python
+RUN cd /go/src/github.com/twitchtv/twirp && go install ./protoc-gen-twirp ./protoc-gen-twirp_python
 RUN cp /go/bin/protoc-gen-twirp /usr/local/bin/
 RUN cp /go/bin/protoc-gen-twirp_python /usr/local/bin/
 
