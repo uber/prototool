@@ -233,26 +233,26 @@ func (f *flags) bindTmp(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindTLS(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.tls, "tls", false, "Enable SSL/TLS connection to remote host")
+	flagSet.BoolVar(&f.tls, "tls", false, "Enable SSL/TLS connection to remote host.")
 }
 
 func (f *flags) bindInsecure(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.insecure, "insecure", false, "Disable host certificate validation for TLS connections. Ignored if --tls is not specified.")
+	flagSet.BoolVar(&f.insecure, "insecure", false, "Disable host certificate validation for TLS connections. If set, --tls is required and --cert, --key, --cacert and --server-name must not be set.")
 }
 
 func (f *flags) bindCacert(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.cacert, "cacert", "", "File containing trusted root certificates for verifying the server. Ignored if --tls is not specified.")
+	flagSet.StringVar(&f.cacert, "cacert", "", "File containing trusted root certificates for verifying the server. Can also be a file containing the public certificate of the server itself. If set, --tls is required.")
 }
 
 func (f *flags) bindCert(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.cert, "cert", "", "File containing client certificate (public key), to present to the server. Ignored if --tls is not specified. Must also provide the --key.")
+	flagSet.StringVar(&f.cert, "cert", "","File containing client certificate (public key) in pem encoded format to present to the server for mutual TLS authentication. If set, --tls and --key is required.")
 }
 
 func (f *flags) bindKey(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.key, "key", "", "File containing client private key, to present to the server. Ignored if --tls is not specified. Must also provide the --cert option.")
+	flagSet.StringVar(&f.key, "key", "", "File containing client key (private key) in pem encoded format to present to the server for mutual TLS authentication. If set, --tls and --cert is required.")
 }
 
 func (f *flags) bindServerName(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.serverName, "server-name", "", "Override server name when validating TLS certificate. Ignored if --tls is not specified.")
+	flagSet.StringVar(&f.serverName, "server-name", "", "Override expected server \"Common Name\" when validating TLS certificate. Should usually be set if using a HTTP proxy or an IP for the --address. If set, --tls is required.")
 }
 

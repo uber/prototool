@@ -536,8 +536,14 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	if data != "" && stdin {
 		return newExitErrorf(255, "must set only one of data or stdin")
 	}
-	if (cert != "") != (key != "") {
-		return newExitErrorf( 255, "If cert is specified, key must be specified")
+	if tls {
+		if insecure && (cacert != "" || cert != "" || key != "" || serverName != "") {
+			return newExitErrorf(255, "if insecure then cacert, cert, key, and server-name must not be specified")
+		} else if (cert != "") != (key != "") {
+			return newExitErrorf(255, "if cert is specified, key must be specified")
+		}
+	} else if insecure || cacert != "" || cert != "" || key != "" || serverName != "" {
+		return newExitErrorf(255, "tls must be specified if insecure, cacert, cert, key or server-name are specified")
 	}
 	reader := r.getInputReader(data, stdin)
 

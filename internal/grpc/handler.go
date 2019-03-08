@@ -126,17 +126,16 @@ func getNetworkAddress(address string) (string, string, error) {
 }
 
 func (h *handler) getClientTransportCredentials() (credentials.TransportCredentials, error) {
-	var creds credentials.TransportCredentials
-	if h.tls {
-		var err error
-		creds, err = grpcurl.ClientTransportCredentials(h.insecure, h.cacert, h.cert, h.key)
-		if err != nil {
+	if !h.tls {
+		return nil, nil
+	}
+	creds, err := grpcurl.ClientTransportCredentials(h.insecure, h.cacert, h.cert, h.key)
+	if err != nil {
+		return nil, err
+	}
+	if h.serverName != "" {
+		if err := creds.OverrideServerName(h.serverName); err != nil {
 			return nil, err
-		}
-		if h.serverName != "" {
-			if err := creds.OverrideServerName(h.serverName); err != nil {
-				return nil, err
-			}
 		}
 	}
 	return creds, nil

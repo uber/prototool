@@ -187,31 +187,6 @@ Call a gRPC endpoint using a JSON input. What this does behind the scenes:
 
 *See [docs/grpc.md](docs/grpc.md) for full instructions.*
 
-### SSL/TLS Connections
-
-To enable SSL/TLS connections to the server, use the `--tls` command line flag. 
-If not specified all the following flags will be ignored.
-
-By default host validation is enabled. To disable, pass the `--insecure` command line flag.
-
-To use a custom certificate authority, pass the `--cacert` command line flag to the path of the file in pem format.
-
-To use a custom key and certificate, pass the `--key` and `--cert` command line flag to the path of the files in pem format.
-
-To use a custom server name for validation, pass `--server-name` command line flag.
-
-```bash
-$ prototool grpc example \  
-  --data '{"value":"hello"}'
-  --address foo.bar.com:443
-  --method foo.ExcitedService/ExclamationBidiStream
-  --tls
-  --cacert /path/to/cacert/file.pem
-  --cert /path/to/cert/file.pem
-  --key /path/to/key/file.pem
-  --server-name foo.bar.com
-```
-
 ## Tips and Tricks
 
 Prototool is meant to help enforce a consistent development style for Protobuf, and as such you should follow some basic rules:
