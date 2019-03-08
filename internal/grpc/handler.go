@@ -46,6 +46,7 @@ type handler struct {
 	connectTimeout time.Duration
 	keepaliveTime  time.Duration
 	headers        []string
+	details        bool
 	tls            bool
 	insecure       bool
 	cacert         string
@@ -80,7 +81,7 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 		return err
 	}
 	defer func() { _ = clientConn.Close() }()
-	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger)
+	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger, h.details)
 	ctx, cancel := context.WithTimeout(context.Background(), h.callTimeout)
 	defer cancel()
 	if err := grpcurl.InvokeRPC(

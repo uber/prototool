@@ -11,16 +11,27 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   version of our lint rules. These rules are almost entirely a superset of the
   V1 Style guide lint rules. If `lint.group` is set to `uber2`, this also will
   affect the `create` and `format` commands, as the `uber2` lint group adds
-  more file options to more closely match the [Google Cloud APIs File Structure](https://cloud.google.com/apis/design/file_structure).
+  more file options to more closely match the [Google Cloud APIs File Structure](https://cloud.google.com/apis/design/file_structure)
+  and changes the value of `go_package` to take versions into account.
   In total, 39 lint rules have been added as compared to the `uber1` lint
   group.
-  and changes the value of `go_package` to take versions into account.
 - New `google` lint group representing Google's minimal [Style Guide](https://developers.google.com/protocol-buffers/docs/style).
 - Add `--list-lint-group` flag to the `lint` command to list a lint group's
   rules.
 - Add `--diff-lint-groups` flag to the `lint` command to print the diff
-  between two lint groups
-- Breaking change detector added as the `break check` command.
+  between two lint groups.
+- Add `descriptor-set` command to output a merged `FileDescriptorSet`
+  with all files compiled to either stdout, a given file, or a temporary file.
+  Useful with external tools that use FileDescriptorSets, and also useful for
+  inspection if the `--json` flag is given.
+- Add breaking change detector as the `break check` command. By default, this
+  compiles your existing Protobuf definitions, and then does a shallow clone
+  of your git repository against the default branch and compiles the
+  definitions on that branch, and compares the existing versus the branch.
+  The branch can be controlled with the `--git-branch` flag, and one can
+  use a `FileDescriptorSet` instead of a shallow clone by generating a
+  file with `break descriptor-set` and then passing the path to this file
+  to `break check` with the `--descriptor-set-path` flag.
 - A Docker image is now provided on Docker Hub as [uber/prototool](https://hub.docker.com/r/uber/prototool)
   which provides an environment with commonly-used plugins.
 - Switch to Golang Modules for dependency management.
@@ -36,12 +47,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `generate.plugins.include_imports` and
   `generate.plugins.include_source_info` to be used with the built-in
   `descriptor_set` plugin.
-- Add `inspect` top-level command with Protobuf inspection capabilities.
 - Add `cache` top-level command to allow management of the `protoc` cache.
+- Add `x` top-level command for experimental functionality.
+- Add `inspect` command under `x` with Protobuf inspection capabilities.
 - Add `--error-format` flag to allow specific error fields to be printed.
+- Allow the `protoc` binary and WKT paths to be controlled by the environment
+  variables `PROTOTOOL_PROTOC_BIN_PATH` and `PROTOTOOL_PROTOC_WKT_PATH` in
+  addition to the existing `--protoc-bin-path` and `--protoc-wkt-path` flags.
+  The flags take precedence. This is especially useful for Docker images.
 - Add file locking around the `protoc` downloader to eliminate concurrency
   issues where multiple `prototool` invocations may be accessing the cache
   at the same time.
+- Add `--details` flag to the `grpc` command to output headers, trailers,
+  and statuses as well as the responses.
 - Unix domain sockets can now be specified for the `--address` flag of the
   `grpc` command via the prefix `unix://`.
 

@@ -61,24 +61,39 @@ var (
 	breakCheckCmdTemplate = &cmdTemplate{
 		Use:   "check [dir]",
 		Short: "Check for breaking changes.",
-		Long: `This command must be run from the root of a git repository.
-
-The input directory must be relative.`,
-		Args: cobra.MaximumNArgs(1),
+		Long:  `This command must be run from the root of a git repository, and the input directory must be relative, unless --descriptor-set-path is specified.`,
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.BreakCheck(args, flags.gitBranch, flags.gitTag, flags.includeBeta, flags.allowBetaDeps)
+			return runner.BreakCheck(args, flags.gitBranch, flags.descriptorSetPath)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
-			flags.bindAllowBetaDeps(flagSet)
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindDescriptorSetPath(flagSet)
 			flags.bindGitBranch(flagSet)
-			flags.bindGitTag(flagSet)
 			flags.bindJSON(flagSet)
-			flags.bindIncludeBeta(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
+	breakDescriptorSetCmdTemplate = &cmdTemplate{
+		Use:   "descriptor-set [dir]",
+		Short: "Generate a FileDescriptorSet file that stores the current state of your Protobuf definitions for use with break check --descriptor-set-path. The -o flag is required.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.BreakDescriptorSet(args, flags.outputPath)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+			flags.bindOutputPathBreakDescriptorSet(flagSet)
 		},
 	}
 
@@ -216,6 +231,28 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 	}
 
+	descriptorSetCmdTemplate = &cmdTemplate{
+		Use:   "descriptor-set [dirOrFile]",
+		Short: "Generate a FileDescriptorSet containing all files.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.DescriptorSet(args, flags.includeImports, flags.includeSourceInfo, flags.outputPath, flags.tmp)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindIncludeImports(flagSet)
+			flags.bindIncludeSourceInfo(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+			flags.bindOutputPath(flagSet)
+			flags.bindTmp(flagSet)
+		},
+	}
+
 	filesCmdTemplate = &cmdTemplate{
 		Use:   "files [dirOrFile]",
 		Short: "Print all files that match the input arguments.",
@@ -286,37 +323,24 @@ prototool grpc [dirOrFile] \
 Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" which will result in the input being read from stdin as JSON.
 
 $ make example # make sure everything is built just in case
+$ go run example/cmd/excited/main.go # run in another terminal
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/Exclamation \
+  --method uber.foo.v1.ExcitedAPI/Exclamation \
   --data '{"value":"hello"}'
-{
-  "value": "hello!"
-}
+{"value": "hello!"}
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationServerStream \
+  --method uber.foo.v1.ExcitedAPI/ExclamationServerStream \
   --data '{"value":"hello"}'
-{
-  "value": "h"
-}
-{
-  "value": "e"
-}
-{
-  "value": "l"
-}
-{
-  "value": "l"
-}
-{
-  "value": "o"
-}
-{
-  "value": "!"
-}
+{"value": "h"}
+{"value": "e"}
+{"value": "l"}
+{"value": "l"}
+{"value": "o"}
+{"value": "!"}
 
 $ cat input.json
 {"value":"hello"}
@@ -324,25 +348,32 @@ $ cat input.json
 
 $ cat input.json | prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationClientStream \
+  --method uber.foo.v1.ExcitedAPI/ExclamationClientStream \
   --stdin
-{
-  "value": "hellosalutations!"
-}
+{"value": "hellosalutations!"}
 
 $ cat input.json | prototool grpc example \
   --address 0.0.0.0:8080 \
-  --method foo.ExcitedService/ExclamationBidiStream \
+  --method uber.foo.v1.ExcitedAPI/ExclamationBidiStream \
   --stdin
-{
-  "value": "hello!"
-}
-{
-  "value": "salutations!"
-}`,
+{"value": "hello!"}
+{"value": "salutations!"}
+
+$ prototool grpc example \
+  --address 0.0.0.0:8080 \
+  --method uber.foo.v1.ExcitedAPI/ExclamationServerStream \
+  --data '{"value":"hello"}' \
+  --details
+{"headers":{"content-type":["application/grpc"]}}
+{"response":{"value":"h"}}
+{"response":{"value":"e"}}
+{"response":{"value":"l"}}
+{"response":{"value":"l"}}
+{"response":{"value":"o"}}
+{"response":{"value":"!"}}`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.tls, flags.insecure, flags.cacert, flags.cert, flags.key, flags.serverName)
+			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.details, flags.tls, flags.insecure, flags.cacert, flags.cert, flags.key, flags.serverName)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
@@ -351,6 +382,7 @@ $ cat input.json | prototool grpc example \
 			flags.bindCallTimeout(flagSet)
 			flags.bindConnectTimeout(flagSet)
 			flags.bindData(flagSet)
+			flags.bindDetails(flagSet)
 			flags.bindErrorFormat(flagSet)
 			flags.bindHeaders(flagSet)
 			flags.bindKeepaliveTime(flagSet)

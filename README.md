@@ -231,6 +231,8 @@ This repository is a self-contained plugin for use with the [ALE Lint Engine](ht
 Prototool is generally available, and conforms to [SemVer](https://semver.org), so Prototool will not have any breaking changes on a given
 major version, with some exceptions:
 
+- Commands under the `x` top-level command are experimental, and may change or be deleted between minor versions of Prototool. We expect
+  such commands to be promoted to stable within a few minor releases, however development is still in-progress.
 - The output of the formatter may change between minor versions. This has not happened yet, but we may change the format in the future to
   reflect things such as max line lengths.
 - The breaking change detector's output format currently does not output filename, line, or column. This is an expected upgrade in the

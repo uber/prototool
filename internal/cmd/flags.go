@@ -25,7 +25,6 @@ import (
 )
 
 type flags struct {
-	allowBetaDeps     bool
 	address           string
 	cachePath         string
 	callTimeout       string
@@ -35,6 +34,8 @@ type flags struct {
 	connectTimeout    string
 	data              string
 	debug             bool
+	descriptorSetPath string
+	details           bool
 	diffLintGroups    string
 	diffMode          bool
 	disableFormat     bool
@@ -44,12 +45,12 @@ type flags struct {
 	errorFormat       string
 	fix               bool
 	gitBranch         string
-	gitTag            string
 	headers           []string
 	insecure          bool
-	includeBeta       bool
-	keepaliveTime     string
+	includeImports    bool
+	includeSourceInfo bool
 	json              bool
+	keepaliveTime     string
 	key               string
 	listAllLinters    bool
 	listLinters       bool
@@ -66,11 +67,9 @@ type flags struct {
 	serverName        string
 	stdin             bool
 	tls               bool
+	outputPath        string
+	tmp               bool
 	uncomment         bool
-}
-
-func (f *flags) bindAllowBetaDeps(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.allowBetaDeps, "allow-beta-deps", false, "Allow stable packages to depend on beta packages. This is implicitly set if --include-beta is set.")
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -101,6 +100,14 @@ func (f *flags) bindDebug(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.debug, "debug", false, "Run in debug mode, which will print out debug logging.")
 }
 
+func (f *flags) bindDescriptorSetPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVarP(&f.descriptorSetPath, "descriptor-set-path", "f", "", "The path to the file containing a serialized FileDescriptorSet to check against.\nFileDescriptorSet files can be produced using the descriptor-set sub-command.\nThe default behavior is to check against a git branch or tag. This cannot be used with the --git-branch flag.")
+}
+
+func (f *flags) bindDetails(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.details, "details", false, "Output headers, trailers, and status as well as the responses.")
+}
+
 func (f *flags) bindDiffLintGroups(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.diffLintGroups, "diff-lint-groups", "", "Diff the two lint groups separated by '.', for example google,uber2.")
 }
@@ -129,28 +136,32 @@ func (f *flags) bindErrorFormat(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.errorFormat, "error-format", "filename:line:column:message", `The colon-separated fields to print out on error. Valid values are "filename:line:column:id:message".`)
 }
 
-func (f *flags) bindGitBranch(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.gitBranch, "git-branch", "", "The git branch to check against. The default is the default branch.")
+func (f *flags) bindFix(flagSet *pflag.FlagSet) {
+	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
 }
 
-func (f *flags) bindGitTag(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.gitTag, "git-tag", "", "The git tag to check against. The default is to not use tags and use the default branch.")
+func (f *flags) bindGitBranch(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.gitBranch, "git-branch", "", "The git branch or tag to check against. The default is the default branch.")
 }
 
 func (f *flags) bindHeaders(flagSet *pflag.FlagSet) {
 	flagSet.StringSliceVarP(&f.headers, "header", "H", []string{}, "Additional request headers in 'name:value' format.")
 }
 
-func (f *flags) bindIncludeBeta(flagSet *pflag.FlagSet) {
-	flagSet.BoolVar(&f.includeBeta, "include-beta", false, "Include beta packages in breaking change detection.")
+func (f *flags) bindIncludeImports(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.includeImports, "include-imports", false, "Include all dependencies of the input files in the set, so that the set is self-contained.")
 }
 
-func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.keepaliveTime, "keepalive-time", "", "The maximum idle time after which a keepalive probe is sent.")
+func (f *flags) bindIncludeSourceInfo(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.includeSourceInfo, "include-source-info", false, "Do not strip SourceCodeInfo from the FileDescriptorProto. This results in vastly larger descriptors that include information about the original location of each decl in the source file as well as surrounding comments.")
 }
 
 func (f *flags) bindJSON(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.json, "json", false, "Output as JSON.")
+}
+
+func (f *flags) bindKeepaliveTime(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.keepaliveTime, "keepalive-time", "", "The maximum idle time after which a keepalive probe is sent.")
 }
 
 func (f *flags) bindLintMode(flagSet *pflag.FlagSet) {
@@ -181,6 +192,14 @@ func (f *flags) bindName(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.name, "name", "", "The package name. This is required.")
 }
 
+func (f *flags) bindOutputPath(flagSet *pflag.FlagSet) {
+	flagSet.StringVarP(&f.outputPath, "output-path", "o", "", "Write the FileDescriptorSet to the given file path instead of outputting to stdout.")
+}
+
+func (f *flags) bindOutputPathBreakDescriptorSet(flagSet *pflag.FlagSet) {
+	flagSet.StringVarP(&f.outputPath, "output-path", "o", "", "The file path to write the FileDescriptorSet to. This is required.")
+}
+
 func (f *flags) bindOverwrite(flagSet *pflag.FlagSet) {
 	flagSet.BoolVarP(&f.overwrite, "overwrite", "w", false, "Overwrite the existing file instead of writing the formatted file to stdout.")
 }
@@ -209,8 +228,8 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings. Automatically sets --document.")
 }
 
-func (f *flags) bindFix(flagSet *pflag.FlagSet) {
-	flagSet.BoolVarP(&f.fix, "fix", "f", false, "Fix the file according to the Style Guide.")
+func (f *flags) bindTmp(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.tmp, "tmp", false, "Write the FileDescriptorSet to a temporary file and print the file path instead of outputting to stdout.")
 }
 
 func (f *flags) bindTLS(flagSet *pflag.FlagSet) {

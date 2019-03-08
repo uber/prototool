@@ -53,6 +53,16 @@ func HandlerWithLogger(logger *zap.Logger) HandlerOption {
 	}
 }
 
+// HandlerWithDetails returns a HandlerOption that outputs responses
+// in a structured JSON message that includes headers, trailers, and statuses.
+//
+// The default is to just print the responses.
+func HandlerWithDetails() HandlerOption {
+	return func(handler *handler) {
+		handler.details = true
+	}
+}
+
 // HandlerWithCallTimeout returns a HandlerOption that has the given call timeout.
 //
 // Each invocation must be completed within this time.

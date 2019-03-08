@@ -34,6 +34,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
@@ -1116,22 +1118,14 @@ func TestGRPC(t *testing.T) {
 	t.Parallel()
 	assertGRPC(t,
 		0,
-		`
-		{
-			"value": "hello!"
-		}
-		`,
+		`{"value":"hello!"}`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/Exclamation",
 		`{"value":"hello"}`,
 	)
 	assertGRPC(t,
 		0,
-		`
-		{
-			"value": "hellosalutations!"
-		}
-		`,
+		`{"value":"hellosalutations!"}`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationClientStream",
 		`{"value":"hello"}
@@ -1139,26 +1133,12 @@ func TestGRPC(t *testing.T) {
 	)
 	assertGRPC(t,
 		0,
-		`
-		{
-			"value": "h"
-		}
-		{
-			"value": "e"
-		}
-		{
-			"value": "l"
-		}
-		{
-			"value": "l"
-		}
-		{
-			"value": "o"
-		}
-		{
-			"value": "!"
-		}
-		`,
+		`{"value":"h"}
+		{"value":"e"}
+		{"value":"l"}
+		{"value":"l"}
+		{"value":"o"}
+		{"value":"!"}`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationServerStream",
 		`{"value":"hello"}`,
@@ -1166,17 +1146,27 @@ func TestGRPC(t *testing.T) {
 	assertGRPC(t,
 		0,
 		`
-		{
-			"value": "hello!"
-		}
-		{
-			"value": "salutations!"
-		}
+		{"value":"hello!"}
+		{"value":"salutations!"}
 		`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/ExclamationBidiStream",
 		`{"value":"hello"}
 		{"value":"salutations"}`,
+	)
+	assertGRPC(t,
+		0,
+		`{"headers":{"content-type":["application/grpc"]}}
+		{"response":{"value":"h"}}
+		{"response":{"value":"e"}}
+		{"response":{"value":"l"}}
+		{"response":{"value":"l"}}
+		{"response":{"value":"o"}}
+		{"response":{"value":"!"}}`,
+		"testdata/grpc/grpc.proto",
+		"grpc.ExcitedService/ExclamationServerStream",
+		`{"value":"hello"}`,
+		`--details`,
 	)
 }
 
@@ -1188,6 +1178,46 @@ func TestVersionJSON(t *testing.T) {
 	assertRegexp(t, false, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
+func TestDescriptorSet(t *testing.T) {
+	for _, includeSourceInfo := range []bool{false, true} {
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo",
+			false,
+			includeSourceInfo,
+			"success.proto",
+			"bar/dep.proto",
+		)
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo/bar",
+			false,
+			includeSourceInfo,
+			"bar/dep.proto",
+		)
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo",
+			true,
+			includeSourceInfo,
+			"success.proto",
+			"bar/dep.proto",
+			"google/protobuf/timestamp.proto",
+		)
+		assertDescriptorSet(
+			t,
+			true,
+			"testdata/foo/bar",
+			true,
+			includeSourceInfo,
+			"bar/dep.proto",
+		)
+	}
+}
+
 func TestInspectPackages(t *testing.T) {
 	assertExact(
 		t,
@@ -1196,7 +1226,7 @@ func TestInspectPackages(t *testing.T) {
 		`bar
 foo
 google.protobuf`,
-		"inspect", "packages", "testdata/foo",
+		"x", "inspect", "packages", "testdata/foo",
 	)
 }
 
@@ -1207,21 +1237,21 @@ func TestInspectPackageDeps(t *testing.T) {
 		0,
 		`bar
 google.protobuf`,
-		"inspect", "package-deps", "testdata/foo", "--name", "foo",
+		"x", "inspect", "package-deps", "testdata/foo", "--name", "foo",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		``,
-		"inspect", "package-deps", "testdata/foo", "--name", "bar",
+		"x", "inspect", "package-deps", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		``,
-		"inspect", "package-deps", "testdata/foo", "--name", "google.protobuf",
+		"x", "inspect", "package-deps", "testdata/foo", "--name", "google.protobuf",
 	)
 }
 
@@ -1231,21 +1261,21 @@ func TestInspectPackageImporters(t *testing.T) {
 		true,
 		0,
 		``,
-		"inspect", "package-importers", "testdata/foo", "--name", "foo",
+		"x", "inspect", "package-importers", "testdata/foo", "--name", "foo",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		`foo`,
-		"inspect", "package-importers", "testdata/foo", "--name", "bar",
+		"x", "inspect", "package-importers", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
 		true,
 		0,
 		`foo`,
-		"inspect", "package-importers", "testdata/foo", "--name", "google.protobuf",
+		"x", "inspect", "package-importers", "testdata/foo", "--name", "google.protobuf",
 	)
 }
 
@@ -1381,10 +1411,38 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 	assert.Equal(t, strings.TrimSpace(string(golden)), output)
 }
 
-func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string) {
+func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, includeImports bool, includeSourceInfo bool, expectedNames ...string) {
+	args := []string{"descriptor-set"}
+	if includeImports {
+		args = append(args, "--include-imports")
+	}
+	if includeSourceInfo {
+		args = append(args, "--include-source-info")
+	}
+	args = append(args, dirOrFile)
+	expectedExitCode := 0
+	if !expectSuccess {
+		expectedExitCode = 255
+	}
+	buffer := bytes.NewBuffer(nil)
+	exitCode := do(true, args, os.Stdin, buffer, buffer)
+	assert.Equal(t, expectedExitCode, exitCode)
+
+	fileDescriptorSet := &descriptor.FileDescriptorSet{}
+	assert.NoError(t, proto.Unmarshal(buffer.Bytes(), fileDescriptorSet))
+	names := make([]string, 0, len(fileDescriptorSet.File))
+	for _, fileDescriptorProto := range fileDescriptorSet.File {
+		names = append(names, fileDescriptorProto.GetName())
+	}
+	sort.Strings(expectedNames)
+	sort.Strings(names)
+	assert.Equal(t, expectedNames, names)
+}
+
+func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, "grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin")
+	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin"}, extraFlags...)...)
 }
 
 func assertRegexp(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedRegexp string, args ...string) {

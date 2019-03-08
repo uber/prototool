@@ -235,6 +235,19 @@ func CompilerWithFileDescriptorSet() CompilerOption {
 	}
 }
 
+// CompilerWithFileDescriptorSetFullControl says to also return the FileDescriptorSet but
+// with extra controls.
+//
+// This is added for backwards compatibility within the codebase.
+func CompilerWithFileDescriptorSetFullControl(includeImports bool, includeSourceInfo bool) CompilerOption {
+	return func(compiler *compiler) {
+		compiler.doFileDescriptorSet = true
+		compiler.fileDescriptorSetFullControl = true
+		compiler.fileDescriptorSetIncludeImports = includeImports
+		compiler.fileDescriptorSetIncludeSourceInfo = includeSourceInfo
+	}
+}
+
 // NewCompiler returns a new Compiler.
 func NewCompiler(options ...CompilerOption) Compiler {
 	return newCompiler(options...)

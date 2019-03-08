@@ -74,6 +74,7 @@ RUN cp -R /tmp/protoc/include /usr/local/include
 
 RUN mkdir -p /tmp/prototool
 COPY go.mod go.sum /tmp/prototool/
+RUN cd /tmp/prototool && go mod download
 COPY cmd /tmp/prototool/cmd
 COPY internal /tmp/prototool/internal
 RUN cd /tmp/prototool && go install ./cmd/prototool

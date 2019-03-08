@@ -22,6 +22,7 @@ package breaking
 
 import (
 	"github.com/uber/prototool/internal/extract"
+	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/text"
 	"go.uber.org/zap"
 )
@@ -151,7 +152,7 @@ type Runner interface {
 	//
 	// Returns Failures if there are incompatibilities, or error if there is
 	// a system error
-	Run(from *extract.PackageSet, to *extract.PackageSet) ([]*text.Failure, error)
+	Run(config settings.BreakConfig, from *extract.PackageSet, to *extract.PackageSet) ([]*text.Failure, error)
 }
 
 // RunnerOption is an option for a new Runner.
@@ -163,27 +164,6 @@ type RunnerOption func(*runner)
 func RunnerWithLogger(logger *zap.Logger) RunnerOption {
 	return func(runner *runner) {
 		runner.logger = logger
-	}
-}
-
-// RunnerWithIncludeBeta returns a RunnerOption that includes beta packages.
-//
-// The default is to ignore beta packages.
-func RunnerWithIncludeBeta() RunnerOption {
-	return func(runner *runner) {
-		runner.includeBeta = true
-	}
-}
-
-// RunnerWithAllowBetaDeps returns a RunnerOption that allows beta dependencies
-// in stable packages.
-//
-// Setting RunnerWithIncludeBeta will cause this to be true.
-//
-// The default is to not allow beta dependencies in stable packages.
-func RunnerWithAllowBetaDeps() RunnerOption {
-	return func(runner *runner) {
-		runner.allowBetaDeps = true
 	}
 }
 

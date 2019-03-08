@@ -12,6 +12,7 @@ go_library(
         "//internal/breaking:go_default_library",
         "//internal/cfginit:go_default_library",
         "//internal/create:go_default_library",
+        "//internal/desc:go_default_library",
         "//internal/diff:go_default_library",
         "//internal/extract:go_default_library",
         "//internal/file:go_default_library",
@@ -24,6 +25,10 @@ go_library(
         "//internal/settings:go_default_library",
         "//internal/text:go_default_library",
         "//internal/vars:go_default_library",
+        "@com_github_golang_protobuf//jsonpb:go_default_library_gen",
+        "@com_github_golang_protobuf//proto:go_default_library",
+        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
+        "@org_uber_go_multierr//:go_default_library",
         "@org_uber_go_zap//:go_default_library",
     ],
 )
