@@ -1,0 +1,5 @@
+lint:
+  group: empty
+  rules:
+    add:
+      - RPC_NAMES_CAMEL_CASE
