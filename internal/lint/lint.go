@@ -260,11 +260,15 @@ var (
 		wktTimestampSuffixLinter,
 	}
 
+	// EmptyLinters is the slice of linters for the empty lint group.
+	EmptyLinters = []Linter{}
+
 	// GroupToLinters is the map from linter group to the corresponding slice of linters.
 	GroupToLinters = map[string][]Linter{
 		"google": GoogleLinters,
 		"uber1":  Uber1Linters,
 		"uber2":  Uber2Linters,
+		"empty":  EmptyLinters,
 	}
 
 	allLintIDs = make(map[string]struct{})
