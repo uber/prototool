@@ -1512,6 +1512,8 @@ func TestInspectPackageImporters(t *testing.T) {
 func TestListLinters(t *testing.T) {
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters", "testdata/lint/base")
 	assertLinters(t, lint.Uber1Linters, "lint", "--list-linters", "testdata/lint/base")
+	assertLinters(t, lint.EmptyLinters, "lint", "--list-linters", "testdata/lint/empty")
+	assertLinterIDs(t, []string{"RPC_NAMES_CAMEL_CASE"}, "lint", "--list-linters", "testdata/lint/emptycustom")
 }
 
 func TestListAllLinters(t *testing.T) {
@@ -1519,10 +1521,11 @@ func TestListAllLinters(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, true, 0, "google\nuber1\nuber2", "lint", "--list-all-lint-groups")
+	assertExact(t, true, 0, "empty\ngoogle\nuber1\nuber2", "lint", "--list-all-lint-groups")
 }
 
 func TestListLintGroup(t *testing.T) {
+	assertLinters(t, lint.EmptyLinters, "lint", "--list-lint-group", "empty", "testdata/lint/base")
 	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google", "testdata/lint/base")
 	assertLinters(t, lint.Uber1Linters, "lint", "--list-lint-group", "uber1", "testdata/lint/base")
 	assertLinters(t, lint.Uber2Linters, "lint", "--list-lint-group", "uber2", "testdata/lint/base")
@@ -1566,6 +1569,11 @@ func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
 	for _, linter := range linters {
 		linterIDs = append(linterIDs, linter.ID())
 	}
+	sort.Strings(linterIDs)
+	assertDo(t, true, 0, strings.Join(linterIDs, "\n"), args...)
+}
+
+func assertLinterIDs(t *testing.T, linterIDs []string, args ...string) {
 	sort.Strings(linterIDs)
 	assertDo(t, true, 0, strings.Join(linterIDs, "\n"), args...)
 }

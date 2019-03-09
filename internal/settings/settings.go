@@ -179,6 +179,7 @@ type LintConfig struct {
 	Group string
 	// NoDefault is set to exclude the default set of linters.
 	// This value is ignored if Group is set.
+	// Deprecated: Use group "empty" instead.
 	NoDefault bool
 	// IncludeIDs are the list of linter IDs to use in addition to the defaults.
 	// Expected to be all uppercase.

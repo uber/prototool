@@ -34,7 +34,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_fullstorydev_grpcurl",
         importpath = "github.com/fullstorydev/grpcurl",
-        tag = "v1.1.0",
+        tag = "v1.2.1",
     )
     go_repository(
         name = "com_github_gobuffalo_flect",
@@ -69,7 +69,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_jhump_protoreflect",
         importpath = "github.com/jhump/protoreflect",
-        tag = "v1.1.0",
+        tag = "v1.2.0",
     )
     go_repository(
         name = "com_github_mitchellh_go_wordwrap",

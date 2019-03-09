@@ -25,7 +25,19 @@ lint:
 See the `prototool.yaml` files at [etc/style/google/prototool.yaml](../etc/style/google/prototool.yaml) and
 [etc/style/uber1/prototool.yaml](../etc/style/uber1/prototool.yaml) for examples.
 
-The `uber` lint group represents the default lint group, and will be used if no lint group is configured.
+The `uber1` lint group represents the default lint group, and will be used if no lint group is configured. This is the default
+lint group for backwards compatibility reasons, as it is what we released with v1.0.0. We recommend using the `uber2` lint group.
+
+The special lint group `empty` has no lint rules. This allows one to specify only the linters they want in `lint.rules.add`
+
+```yaml
+lint:
+  group: empty
+  rules:
+    add:
+      - MESSAGE_NAMES_CAMEL_CASE
+      - MESSAGE_NAMES_CAPITALIZED
+```
 
 Linting also understands the concept of file headers, typically license headers. To specify a license header, add the following to your
 `prototool.yaml`:
