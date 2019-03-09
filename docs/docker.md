@@ -23,8 +23,7 @@ You can build on top of this image as well if you have custom requirements.
 ## Included
 
 The following libraries are included. This is not meant to be exhaustive - these represent our view of the most
-commonly-used, stable, maintained libraries. If you think another library should be included, propose it in
-a GitHub issue and we will evaluate it.
+commonly-used, stable, maintained libraries.
 
 | Name | Version | Binaries |
 | --- | --- | --- |
@@ -40,6 +39,8 @@ a GitHub issue and we will evaluate it.
 
 The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also installed.
 
+If you think another library should be included, propose it in a GitHub issue and we will evaluate it.
+
 ## Versioning
 
 Images are pushed for every commit to the dev branch as the tags `uber/prototool:dev, uber:prototool:latest`, and
@@ -47,6 +48,29 @@ every minor release starting with `v1.4.0` will have a tag e.g. `uber/prototool:
 to the rest of Prototool, there is no breaking change guarantee between minor releases - we do not account
 for breaking changes in libraries we provide within this image, and will update them regularly on `dev`.
 We recommend pinning to one of the minor release Docker image tags once they are available.
+
+## Development
+
+To update the Docker image, edit the [Dockerfile](../Dockerfile).
+
+Note that for version changes, the versions are copied in four places: once for each layer in the
+Dockerfile (sharing these is harder than you think), once in [etc/docker/testing/bin/test.sh](../etc/docker/testing/bin/test.sh),
+and once in this documentation.
+
+Updates of `protobuf` and `grpc` must match the current versions for `alpine:edge` for now. See [here](https://pkgs.alpinelinux.org/packages?name=protobuf&branch=edge&repo=main&arch=x86_64) and [here](https://pkgs.alpinelinux.org/packages?name=grpc&branch=edge&repo=testing&arch=x86_64) for the current versions.
+
+Local development commands:
+
+```
+# build the docker image
+make dockerbuild
+# test a built docker image
+make dockertest
+# build and then test
+make dockerall
+```
+
+The test files are in [etc/docker/testing](../etc/docker/testing).
 
 [protoc]: https://github.com/protocolbuffers/protobuf
 [grpc]: https://github.com/grpc/grpc
