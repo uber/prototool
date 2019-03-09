@@ -1,8 +1,8 @@
 # Prototool Docker Image
 
-We provide a Docker image with `prototool`, `protoc`, and common Protobuf plugins pre-installed. As of
-this writing, the resulting image is around 141MB. This provides a consistent environment to generate your Protobuf
-stubs.
+We provide a Docker image with `prototool`, `protoc`, and common Protobuf plugins pre-installed.
+Most plugins are compressed with [UPX](https://github.com/upx/upx). As of this writing, the resulting
+image is around 79MB. This provides a consistent environment to generate your Protobuf stubs.
 
 This is in early development.
 
@@ -23,8 +23,7 @@ You can build on top of this image as well if you have custom requirements.
 ## Included
 
 The following libraries are included. This is not meant to be exhaustive - these represent our view of the most
-commonly-used, stable, maintained libraries. If you think another library should be included, propose it in
-a GitHub issue and we will evaluate it.
+commonly-used, stable, maintained libraries.
 
 | Name | Version | Binaries |
 | --- | --- | --- |
@@ -33,12 +32,14 @@ a GitHub issue and we will evaluate it.
 | [grpc] | 1.18.0 | grpc_cpp_plugin<br>grpc_csharp_plugin<br>grpc_node_plugin<br>grpc_objective_c_plugin<br>grpc_php_plugin<br>grpc_python_plugin<br>grpc_ruby_plugin |
 | [golang/protobuf] | 1.3.0 | protoc-gen-go |
 | [gogo/protobuf] | 1.2.1 | protoc-gen-gofast<br>protoc-gen-gogo<br>protoc-gen-gogofast<br>protoc-gen-gogofaster<br>protoc-gen-gogoslick |
-| [grpc-gateway] | 1.8.1 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
+| [grpc-gateway] | 1.8.2 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
 | [grpc-web] | 1.0.3 | protoc-gen-grpc-web |
 | [twirp] | 5.5.2 | protoc-gen-twirp<br>protoc-gen-twirp_python |
 | [yarpc] | 1.36.2 | protoc-gen-yarpc-go |
 
 The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also installed.
+
+If you think another library should be included, propose it in a GitHub issue and we will evaluate it.
 
 ## Versioning
 
@@ -47,6 +48,29 @@ every minor release starting with `v1.4.0` will have a tag e.g. `uber/prototool:
 to the rest of Prototool, there is no breaking change guarantee between minor releases - we do not account
 for breaking changes in libraries we provide within this image, and will update them regularly on `dev`.
 We recommend pinning to one of the minor release Docker image tags once they are available.
+
+## Development
+
+To update the Docker image, edit the [Dockerfile](../Dockerfile).
+
+Note that for version changes, the versions are copied in four places: once for each layer in the
+Dockerfile (sharing these is harder than you think), once in [etc/docker/testing/bin/test.sh](../etc/docker/testing/bin/test.sh),
+and once in this documentation.
+
+Updates of `protobuf` and `grpc` must match the current versions for `alpine:edge` for now. See [here](https://pkgs.alpinelinux.org/packages?name=protobuf&branch=edge&repo=main&arch=x86_64) and [here](https://pkgs.alpinelinux.org/packages?name=grpc&branch=edge&repo=testing&arch=x86_64) for the current versions.
+
+Local development commands:
+
+```
+# build the docker image
+make dockerbuild
+# test a built docker image
+make dockertest
+# build and then test
+make dockerall
+```
+
+The test files are in [etc/docker/testing](../etc/docker/testing).
 
 [protoc]: https://github.com/protocolbuffers/protobuf
 [grpc]: https://github.com/grpc/grpc
