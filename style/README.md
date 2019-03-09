@@ -451,7 +451,7 @@ should be used whenever possible, and imported starting with `google/protobuf`, 
 
 These are available for browsing at
 [github.com/protocolbuffers/protobuf/src/google/protobuf](https://github.com/protocolbuffers/protobuf/tree/master/src/google/protobuf)
-and are also includeed in the `include` directory of each [Protobuf Releases ZIP
+and are also included in the `include` directory of each [Protobuf Releases ZIP
 file](https://github.com/protocolbuffers/protobuf/releases).
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
@@ -463,7 +463,7 @@ small, finite, and relatively static number of values. These values should almos
 represented as enums and not strings or integers. An enum value carries semantic meaning and there
 is no ability for incorrect values to be set.
 
-Enums should always be `PascalCase`. Enum values should be `UPPER_SNAKE_CASE`. The enum optioni
+Enums should always be `PascalCase`. Enum values should be `UPPER_SNAKE_CASE`. The enum option
 `allow_aliases` should never be used.
 
 ### Enum Value Names
