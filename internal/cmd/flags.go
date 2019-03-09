@@ -59,6 +59,7 @@ type flags struct {
 	lintMode          bool
 	method            string
 	name              string
+	outputPath        string
 	overwrite         bool
 	pkg               string
 	protocBinPath     string
@@ -67,7 +68,6 @@ type flags struct {
 	serverName        string
 	stdin             bool
 	tls               bool
-	outputPath        string
 	tmp               bool
 	uncomment         bool
 }
@@ -245,7 +245,7 @@ func (f *flags) bindCacert(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindCert(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.cert, "cert", "","File containing client certificate (public key) in pem encoded format to present to the server for mutual TLS authentication. If set, --tls and --key is required.")
+	flagSet.StringVar(&f.cert, "cert", "", "File containing client certificate (public key) in pem encoded format to present to the server for mutual TLS authentication. If set, --tls and --key is required.")
 }
 
 func (f *flags) bindKey(flagSet *pflag.FlagSet) {
@@ -255,4 +255,3 @@ func (f *flags) bindKey(flagSet *pflag.FlagSet) {
 func (f *flags) bindServerName(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.serverName, "server-name", "", "Override expected server \"Common Name\" when validating TLS certificate. Should usually be set if using a HTTP proxy or an IP for the --address. If set, --tls is required.")
 }
-
