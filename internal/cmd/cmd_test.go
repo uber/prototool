@@ -1118,6 +1118,7 @@ option php_namespace = "Foo\\V1";`,
 }
 
 func TestGRPC(t *testing.T) {
+	t.Parallel()
 	const (
 		serverCrt         = "testdata/grpc/tls/server.crt"
 		serverKey         = "testdata/grpc/tls/server.key"
@@ -1133,7 +1134,6 @@ func TestGRPC(t *testing.T) {
 		grpcFilePath      = "testdata/grpc/grpc.proto"
 		exclamationMethod = "grpc.ExcitedService/Exclamation"
 	)
-	t.Parallel()
 	assertGRPC(t,
 		0,
 		helloExclaimValue,
@@ -1680,7 +1680,7 @@ func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, inc
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin"}, extraFlags...)...)
+	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin", "--connect-timeout", "500ms"}, extraFlags...)...)
 }
 
 // GRPC Server TLS assert
@@ -1697,7 +1697,7 @@ func assertGRPCmTLS(t *testing.T, expectedExitCode int, expectedLinePrefixes str
 		excitedTestCase = startTLSExcitedTestCase(t, serverCrt, serverKey)
 	}
 	defer excitedTestCase.Close()
-	args := []string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin"}
+	args := []string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin", "--connect-timeout", "500ms"}
 	if serverCaCert != "" {
 		args = append(args, "--cacert", serverCaCert, "--tls")
 	}
