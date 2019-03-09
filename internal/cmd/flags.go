@@ -249,7 +249,7 @@ func (f *flags) bindCert(flagSet *pflag.FlagSet) {
 }
 
 func (f *flags) bindKey(flagSet *pflag.FlagSet) {
-	flagSet.StringVar(&f.key, "key", "", "File containing client key (private key) in pem encoded format to present to the server for mutual TLS authentication. If set, --tls and --cert is required.")
+	flagSet.StringVar(&f.key, "key", "", "File containing client key (private key) in pem encoded format to use for mutual TLS authentication. If set, --tls and --cert is required.")
 }
 
 func (f *flags) bindServerName(flagSet *pflag.FlagSet) {
