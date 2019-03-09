@@ -61,7 +61,7 @@ Some conventions:
 - A **package version** is the last package sub-name that specifies the version,
   i.e. `v1`, `v1beta1`, or `v2`.
 
-Package sub-names should be short and descriptive, and can use abbreviations if necesary.
+Package sub-names should be short and descriptive, and can use abbreviations if necessary.
 Package sub-names should only include characters in the range `[a-z0-9]`, i.e always lowercase
 and with only letter and digit characters. If names get too long or have underscores, the
 generated stubs in certain languages are less than idiomatic.
@@ -222,7 +222,7 @@ The following is an example of this in practice.
         │   └── trip.proto // package uber.trip.v1
         └── v2
             ├── trip_api.proto // package uber.trip.v2
-            └── trip.proto // pacakge uber.trip.v2
+            └── trip.proto // package uber.trip.v2
 ```
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
@@ -528,8 +528,8 @@ which enums are), as a result it is possible to create a empty version of a mess
 accidentally create the impression that an enum value was set by the caller. This can lead to hard
 to find bugs where the default zero value is being set without the caller knowingly doing so. You
 may be thinking - but it is super useful to just be able to assume my default enum option, just
-like I want an integer field called count to default to 0 without setting it explicitly. Howeever,
-Enum valuess are not integers, they are just represented as them in the Protobuf description. Take
+like I want an integer field called count to default to 0 without setting it explicitly. However,
+Enum values are not integers, they are just represented as them in the Protobuf description. Take
 for example the following enum:
 
 ```proto
