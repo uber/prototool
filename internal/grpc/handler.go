@@ -25,7 +25,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/grpc/credentials"
 	"io"
 	"strings"
 	"time"
@@ -37,6 +36,7 @@ import (
 	"github.com/uber/prototool/internal/desc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
 )
 
@@ -107,7 +107,7 @@ func (h *handler) dial(address string) (*grpc.ClientConn, error) {
 	}
 	creds, err := h.getClientTransportCredentials()
 	if err != nil {
-		return nil, fmt.Errorf("grpc cred: %v", err)
+		return nil, fmt.Errorf("grpc credentials: %v", err)
 	}
 	return grpcurl.BlockingDial(ctx, network, address, creds, h.getDialOptions()...)
 }
