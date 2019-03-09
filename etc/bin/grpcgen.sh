@@ -1,25 +1,28 @@
-# TLS Certificates
+#!/bin/bash
 
-Information on generating these certificates and keys is at https://bbengfort.github.io/programmer/2017/03/03/secure-grpc.html
+set -euo pipefail
 
-The certificates in this directory were generated with a combination of the [openssl](https://www.openssl.org/)
-and  [certstrap](https://github.com/square/certstrap). Both can be installed with homebrew packages of the same names.
-For other operating systems, follow the instructions on each site.
+DIR="$(cd "$(dirname "${0}")/../.." && pwd)"
+cd "${DIR}"
 
-## Generation
+# https://bbengfort.github.io/programmer/2017/03/03/secure-grpc.html
 
-The following commands will generate all the certificates in the "tls" folder with a blank passphrase and
- an expiration of 100 years
+check_which() {
+  if ! command -v "${1}" >/dev/null 2>/dev/null; then
+    echo "${1} is not installed" >&2
+    exit1
+  fi
+}
 
-```bash
+check_which openssl
+check_which certstrap
+
 cd internal/cmd/testdata/grpc
-rm -fr tls
+rm -rf tls
 
 certstrap --depot-path tls init --common-name "cacert" --passphrase ""
-
 certstrap --depot-path tls request-cert --ip 127.0.0.1 --cn server --passphrase ""
 certstrap --depot-path tls sign server --CA cacert --expires "100 years"
-
 certstrap --depot-path tls request-cert --cn client --passphrase ""
 certstrap --depot-path tls sign client --CA cacert --expires "100 years"
 
@@ -52,6 +55,3 @@ EOF
 openssl req -new -newkey rsa:2048 -x509 -sha256 -nodes -days 36500 \
     -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=client.local" \
     -keyout tls/self-signed-client.key -out tls/self-signed-client.crt
-
-cd ../../../..
-```

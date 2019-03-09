@@ -26,7 +26,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"google.golang.org/grpc/credentials"
 	"io"
 	"io/ioutil"
 	"net"
@@ -46,6 +45,7 @@ import (
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func TestCompile(t *testing.T) {
@@ -1685,7 +1685,7 @@ func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string,
 
 // GRPC Server TLS assert
 func assertGRPCTLS(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, serverCrt string, serverKey string, caCrt string, extraFlags ...string) {
-	assertGRPCmTLS(t, expectedExitCode, expectedLinePrefixes, filePath, method, jsonData, serverCrt, serverKey, caCrt,"", "", "", extraFlags...)
+	assertGRPCmTLS(t, expectedExitCode, expectedLinePrefixes, filePath, method, jsonData, serverCrt, serverKey, caCrt, "", "", "", extraFlags...)
 }
 
 // GRPC Mutual TLS assert
@@ -1699,7 +1699,7 @@ func assertGRPCmTLS(t *testing.T, expectedExitCode int, expectedLinePrefixes str
 	defer excitedTestCase.Close()
 	args := []string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin"}
 	if serverCaCert != "" {
-		args = append(args, "--cacert", serverCaCert,  "--tls")
+		args = append(args, "--cacert", serverCaCert, "--tls")
 	}
 	if clientCert != "" {
 		args = append(args, "--cert", clientCert, "--key", clientKey)
