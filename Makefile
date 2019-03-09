@@ -68,6 +68,13 @@ $(PROTOC_GEN_GO):
 	@cd $(PROTOC_GEN_GO_TMP); go get github.com/golang/protobuf/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
 	@rm -rf $(PROTOC_GEN_GO_TMP)
 
+CERTSTRAP_VERSION := v1.1.1
+CERTSTRAP := $(TMP_BIN)/certstrap
+$(CERTSTRAP):
+	$(eval CERTSTRAP_TMP := $(shell mktemp -d))
+	@cd $(CERTSTRAP_TMP); go get github.com/square/certstrap@$(CERTSTRAP_VERSION)
+	@rm -rf $(CERTSTRAP_TMP)
+
 unexport GOPATH
 export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
@@ -130,6 +137,10 @@ internalgen: install $(PROTOC_GEN_GO)
 .PHONY: bazelgen
 bazelgen: $(BAZEL)
 	bash etc/bin/bazelgen.sh
+
+.PHONY: grpcgen
+grpcgen: $(CERTSTRAP)
+	bash etc/bin/grpcgen.sh
 
 .PHONY: generate
 generate: license golden example internalgen bazelgen

@@ -23,6 +23,8 @@ package cmd
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -43,6 +45,7 @@ import (
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func TestCompile(t *testing.T) {
@@ -1116,17 +1119,32 @@ option php_namespace = "Foo\\V1";`,
 
 func TestGRPC(t *testing.T) {
 	t.Parallel()
+	const (
+		serverCrt         = "testdata/grpc/tls/server.crt"
+		serverKey         = "testdata/grpc/tls/server.key"
+		clientCrt         = "testdata/grpc/tls/client.crt"
+		clientKey         = "testdata/grpc/tls/client.key"
+		caCrt             = "testdata/grpc/tls/cacert.crt"
+		ssServerCrt       = "testdata/grpc/tls/self-signed-server.crt"
+		ssServerKey       = "testdata/grpc/tls/self-signed-server.key"
+		ssClientCrt       = "testdata/grpc/tls/self-signed-client.crt"
+		ssClientKey       = "testdata/grpc/tls/self-signed-client.key"
+		helloJSONValue    = `{"value":"hello"}`
+		helloExclaimValue = `{"value":"hello!"}`
+		grpcFilePath      = "testdata/grpc/grpc.proto"
+		exclamationMethod = "grpc.ExcitedService/Exclamation"
+	)
 	assertGRPC(t,
 		0,
-		`{"value":"hello!"}`,
-		"testdata/grpc/grpc.proto",
-		"grpc.ExcitedService/Exclamation",
-		`{"value":"hello"}`,
+		helloExclaimValue,
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
 	)
 	assertGRPC(t,
 		0,
 		`{"value":"hellosalutations!"}`,
-		"testdata/grpc/grpc.proto",
+		grpcFilePath,
 		"grpc.ExcitedService/ExclamationClientStream",
 		`{"value":"hello"}
 		{"value":"salutations"}`,
@@ -1139,9 +1157,9 @@ func TestGRPC(t *testing.T) {
 		{"value":"l"}
 		{"value":"o"}
 		{"value":"!"}`,
-		"testdata/grpc/grpc.proto",
+		grpcFilePath,
 		"grpc.ExcitedService/ExclamationServerStream",
-		`{"value":"hello"}`,
+		helloJSONValue,
 	)
 	assertGRPC(t,
 		0,
@@ -1149,7 +1167,7 @@ func TestGRPC(t *testing.T) {
 		{"value":"hello!"}
 		{"value":"salutations!"}
 		`,
-		"testdata/grpc/grpc.proto",
+		grpcFilePath,
 		"grpc.ExcitedService/ExclamationBidiStream",
 		`{"value":"hello"}
 		{"value":"salutations"}`,
@@ -1163,10 +1181,222 @@ func TestGRPC(t *testing.T) {
 		{"response":{"value":"l"}}
 		{"response":{"value":"o"}}
 		{"response":{"value":"!"}}`,
-		"testdata/grpc/grpc.proto",
+		grpcFilePath,
 		"grpc.ExcitedService/ExclamationServerStream",
-		`{"value":"hello"}`,
+		helloJSONValue,
 		`--details`,
+	)
+	assertGRPC(t,
+		255,
+		"tls must be specified if insecure, cacert, cert, key or server-name are specified",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		"--cert",
+		clientCrt,
+	)
+	assertGRPC(t,
+		255,
+		"if cert is specified, key must be specified",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		"--tls",
+		"--cert",
+		clientCrt,
+		"--cacert",
+		caCrt,
+	)
+	assertGRPC(t,
+		255,
+		"if insecure then cacert, cert, key, and server-name must not be specified",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		"--tls",
+		"--cert",
+		clientCrt,
+		"--insecure",
+	)
+	// CA issued server certificate valid when using ca cert as server cert
+	assertGRPCTLS(t,
+		0,
+		helloExclaimValue,
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		serverCrt,
+		serverKey,
+		caCrt,
+	)
+	// Self signed server certificate valid when using self-signed server cert
+	assertGRPCTLS(t,
+		0,
+		helloExclaimValue,
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		ssServerCrt,
+	)
+	// Self signed server certificate valid when using system CA and insecure flag
+	assertGRPCTLS(t,
+		0,
+		helloExclaimValue,
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		"",
+		"--tls",
+		"--insecure",
+	)
+	// server uses plaintext but client attempts a TLS connection
+	assertGRPC(t,
+		1,
+		"tls: first record does not look like a TLS handshake",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		"--tls",
+	)
+	// Self signed server certificate invalid when using ca cert as server cert
+	assertGRPCTLS(t,
+		1,
+		"x509: certificate signed by unknown authority",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		caCrt,
+	)
+	// Server uses TLS but client does not
+	assertGRPCTLS(t,
+		1,
+		"context deadline exceeded",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		serverCrt,
+		serverKey,
+		"",
+	)
+	// Mututal TLS with CA issued server certificate and self-signed client certificate valid when using ca cert as server cert
+	assertGRPCmTLS(t,
+		0,
+		helloExclaimValue,
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		serverCrt,
+		serverKey,
+		caCrt,
+		clientCrt,
+		clientKey,
+		caCrt,
+	)
+	// Mututal TLS with self-signed server and client certificates properly exchanged
+	assertGRPCmTLS(t,
+		0,
+		helloExclaimValue,
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		ssServerCrt,
+		ssClientCrt,
+		ssClientKey,
+		ssClientCrt,
+	)
+
+	// Mututal TLS with CA issued server certificate but using self-signed client certificate NOT valid when using ca cert as client cert
+	assertGRPCmTLS(t,
+		1,
+		"remote error: tls: bad certificate",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		serverCrt,
+		serverKey,
+		caCrt,
+		ssClientCrt,
+		ssClientKey,
+		caCrt,
+	)
+	// Mututal TLS with CA issued client certificate and self-signed server certificate NOT valid when using server cert CA as client CA
+	assertGRPCmTLS(t,
+		1,
+		"remote error: tls: bad certificate",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		ssServerCrt,
+		clientCrt,
+		clientKey,
+		ssServerCrt,
+	)
+	// Mututal TLS with self-signed certificate and self-signed client certificate NOT valid when using ca cert as server cert
+	assertGRPCmTLS(t,
+		1,
+		"x509: certificate signed by unknown authority",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		caCrt,
+		ssClientCrt,
+		ssClientKey,
+		ssClientCrt,
+	)
+	// server uses mutual TLS but client does not use TLS at all
+	assertGRPCmTLS(t,
+		1,
+		"context deadline exceeded",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		"",
+		"",
+		"",
+		ssClientCrt,
+	)
+	// server uses mutual TLS but client does not use mutual TLS
+	assertGRPCmTLS(t,
+		1,
+		"remote error: tls: bad certificate",
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssServerCrt,
+		ssServerKey,
+		ssServerCrt,
+		"",
+		"",
+		ssClientCrt,
+	)
+
+	assertGRPCmTLS(t,
+		0,
+		helloExclaimValue,
+		grpcFilePath,
+		exclamationMethod,
+		helloJSONValue,
+		ssClientCrt,
+		ssClientKey,
+		ssClientCrt,
+		ssClientCrt,
+		ssClientKey,
+		ssClientCrt,
+		"--server-name", "client.local",
 	)
 }
 
@@ -1450,7 +1680,31 @@ func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, inc
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
 	excitedTestCase := startExcitedTestCase(t)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin"}, extraFlags...)...)
+	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin", "--connect-timeout", "500ms"}, extraFlags...)...)
+}
+
+// GRPC Server TLS assert
+func assertGRPCTLS(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, serverCrt string, serverKey string, caCrt string, extraFlags ...string) {
+	assertGRPCmTLS(t, expectedExitCode, expectedLinePrefixes, filePath, method, jsonData, serverCrt, serverKey, caCrt, "", "", "", extraFlags...)
+}
+
+// GRPC Mutual TLS assert
+func assertGRPCmTLS(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, serverCrt string, serverKey string, serverCaCert string, clientCert string, clientKey string, clientCaCert string, extraFlags ...string) {
+	var excitedTestCase *excitedTestCase
+	if clientCaCert != "" {
+		excitedTestCase = startmTLSExcitedTestCase(t, serverCrt, serverKey, clientCaCert)
+	} else {
+		excitedTestCase = startTLSExcitedTestCase(t, serverCrt, serverKey)
+	}
+	defer excitedTestCase.Close()
+	args := []string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin", "--connect-timeout", "500ms"}
+	if serverCaCert != "" {
+		args = append(args, "--cacert", serverCaCert, "--tls")
+	}
+	if clientCert != "" {
+		args = append(args, "--cert", clientCert, "--key", clientKey)
+	}
+	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append(args, extraFlags...)...)
 }
 
 func assertRegexp(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedRegexp string, args ...string) {
@@ -1501,10 +1755,43 @@ type excitedTestCase struct {
 	excitedServer *excitedServer
 }
 
+func startTLSExcitedTestCase(t *testing.T, serverCert string, serverKey string) *excitedTestCase {
+	creds, err := credentials.NewServerTLSFromFile(serverCert, serverKey)
+	require.NoError(t, err)
+	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	return startExcitedTestCaseWithServer(t, grpcServer)
+}
+
+func startmTLSExcitedTestCase(t *testing.T, serverCert string, serverKey string, clientCaCerts string) *excitedTestCase {
+	certificate, err := tls.LoadX509KeyPair(serverCert, serverKey)
+	require.NoError(t, err)
+
+	// Create a certificate pool from the certificate authority
+	certPool := x509.NewCertPool()
+	ca, err := ioutil.ReadFile(clientCaCerts)
+	require.NoError(t, err)
+
+	// Append the client certificates from the CA
+	if ok := certPool.AppendCertsFromPEM(ca); !ok {
+		require.NoError(t, err)
+	}
+	// Create the TLS credentials
+	creds := credentials.NewTLS(&tls.Config{
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		Certificates: []tls.Certificate{certificate},
+		ClientCAs:    certPool,
+	})
+	grpcServer := grpc.NewServer(grpc.Creds(creds))
+	return startExcitedTestCaseWithServer(t, grpcServer)
+}
+
 func startExcitedTestCase(t *testing.T) *excitedTestCase {
+	return startExcitedTestCaseWithServer(t, grpc.NewServer())
+}
+
+func startExcitedTestCaseWithServer(t *testing.T, grpcServer *grpc.Server) *excitedTestCase {
 	listener, err := getFreeListener()
 	require.NoError(t, err)
-	grpcServer := grpc.NewServer()
 	excitedServer := newExcitedServer()
 	grpcpb.RegisterExcitedServiceServer(grpcServer, excitedServer)
 	go func() { _ = grpcServer.Serve(listener) }()

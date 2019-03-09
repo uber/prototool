@@ -102,6 +102,18 @@ func HandlerWithHeader(key string, value string) HandlerOption {
 	}
 }
 
+// HandlerWithTLS returns a HandlerOption that enables TLS connections to the remote host with the given configuration attributes.
+func HandlerWithTLS(insecure bool, cacert string, cert string, key string, serverName string) HandlerOption {
+	return func(handler *handler) {
+		handler.tls = true
+		handler.insecure = insecure
+		handler.cacert = cacert
+		handler.cert = cert
+		handler.key = key
+		handler.serverName = serverName
+	}
+}
+
 // NewHandler returns a new Handler.
 func NewHandler(options ...HandlerOption) Handler {
 	return newHandler(options...)

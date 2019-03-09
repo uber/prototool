@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add file locking around the `protoc` downloader to eliminate concurrency
   issues where multiple `prototool` invocations may be accessing the cache
   at the same time.
+- Add TLS support to the `grpc` command.
 - Add `--details` flag to the `grpc` command to output headers, trailers,
   and statuses as well as the responses.
 - Unix domain sockets can now be specified for the `--address` flag of the

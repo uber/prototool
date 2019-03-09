@@ -36,6 +36,7 @@ import (
 	"github.com/uber/prototool/internal/desc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
 )
 
@@ -46,6 +47,12 @@ type handler struct {
 	keepaliveTime  time.Duration
 	headers        []string
 	details        bool
+	tls            bool
+	insecure       bool
+	cacert         string
+	cert           string
+	key            string
+	serverName     string
 }
 
 func newHandler(options ...HandlerOption) *handler {
@@ -98,7 +105,11 @@ func (h *handler) dial(address string) (*grpc.ClientConn, error) {
 	if err != nil {
 		return nil, fmt.Errorf("grpc dial: %v", err)
 	}
-	return grpcurl.BlockingDial(ctx, network, address, nil, h.getDialOptions()...)
+	creds, err := h.getClientTransportCredentials()
+	if err != nil {
+		return nil, fmt.Errorf("grpc credentials: %v", err)
+	}
+	return grpcurl.BlockingDial(ctx, network, address, creds, h.getDialOptions()...)
 }
 
 func getNetworkAddress(address string) (string, string, error) {
@@ -112,6 +123,22 @@ func getNetworkAddress(address string) (string, string, error) {
 	default:
 		return "", "", fmt.Errorf("invalid network, only tcp or unix allowed: %s", split[0])
 	}
+}
+
+func (h *handler) getClientTransportCredentials() (credentials.TransportCredentials, error) {
+	if !h.tls {
+		return nil, nil
+	}
+	creds, err := grpcurl.ClientTransportCredentials(h.insecure, h.cacert, h.cert, h.key)
+	if err != nil {
+		return nil, err
+	}
+	if h.serverName != "" {
+		if err := creds.OverrideServerName(h.serverName); err != nil {
+			return nil, err
+		}
+	}
+	return creds, nil
 }
 
 func (h *handler) getDialOptions() []grpc.DialOption {

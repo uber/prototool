@@ -373,7 +373,7 @@ $ prototool grpc example \
 {"response":{"value":"!"}}`,
 		Args: cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.details)
+			return runner.GRPC(args, flags.headers, flags.address, flags.method, flags.data, flags.callTimeout, flags.connectTimeout, flags.keepaliveTime, flags.stdin, flags.details, flags.tls, flags.insecure, flags.cacert, flags.cert, flags.key, flags.serverName)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
@@ -391,6 +391,12 @@ $ prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindTLS(flagSet)
+			flags.bindInsecure(flagSet)
+			flags.bindCacert(flagSet)
+			flags.bindCert(flagSet)
+			flags.bindKey(flagSet)
+			flags.bindServerName(flagSet)
 		},
 	}
 
