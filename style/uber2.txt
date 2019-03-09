@@ -38,20 +38,19 @@ x REQUEST_RESPONSE_TYPES_AFTER_SERVICE                           Verifies that r
 x REQUEST_RESPONSE_TYPES_IN_SAME_FILE                            Verifies that all request and response types are in the same file as their corresponding service and are not nested messages.
 x REQUEST_RESPONSE_TYPES_ONLY_IN_FILE                            Verifies that only request and response types are the only types in the same file as their corresponding service.
 x SYNTAX_PROTO3                                                  Verifies that the syntax is proto3.
+x MESSAGE_NAMES_CAMEL_CASE                                       Verifies that all non-extended message names are CamelCase.
+x MESSAGE_NAMES_CAPITALIZED                                      Verifies that all non-extended message names are Capitalized.
+x MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE                           Verifies that all message field names are lower_snake_case.
+x MESSAGE_FIELD_NAMES_NO_DESCRIPTOR                              Verifies that all message field names are not "descriptor", which results in a collision in Java-generated code.
+x MESSAGE_FIELD_NAMES_FILENAME                                   Verifies that all message field names do not contain "file_name" as "filename" should be used instead.
+x MESSAGE_FIELD_NAMES_FILEPATH                                   Verifies that all message field names do not contain "file_path" as "filepath" should be used instead.
+x WKT_DURATION_SUFFIX                                            Verifies that all google.protobuf.Duration field names are "duration" or end in "_duration".
+x WKT_TIMESTAMP_SUFFIX                                           Verifies that all google.protobuf.Timestamp field names are "time" or end in "_time".
+x MESSAGE_FIELDS_NO_JSON_NAME                                    Verifies that no message field has the "json_name" option set.
+x WKT_DIRECTLY_IMPORTED                                          Verifies that the Well-Known Types are directly imported using "google/protobuf/" as the base of the import.
+x ONEOF_NAMES_LOWER_SNAKE_CASE                                   Verifies that all oneof names are lower_snake_case.
 
 FIELDS_NOT_RESERVED                                            Verifies that no message or enum has a reserved field.
-WKT_DIRECTLY_IMPORTED                                          Verifies that the Well-Known Types are directly imported using "google/protobuf/" as the base of the import.
-
-MESSAGE_NAMES_CAMEL_CASE                                       Verifies that all non-extended message names are CamelCase.
-MESSAGE_NAMES_CAPITALIZED                                      Verifies that all non-extended message names are Capitalized.
-MESSAGE_FIELDS_NO_JSON_NAME                                    Verifies that no message field has the "json_name" option set.
-MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE                           Verifies that all message field names are lower_snake_case.
-MESSAGE_FIELD_NAMES_NO_DESCRIPTOR                              Verifies that all message field names are not "descriptor", which results in a collision in Java-generated code.
-MESSAGE_FIELD_NAMES_FILENAME                                   Verifies that all message field names do not contain "file_name" as "filename" should be used instead.
-MESSAGE_FIELD_NAMES_FILEPATH                                   Verifies that all message field names do not contain "file_path" as "filepath" should be used instead.
-WKT_DURATION_SUFFIX                                            Verifies that all google.protobuf.Duration field names are "duration" or end in "_duration".
-WKT_TIMESTAMP_SUFFIX                                           Verifies that all google.protobuf.Timestamp field names are "time" or end in "_time".
-ONEOF_NAMES_LOWER_SNAKE_CASE                                   Verifies that all oneof names are lower_snake_case.
 
 SERVICE_NAMES_API_SUFFIX                                       Verifies that all service names end with "API".
 SERVICE_NAMES_CAMEL_CASE                                       Verifies that all service names are CamelCase.

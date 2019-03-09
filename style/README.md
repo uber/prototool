@@ -14,6 +14,7 @@
   * [Messages](#messages)
     * [Message Fields](#message-fields)
     * [Oneofs](#oneofs)
+    * [Nested Messages](#nested-messages)
   * [Services](#services)
   * [RPCs](#rpcs)
     * [Streaming](#streaming)
@@ -458,13 +459,13 @@ file](https://github.com/protocolbuffers/protobuf/releases).
 
 ## Enums
 
+Enums should always be `PascalCase`. Enum values should be `UPPER_SNAKE_CASE`. The enum option
+`allow_aliases` should never be used.
+
 There are many cases when it's tempting to use a string or integer to represent a value that has a
 small, finite, and relatively static number of values. These values should almost always be
 represented as enums and not strings or integers. An enum value carries semantic meaning and there
 is no ability for incorrect values to be set.
-
-Enums should always be `PascalCase`. Enum values should be `UPPER_SNAKE_CASE`. The enum option
-`allow_aliases` should never be used.
 
 ### Enum Value Names
 
@@ -639,9 +640,43 @@ and there is no cost to having an enum be unnested.
 
 ## Messages
 
+Messages should always be `PascalCase`.
+
+Messages that will always contain a single field are strongly discouraged. Sometimes, it is
+tempting to use messages to confer type information.
+
+```proto
+// Do not do this.
+message VehicleID {
+  string value = 1;
+}
+```
+
+###### TODO Finish ######
+
 ### Message Fields
 
+Message field names should always be `lower_snake_case`.
+
+The built-in message field option `json_name` should never be used.
+
+The following additional naming rules apply.
+
+- Field names cannot contain `descriptor`. This causes a collision in Java-generated code.
+- Field names cannot contain `file_name`, instead using `filename`. This is just for consistency.
+- Field names cannot contain `file_path`, instead using `filepath`. This is just for consistency.
+- Fields of type `google.protobuf.Timestamp` should be named `time` or end in `_time`. For example,
+  `foo_time`.
+- Fields of type `google.protobuf.Duration` should be named `duration` or end in `_duration`. For
+  example, `foo_duration`.
+
 ### Oneofs
+
+Oneof names should always be `lower_snake_case`.
+
+###### TODO When to use oneofs ######
+
+### Nested Messages
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
