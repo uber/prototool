@@ -1,7 +1,7 @@
 # Prototool Docker Image
 
 We provide a Docker image with `prototool`, `protoc`, and common Protobuf plugins pre-installed.
-All plugins are compressed with [UPX](https://github.com/upx/upx). As of this writing, the resulting
+Most plugins are compressed with [UPX](https://github.com/upx/upx). As of this writing, the resulting
 image is around 79MB. This provides a consistent environment to generate your Protobuf stubs.
 
 This is in early development.
