@@ -523,7 +523,7 @@ func (r *runner) All(args []string, disableFormat, disableLint, fixFlag bool) er
 	return nil
 }
 
-func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, details bool) error {
+func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, details bool, tls bool, insecure bool, cacert string, cert string, key string, serverName string) error {
 	if address == "" {
 		return newExitErrorf(255, "must set address")
 	}
@@ -535,6 +535,15 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 	}
 	if data != "" && stdin {
 		return newExitErrorf(255, "must set only one of data or stdin")
+	}
+	if tls {
+		if insecure && (cacert != "" || cert != "" || key != "" || serverName != "") {
+			return newExitErrorf(255, "if insecure then cacert, cert, key, and server-name must not be specified")
+		} else if (cert != "") != (key != "") {
+			return newExitErrorf(255, "if cert is specified, key must be specified")
+		}
+	} else if insecure || cacert != "" || cert != "" || key != "" || serverName != "" {
+		return newExitErrorf(255, "tls must be specified if insecure, cacert, cert, key or server-name are specified")
 	}
 	reader := r.getInputReader(data, stdin)
 
@@ -587,6 +596,12 @@ func (r *runner) GRPC(args, headers []string, address, method, data, callTimeout
 		parsedConnectTimeout,
 		parsedKeepaliveTime,
 		details,
+		tls,
+		insecure,
+		cacert,
+		cert,
+		key,
+		serverName,
 	).Invoke(fileDescriptorSets.Unwrap(), address, method, reader, r.output)
 }
 
@@ -968,6 +983,12 @@ func (r *runner) newGRPCHandler(
 	connectTimeout time.Duration,
 	keepaliveTime time.Duration,
 	details bool,
+	tls bool,
+	insecure bool,
+	cacert string,
+	cert string,
+	key string,
+	serverName string,
 ) grpc.Handler {
 	handlerOptions := []grpc.HandlerOption{
 		grpc.HandlerWithLogger(r.logger),
@@ -986,6 +1007,9 @@ func (r *runner) newGRPCHandler(
 	}
 	if details {
 		handlerOptions = append(handlerOptions, grpc.HandlerWithDetails())
+	}
+	if tls {
+		handlerOptions = append(handlerOptions, grpc.HandlerWithTLS(insecure, cacert, cert, key, serverName))
 	}
 	return grpc.NewHandler(handlerOptions...)
 }

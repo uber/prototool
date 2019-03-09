@@ -28,6 +28,8 @@ type flags struct {
 	address           string
 	cachePath         string
 	callTimeout       string
+	cacert            string
+	cert              string
 	configData        string
 	connectTimeout    string
 	data              string
@@ -44,10 +46,12 @@ type flags struct {
 	fix               bool
 	gitBranch         string
 	headers           []string
+	insecure          bool
 	includeImports    bool
 	includeSourceInfo bool
 	json              bool
 	keepaliveTime     string
+	key               string
 	listAllLinters    bool
 	listLinters       bool
 	listAllLintGroups bool
@@ -55,13 +59,15 @@ type flags struct {
 	lintMode          bool
 	method            string
 	name              string
+	outputPath        string
 	overwrite         bool
 	pkg               string
 	protocBinPath     string
 	protocWKTPath     string
 	protocURL         string
-	outputPath        string
+	serverName        string
 	stdin             bool
+	tls               bool
 	tmp               bool
 	uncomment         bool
 }
@@ -224,4 +230,28 @@ func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindTmp(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.tmp, "tmp", false, "Write the FileDescriptorSet to a temporary file and print the file path instead of outputting to stdout.")
+}
+
+func (f *flags) bindTLS(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.tls, "tls", false, "Enable SSL/TLS connection to remote host.")
+}
+
+func (f *flags) bindInsecure(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.insecure, "insecure", false, "Disable host certificate validation for TLS connections. If set, --tls is required and --cert, --key, --cacert and --server-name must not be set.")
+}
+
+func (f *flags) bindCacert(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.cacert, "cacert", "", "File containing trusted root certificates for verifying the server. Can also be a file containing the public certificate of the server itself. If set, --tls is required.")
+}
+
+func (f *flags) bindCert(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.cert, "cert", "", "File containing client certificate (public key) in pem encoded format to present to the server for mutual TLS authentication. If set, --tls and --key is required.")
+}
+
+func (f *flags) bindKey(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.key, "key", "", "File containing client key (private key) in pem encoded format to use for mutual TLS authentication. If set, --tls and --cert is required.")
+}
+
+func (f *flags) bindServerName(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.serverName, "server-name", "", "Override expected server \"Common Name\" when validating TLS certificate. Should usually be set if using a HTTP proxy or an IP for the --address. If set, --tls is required.")
 }

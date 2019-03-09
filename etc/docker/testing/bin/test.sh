@@ -26,6 +26,17 @@ check_command_output() {
   fi
 }
 
+check_command_output_file() {
+  tmp_file="$(mktemp)"
+  trap 'rm -rf "${tmp_file}"' EXIT
+  echo "Checking that '${*:2}' results in the contents of '${1}'"
+  "${@:2}" > "${tmp_file}"
+  if ! diff "${1}" "${tmp_file}"; then
+    echo "Diff detected" >&2
+    exit 1
+  fi
+}
+
 
 check_command_success() {
   echo "Checking that '${*}' is successful"
@@ -46,7 +57,7 @@ check_dir_not_exists() {
 check_env GOGO_PROTOBUF_VERSION 1.2.1
 check_env GOLANG_PROTOBUF_VERSION 1.3.0
 check_env GRPC_VERSION 1.18.0
-check_env GRPC_GATEWAY_VERSION 1.8.1
+check_env GRPC_GATEWAY_VERSION 1.8.2
 check_env GRPC_WEB_VERSION 1.0.3
 check_env PROTOBUF_VERSION 3.6.1
 check_env TWIRP_VERSION 5.5.2
@@ -54,6 +65,7 @@ check_env YARPC_VERSION 1.36.2
 check_env PROTOTOOL_PROTOC_BIN_PATH /usr/bin/protoc
 check_env PROTOTOOL_PROTOC_WKT_PATH /usr/include
 check_command_output "libprotoc 3.6.1" protoc --version
+check_command_output_file etc/wkt.txt find /usr/include -type f
 check_which /usr/bin/protoc
 check_which /usr/bin/grpc_cpp_plugin
 check_which /usr/bin/grpc_csharp_plugin

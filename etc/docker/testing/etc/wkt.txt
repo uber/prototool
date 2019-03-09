@@ -1,0 +1,12 @@
+/usr/include/google/protobuf/duration.proto
+/usr/include/google/protobuf/empty.proto
+/usr/include/google/protobuf/descriptor.proto
+/usr/include/google/protobuf/any.proto
+/usr/include/google/protobuf/field_mask.proto
+/usr/include/google/protobuf/source_context.proto
+/usr/include/google/protobuf/struct.proto
+/usr/include/google/protobuf/timestamp.proto
+/usr/include/google/protobuf/type.proto
+/usr/include/google/protobuf/compiler/plugin.proto
+/usr/include/google/protobuf/api.proto
+/usr/include/google/protobuf/wrappers.proto
