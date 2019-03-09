@@ -12,7 +12,7 @@ RUN GO111MODULE=on go get \
   github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gogoslick@v${GOGO_PROTOBUF_VERSION} && \
-  cp /go/bin/protoc-gen-go* /usr/local/bin/
+  mv /go/bin/protoc-gen-go* /usr/local/bin/
 
 ENV GRPC_GATEWAY_VERSION=1.8.2
 RUN curl -sSL \
@@ -35,13 +35,13 @@ RUN git clone --depth 1 -b v${YARPC_VERSION} https://github.com/yarpc/yarpc-go.g
     cd /go/src/go.uber.org/yarpc && \
     GO111MODULE=on go mod init && \
     GO111MODULE=on go install ./encoding/protobuf/protoc-gen-yarpc-go && \
-    cp /go/bin/protoc-gen-yarpc-go /usr/local/bin/
+    mv /go/bin/protoc-gen-yarpc-go /usr/local/bin/
 
 ENV TWIRP_VERSION=5.5.2
 RUN git clone --depth 1 -b v${TWIRP_VERSION} https://github.com/twitchtv/twirp.git /go/src/github.com/twitchtv/twirp && \
   cd /go/src/github.com/twitchtv/twirp && \
   go install ./protoc-gen-twirp ./protoc-gen-twirp_python && \
-  cp /go/bin/protoc-gen-twirp* /usr/local/bin/
+  mv /go/bin/protoc-gen-twirp* /usr/local/bin/
 
 ENV PROTOBUF_VERSION=3.6.1
 RUN mkdir -p /tmp/protoc && \
@@ -50,7 +50,7 @@ RUN mkdir -p /tmp/protoc && \
   -o /tmp/protoc/protoc.zip && \
   cd /tmp/protoc && \
   unzip protoc.zip && \
-  cp -R /tmp/protoc/include /usr/local/include
+  mv /tmp/protoc/include /usr/local/include
 
 RUN mkdir -p /tmp/prototool
 COPY go.mod go.sum /tmp/prototool/
@@ -59,7 +59,7 @@ COPY cmd /tmp/prototool/cmd
 COPY internal /tmp/prototool/internal
 RUN cd /tmp/prototool && \
   go install ./cmd/prototool && \
-  cp /go/bin/prototool /usr/local/bin/prototool
+  mv /go/bin/prototool /usr/local/bin/prototool
 
 FROM alpine:edge
 
