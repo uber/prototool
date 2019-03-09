@@ -1,6 +1,6 @@
 FROM golang:1.12.0-alpine3.9 as builder
 
-RUN apk add --update --no-cache build-base curl git && \
+RUN apk add --update --no-cache build-base curl git upx && \
   rm -rf /var/cache/apk/*
 
 ENV GOLANG_PROTOBUF_VERSION=1.3.0 \
@@ -60,6 +60,8 @@ COPY internal /tmp/prototool/internal
 RUN cd /tmp/prototool && \
   go install ./cmd/prototool && \
   mv /go/bin/prototool /usr/local/bin/prototool
+
+RUN upx --lzma /usr/local/bin/*
 
 FROM alpine:edge
 
