@@ -46,7 +46,7 @@ check_dir_not_exists() {
 check_env GOGO_PROTOBUF_VERSION 1.2.1
 check_env GOLANG_PROTOBUF_VERSION 1.3.0
 check_env GRPC_VERSION 1.18.0
-check_env GRPC_GATEWAY_VERSION 1.8.1
+check_env GRPC_GATEWAY_VERSION 1.8.2
 check_env GRPC_WEB_VERSION 1.0.3
 check_env PROTOBUF_VERSION 3.6.1
 check_env TWIRP_VERSION 5.5.2
