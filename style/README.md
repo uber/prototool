@@ -598,9 +598,10 @@ Of special note: For the V1 Style Guide, enums had their nesting types prefixed 
 so in the above example you would have had `TRAFFIC_LIGHT_COLOR_INVALID`. This was dropped
 for the V2 Style Guide.
 
-While the above example is valid, it is not allowed to reference a `TrafficLight.Color` outside
-of the `TrafficLight` message. If you need to reference an enum outside of a message, instead do
-the following.
+While the above example is valid, you should not reference a `TrafficLight.Color` outside of the
+`TrafficLight` message as a matter of convention - if referencd outside of `TrafficLight`, the enum
+has meaning in other contexts, which means it should be top-level. If you need to reference an enum
+outside of a message, instead do the following.
 
 ```proto
 // A traffic light color.
@@ -677,6 +678,67 @@ Oneof names should always be `lower_snake_case`.
 ###### TODO When to use oneofs ######
 
 ### Nested Messages
+
+Nested messages are allowed, but **strongly discouraged.**
+
+While allowed, **a good general policy is to always use unnested messages.**
+
+Nested messages should not be referenced outside of their encapsulating message.
+
+The following is valid but discouraged.
+
+```proto
+// A Vehicle.
+//
+// Discouraged.
+message Vehicle {
+  // A vehicle type.
+  message Type {
+    // Should probably be an enum.
+    string make = 1;
+    string model = 2;
+    uint32 year = 3;
+  }
+  string id = 1;
+  Type type = 2;
+}
+```
+
+While the above example is valid, you should not reference a `Vehicle.Type` outside of the
+`Vehicle` message as a matter of convention - if referencd outside of `Vehicle`, the message has
+meaning in other contexts, which means it should be top-level. If you need to reference a message
+outside of a message, instead do the following.
+
+```proto
+// A vehicle type.
+message VehicleType {
+  // Should probably be an enum.
+  string make = 1;
+  string model = 2;
+  uint32 year = 3;
+}
+
+// A vehicle.
+message Vehicle {
+  string id = 1;
+  VehicleType type = 2;
+}
+```
+
+Only use nested messages when you are sure that for the lifetime of your API, the message value
+will not be used outside of the message. In the above example, there could easily be situations
+where we want to reference `VehicleType` in other messages in the future.
+
+```proto
+// Statistics on a vehicle type.
+message VehicleTypeStats {
+  VehicleType vehicle_type = 1;
+  uint64 number_made = 2;
+}
+```
+
+In most cases, you cannot be sure that you will never want to use a message in another message,
+and there is no cost to having a message be unnested.
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
