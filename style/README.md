@@ -8,6 +8,7 @@
   * [Syntax](#syntax)
   * [File Options](#file-options)
   * [Imports](#imports)
+  * [Reserved Keyword](#reserved-keyword)
   * [Enums](#enums)
     * [Enum Value Names](#enum-value-names)
     * [Nested Enums](#nested-enums)
@@ -456,6 +457,74 @@ and are also included in the `include` directory of each [Protobuf Releases ZIP
 file](https://github.com/protocolbuffers/protobuf/releases).
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
+## Reserved Keyword
+
+Do not use the `reserved` keyword in messages or enums. Instead, rely on the `deprecated` option.
+
+The following is an example of what not to do.
+
+```proto
+// A user.
+message User {
+  // Do not do this.
+  reserved 2, 4;
+  reserved "first_name", "middle_names"
+
+  string id = 1;
+  string last_name = 3;
+  repeated string first_names = 4;
+}
+
+// The type of the trip.
+enum TripType {
+  // Do not do this.
+  reserved 2;
+  reserved "TRIP_TYPE_POOL";
+
+  TRIP_TYPE_INVALID = 0;
+  TRIP_TYPE_UBERX = 1;
+  TRIP_TYPE_UBER_POOL = 3;
+}
+```
+
+Instead, do the following.
+
+```proto
+// A user.
+message User {
+  string id = 1;
+  string last_name = 3;
+  repeated string first_names = 5;
+
+  string first_name = 2 [deprecated = true];
+  repeated string middle_names = 4 [deprecated = true];
+}
+
+// The type of the trip.
+enum TripType {
+  TRIP_TYPE_INVALID = 0;
+  TRIP_TYPE_UBERX = 1;
+  TRIP_TYPE_UBER_POOL = 3;
+
+  TRIP_TYPE_POOL = 2 [deprecated = true];
+}
+```
+
+By far the most important reason to use `deprecated` instead of `reserved` is that while not a wire
+breaking change, deleting a field or enum value is a source code breaking change. This will result
+in code that does not compile, which we take a strong stance against, including in Prototool's
+breaking change detector. Your API as a whole should not need semantic versioning - one of the core
+promises of Protobuf is forwards and backwards compatibility, and this should extend to your
+code as well. This is especially true if your Protobuf definitions are used across multiple
+repositories, and even if you have a single monorepo for your entire organization, any external
+customers who use your Protobuf definitions should not be broken either.
+
+As of proto3, JSON is also a first-class citizen with respect to Protobuf, and JSON serialization
+of Protobuf types uses field names, not tags. This means that if you have JSON consumers, re-using
+the same field name is a breaking change. Therefore, when removing a field, if you ever use JSON
+or ever could use JSON, you must reserve both the tag and the field name, as done in the above
+bad example. If you have to reserve these, it is easier and cleaner to just deprecate the field.
 
 ## Enums
 
