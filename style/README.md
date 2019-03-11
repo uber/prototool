@@ -1047,6 +1047,43 @@ messages.
 
 ### Streaming
 
+Streaming RPCs are allowed, but **strongly discouraged**.
+
+Streaming RPCs seem enticing at first, but they push RPC framework concerns to the application
+level, which results in inconsistent implementations and behavior, which results in lower
+reliability. It is rare that a problem solved by streaming cannot be solved in a unary manner.
+
+Spencer Nelson wrote a great summary of the issues with streaming RPCs in
+[this GitHub Issue comment](https://github.com/twitchtv/twirp/issues/70#issuecomment-470367807),
+which we paraphrase here:
+
+Unary calls, while limiting, prevent many problems being created if you only give unary RPC
+capabilities to an inexperienced developer as part of your tool kit. While you can make mistakes in
+API design and message design, those mistakes stay local, they largely aren't architectural or
+infrastructural.
+
+Streams are different. They imply expectations about how connection state is managed. Load
+balancing them is really hard, which means that a decision to use streams for an API has
+ramifications that ripple out to the infrastructure of a system.
+
+How plausible is it that users trip on that pothole? Unfortunately, it is quite likely. Streaming
+is the sort of feature whose downsides can be hard to see at first. "Lower latency and the ability
+to push data to the client? Sign me up!" But people could easily reach for it too early in order
+to future-proof their APIs, "just in case we need streams later," and walk themselves into an
+architectural hole which is very difficult to get out of.
+
+Most simple streaming RPCs can be implemented in terms of request-response RPCs, so long as they
+don't have extreme demands on latency or number of open connections (although HTTP/2 request
+multiplexing mostly resolves those issues anyway). Pagination and polling are the obvious tools
+here, but even algorithms like rsync are surprisingly straightforward to implement in a
+request/response fashion, and probably more efficient than you think if you're using HTTP/2,
+since the transport is streaming anyway.
+
+Sometimes you really do need streams for your system, like if you are replicating a data stream.
+Nothing else is really going to work, there. But Protobuf APIs do not need to be all things for all
+use-cases. There is room for specialized solutions, but streams are a special thing, and they have
+resounding architectural impact.
+
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
 ## Naming
