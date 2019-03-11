@@ -109,6 +109,7 @@ var (
 		packagesSameInDirLinter,
 		rpcsHaveCommentsLinter,
 		rpcsHaveSentenceCommentsLinter,
+		rpcsNoStreamingLinter,
 		rpcNamesCamelCaseLinter,
 		rpcNamesCapitalizedLinter,
 		rpcOptionsNoGoogleAPIHTTPLinter,
