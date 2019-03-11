@@ -6,7 +6,7 @@ Prototool lets you:
 
 - Handle installation of `protoc` and the import of all of the Well-Known Types behind the scenes in a platform-independent manner without any work on the part of the user.
 - Standardize building of your Protobuf files with a common [configuration](#configuration), abstracting away all of the pain of protoc for you.
-- [Lint](#prototool-lint) your Protobuf files with common linting rules according to [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style), [Uber's V1 Style Guide](https://github.com/uber/prototool/blob/dev/etc/style/uber1/uber1.proto), or your own set of configured lint rules.
+- [Lint](#prototool-lint) your Protobuf files with common linting rules according to [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style), [Uber's V1 Style Guide](https://github.com/uber/prototool/blob/dev/etc/style/uber1/uber1.proto), [Uber's V2 Style Guide](style/README.md), or your own set of configured lint rules.
 - [Format](#prototool-format) your Protobuf files in a consistent manner.
 - [Create](#prototool-create) Protobuf files from a template that passes lint, taking care of package naming for you.
 - [Generate](#prototool-generate) stubs using any plugin based on a simple configuration file, including handling imports of all the Well-Known Types.
@@ -157,7 +157,7 @@ There are three pre-configured groups of rules: `google`, `uber1`, and `uber2`.
 Format a Protobuf file and print the formatted file to stdout. There are flags to perform different actions:
 
 - `-d` Write a diff instead.
-- `-f` Fix the file according to the Style Guide.
+- `-f` Fix the file according to the Style Guide. This will have different behavior if the `uber2` lint group is set.
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
 

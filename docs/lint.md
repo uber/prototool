@@ -6,7 +6,7 @@ Lint rules can be set using the configuration file. See the configuration at [et
 
 - `google`: This lint group follows the Style Guide at https://developers.google.com/protocol-buffers/docs/style. This is a small group of rules meant to enforce basic naming, and is widely followed. The style guide is copied to [etc/style/google/google.proto](../etc/style/google/google.proto).
 - `uber1`: This lint group follows the V1 Style Guide at [etc/style/uber1/uber1.proto](../etc/style/uber1/uber1.proto). This is a very strict rule group and is meant to enforce consistent development patterns.
-- `uber2`: This lint group is the V2 Style Guide, and makes some modifcations to more closely follow the Google Cloud APIs file
+- `uber2`: This lint group follows the [V2 Style Guide](../style/README.md), and makes some modifcations to more closely follow the Google Cloud APIs file
   structure, as well as adding even more rules to enforce more consistent development patterns. This lint group is under development.
 
 To see the differences between lint groups, use the `--diff-lint-groups` flag:
