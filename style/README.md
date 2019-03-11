@@ -719,13 +719,72 @@ The following is an example of what not to do.
 
 ```proto
 // Do not do this.
-message CommonVehicleFields {
+message CommonFields {
   string id = 1;
+  google.protobuf.Timestamp updated_time = 2;
+}
 
+// Do not do this.
+message Vehicle {
+  CommonVehicleFields common_fields = 1;
+  string vin = 2;
+}
+
+// Do not do this.
+message User {
+  CommonFields common_fields = 1;
+  string name = 2;
 }
 ```
 
-##### TODO Finish #####
+This is commonly done to simplify server-side implementations of Protobuf APIs. There are sometimes
+operations you want to do on request types that require a common set of fields, so it seems to make
+sense to group them as messages in your Protobuf schema.
+
+You should optimize your Protobuf schema for the simplicity and semantic value of the API, not for
+for your server-side implementations. `CommonFields` has no semantic meaning - it's a
+pair of a couple fields that are part of messages that do have semantic meaning. A user of your
+API does not care that these fields are common, they only care what a `Vehicle` is, and what
+a `User` is. Thinking of this as JSON, the following has no meaning.
+
+```json
+{
+  "common_fields": {
+    "id": "asdvasd",
+    "updated_time": "timestamp",
+  },
+  "vin": "asdvasdv"
+}
+```
+
+The key `common_fields` has no meaning, `id` and `updated_time` are fields of a vehicle. Therefore,
+the following is what you would want as a consumer of the API:
+
+```json
+{
+  "id": "asdvasd",
+  "updated_time": "timestamp",
+  "vin": "asdvasdv"
+}
+```
+
+In our example, you would copy the fields between `Vehicle` and `User`.
+
+```proto
+// A vehicle.
+message Vehicle {
+  string id = 1;
+  google.protobuf.Timestamp updated_time = 2;
+  string vin = 3;
+}
+
+// A user.
+message User {
+  string id = 1;
+  google.protobuf.Timestamp updated_time = 2;
+  string name = 3;
+}
+```
 
 Messages that will always contain a single field are strongly discouraged. Sometimes, it is
 tempting to use messages to confer type information.

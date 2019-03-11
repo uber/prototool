@@ -49,8 +49,7 @@ x WKT_TIMESTAMP_SUFFIX                                           Verifies that a
 x MESSAGE_FIELDS_NO_JSON_NAME                                    Verifies that no message field has the "json_name" option set.
 x WKT_DIRECTLY_IMPORTED                                          Verifies that the Well-Known Types are directly imported using "google/protobuf/" as the base of the import.
 x ONEOF_NAMES_LOWER_SNAKE_CASE                                   Verifies that all oneof names are lower_snake_case.
-
-FIELDS_NOT_RESERVED                                            Verifies that no message or enum has a reserved field.
+x FIELDS_NOT_RESERVED                                            Verifies that no message or enum has a reserved field.
 
 SERVICE_NAMES_API_SUFFIX                                       Verifies that all service names end with "API".
 SERVICE_NAMES_CAMEL_CASE                                       Verifies that all service names are CamelCase.
