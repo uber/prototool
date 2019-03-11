@@ -19,6 +19,7 @@
   * [Services](#services)
   * [RPCs](#rpcs)
     * [Streaming](#streaming)
+    * [HTTP Annotations](#http-annotations)
   * [Naming](#naming)
   * [Documentation](#documentation)
 
@@ -52,6 +53,8 @@ that are incompatible.
 We call out these differences below. Even if you are primarily using the V1 Style Guide, we still
 recommend you follow the remainder of the rules in the V2 Style Guide, although they will not
 be enforced by Prototool unless the `uber2` lint group is set.
+
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
 ## Package Naming
 
@@ -526,6 +529,8 @@ the same field name is a breaking change. Therefore, when removing a field, if y
 or ever could use JSON, you must reserve both the tag and the field name, as done in the above
 bad example. If you have to reserve these, it is easier and cleaner to just deprecate the field.
 
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
 ## Enums
 
 Enums should always be `PascalCase`. Enum values should be `UPPER_SNAKE_CASE`. The enum option
@@ -538,6 +543,8 @@ There are many cases when it's tempting to use a string or integer to represent 
 small, finite, and relatively static number of values. These values should almost always be
 represented as enums and not strings or integers. An enum value carries semantic meaning and there
 is no ability for incorrect values to be set.
+
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
 ### Enum Value Names
 
@@ -635,6 +642,8 @@ It's tempting to use `UNSET` as a default value, but then again we risk the case
 forgetting to set the value and it being interpreted as the intentional value `UNSET`. For
 consistency across our enums, if `UNSET` is a semantic value of your enum, it should have the
 value 1.
+
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
 ### Nested Enums
 
@@ -873,6 +882,8 @@ As compared to:
 If a message will always be a single value, prefer that single value for fields. You will thank us
 later.
 
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
 ### Message Fields
 
 Message field names should always be `lower_snake_case`.
@@ -907,9 +918,13 @@ The following additional naming rules apply.
 - Fields of type `google.protobuf.Duration` should be named `duration` or end in `_duration`. For
   example, `foo_duration`.
 
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
 ### Oneofs
 
 Oneof names should always be `lower_snake_case`.
+
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
 ### Nested Messages
 
@@ -1045,9 +1060,21 @@ message ListUserTripsResponse {
 Note that request and response types do not need documentation comments, as opposed to all other
 messages.
 
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
 ### Streaming
 
 Streaming RPCs are allowed, but **strongly discouraged**.
+
+If you'd like to enforce this, add the following to your `prototool.yaml`.
+
+```yaml
+lint:
+  group: uber2
+  rules:
+    add:
+      - RPCS_NO_STREAMING
+```
 
 Streaming RPCs seem enticing at first, but they push RPC framework concerns to the application
 level, which results in inconsistent implementations and behavior, which results in lower
@@ -1083,6 +1110,28 @@ Sometimes you really do need streams for your system, like if you are replicatin
 Nothing else is really going to work, there. But Protobuf APIs do not need to be all things for all
 use-cases. There is room for specialized solutions, but streams are a special thing, and they have
 resounding architectural impact.
+
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
+### HTTP Annotations
+
+[HTTP annotations](https://github.com/googleapis/googleapis/blob/master/google/api/annotations.proto)
+for use with libraries such as [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)
+are allowed, but **strongly discouraged**.
+
+If you'd like to enforce this, add the following to your `prototool.yaml`.
+
+```yaml
+lint:
+  group: uber2
+  rules:
+    add:
+      - RPC_OPTIONS_NO_GOOGLE_API_HTTP
+```
+
+HTTP annotations provide an alternative call path for RPCs that is not structured per the main
+Protobuf schema. One of the benefits of Protobuf is having this structure, and generated clients
+which properly call each endpoint.
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
