@@ -829,18 +829,18 @@ also explodes.
 
 ```json
 {
-  id: {
-    value: "sdfvsavassava"
+  "id": {
+    "value": "sdfvsavassava"
   },
-  first_name: {
-    value: "John"
+  "first_name": {
+    "value": "John"
   },
-  last_name: {
-    value: "Smith"
+  "last_name": {
+    "value": "Smith"
   },
-  middle_names: [
+  "middle_names": [
     {
-      value: "Foo"
+      "value": "Foo"
     },
     {
       "value": "Bar"
@@ -853,10 +853,10 @@ As compared to:
 
 ```json
 {
-  id: "sdfvsavassava",
-  first_name: "John",
-  last_name: "Smith",
-  middle_names: [
+  "id": "sdfvsavassava",
+  "first_name": "John",
+  "last_name": "Smith",
+  "middle_names": [
     "Foo",
     "Bar"
   ]

@@ -13,7 +13,11 @@ option php_namespace = "Uber\\User\\V1";
 // A user.
 message User {
   string id = 1;
-  string first_name = 2;
   string last_name = 3;
-  repeated string middle_names = 4;
+  string first_names = 5;
+
+  // Deprecated: use first_names instead.
+  string first_name = 2 [deprecated = true];
+  // Deprecated: use first_names instead.
+  repeated string middle_names = 4 [deprecated = true];
 }
