@@ -712,6 +712,21 @@ and there is no cost to having an enum be unnested.
 
 Messages should always be `PascalCase`.
 
+Messages should be used to represent logical entities that have semantic meaning. They should not
+be used to group common fields that carry no meaning themselves.
+
+The following is an example of what not to do.
+
+```proto
+// Do not do this.
+message CommonVehicleFields {
+  string id = 1;
+
+}
+```
+
+##### TODO Finish #####
+
 Messages that will always contain a single field are strongly discouraged. Sometimes, it is
 tempting to use messages to confer type information.
 
@@ -722,7 +737,75 @@ message VehicleID {
 }
 ```
 
-###### TODO Finish ######
+The above is generally done because Protobuf happens to generate specific struct or class types in
+each language, and therefore have semantic meaning. However, this is not how Protobuf values are
+intended to be typed, and this can explode in a myriad of ways. To be consistent in our User
+example, we would need to do the following.
+
+```proto
+// Do not do this.
+message UserID {
+  string value = 1;
+}
+
+// Do not do this.
+message Name {
+  string value = 1;
+}
+
+// Do not do this.
+message User {
+  UserID id = 1;
+  Name first_name = 2;
+  Name last_name = 3;
+  repeated Name middle_names = 4;
+}
+```
+
+When taken further, this becomes nightmarish to work with both in terms of internal
+implementations, and from an API standpoint. The code in most languages will require
+so many Builders or struct initializations just to set single values that it becomes
+extremely tedious to iterate on an API. While less important, the JSON structure
+also explodes.
+
+```json
+{
+  id: {
+    value: "sdfvsavassava"
+  },
+  first_name: {
+    value: "John"
+  },
+  last_name: {
+    value: "Smith"
+  },
+  middle_names: [
+    {
+      value: "Foo"
+    },
+    {
+      "value": "Bar"
+    }
+  ]
+}
+```
+
+As compared to:
+
+```json
+{
+  id: "sdfvsavassava",
+  first_name: "John",
+  last_name: "Smith",
+  middle_names: [
+    "Foo",
+    "Bar"
+  ]
+}
+```
+
+If a message will always be a single value, prefer that single value for fields. You will thank us
+later.
 
 ### Message Fields
 
