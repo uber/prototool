@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package uber.trip.v1;
+
+option csharp_namespace = "Uber.Trip.V1";
+option go_package = "tripv1";
+option java_multiple_files = true;
+option java_outer_classname = "TripApiProto";
+option java_package = "com.uber.trip.v1";
+option objc_class_prefix = "UTX";
+option php_namespace = "Uber\\Trip\\V1";
+
+import "uber/trip/v1/trip.proto";
+import "google/protobuf/timestamp.proto";
+
+// Handles interaction with trips.
+service TripAPI {
+  // Get the trip specified by the ID.
+  rpc GetTrip(GetTripRequest) returns (GetTripResponse);
+  // List the trips for the given user before a given time.
+  //
+  // If the start index is beyond the end of the available number
+  // of trips, an empty list of trips will be returned.
+  // If the start index plus the size is beyond the available number
+  // of trips, only the number of available trips will be returned.
+  rpc ListUserTrips(ListUserTripsRequest) returns (ListUserTripsResponse);
+}
+
+message GetTripRequest {
+  string id = 1;
+}
+
+message GetTripResponse {
+  Trip trip = 1;
+}
+
+message ListUserTripsRequest {
+  string user_id = 1;
+  google.protobuf.Timestamp before_time = 2;
+  // The start index for pagination.
+  uint64 start = 3;
+  // The maximum number of trips to return.
+  uint64 max_size = 4;
+}
+
+message ListUserTripsResponse {
+  repeated Trip trips = 1;
+  // True if more trips are available.
+  bool next = 2;
+}

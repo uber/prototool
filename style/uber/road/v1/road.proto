@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package uber.road.v1;
+
+option csharp_namespace = "Uber.Road.V1";
+option go_package = "roadv1";
+option java_multiple_files = true;
+option java_outer_classname = "RoadProto";
+option java_package = "com.uber.road.v1";
+option objc_class_prefix = "URX";
+option php_namespace = "Uber\\Road\\V1";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+// A traffic light color.
+enum TrafficLightColor {
+  TRAFFIC_LIGHT_COLOR_INVALID = 0;
+  TRAFFIC_LIGHT_COLOR_UNSET = 1;
+  TRAFFIC_LIGHT_COLOR_GREEN = 2;
+  TRAFFIC_LIGHT_COLOR_YELLOW = 3;
+  TRAFFIC_LIGHT_COLOR_RED = 4;
+}
+
+// A traffic light.
+message TrafficLight {
+  string id = 1;
+  TrafficLightColor current_color = 2;
+}
+
+// Statistics on a traffic light color.
+message TrafficLightColorStats {
+  string traffic_light_id = 1;
+  TrafficLightColor traffic_light_color = 2;
+  google.protobuf.Timestamp last_active_time = 3;
+  google.protobuf.Duration total_duration = 4;
+}

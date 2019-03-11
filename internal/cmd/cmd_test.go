@@ -165,6 +165,12 @@ func TestLint(t *testing.T) {
 	)
 	assertDoLintFile(
 		t,
+		true,
+		"",
+		"../../style",
+	)
+	assertDoLintFile(
+		t,
 		false,
 		"1:1:SYNTAX_PROTO3",
 		"testdata/lint/syntaxproto2/syntax_proto2.proto",
