@@ -1,6 +1,7 @@
 # Uber Protobuf Style Guide V2
 
   * [V1 versus V2 Style Guides](#v1-versus-v2-style-guides)
+  * [Spacing](#spacing)
   * [Package Naming](#package-naming)
   * [Package Versioning](#package-versioning)
   * [Directory Structure](#directory-structure)
@@ -53,6 +54,12 @@ that are incompatible.
 We call out these differences below. Even if you are primarily using the V1 Style Guide, we still
 recommend you follow the remainder of the rules in the V2 Style Guide, although they will not
 be enforced by Prototool unless the `uber2` lint group is set.
+
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
+## Spacing
+
+Use two spaces instead of tabs. There are many schools of thought here, this is the one we chose.
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
@@ -1152,5 +1159,52 @@ capitalization.
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
 ## Documentation
+
+All comments should use `//` and not `/* */`. This is for consistency.
+
+Comments should never be inline, instead always being above the type.
+
+```proto
+// A foo. Note that "A Foo." is a complete sentence as we define it.
+message Vehicle {
+  // Comment here.
+  string id = 1; // Do not do inline comments.
+}
+```
+
+While not enforced, aim for a 120 character maximum length for comments.
+
+You must document your messages, enums, services, and RPCs. These types require at least
+one complete sentence, represented as starting with a capital letter and ending with a period.
+
+The following are some general recommendations.
+
+**Message Documentation**
+
+Description of message. Consider including:
+- Assumptions and requirements (e.g. "This polygon must have its points in a counter-clockwise order.").
+
+**Message Field Documentation**
+
+Description of field. Not required, but recommended. Consider including:
+- Assumptions and requirements.
+- What happens when the field is left blank. Does it default to a specific value or throw an invalid argument error?
+
+**Service Documentation**
+
+Explanation of what the service is intended to do/not do. Consider including:
+
+- Advantage or use cases.
+- Related services (mark with the `@see` annotation).
+
+**RPC Documentation**
+
+Explanation of what the RPC is intended to do/not do. Consider including:
+
+- Advantages or use cases (e.g."Useful when you want to send large volumes and don't care about latency.").
+- Side effects (e.g."If a feature with this ID already exists, this method will overwrite it.").
+- Performance considerations (e.g."Sending your data in chunks of X size is more efficient.").
+- Pre-requisites (e.g. "You must complete registration using the X method before calling this one.").
+- Post-requisites (e.g. "Clean up the registered resource after use to free up resources.").
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
