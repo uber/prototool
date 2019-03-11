@@ -870,6 +870,24 @@ later.
 
 Message field names should always be `lower_snake_case`.
 
+While there is no enforcement of this, we recommend that message field names match their type in
+lieu of a name that makes more sense. The following is an example of this pattern.
+
+```proto
+// A vehicle
+message VehicleState {
+  string vehicle_id = 1;
+  // The field name matches the type PositionEstimate.
+  PositionEstimate position_estimate = 2;
+  // The field name is the plural of the type VehicleFeature.
+  repeated VehicleFeature vehicle_features = 3;
+  // The map is from key type to value type.
+  map<string, Order> order_id_to_order = 4;
+  // Timestamps are the exception, see below.
+  google.protobuf.Timestmp time = 5;
+}
+```
+
 The built-in message field option `json_name` should never be used.
 
 The following additional naming rules apply.
@@ -932,7 +950,7 @@ message VehicleType {
 // A vehicle.
 message Vehicle {
   string id = 1;
-  VehicleType type = 2;
+  VehicleType vehicle_type = 2;
 }
 ```
 
