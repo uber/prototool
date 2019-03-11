@@ -62,6 +62,7 @@ go_library(
         "check_rpc_options_no_google_api_http.go",
         "check_rpcs_have_comments.go",
         "check_rpcs_have_sentence_comments.go",
+        "check_rpcs_no_streaming.go",
         "check_service_names_api_suffix.go",
         "check_service_names_camel_case.go",
         "check_service_names_capitalized.go",

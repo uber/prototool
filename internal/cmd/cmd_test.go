@@ -564,6 +564,15 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`15:3:RPCS_NO_STREAMING
+		16:3:RPCS_NO_STREAMING
+		17:3:RPCS_NO_STREAMING`,
+		"testdata/lint/nostreaming/foo/v1/hello_api.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`10:1:GOGO_NOT_IMPORTED`,
 		"testdata/lint/gogonotimported/gogonotimported.proto",
 	)
