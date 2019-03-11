@@ -531,6 +531,9 @@ bad example. If you have to reserve these, it is easier and cleaner to just depr
 Enums should always be `PascalCase`. Enum values should be `UPPER_SNAKE_CASE`. The enum option
 `allow_aliases` should never be used.
 
+All enums require a comment that contains at least one complete sentence. See the
+[Documentation](#documentation) section for more details.
+
 There are many cases when it's tempting to use a string or integer to represent a value that has a
 small, finite, and relatively static number of values. These values should almost always be
 represented as enums and not strings or integers. An enum value carries semantic meaning and there
@@ -711,6 +714,10 @@ and there is no cost to having an enum be unnested.
 ## Messages
 
 Messages should always be `PascalCase`.
+
+All messages require a comment that contains at least one complete sentence, with the exception of
+request and response messages as described in the [Services](#services) section. See the
+[Documentation](#documentation) section for more details.
 
 Messages should be used to represent logical entities that have semantic meaning. They should not
 be used to group common fields that carry no meaning themselves.
@@ -904,8 +911,6 @@ The following additional naming rules apply.
 
 Oneof names should always be `lower_snake_case`.
 
-###### TODO When to use oneofs ######
-
 ### Nested Messages
 
 Nested messages are allowed, but **strongly discouraged.**
@@ -973,9 +978,72 @@ and there is no cost to having a message be unnested.
 
 ## Services
 
-**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+Services should always be `PascalCase`. RPCs should always be `PascalCase.`
 
-## RPCs
+Services should always be suffixed with `API`. For example, `TripAPI` or `UserAPI. This is for
+consistency.
+
+All services and RPCs require a comment that contains at least one complete sentence. See the
+[Documentation](#documentation) section for more details.
+
+Please read the above [File Structure](#file-structure) section carefully. Each service should
+be in it's own file named after the service. For example, `TripAPI` should be in a file named
+`trip_api.proto`.
+
+Every RPC request and response should be unique to the RPC, and named after the RPC. As per the
+[File Structure](#file-structure) section, the request and response messages should be in the
+same file as the service, underneath the service definition and in order of the RPCs defined
+in the service.
+
+The unique request/response requirement is compatibility as you iterate your RPC definitions. If
+one were to use the same request or response message for different RPCs, and then need to add or
+want to deprecate a field, each RPC that uses this request and response message would be affected,
+regardless of whether or not the new field applied to each RPC, or whether the deprecated field
+was deprecated for each RPC. While this pattern can cause some duplication, it's become the "gold
+standard" for Protobuf APIs.
+
+The following is an example of such a pattern.
+
+```proto
+// Handles interaction with trips.
+service TripAPI {
+  // Get the trip specified by the ID.
+  rpc GetTrip(GetTripRequest) returns (GetTripResponse);
+  // List the trips for the given user before a given time.
+  //
+  // If the start index is beyond the end of the available number
+  // of trips, an empty list of trips will be returned.
+  // If the start index plus the size is beyond the available number
+  // of trips, only the number of available trips will be returned.
+  rpc ListUserTrips(ListUserTripsRequest) returns (ListUserTripsResponse);
+}
+
+message GetTripRequest {
+  string id = 1;
+}
+
+message GetTripResponse {
+  Trip trip = 1;
+}
+
+message ListUserTripsRequest {
+  string user_id = 1;
+  google.protobuf.Timestamp before_time = 2;
+  // The start index for pagination.
+  uint64 start = 3;
+  // The maximum number of trips to return.
+  uint64 max_size = 4;
+}
+
+message ListUserTripsResponse {
+  repeated Trip trips = 1;
+  // True if more trips are available.
+  bool next = 2;
+}
+```
+
+Note that request and response types do not need documentation comments, as opposed to all other
+messages.
 
 ### Streaming
 

@@ -50,15 +50,14 @@ x MESSAGE_FIELDS_NO_JSON_NAME                                    Verifies that n
 x WKT_DIRECTLY_IMPORTED                                          Verifies that the Well-Known Types are directly imported using "google/protobuf/" as the base of the import.
 x ONEOF_NAMES_LOWER_SNAKE_CASE                                   Verifies that all oneof names are lower_snake_case.
 x FIELDS_NOT_RESERVED                                            Verifies that no message or enum has a reserved field.
-
-SERVICE_NAMES_API_SUFFIX                                       Verifies that all service names end with "API".
-SERVICE_NAMES_CAMEL_CASE                                       Verifies that all service names are CamelCase.
-SERVICE_NAMES_CAPITALIZED                                      Verifies that all service names are Capitalized.
-SERVICE_NAMES_MATCH_FILE_NAME                                  Verifies that there is one service per file and the file name is service_name_lower_snake_case.proto.
-RPC_NAMES_CAMEL_CASE                                           Verifies that all RPC names are CamelCase.
-RPC_NAMES_CAPITALIZED                                          Verifies that all RPC names are Capitalized.
-REQUEST_RESPONSE_NAMES_MATCH_RPC                               Verifies that all request names are RpcNameRequest and all response names are RpcNameResponse.
-REQUEST_RESPONSE_TYPES_UNIQUE                                  Verifies that all request and response types are unique to each RPC.
+x SERVICE_NAMES_API_SUFFIX                                       Verifies that all service names end with "API".
+x SERVICE_NAMES_CAMEL_CASE                                       Verifies that all service names are CamelCase.
+x SERVICE_NAMES_CAPITALIZED                                      Verifies that all service names are Capitalized.
+x SERVICE_NAMES_MATCH_FILE_NAME                                  Verifies that there is one service per file and the file name is service_name_lower_snake_case.proto.
+x RPC_NAMES_CAMEL_CASE                                           Verifies that all RPC names are CamelCase.
+x RPC_NAMES_CAPITALIZED                                          Verifies that all RPC names are Capitalized.
+x REQUEST_RESPONSE_NAMES_MATCH_RPC                               Verifies that all request names are RpcNameRequest and all response names are RpcNameResponse.
+x REQUEST_RESPONSE_TYPES_UNIQUE                                  Verifies that all request and response types are unique to each RPC.
 
 NAMES_NO_COMMON                                                Verifies that no type name contains the word "common".
 NAMES_NO_DATA                                                  Verifies that no type name contains the word "data".
