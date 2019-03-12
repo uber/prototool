@@ -1,5 +1,4 @@
-Release Process
-===============
+# Release Process
 
 This document outlines how to create a release of prototool.
 
