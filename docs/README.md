@@ -235,6 +235,8 @@ Before submitting a PR, make sure to:
 
 The entire implementation is purposefully under the `internal` package to not expose any API for the time being.
 
+For maintainers: See [release.md](release.md) for the release process.
+
 ## FAQ
 
 ##### Pre-Cache Protoc
