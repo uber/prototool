@@ -24,6 +24,7 @@
 /internal/cmd/testdata/create/version2three/baz.proto
 /internal/cmd/testdata/create/version2four/baz.proto
 /internal/cmd/testdata/create/version2five/baz.proto
+/internal/cmd/testdata/generate/descriptorset/descriptorset.bin
 /main
 /prototool.iml
 /release
