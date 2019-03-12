@@ -1579,6 +1579,18 @@ func TestDiffLintGroups(t *testing.T) {
 	)
 }
 
+func TestGenerateDescriptorSetSameDirAsConfigFile(t *testing.T) {
+	// https://github.com/uber/prototool/issues/389
+	generatedFilePath := "testdata/generate/descriptorset/descriptorset.bin"
+	if _, err := os.Stat(generatedFilePath); err == nil {
+		assert.NoError(t, os.Remove(generatedFilePath))
+	}
+	_, exitCode := testDo(t, false, "generate", filepath.Dir(generatedFilePath))
+	assert.Equal(t, 0, exitCode)
+	_, err := os.Stat(generatedFilePath)
+	assert.NoError(t, err)
+}
+
 func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
 	linterIDs := make([]string, 0, len(linters))
 	for _, linter := range linters {

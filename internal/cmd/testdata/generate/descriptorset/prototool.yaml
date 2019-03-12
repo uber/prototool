@@ -1,0 +1,7 @@
+lint:
+  group: uber2
+generate:
+  plugins:
+    - name: descriptor_set
+      file_suffix: bin
+      output: .
