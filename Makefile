@@ -213,7 +213,7 @@ bazelbuild: $(BAZEL)
 	bazel build //...:all
 
 .PHONY: releasegen
-releasegen: internalgen
+releasegen: all
 	docker run \
 		--volume "$(CURDIR):/app" \
 		--workdir "/app" \
