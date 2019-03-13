@@ -1,3 +1,19 @@
+" For use in your .vimrc
+" nnoremap <silent> <leader>f :call PrototoolFormat()<CR>
+function! PrototoolFormat() abort
+    silent! execute '!prototool format -w %'
+    silent! edit
+endfunction
+
+" For use in your .vimrc
+" nnoremap <silent> <leader>f :call PrototoolFormatFix()<CR>
+function! PrototoolFormatFix() abort
+    silent! execute '!prototool format --fix -w %'
+    silent! edit
+endfunction
+
+" auto functions
+
 function! PrototoolFormatEnable() abort
     silent! let g:prototool_format_enable = 1
     silent! let g:prototool_format_fix_flag = ''
@@ -33,7 +49,7 @@ function! PrototoolFormatFixToggle() abort
     endif
 endfunction
 
-function! PrototoolFormat() abort
+function! PrototoolFormatOnSave() abort
     if exists('g:prototool_format_enable')
         silent! execute '!prototool format ' . g:prototool_format_fix_flag . '-w %'
         silent! edit
@@ -58,14 +74,14 @@ function! PrototoolCreateToggle() abort
     endif
 endfunction
 
-function! PrototoolCreate() abort
+function! PrototoolCreateOnSave() abort
     if exists('g:prototool_create_enable')
         silent! execute '!prototool create %'
         silent! edit
     endif
 endfunction
 
-function! PrototoolCreateReadPost() abort
+function! PrototoolCreateReadPostOnSave() abort
     if exists('g:prototool_create_enable')
       if line('$') == 1 && getline(1) == ''
         silent! execute '!prototool create %'
@@ -76,9 +92,10 @@ endfunction
 
 " default functionality below
 
+let g:prototool_format_fix_flag = '--fix '
 call PrototoolFormatDisable()
 call PrototoolCreateEnable()
 
-autocmd BufEnter,BufWritePost *.proto :call PrototoolFormat()
-autocmd BufNewFile *.proto :call PrototoolCreate()
-autocmd BufReadPost *.proto :call PrototoolCreateReadPost()
+autocmd BufEnter,BufWritePost *.proto :call PrototoolFormatOnSave()
+autocmd BufNewFile *.proto :call PrototoolCreateOnSave()
+autocmd BufReadPost *.proto :call PrototoolCreateReadPostOnSave()
