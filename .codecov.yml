@@ -12,8 +12,12 @@ coverage:
         enabled: yes
         target: 50%
 ignore:
+  - /cmd/prototool
   - /example/cmd/excited
-  - /example/gen/go/uber/foo/v1
   - /example/gen/go/uber/bar/v1
+  - /example/gen/go/uber/foo/v1
+  - /internal/cmd/gen-prototool-bash-completion
+  - /internal/cmd/gen-prototool-manpages
+  - /internal/cmd/gen-prototool-zsh-completion
   - /internal/cmd/testdata/grpc/gen/grpcpb
   - /internal/reflect/gen/uber/proto/reflect/v1
