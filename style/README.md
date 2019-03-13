@@ -17,9 +17,8 @@
     * [Message Fields](#message-fields)
     * [Oneofs](#oneofs)
     * [Nested Messages](#nested-messages)
-  * [Services](#services)
-  * [RPCs](#rpcs)
-    * [Streaming](#streaming)
+  * [Services/RPCs](#servicesrpcs)
+    * [Streaming RPCs](#streaming-rpcs)
     * [HTTP Annotations](#http-annotations)
   * [Naming](#naming)
   * [Documentation](#documentation)
@@ -998,7 +997,7 @@ and there is no cost to having a message be unnested.
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
-## Services
+## Services/RPCs
 
 Services should always be `PascalCase`. RPCs should always be `PascalCase.`
 
@@ -1017,8 +1016,8 @@ Every RPC request and response should be unique to the RPC, and named after the 
 same file as the service, underneath the service definition and in order of the RPCs defined
 in the service.
 
-The unique request/response requirement is compatibility as you iterate your RPC definitions. If
-one were to use the same request or response message for different RPCs, and then need to add or
+The unique request/response requirement is for compatibility as you iterate your RPC definitions.
+If one were to use the same request or response message for different RPCs, and then need to add or
 want to deprecate a field, each RPC that uses this request and response message would be affected,
 regardless of whether or not the new field applied to each RPC, or whether the deprecated field
 was deprecated for each RPC. While this pattern can cause some duplication, it's become the "gold
@@ -1069,7 +1068,7 @@ messages.
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
-### Streaming
+### Streaming RPCs
 
 Streaming RPCs are allowed, but **strongly discouraged**.
 
