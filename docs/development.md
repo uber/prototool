@@ -9,9 +9,12 @@ Prototool is under active development. If you want to help, here's some places t
 
 We appreciate any input you have!
 
-Before filing an issue or submitting a PR, make sure to review the [Issue Guidelines](../.github/ISSUE_TEMPLATE.md), and before submitting a PR, make sure to also review
-the [PR Guidelines](../.github/PULL_REQUEST_TEMPLATE.md). The Issue Guidelines will show up in the description field when filing a new issue, and the PR guidelines will show up in the
-description field when submitting a PR, but clear the description field of this pre-populated text once you've read it :-)
+Before filing an issue or submitting a PR, make sure to review the
+[Issue Guidelines](../.github/ISSUE_TEMPLATE.md), and before submitting a PR, make sure to also
+review the [PR Guidelines](../.github/PULL_REQUEST_TEMPLATE.md). The Issue Guidelines will show up
+in the description field when filing a new issue, and the PR guidelines will show up in the
+description field when submitting a PR, but clear the description field of this pre-populated text
+once you've read it.
 
 Note that development of Prototool will only work with Golang 1.12 or newer.
 
@@ -20,6 +23,7 @@ Before submitting a PR, make sure to:
 - Run `make generate` to make sure there is no diff.
 - Run `make` to make sure all tests pass. This is functionally equivalent to the tests run on CI.
 
-The entire implementation is purposefully under the `internal` package to not expose any API for the time being.
+The entire implementation is purposefully under the `internal` package to not expose any API for
+the time being.
 
 For maintainers: See [release.md](release.md) for the release process.
