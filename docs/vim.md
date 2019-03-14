@@ -1,5 +1,7 @@
 # Vim Integration
 
+[Back to README.md](README.md)
+
 This repository is a self-contained plugin for use with the
 [ALE Lint Engine](https://github.com/w0rp/ale).
 

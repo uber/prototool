@@ -1,5 +1,7 @@
 # gRPC
 
+[Back to README.md](README.md)
+
 The `prototool grpc` command calls a gRPC endpoint using a JSON input. What this does behind the scenes:
 
 - Compiles your Protobuf files with `protoc`, generating a `FileDescriptorSet`.
