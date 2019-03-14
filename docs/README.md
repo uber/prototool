@@ -93,7 +93,11 @@ The make command `make example` runs prototool while installing the necessary pl
 
 ## Configuration
 
-Prototool operates using a config file named either `prototool.yaml` or `prototool.json`. Only one of `prototool.yaml` or `prototool.json` can exist in a given directory. For non-trivial use, you should have a config file checked in to at least the root of your repository. It is important because the directory of an associated config file is passed to `protoc` as an include directory with `-I`, so this is the logical location your Protobuf file imports should start from.
+Prototool operates using a config file named either `prototool.yaml` or `prototool.json`. Only one
+of `prototool.yaml` or `prototool.json` can exist in a given directory. For non-trivial use, you
+should have a config file checked in to at least the root of your repository. It is important
+because the directory of an associated config file is passed to `protoc` as an include directory
+with `-I`, so this is the logical location your Protobuf file imports should start from.
 
 Recommended base config file:
 
@@ -104,13 +108,19 @@ lint:
   group: uber2
 ```
 
-The command `prototool config init` will generate a config file in the current directory with the currently recommended options set.
+The command `prototool config init` will generate a config file in the current directory with the
+currently recommended options set.
 
-When specifying a directory or set of files for Prototool to operate on, Prototool will search for config files for each directory starting at the given path, and going up a directory until hitting root. If no config file is found, Prototool will use default values and operate as if there was a config file in the current directory, including the current directory with `-I` to `protoc`.
+When specifying a directory or set of files for Prototool to operate on, Prototool will search for
+config files for each directory starting at the given path, and going up a directory until hitting
+root. If no config file is found, Prototool will use default values and operate as if there was a
+config file in the current directory, including the current directory with `-I` to `protoc`.
 
-If multiple `prototool.yaml` or `prototool.json` files are found that match the input directory or files, an error will be returned.
+If multiple `prototool.yaml` or `prototool.json` files are found that match the input directory or
+files, an error will be returned.
 
-See [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) all available options.
+See [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) all available
+options.
 
 ## File Discovery
 
@@ -126,11 +136,20 @@ Usage:
 
 `dirOrFile` can take two forms:
 
-- You can specify exactly one directory. If this is done, Prototool goes up until it finds a `prototool.yaml` or `prototool.json` file (or uses the current directory if none is found), and then uses this config for all `.proto` files under the given directory recursively, except for files in the `excludes` lists in `prototool.yaml` or `prototool.json` files.
-- You can specify exactly one file. This has the effect as if you specified the directory of this file (using the logic above), but errors are only printed for that file. This is useful for e.g. Vim integration.
-- You can specify nothing. This has the effect as if you specified the current directory as the directory.
+- You can specify exactly one directory. If this is done, Prototool goes up until it finds a
+  `prototool.yaml` or `prototool.json` file (or uses the current directory if none is found), and
+  then uses this config for all `.proto` files under the given directory recursively, except for
+  files in the `excludes` lists in `prototool.yaml` or `prototool.json` files.
+- You can specify exactly one file. This has the effect as if you specified the directory of this
+  file (using the logic above), but errors are only printed for that file. This is useful for
+  e.g. Vim integration.
+- You can specify nothing. This has the effect as if you specified the current directory as the
+  directory.
 
-The idea with "directory builds" is that you often need more than just one file to do a `protoc` call, for example if you have types in other files in the same package that are not referenced by their fully-qualified name, and/or if you need to know what directories to specify with `-I` to `protoc` (by default, the directory of the `prototool.yaml` or `prototool.json` file is used).
+The idea with "directory builds" is that you often need more than just one file to do a `protoc`
+call, for example if you have types in other files in the same package that are not referenced by
+their fully-qualified name, and/or if you need to know what directories to specify with `-I` to
+`protoc` (by default, the directory of the `prototool.yaml` or `prototool.json` file is used).
 
 ## Command Overview
 
@@ -140,52 +159,70 @@ Let's go over some of the basic commands.
 
 Create a `prototool.yaml` file in the current directory with the currently recommended options set.
 
-Pass the `--document` flag to generate a `prototool.yaml` file with all other options documented and commented out.
+Pass the `--document` flag to generate a `prototool.yaml` file with all other options documented
+and commented out.
 
-Pass the `--uncomment` flag to generate `prototool.yaml` file with all options documented but uncommented.
+Pass the `--uncomment` flag to generate `prototool.yaml` file with all options documented but
+uncommented.
 
-See [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for the config file that `prototool config init --uncomment` generates.
+See [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for the config file
+that `prototool config init --uncomment` generates.
 
 ##### `prototool compile`
 
-Compile your Protobuf files, but do not generate stubs. This has the effect of calling `protoc` with `-o /dev/null`.
+Compile your Protobuf files, but do not generate stubs. This has the effect of calling `protoc`
+with `-o /dev/null`.
+
+Pass the `--dry-fun` flag to see the `protoc` commands that Prototool runs behind the scenes.
 
 ##### `prototool generate`
 
-Compile your Protobuf files and generate stubs according to the rules in your `prototool.yaml` or `prototool.json` file.
+Compile your Protobuf files and generate stubs according to the rules in your `prototool.yaml` or
+`prototool.json` file.
 
-See [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available options. There are special
-options available for Golang plugins, and plugins that output a single file instead of a set of files. Specifically, you
-can output a single JAR for the built-in `protoc` `java` plugin, and you can output a file with the serialized
-`FileDescriptorSet` using the built-in `protoc` `descriptor_set` plugin, optionally also calling `--include_imports`
-and/or `--include_source_info`.
+See [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available
+options. There are special options available for Golang plugins, and plugins that output a single
+file instead of a set of files. Specifically, you can output a single JAR for the built-in `protoc`
+`java` plugin, and you can output a file with the serialized `FileDescriptorSet` using the built-in
+`protoc` `descriptor_set` plugin, optionally also calling `--include_imports` and/or
+`--include_source_info`.
+
+Pass the `--dry-fun` flag to see the `protoc` commands that Prototool runs behind the scenes.
 
 See [example/proto/prototool.yaml](../example/proto/prototool.yaml) for a full example.
 
 ##### `prototool lint`
 
-Lint your Protobuf files. Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available options.
+Lint your Protobuf files. Lint rules can be set using the configuration file. See the configuration
+at [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available
+options.
+
 There are three pre-configured groups of rules: `google`, `uber1`, and `uber2`.
 
 *See [lint.md](lint.md) for full instructions.*
 
 ##### `prototool format`
 
-Format a Protobuf file and print the formatted file to stdout. There are flags to perform different actions:
+Format a Protobuf file and print the formatted file to stdout. There are flags to perform different
+actions:
 
 - `-d` Write a diff instead.
-- `-f` Fix the file according to the Style Guide. This will have different behavior if the `uber2` lint group is set.
+- `-f` Fix the file according to the Style Guide. This will have different behavior if the `uber2`
+  lint group is set.
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
 
-Concretely, the `-f` flag can be used so that the values for `java_multiple_files`, `java_outer_classname`, and `java_package` are updated to reflect what is expected by the
-[Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the value of `go_package` is updated to reflect what we expect for the
-Uber Style Guide. By formatting, the linting for these values will pass by default. See the documentation below for `prototool create` for an example.
+Concretely, the `-f` flag can be used so that the values for `java_multiple_files`,
+`java_outer_classname`, and `java_package` are updated to reflect what is expected by the
+[Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the
+value of `go_package` is updated to reflect what we expect for the Uber Style Guide. By formatting,
+the linting for these values will pass by default. See the documentation below for
+`prototool create` for an example.
 
 ##### `prototool create`
 
-Create Protobuf files from a template. With the provided Vim integration, this will automatically create new files
-that pass lint when a new file is opened.
+Create Protobuf files from a template. With the provided Vim integration, this will automatically
+create new files that pass lint when a new file is opened.
 
 *See [create.md](create.md) for full instructions.*
 
@@ -202,40 +239,50 @@ TODO
 Call a gRPC endpoint using a JSON input. What this does behind the scenes:
 
 - Compiles your Protobuf files with `protoc`, generating a `FileDescriptorSet`.
-- Uses the `FileDescriptorSet` to figure out the request and response type for the endpoint, and to convert the JSON input to binary.
+- Uses the `FileDescriptorSet` to figure out the request and response type for the endpoint, and to
+  convert the JSON input to binary.
 - Calls the gRPC endpoint.
-- Uses the `FileDescriptorSet` to convert the resulting binary back to JSON, and prints it out for you.
+- Uses the `FileDescriptorSet` to convert the resulting binary back to JSON, and prints it out for
+  you.
 
 *See [grpc.md](grpc.md) for full instructions.*
 
 ## Tips and Tricks
 
-Prototool is meant to help enforce a consistent development style for Protobuf, and as such you should follow some basic rules:
+Prototool is meant to help enforce a consistent development style for Protobuf, and as such you
+should follow some basic rules:
 
-- Have all your imports start from the directory your `prototool.yaml` or `prototool.json` file is in. While there is a configuration option `protoc.includes` to denote extra include directories, this is not recommended.
+- Have all your imports start from the directory your `prototool.yaml` or `prototool.json` file is
+  in. While there is a configuration option `protoc.includes` to denote extra include directories,
+  this is not recommended.
 - Have all Protobuf files in the same directory use the same `package`.
-- Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`. This helps `prototool generate` do the best job.
+- Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`.
+  This helps `prototool generate` do the best job.
 
 ## Vim Integration
 
-This repository is a self-contained plugin for use with the [ALE Lint Engine](https://github.com/w0rp/ale). The Vim integration will currently compile, provide lint errors, do generation of your stubs, and format your files on save. It will also optionally create new files from a template when opened.
+This repository is a self-contained plugin for use with the
+[ALE Lint Engine](https://github.com/w0rp/ale). The Vim integration will currently compile, provide
+lint errors, do generation of your stubs, and format your files on save. It will also optionally
+create new files from a template when opened.
 
 *See [vim.md](vim.md) for full instructions.*
 
 ## Stability
 
-Prototool is generally available, and conforms to [SemVer](https://semver.org), so Prototool will not have any breaking changes on a given
-major version, with some exceptions:
+Prototool is generally available, and conforms to [SemVer](https://semver.org), so Prototool will
+not have any breaking changes on a given major version, with some exceptions:
 
-- Commands under the `x` top-level command are experimental, and may change or be deleted between minor versions of Prototool. We expect
-  such commands to be promoted to stable within a few minor releases, however development is still in-progress.
-- The output of the formatter may change between minor versions. This has not happened yet, but we may change the format in the future to
-  reflect things such as max line lengths.
-- The breaking change detector's output format currently does not output filename, line, or column. This is an expected upgrade in the
-  future, so the output will likely change. This is viewed as purely an upgrade, so until this is done, do not parse
-  `prototool break check` output in scripts.
-- The breaking change detector may have additional checks added between minor versions, and therefore a change that might not have been
-  breaking previously might become a breaking change.
+- Commands under the `x` top-level command are experimental, and may change or be deleted between
+  minor versions of Prototool. We expect such commands to be promoted to stable within a few minor
+  releases, however development is still in-progress.
+- The output of the formatter may change between minor versions. This has not happened yet, but we
+  may change the format in the future to reflect things such as max line lengths.
+- The breaking change detector's output format currently does not output filename, line, or column.
+  This is an expected upgrade in the future, so the output will likely change. This is viewed as
+  purely an upgrade, so until this is done, do not parse `prototool break check` output in scripts.
+- The breaking change detector may have additional checks added between minor versions, and
+  therefore a change that might not have been breaking previously might become a breaking change.
 
 ## Development
 
@@ -247,11 +294,18 @@ See [faq.md](faq.md) for answers to frequently asked questions.
 
 ## Special Thanks
 
-Prototool uses some external libraries that deserve special mention and thanks for their contribution to Prototool's functionality:
+Prototool uses some external libraries that deserve special mention and thanks for their
+contribution to Prototool's functionality:
 
-- [github.com/emicklei/proto](https://github.com/emicklei/proto) - The Golang Protobuf parsing library that started it all, and is still used for the linting and formatting functionality. We can't thank Ernest Micklei enough for his help and putting up with all the [filed issues](https://github.com/emicklei/proto/issues?q=is%3Aissue+is%3Aclosed).
-- [github.com/jhump/protoreflect](https://github.com/jhump/protoreflect) - Used for the JSON to binary and back conversion. Josh Humphries is an amazing developer, thank you so much.
-- [github.com/fullstorydev/grpcurl](https://github.com/fullstorydev/grpcurl) - Still used for the gRPC functionality. Again a thank you to Josh Humphries and the team over at FullStory for their work.
+- [github.com/emicklei/proto](https://github.com/emicklei/proto) - The Golang Protobuf parsing
+  library that started it all, and is still used for the linting and formatting functionality. We
+  can't thank Ernest Micklei enough for his help and putting up with all the
+  [filed issues](https://github.com/emicklei/proto/issues?q=is%3Aissue+is%3Aclosed).
+- [github.com/jhump/protoreflect](https://github.com/jhump/protoreflect) - Used for the JSON to
+  binary and back conversion. Josh Humphries is an amazing developer, thank you so much.
+- [github.com/fullstorydev/grpcurl](https://github.com/fullstorydev/grpcurl) - Still used for the
+  gRPC functionality. Again a thank you to Josh Humphries and the team over at FullStory for their
+  work.
 
 [mit-img]: http://img.shields.io/badge/License-MIT-blue.svg
 [mit]: https://github.com/uber/prototool/blob/master/LICENSE
