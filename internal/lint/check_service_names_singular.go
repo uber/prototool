@@ -38,7 +38,7 @@ var serviceNamesNoPluralsLinter = NewSuppressableLinter(
 )
 
 var allowedServiceNamePlurals = map[string]struct{}{
-	"data": struct{}{},
+	"data": {},
 }
 
 func checkServiceNamesNoPlurals(add func(*file.ProtoSet, *proto.Comment, *text.Failure), dirPath string, descriptors []*FileDescriptor) error {

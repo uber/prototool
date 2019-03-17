@@ -46,29 +46,29 @@ func TestProtoSetProviderGetMultipleForDirCwdAsValidRel(t *testing.T) {
 	require.Equal(
 		t,
 		[]*ProtoSet{
-			&ProtoSet{
+			{
 				WorkDirPath: cwd,
 				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a": []*ProtoFile{
+					cwd + "/testdata/valid/base/a": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/file.proto",
 							DisplayPath: "testdata/valid/base/a/file.proto",
 						},
 					},
-					cwd + "/testdata/valid/base/c": []*ProtoFile{
+					cwd + "/testdata/valid/base/c": {
 						{
 							Path:        cwd + "/testdata/valid/base/c/file.proto",
 							DisplayPath: "testdata/valid/base/c/file.proto",
 						},
 					},
-					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/e": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
 							DisplayPath: "testdata/valid/base/a/e/file.proto",
 						},
 					},
-					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/f": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
 							DisplayPath: "testdata/valid/base/a/f/file.proto",
@@ -97,11 +97,11 @@ func TestProtoSetProviderGetMultipleForDirCwdAsValidRel(t *testing.T) {
 					},
 				},
 			},
-			&ProtoSet{
+			{
 				WorkDirPath: cwd,
 				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/d": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
 							DisplayPath: "testdata/valid/base/a/d/file.proto",
@@ -133,11 +133,11 @@ func TestProtoSetProviderGetMultipleForDirCwdAsValidRel(t *testing.T) {
 					},
 				},
 			},
-			&ProtoSet{
+			{
 				WorkDirPath: cwd,
 				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/b": []*ProtoFile{
+					cwd + "/testdata/valid/base/b": {
 						{
 							Path:        cwd + "/testdata/valid/base/b/file.proto",
 							DisplayPath: "testdata/valid/base/b/file.proto",
@@ -184,29 +184,29 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 	require.Equal(
 		t,
 		[]*ProtoSet{
-			&ProtoSet{
+			{
 				WorkDirPath: cwd,
 				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a": []*ProtoFile{
+					cwd + "/testdata/valid/base/a": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/file.proto",
 							DisplayPath: "testdata/valid/base/a/file.proto",
 						},
 					},
-					cwd + "/testdata/valid/base/c": []*ProtoFile{
+					cwd + "/testdata/valid/base/c": {
 						{
 							Path:        cwd + "/testdata/valid/base/c/file.proto",
 							DisplayPath: "testdata/valid/base/c/file.proto",
 						},
 					},
-					cwd + "/testdata/valid/base/a/e": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/e": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/e/file.proto",
 							DisplayPath: "testdata/valid/base/a/e/file.proto",
 						},
 					},
-					cwd + "/testdata/valid/base/a/f": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/f": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/f/file.proto",
 							DisplayPath: "testdata/valid/base/a/f/file.proto",
@@ -235,11 +235,11 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 					},
 				},
 			},
-			&ProtoSet{
+			{
 				WorkDirPath: cwd,
 				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/a/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/a/d": {
 						{
 							Path:        cwd + "/testdata/valid/base/a/d/file.proto",
 							DisplayPath: "testdata/valid/base/a/d/file.proto",
@@ -271,11 +271,11 @@ func TestProtoSetProviderGetMultipleForDirCwdAbs(t *testing.T) {
 					},
 				},
 			},
-			&ProtoSet{
+			{
 				WorkDirPath: cwd,
 				DirPath:     validDirPath,
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/b": []*ProtoFile{
+					cwd + "/testdata/valid/base/b": {
 						{
 							Path:        cwd + "/testdata/valid/base/b/file.proto",
 							DisplayPath: "testdata/valid/base/b/file.proto",
@@ -317,17 +317,17 @@ func TestProtoSetProviderGetMultipleForDirCwdSubRel(t *testing.T) {
 	require.Equal(
 		t,
 		[]*ProtoSet{
-			&ProtoSet{
+			{
 				WorkDirPath: cwd,
 				DirPath:     cwd + "/testdata/valid/base/d/g",
 				DirPathToFiles: map[string][]*ProtoFile{
-					cwd + "/testdata/valid/base/d": []*ProtoFile{
+					cwd + "/testdata/valid/base/d": {
 						{
 							Path:        cwd + "/testdata/valid/base/d/file.proto",
 							DisplayPath: "testdata/valid/base/d/file.proto",
 						},
 					},
-					cwd + "/testdata/valid/base/d/g/h": []*ProtoFile{
+					cwd + "/testdata/valid/base/d/g/h": {
 						{
 							Path:        cwd + "/testdata/valid/base/d/g/h/file.proto",
 							DisplayPath: "testdata/valid/base/d/g/h/file.proto",
