@@ -126,7 +126,8 @@ enum Something {
   option (bar.enum_option) = true;
 // comment25
   SOMETHING_INVALID = 0 [
-  (bar.enum_value_option) = true
+  (bar.enum_value_option) = true,
+  (bar.enum_value_dep_option) = { hello: 1, bar: 2, recursive: { hello: 3, recursive: { bar: 2 } } }
   ]; // inline comment25
 // comment27
   SOMETHING_UNSET = 1; // inline comment27

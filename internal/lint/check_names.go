@@ -113,8 +113,8 @@ func (v *namesVisitor) VisitNormalField(element *proto.NormalField) {
 
 func (v *namesVisitor) VisitEnumField(element *proto.EnumField) {
 	v.checkName(element.Position, element.Name, element.Comment)
-	if element.ValueOption != nil {
-		element.ValueOption.Accept(v)
+	for _, child := range element.Elements {
+		child.Accept(v)
 	}
 }
 

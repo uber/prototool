@@ -33,92 +33,92 @@ var (
 	// Purposely not configurable - there are some dependencies between linters, for example if a message is deleted,
 	// ENUMS_NOT_DELETED will not print out any nested enums that were deleted.
 	AllCheckers = []Checker{
-		Checker{
+		{
 			ID:      "ENUMS_NOT_DELETED",
 			Purpose: "Checks that no enums have been deleted.",
 			Check:   checkEnumsNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "ENUM_VALUES_NOT_DELETED",
 			Purpose: "Checks that no enum values have been deleted.",
 			Check:   checkEnumValuesNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "ENUM_VALUES_SAME_NAME",
 			Purpose: "Checks that enum values have the same name.",
 			Check:   checkEnumValuesSameName,
 		},
-		Checker{
+		{
 			ID:      "MESSAGES_NOT_DELETED",
 			Purpose: "Checks that no messages have been deleted.",
 			Check:   checkMessagesNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "MESSAGE_FIELDS_NOT_DELETED",
 			Purpose: "Checks that no message fields have been deleted.",
 			Check:   checkMessageFieldsNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "MESSAGE_FIELDS_SAME_LABEL",
 			Purpose: "Checks that message fields have the same label.",
 			Check:   checkMessageFieldsSameLabel,
 		},
-		Checker{
+		{
 			ID:      "MESSAGE_FIELDS_SAME_NAME",
 			Purpose: "Checks that message fields have the same name.",
 			Check:   checkMessageFieldsSameName,
 		},
-		Checker{
+		{
 			ID:      "MESSAGE_FIELDS_SAME_ONEOF",
 			Purpose: "Checks that message fields that were not in a oneof are not now in a oneof.",
 			Check:   checkMessageFieldsSameOneof,
 		},
-		Checker{
+		{
 			ID:      "MESSAGE_FIELDS_SAME_TYPE",
 			Purpose: "Checks that message fields have the same type.",
 			Check:   checkMessageFieldsSameType,
 		},
-		Checker{
+		{
 			ID:      "MESSAGE_ONEOFS_NOT_DELETED",
 			Purpose: "Checks that no message oneofs have been deleted.",
 			Check:   checkMessageOneofsNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "MESSAGE_ONEOFS_FIELDS_NOT_REMOVED",
 			Purpose: "Checks that no message oneofs have fields removed.",
 			Check:   checkMessageOneofsFieldsNotRemoved,
 		},
-		Checker{
+		{
 			ID:      "PACKAGES_NOT_DELETED",
 			Purpose: "Checks that no packages have been deleted.",
 			Check:   checkPackagesNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "SERVICES_NOT_DELETED",
 			Purpose: "Checks that no services have been deleted.",
 			Check:   checkServicesNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "SERVICE_METHODS_NOT_DELETED",
 			Purpose: "Checks that no service methods have been deleted.",
 			Check:   checkServiceMethodsNotDeleted,
 		},
-		Checker{
+		{
 			ID:      "SERVICE_METHODS_SAME_CLIENT_STREAMING",
 			Purpose: "Checks that service methods have the same client streaming.",
 			Check:   checkServiceMethodsSameClientStreaming,
 		},
-		Checker{
+		{
 			ID:      "SERVICE_METHODS_SAME_REQUEST_TYPE",
 			Purpose: "Checks that service methods have the same request type.",
 			Check:   checkServiceMethodsSameRequestType,
 		},
-		Checker{
+		{
 			ID:      "SERVICE_METHODS_SAME_RESPONSE_TYPE",
 			Purpose: "Checks that service methods have the same response type.",
 			Check:   checkServiceMethodsSameResponseType,
 		},
-		Checker{
+		{
 			ID:      "SERVICE_METHODS_SAME_SERVER_STREAMING",
 			Purpose: "Checks that service methods have the same server streaming.",
 			Check:   checkServiceMethodsSameServerStreaming,

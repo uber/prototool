@@ -163,7 +163,19 @@ message Empty {}
 enum Something {
   option (bar.enum_option) = true;
   // comment25
-  SOMETHING_INVALID = 0 [(bar.enum_value_option) = true]; // inline comment25
+  SOMETHING_INVALID = 0 [
+    (bar.enum_value_dep_option) = {
+      hello: 1
+      bar: 2
+      recursive: {
+        hello: 3
+        recursive: {
+          bar: 2
+        }
+      }
+    },
+    (bar.enum_value_option) = true
+  ]; // inline comment25
   // comment27
   SOMETHING_UNSET = 1; // inline comment27
   // comment28

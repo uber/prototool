@@ -322,7 +322,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		}
 		fileHeader = strings.Join(fileHeaderLines, "\n")
 		if fileHeader == "" {
-			return Config{}, fmt.Errorf("file header path or content specifed but result was empty file header")
+			return Config{}, fmt.Errorf("file header path or content specified but result was empty file header")
 		}
 	}
 
