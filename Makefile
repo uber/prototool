@@ -1,23 +1,26 @@
-SRCS := $(shell find . -name '*.go' | grep -v ^\.\/vendor\/ | grep -v ^\.\/example\/ | grep -v \/gen\/grpcpb\/ | grep -v \/gen\/uber\/proto\/reflect\/ | grep -v ^\/.\/internal\/cmd\/gen-prototool)
-PKGS := $(shell go list ./... | grep -v github.com\/uber\/prototool\/example | grep -v \/gen\/grpcpb | grep -v \/gen\/uber\/proto\/reflect\/ | grep -v \/internal\/cmd\/gen-prototool)
-BINS := ./cmd/prototool
-
-DOCKER_IMAGE := uber/prototool:latest
-DOCKER_RELEASE_IMAGE := golang:1.12.0-stretch
-
 SHELL := /bin/bash -o pipefail
 UNAME_OS := $(shell uname -s)
 UNAME_ARCH := $(shell uname -m)
+
+GOLANG_EXCLUDES := \/example\/ \/gen\/grpcpb \/gen\/uber\/proto\/reflect\/ \/internal\/cmd\/gen-prototool
 
 TMP_BASE := .tmp
 TMP := $(TMP_BASE)/$(UNAME_OS)/$(UNAME_ARCH)
 TMP_BIN = $(TMP)/bin
 TMP_ETC := $(TMP)/etc
 TMP_LIB := $(TMP)/lib
+TMP_VERSIONS := $(TMP)/versions
 
-BAZEL_VERSION := 0.23.0
-BAZEL_LIB := $(TMP_LIB)/bazel-$(BAZEL_VERSION)
-BAZEL := $(abspath $(BAZEL_LIB)/bin/bazel)
+DOCKER_IMAGE := uber/prototool:latest
+DOCKER_RELEASE_IMAGE := golang:1.12.1-stretch
+
+unexport GOPATH
+export GO111MODULE := on
+export GOBIN := $(abspath $(TMP_BIN))
+export PATH := $(GOBIN):$(PATH)
+
+BAZEL_VERSION := 0.23.2
+BAZEL := $(TMP_VERSIONS)/bazel/$(BAZEL_VERSION)
 ifeq ($(UNAME_OS),Darwin)
 BAZEL_OS := darwin
 else
@@ -25,60 +28,75 @@ BAZEL_OS = linux
 endif
 BAZEL_ARCH := $(UNAME_ARCH)
 $(BAZEL):
-	$Q rm -f $(TMP_BIN)/bazel
-	$Q mkdir -p $(TMP_BIN)
-	$Q rm -rf $(BAZEL_LIB)
-	$Q mkdir -p $(BAZEL_LIB)
-	$Q curl -SSL https://github.com/bazelbuild/bazel/releases/download/$(BAZEL_VERSION)/bazel-$(BAZEL_VERSION)-installer-$(BAZEL_OS)-$(BAZEL_ARCH).sh -o $(BAZEL_LIB)/bazel-installer.sh
-	$Q chmod +x $(BAZEL_LIB)/bazel-installer.sh
-	$Q $(BAZEL_LIB)/bazel-installer.sh --base=$(abspath $(BAZEL_LIB)) --bin=$(abspath $(TMP_BIN))
+	@rm -rf $(TMP_BIN)/bazel $(TMP_LIB)/bazel
+	@mkdir -p $(TMP_BIN) $(TMP_LIB)
+	curl -SSL https://github.com/bazelbuild/bazel/releases/download/$(BAZEL_VERSION)/bazel-$(BAZEL_VERSION)-installer-$(BAZEL_OS)-$(BAZEL_ARCH).sh \
+		-o $(TMP_LIB)/bazel/bazel-installer.sh
+	@chmod +x $(TMP_LIB)/bazel/bazel-installer.sh
+	@$(TMP_LIB)/bazel/bazel-installer.sh --base=$(abspath $(TMP_LIB)/bazel) --bin=$(abspath $(TMP_BIN))
+	@rm -rf $(dir $(BAZEL))
+	@mkdir -p $(dir $(BAZEL))
+	@touch $(BAZEL)
 
 GOLINT_VERSION := d0100b6bd8b389f0385611eb39152c4d7c3a7905
-GOLINT := $(TMP_BIN)/golint
+GOLINT := $(TMP_VERSIONS)/golint/$(GOLINT_VERSION)
 $(GOLINT):
 	$(eval GOLINT_TMP := $(shell mktemp -d))
-	@cd $(GOLINT_TMP); go get golang.org/x/lint/golint@$(GOLINT_VERSION)
+	cd $(GOLINT_TMP); go get golang.org/x/lint/golint@$(GOLINT_VERSION)
 	@rm -rf $(GOLINT_TMP)
+	@rm -rf $(dir $(GOLINT))
+	@mkdir -p $(dir $(GOLINT))
+	@touch $(GOLINT)
 
 ERRCHECK_VERSION := v1.2.0
-ERRCHECK := $(TMP_BIN)/errcheck
+ERRCHECK := $(TMP_VERSIONS)/errcheck/$(ERRCHECK_VERSION)
 $(ERRCHECK):
 	$(eval ERRCHECK_TMP := $(shell mktemp -d))
-	@cd $(ERRCHECK_TMP); go get github.com/kisielk/errcheck@$(ERRCHECK_VERSION)
+	cd $(ERRCHECK_TMP); go get github.com/kisielk/errcheck@$(ERRCHECK_VERSION)
 	@rm -rf $(ERRCHECK_TMP)
+	@rm -rf $(dir $(ERRCHECK))
+	@mkdir -p $(dir $(ERRCHECK))
+	@touch $(ERRCHECK)
 
 STATICCHECK_VERSION := c2f93a96b099cbbec1de36336ab049ffa620e6d7
-STATICCHECK := $(TMP_BIN)/staticcheck
+STATICCHECK := $(TMP_VERSIONS)/staticcheck/$(STATICCHECK_VERSION)
 $(STATICCHECK):
 	$(eval STATICCHECK_TMP := $(shell mktemp -d))
-	@cd $(STATICCHECK_TMP); go get honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION)
+	cd $(STATICCHECK_TMP); go get honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION)
 	@rm -rf $(STATICCHECK_TMP)
+	@rm -rf $(dir $(STATICCHECK))
+	@mkdir -p $(dir $(STATICCHECK))
+	@touch $(STATICCHECK)
 
 UPDATE_LICENSE_VERSION := ce2550dad7144b81ae2f67dc5e55597643f6902b
-UPDATE_LICENSE := $(TMP_BIN)/update-license
+UPDATE_LICENSE := $(TMP_VERSIONS)/update-license/$(UPDATE_LICENSE_VERSION)
 $(UPDATE_LICENSE):
 	$(eval UPDATE_LICENSE_TMP := $(shell mktemp -d))
-	@cd $(UPDATE_LICENSE_TMP); go get go.uber.org/tools/update-license@$(UPDATE_LICENSE_VERSION)
+	cd $(UPDATE_LICENSE_TMP); go get go.uber.org/tools/update-license@$(UPDATE_LICENSE_VERSION)
 	@rm -rf $(UPDATE_LICENSE_TMP)
+	@rm -rf $(dir $(UPDATE_LICENSE))
+	@mkdir -p $(dir $(UPDATE_LICENSE))
+	@touch $(UPDATE_LICENSE)
 
 PROTOC_GEN_GO_VERSION := v1.3.0
-PROTOC_GEN_GO := $(TMP_BIN)/protoc-gen-go
+PROTOC_GEN_GO := $(TMP_VERSIONS)/protoc-gen-go/$(PROTOC_GEN_GO_VERSION)
 $(PROTOC_GEN_GO):
 	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
-	@cd $(PROTOC_GEN_GO_TMP); go get github.com/golang/protobuf/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	cd $(PROTOC_GEN_GO_TMP); go get github.com/golang/protobuf/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
 	@rm -rf $(PROTOC_GEN_GO_TMP)
+	@rm -rf $(dir $(PROTOC_GEN_GO))
+	@mkdir -p $(dir $(PROTOC_GEN_GO))
+	@touch $(PROTOC_GEN_GO)
 
 CERTSTRAP_VERSION := v1.1.1
-CERTSTRAP := $(TMP_BIN)/certstrap
+CERTSTRAP := $(TMP_VERSIONS)/certstrap/$(CERTSTRAP_VERSION)
 $(CERTSTRAP):
 	$(eval CERTSTRAP_TMP := $(shell mktemp -d))
-	@cd $(CERTSTRAP_TMP); go get github.com/square/certstrap@$(CERTSTRAP_VERSION)
+	cd $(CERTSTRAP_TMP); go get github.com/square/certstrap@$(CERTSTRAP_VERSION)
 	@rm -rf $(CERTSTRAP_TMP)
-
-unexport GOPATH
-export GO111MODULE := on
-export GOBIN := $(abspath $(TMP_BIN))
-export PATH := $(GOBIN):$(PATH)
+	@rm -rf $(dir $(CERTSTRAP))
+	@mkdir -p $(dir $(CERTSTRAP))
+	@touch $(CERTSTRAP)
 
 .DEFAULT_GOAL := all
 
@@ -87,10 +105,10 @@ all: lint cover bazelbuild
 
 .PHONY: install
 install:
-	go install $(BINS)
+	go install ./cmd/prototool
 
 .PHONY: license
-license: $(UPDATE_LICENSE)
+license: __eval_srcs $(UPDATE_LICENSE)
 	update-license $(SRCS)
 
 .PHONY: golden
@@ -143,7 +161,7 @@ grpcgen: $(CERTSTRAP)
 	bash etc/bin/grpcgen.sh
 
 .PHONY: generate
-generate: license golden example internalgen bazelgen
+generate: __eval_srcs license golden example internalgen bazelgen
 	gofmt -s -w $(SRCS)
 	go mod tidy -v
 
@@ -159,7 +177,7 @@ checknodiffgenerated:
 	@[ ! -s "$(CHECKNODIFFGENERATED_DIFF)" ] || (echo "make generate produced a diff, make sure to check these in:" | cat - $(CHECKNODIFFGENERATED_DIFF) && false)
 
 .PHONY: golint
-golint: $(GOLINT)
+golint: __eval_srcs $(GOLINT)
 	for file in $(SRCS); do \
 		golint $${file}; \
 		if [ -n "$$(golint $${file})" ]; then \
@@ -168,16 +186,16 @@ golint: $(GOLINT)
 	done
 
 .PHONY:
-errcheck: $(ERRCHECK)
+errcheck: __eval_pkgs $(ERRCHECK)
 	errcheck -ignoretests $(PKGS)
 
 
 .PHONY: staticcheck
-staticcheck: $(STATICCHECK)
+staticcheck: __eval_pkgs $(STATICCHECK)
 	staticcheck --tests=false $(PKGS)
 
 .PHONY: checklicense
-checklicense: $(UPDATE_LICENSE)
+checklicense: __eval_srcs $(UPDATE_LICENSE)
 	@echo update-license --dry $(SRCS)
 	@if [ -n "$$(update-license --dry $(SRCS))" ]; then \
 		echo "These files need to have their license updated by running make license:"; \
@@ -189,11 +207,11 @@ checklicense: $(UPDATE_LICENSE)
 lint: checknodiffgenerated golint errcheck staticcheck checklicense
 
 .PHONY: test
-test:
+test: __eval_pkgs
 	go test -race $(PKGS)
 
 .PHONY: cover
-cover:
+cover: __eval_pkgs
 	@mkdir -p $(TMP_ETC)
 	@rm -f $(TMP_ETC)/coverage.txt $(TMP_ETC)/coverage.html
 	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=$(shell echo $(PKGS) | tr ' ' ',') $(PKGS)
@@ -226,7 +244,7 @@ brewgen:
 
 .PHONY: releaseinstall
 releaseinstall: releasegen releaseclean
-	tar -C /usr/local --strip-components 1 -xzf release/prototool-$(shell uname -s)-$(shell uname -m).tar.gz
+	tar -C /usr/local --strip-components 1 -xzf release/prototool-$(UNAME_OS)-$(UNAME_ARCH).tar.gz
 
 .PHONY: releaseclean
 releaseclean:
@@ -256,3 +274,11 @@ dockershell: dockerbuild
 
 .PHONY: dockerall
 dockerall: dockerbuild dockertest
+
+.PHONY: __eval_srcs
+__eval_srcs:
+	$(eval SRCS := $(shell find . -name '*.go' | grep -v $(patsubst %,-e %,$(GOLANG_EXCLUDES))))
+
+.PHONY: __eval_pkgs
+__eval_pkgs:
+	$(eval PKGS := $(shell go list ./... | grep -v $(patsubst %,-e %,$(GOLANG_EXCLUDES))))
