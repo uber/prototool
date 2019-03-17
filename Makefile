@@ -29,7 +29,7 @@ endif
 BAZEL_ARCH := $(UNAME_ARCH)
 $(BAZEL):
 	@rm -rf $(TMP_BIN)/bazel $(TMP_LIB)/bazel
-	@mkdir -p $(TMP_BIN) $(TMP_LIB)
+	@mkdir -p $(TMP_BIN) $(TMP_LIB)/bazel
 	curl -SSL https://github.com/bazelbuild/bazel/releases/download/$(BAZEL_VERSION)/bazel-$(BAZEL_VERSION)-installer-$(BAZEL_OS)-$(BAZEL_ARCH).sh \
 		-o $(TMP_LIB)/bazel/bazel-installer.sh
 	@chmod +x $(TMP_LIB)/bazel/bazel-installer.sh

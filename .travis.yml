@@ -2,5 +2,5 @@ language: go
 go:
   - "1.12.x"
 script:
-  - make lint cover
+  - make
   - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then make codecov; fi
