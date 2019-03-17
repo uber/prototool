@@ -144,6 +144,7 @@ grpcgen: $(CERTSTRAP)
 
 .PHONY: generate
 generate: license golden example internalgen bazelgen
+	gofmt -s -w $(SRCS)
 	go mod tidy -v
 
 .PHONY: checknodiffgenerated
@@ -174,7 +175,6 @@ errcheck: $(ERRCHECK)
 .PHONY: staticcheck
 staticcheck: $(STATICCHECK)
 	staticcheck --tests=false $(PKGS)
-
 
 .PHONY: checklicense
 checklicense: $(UPDATE_LICENSE)

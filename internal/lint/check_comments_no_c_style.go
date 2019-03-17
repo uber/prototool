@@ -80,8 +80,8 @@ func (v commentsNoCStyleVisitor) VisitNormalField(element *proto.NormalField) {
 
 func (v commentsNoCStyleVisitor) VisitEnumField(element *proto.EnumField) {
 	v.checkComments(element.Position, element.Comment, element.InlineComment)
-	if element.ValueOption != nil {
-		element.ValueOption.Accept(v)
+	for _, child := range element.Elements {
+		child.Accept(v)
 	}
 }
 

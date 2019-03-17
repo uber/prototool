@@ -76,8 +76,8 @@ func (v commentsNoInlineVisitor) VisitNormalField(element *proto.NormalField) {
 
 func (v commentsNoInlineVisitor) VisitEnumField(element *proto.EnumField) {
 	v.checkInlineComment("enum values", element.InlineComment)
-	if element.ValueOption != nil {
-		element.ValueOption.Accept(v)
+	for _, child := range element.Elements {
+		child.Accept(v)
 	}
 }
 
