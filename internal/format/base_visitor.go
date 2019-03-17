@@ -191,11 +191,13 @@ func isSingleValueLiteral(literal proto.Literal) bool {
 }
 
 func (v *baseVisitor) PEnumField(element *proto.EnumField) {
-	if element.ValueOption == nil {
-		v.pMessageOrEnumField("", element.Name, "", element.Integer, element.Comment, element.InlineComment)
-		return
+	var options []*proto.Option
+	for _, e := range element.Elements {
+		if option, ok := e.(*proto.Option); ok {
+			options = append(options, option)
+		}
 	}
-	v.pMessageOrEnumField("", element.Name, "", element.Integer, element.Comment, element.InlineComment, element.ValueOption)
+	v.pMessageOrEnumField("", element.Name, "", element.Integer, element.Comment, element.InlineComment, options...)
 }
 
 func cleanCommentLine(line string) string {
