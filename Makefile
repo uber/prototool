@@ -33,11 +33,11 @@ $(BAZEL):
 	$Q chmod +x $(BAZEL_LIB)/bazel-installer.sh
 	$Q $(BAZEL_LIB)/bazel-installer.sh --base=$(abspath $(BAZEL_LIB)) --bin=$(abspath $(TMP_BIN))
 
-GOLINT_VERSION := 8f45f776aaf18cebc8d65861cc70c33c60471952
+GOLINT_VERSION := d0100b6bd8b389f0385611eb39152c4d7c3a7905
 GOLINT := $(TMP_BIN)/golint
 $(GOLINT):
 	$(eval GOLINT_TMP := $(shell mktemp -d))
-	@cd $(GOLINT_TMP); go get github.com/golang/lint/golint@$(GOLINT_VERSION)
+	@cd $(GOLINT_TMP); go get golang.org/x/lint/golint@$(GOLINT_VERSION)
 	@rm -rf $(GOLINT_TMP)
 
 ERRCHECK_VERSION := v1.2.0
