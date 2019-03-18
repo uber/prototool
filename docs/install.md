@@ -1,5 +1,7 @@
 # Installation
 
+[Back to README.md](README.md)
+
 Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/) or Linux via [Linuxbrew](http://linuxbrew.sh/).
 
 ```bash

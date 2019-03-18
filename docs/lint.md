@@ -1,5 +1,7 @@
 # Lint
 
+[Back to README.md](README.md)
+
 `prototool lint` lints your Protobuf files.
 
 Lint rules can be set using the configuration file. See the configuration at [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available options. There are two pre-configured groups of rules:
