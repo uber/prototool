@@ -19,7 +19,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_cpuguy83_go_md2man",
         importpath = "github.com/cpuguy83/go-md2man",
-        tag = "v1.0.8",
+        tag = "v1.0.10",
     )
     go_repository(
         name = "com_github_davecgh_go_spew",
