@@ -380,7 +380,7 @@ not have any breaking changes on a given major version, with some exceptions:
 
 ## Development
 
-See [development.mq](development.md) for concerns related to Prototool development.
+See [development.md](development.md) for concerns related to Prototool development.
 
 ## FAQ
 
