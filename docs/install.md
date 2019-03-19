@@ -2,6 +2,8 @@
 
 [Back to README.md](README.md)
 
+## Brew
+
 Prototool can be installed on Mac OS X via [Homebrew](https://brew.sh/) or Linux via
 [Linuxbrew](http://linuxbrew.sh/).
 
@@ -10,6 +12,9 @@ brew install prototool
 ```
 
 This installs the `prototool` binary, along with bash completion, zsh completion, and man pages.
+
+## GitHub Releases
+
 You can also install all of the assets on Linux or without Homebrew from GitHub Releases.
 
 ```bash
@@ -28,8 +33,10 @@ curl -sSL \
   chmod +x /usr/local/bin/prototool
 ```
 
-You can also install the `prototool` binary using `go get` if using Go 1.11+ with module support
-enabled. You can specify a branch such as `dev`, or a specific commit.
+## Golang Modules
+
+You can also install the `prototool` binary using `go get` if using Go 1.11+ with Modules enabled.
+You can specify a branch such as `dev`, or a specific commit.
 
 ```bash
 GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
@@ -97,3 +104,7 @@ $(PROTOTOOL):
 proto: $(PROTOTOOL)
   prototool generate
 ```
+
+## Docker
+
+Prototool can also be used within Docker. See [docker.md](docker.md) for more details.
