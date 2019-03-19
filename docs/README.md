@@ -245,6 +245,49 @@ Call a gRPC endpoint using a JSON input. What this does behind the scenes:
 
 *See [grpc.md](grpc.md) for full instructions.*
 
+##### `prototool descriptor-set`
+
+Produce a serialized `FileDescriptorSet` for all Protobuf definitions. By default, the serialized
+`FileDescriptorSet` is printed to stdout. There are a few options:
+
+- `--include-imports, --include-source-info` are analagous to `protoc`'s `--include_imports,
+  --include_source_info` flags.
+- `--json` outputs the FileDescriptorSet as JSON instead of binary.
+- `-o` writes the `FileDescriptorSet` to the given output file path.
+- `--tmp` writes the `FileDescriptorset` to a temporary file and prints the file path.
+
+The outputted `FileDescriptorSet` is a merge of all produced `FileDescriptorSets` for each
+Protobuf package compiled.
+
+This command is useful in a few situations.
+
+One such situation is with external gRPC tools such as [grpcurl](https://github.com/fullstorydev/grpcurl)
+or [ghz](https://ghz.sh). Both tools take a path to a serialized `FileDescriptorSet` for use to
+figure out the request/response structure of RPCs when the gRPC reflection service is not available.
+`prototool descriptor-set` can be used to generate these `FileDescriptorSet`s on the fly.
+
+```bash
+grpcurl -protoset $(prototool descriptor-set --include-imports --tmp) ...
+ghz -protoset $(prototool descriptor-set --include-imports --tmp) ...
+```
+
+You can also just save the file once and not re-compile each time.
+
+```bash
+prototool descriptor-set --include-imports -o descriptor_set.bin
+grpcurl -protoset descriptor_set.bin ...
+ghz -protoset descriptor_set.bin ...
+```
+
+Another situation is to use `jq` to make arbitrary queries on your Protobuf definitions.
+
+For example, if your Protobuf definitions are in `path/to/proto`, the following will print
+all message names.
+
+```bash
+prototool descriptor-set path/to/proto/root --json | jq '.file[] | select(.messageType != null) | .messageType[] | .name' | sort | uniq
+```
+
 ## Tips and Tricks
 
 Prototool is meant to help enforce a consistent development style for Protobuf, and as such you
