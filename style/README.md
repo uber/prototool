@@ -205,6 +205,9 @@ necessary. For example, copy `foo.bar.v1` to `foo.bar.v2`, and do any cleanups r
 This is not a breaking change as `foo.bar.v2` is a new package. Of course, you are responsible
 for the migration of your callers.
 
+Prototool is able to detect breaking changes in your Protobuf definitions. See
+[breaking.md](../docs/breaking.md) for more details.
+
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
 
 ## Directory Structure

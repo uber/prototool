@@ -2,6 +2,14 @@
 
 [Back to README.md](README.md)
 
+  * [Usage](#usage)
+    * [Git](#git)
+    * [Saved State](#saved-state)
+  * [Beta vs\. Stable Packages](#beta-vs-stable-packages)
+  * [Per\-package breaking change detection](#per-package-breaking-change-detection)
+  * [Future source code location references](#future-source-code-location-references)
+  * [Implementation](#implementation)
+
 Protobuf is a great way to represent your APIs and generate stubs in each language you develop
 with. As such, Protobuf APIs should be stable so as not to break consumers across repositories.
 Even in a monorepo context, making sure that your Protobuf APIs do not introduce breaking
@@ -17,7 +25,7 @@ if there are any source or wire incompatible changes. Some notes on this command
 - The breaking change detector can either check against a given git branch or tag, or it can check
   against a previous state saved with the `prototool break descriptor-set` command.
 - The breaking change detector understands the concept of **beta vs. stable packages**, discussed
-  in the [V2 Style Guide](../style.README.md#package-versioning). By default, the breaking change
+  in the [V2 Style Guide](../style/README.md#package-versioning). By default, the breaking change
   detector will not check beta packages for breaking changes, and will not allow stable packages to
   depend on beta packages, however both of these options are configurable in your `prototool.yaml`
   file.
@@ -38,6 +46,11 @@ Over the next few minor versions of Prototool, we may add to this list if other 
 understood to be breaking, for example we may detect file option changes. However, the addition of
 additional checks is highly unlikely, and we will update the documentation accordingly when we are
 sure that no additional checks will be added.
+
+A note on reserved fields: `prototool break check` expects you to deprecate fields instead of
+removing them and adding them to `reserved`. See the
+[V2 Style Guide's discussion](../style/README.md#reserved-keyword) on the `reserved` keyword for
+more details.
 
 ## Usage
 
@@ -100,6 +113,36 @@ What this does behind the scenes:
 - Compares the two `FileDescriptorSets` to see if breaking changes were introduced from the current
   state to the previous state.
 
+## Beta vs. Stable Packages
+
+As described in the [V2 Style Guide](../style/README.md#package-versioning), `prototool`
+understands the concept of beta vs. stable packages.
+
+If a package's last component is `vMAJORbetaBETA`, where `MAJOR` and `BETA`
+are both greater than 0, `prototool break check` will understand that this package is a
+beta package, otherwise the package is understood as a stable pacakge.
+
+The following are examples of beta packages.
+
+```proto
+package uber.trip.v1beta1;
+package uber.user.v1beta2;
+package uber.road.v2beta1;
+```
+
+By default, Prototool will not check beta packages for breaking changes, and will also
+check to make sure not stable packages depend on beta packages. Both of these options
+are configurable in your `prototool.yaml`.
+
+```yaml
+break:
+  # Include beta packages in breaking change detection.
+  include_beta: true
+  # Allow stable packages to depend on beta packages.
+  # If include_beta is true, this is implicitly set.
+  allow_beta_deps: true
+```
+
 ## Per-package breaking change detection
 
 Some notes on why we chose per-package instead of per-file logic for breaking change detection.
@@ -131,3 +174,38 @@ There are two main exceptions to the "no breaking changes in generated code" sta
   this is something that can be detected at compile-time (and should be detectable at testing time
   for dynamic languages), and given the drawbacks of per-file breaking change detection, we still
   prefer per-package breaking change detection.
+
+## Future source code location references
+
+For now, unlike other `prototool` commands, `prototool break check` only outputs error messages
+and **does not output filename:line:column location references.** The problem of referencing your
+current Protobuf files with the location of a breaking change is harder than it seems, however we
+aim to implement this in the future. The logic that will likely be implemented is as follows.
+
+- For deleted enum values, message fields, or service methods, point to the encapsulating enum,
+  message, or service.
+- For renamed fields, fields with a type change or tag change, or service methods whose signature
+  changes, point to the field or service method.
+- For deleted enums, messages, or services, point to `1:1` of the file where this was deleted.
+  Determining the file to put this on will be not technically possible if the file no longer exists
+  or is renamed, so in this case, either do not output a filename and default to `<input>`, or
+  choose the first file in the package alphabetically if a file is required. If all files were
+  deleted, `<input>` will likely have to be defaulted to.
+
+## Implementation
+
+The breaking change detection is primarily implemented through a series of packages within
+`internal`.
+
+- [internal/reflect](../internal/reflect) - This wraps the Protobuf definition at
+  [internal/reflect/proto/uber/proto/reflect/v1/reflect.proto](../internal/reflect/proto/uber/proto/reflect/v1/reflect.proto),
+  which is intended to contain definitions that represent Protobuf definitions on a per-package
+  basis. This file is intended to be analogous to the [descriptor.proto](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/descriptor.proto)
+  file in Protobuf's source code, however, as of now, `reflect.proto` only contains the information
+  necessary for breaking change detection. This could be extended in the future and exposed outside
+  of Prototool's internal implementation.
+- [internal/extract](../internal/extract) - This wraps `internal/reflect` in a manner that makes
+  working with the `reflect.proto` definitions easier within Golang.
+- [internal/breaking](../internal/breaking) - This uses `internal/extract` to implement the actual
+  breaking change logic.
+- [internal/git](../internal/git) - This provides the function to do temporary git clones.
