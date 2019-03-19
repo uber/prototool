@@ -2,6 +2,23 @@
 
 [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
+**New: v1.4.0**
+
+The v1.4.0 release contains many additions and improvements, including:
+
+- A new [V2 Style Guide](../style) and matching lint group containing 39 new lint rules over our V1
+  Style Guide that helps with producing consistent, maintainable Protobuf definitions.
+- A new [breaking change detector](breaking.md) that checks for breaking changes on a per-package
+  basis, either against git branches or tags, or a file with your previously saved state.
+- A new [descriptor-set command](#prototool-descriptor-set) to produce `FileDescriptorSets` for
+  external tools or for manual JSON queries with `jq`.
+- A new [maintained Docker image](docker.md) to provide a consistent environment for common
+  Protobuf plugins.
+- Granular control over the [protoc cache](protoc.md).
+- TLS and unix domain socket support for [grpc](grpc.md).
+
+**See [CHANGELOG.md](../CHANGELOG.md) for full details.**
+
 [Protobuf](https://developers.google.com/protocol-buffers) is one of the best interface description
 languages out there - it's widely adopted, and after over 15 years of use, it's practically
 bulletproof. However, working with Protobuf and maintaining consistency across your Protobuf files
@@ -52,6 +69,7 @@ Protobuf file, or under a second for a larger number (500+) of Protobuf files.
     * [prototool create](#prototool-create)
     * [prototool files](#prototool-files)
     * [prototool break check](#prototool-break-check)
+    * [prototool descriptor-set](#prototool-descriptor-set)
     * [prototool grpc](#prototool-grpc)
   * [Tips and Tricks](#tips-and-tricks)
   * [Vim Integration](#vim-integration)
@@ -108,6 +126,8 @@ protoc:
 lint:
   group: uber2
 ```
+
+*See [protoc.md](protoc.md) for how Prototool handles working with `protoc`.*
 
 The command `prototool config init` will generate a config file in the current directory with the
 currently recommended options set.
@@ -194,9 +214,22 @@ See [example/proto/prototool.yaml](../example/proto/prototool.yaml) for a full e
 
 ##### `prototool lint`
 
-Lint your Protobuf files. Lint rules can be set using the configuration file. See the configuration
-at [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available
-options.
+Lint rules can be set using the configuration file. See the configuration at
+[etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available
+options. There are three pre-configured groups of rules, the setting of which is integral to the
+`prototool lint`, `prototool create`, and `prototool format` commands:
+
+- `uber2`: This lint group follows the [V2 Uber Style Guide](../style/README.md), and makes some
+  modifications to more closely follow the Google Cloud APIs file structure, as well as adding even
+  more rules to enforce more consistent development patterns. This is the lint group we recommend
+  using.
+- `uber1`: This lint group follows the [V1 Uber Style Guide](../etc/style/uber1/uber1.proto). For
+  backwards compatibility reasons, this is the default lint group, however we recommend using the
+  `uber2` lint group.
+- `google`: This lint group follows the
+  [Google Style Guide](https://developers.google.com/protocol-buffers/docs/style). This is a small
+  group of rules meant to enforce basic naming. The style guide is copied to
+  [etc/style/google/google.proto](../etc/style/google/google.proto).
 
 There are three pre-configured groups of rules: `google`, `uber1`, and `uber2`.
 
@@ -226,11 +259,72 @@ Print the list of all files that will be used given the input `dirOrFile`. Usefu
 
 ##### `prototool break check`
 
-Check for breaking changes, either against a git branch or tag, or against a file with saved state,
-checking on a per-package basis. This command also understands the concept of beta vs. stable
-packages.
+Protobuf is a great way to represent your APIs and generate stubs in each language you develop
+with. As such, Protobuf APIs should be stable so as not to break consumers across repositories.
+Even in a monorepo context, making sure that your Protobuf APIs do not introduce breaking
+changes is important so that different deployed versions of your services do not have
+wire incompatibilities.
+
+Prototool exposes a breaking change detector through the `prototool break check` command. This will
+check your current Protobuf definitions against a past version of your Protobuf definitions to see
+if there are any source or wire incompatible changes. Some notes on this command:
+
+- The breaking change detection operates on a **per-package** basis, not per-file - definitions
+  can be moved between files within the same Protobuf package without being considered breaking.
+- The breaking change detector can either check against a given git branch or tag, or it can check
+  against a previous state saved with the `prototool break descriptor-set` command.
+- The breaking change detector understands the concept of **beta vs. stable packages**, discussed
+  in the [V2 Style Guide](../style/README.md#package-versioning). By default, the breaking change
+  detector will not check beta packages for breaking changes, and will not allow stable packages to
+  depend on beta packages, however both of these options are configurable in your `prototool.yaml`
+  file.
 
 *See [breaking.md](breaking.md) for full instructions.*
+
+##### `prototool descriptor-set`
+
+Produce a serialized `FileDescriptorSet` for all Protobuf definitions. By default, the serialized
+`FileDescriptorSet` is printed to stdout. There are a few options:
+
+- `--include-imports, --include-source-info` are analagous to `protoc`'s `--include_imports,
+  --include_source_info` flags.
+- `--json` outputs the FileDescriptorSet as JSON instead of binary.
+- `-o` writes the `FileDescriptorSet` to the given output file path.
+- `--tmp` writes the `FileDescriptorset` to a temporary file and prints the file path.
+
+The outputted `FileDescriptorSet` is a merge of all produced `FileDescriptorSets` for each
+Protobuf package compiled.
+
+This command is useful in a few situations.
+
+One such situation is with external gRPC tools such as [grpcurl](https://github.com/fullstorydev/grpcurl)
+or [ghz](https://ghz.sh). Both tools take a path to a serialized `FileDescriptorSet` for use to
+figure out the request/response structure of RPCs when the gRPC reflection service is not available.
+`prototool descriptor-set` can be used to generate these `FileDescriptorSet`s on the fly.
+
+```bash
+grpcurl -protoset $(prototool descriptor-set --include-imports --tmp) ...
+ghz -protoset $(prototool descriptor-set --include-imports --tmp) ...
+```
+
+You can also just save the file once and not re-compile each time.
+
+```bash
+prototool descriptor-set --include-imports -o descriptor_set.bin
+grpcurl -protoset descriptor_set.bin ...
+ghz -protoset descriptor_set.bin ...
+```
+
+Another situation is to use `jq` to make arbitrary queries on your Protobuf definitions.
+
+For example, if your Protobuf definitions are in `path/to/proto`, the following will print
+all message names.
+
+```bash
+prototool descriptor-set path/to/proto --json | \
+  jq '.file[] | select(.messageType != null) | .messageType[] | .name' | \
+  sort | uniq
+```
 
 ##### `prototool grpc`
 
@@ -286,7 +380,7 @@ not have any breaking changes on a given major version, with some exceptions:
 
 ## Development
 
-See [development.mq](development.md) for concerns related to Prototool development.
+See [development.md](development.md) for concerns related to Prototool development.
 
 ## FAQ
 
