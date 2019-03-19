@@ -5,7 +5,8 @@
 This repository is a self-contained plugin for use with the
 [ALE Lint Engine](https://github.com/w0rp/ale).
 
-Prototool is also enabled as a maker within [Neomake](https://github.com/neomake/neomake/blob/master/autoload/neomake/makers/ft/proto.vim).
+Prototool is also enabled as a maker within
+[Neomake](https://github.com/neomake/neomake/blob/master/autoload/neomake/makers/ft/proto.vim).
 
 The Vim integration will currently compile, provide lint errors, do generation of your stubs, and
 format your files on save. It will also optionally create new files from a template when opened.

@@ -211,13 +211,6 @@ actions:
 - `-l` Write a lint error in the form file:line:column:message if a file is unformatted.
 - `-w` Overwrite the existing file instead.
 
-Concretely, the `-f` flag can be used so that the values for `java_multiple_files`,
-`java_outer_classname`, and `java_package` are updated to reflect what is expected by the
-[Google Cloud APIs file structure](https://cloud.google.com/apis/design/file_structure), and the
-value of `go_package` is updated to reflect what we expect for the Uber Style Guide. By formatting,
-the linting for these values will pass by default. See the documentation below for
-`prototool create` for an example.
-
 ##### `prototool create`
 
 Create Protobuf files from a template. With the provided Vim integration, this will automatically
@@ -282,6 +275,8 @@ not have any breaking changes on a given major version, with some exceptions:
   purely an upgrade, so until this is done, do not parse `prototool break check` output in scripts.
 - The breaking change detector may have additional checks added between minor versions, and
   therefore a change that might not have been breaking previously might become a breaking change.
+  This may become stable in the near future, and at this time we'll denote that no more checks
+  will be added.
 
 ## Development
 
