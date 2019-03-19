@@ -52,6 +52,7 @@ Protobuf file, or under a second for a larger number (500+) of Protobuf files.
     * [prototool create](#prototool-create)
     * [prototool files](#prototool-files)
     * [prototool break check](#prototool-break-check)
+    * [prototool descriptor-set](#prototool-descriptor-set)
     * [prototool grpc](#prototool-grpc)
   * [Tips and Tricks](#tips-and-tricks)
   * [Vim Integration](#vim-integration)
@@ -261,19 +262,6 @@ if there are any source or wire incompatible changes. Some notes on this command
 
 *See [breaking.md](breaking.md) for full instructions.*
 
-##### `prototool grpc`
-
-Call a gRPC endpoint using a JSON input. What this does behind the scenes:
-
-- Compiles your Protobuf files with `protoc`, generating a `FileDescriptorSet`.
-- Uses the `FileDescriptorSet` to figure out the request and response type for the endpoint, and to
-  convert the JSON input to binary.
-- Calls the gRPC endpoint.
-- Uses the `FileDescriptorSet` to convert the resulting binary back to JSON, and prints it out for
-  you.
-
-*See [grpc.md](grpc.md) for full instructions.*
-
 ##### `prototool descriptor-set`
 
 Produce a serialized `FileDescriptorSet` for all Protobuf definitions. By default, the serialized
@@ -318,6 +306,19 @@ prototool descriptor-set path/to/proto --json | \
   jq '.file[] | select(.messageType != null) | .messageType[] | .name' | \
   sort | uniq
 ```
+
+##### `prototool grpc`
+
+Call a gRPC endpoint using a JSON input. What this does behind the scenes:
+
+- Compiles your Protobuf files with `protoc`, generating a `FileDescriptorSet`.
+- Uses the `FileDescriptorSet` to figure out the request and response type for the endpoint, and to
+  convert the JSON input to binary.
+- Calls the gRPC endpoint.
+- Uses the `FileDescriptorSet` to convert the resulting binary back to JSON, and prints it out for
+  you.
+
+*See [grpc.md](grpc.md) for full instructions.*
 
 ## Tips and Tricks
 
