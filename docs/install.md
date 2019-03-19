@@ -23,7 +23,7 @@ curl -sSL \
   tar -C /usr/local --strip-components 1 -xz
 ```
 
-If you do not want to install bash completion, zsh completion, or man mages, you can install just
+If you do not want to install bash completion, zsh completion, or man pages, you can install just
 the `prototool` binary from GitHub Releases as well.
 
 ```bash
