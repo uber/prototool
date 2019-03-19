@@ -194,9 +194,22 @@ See [example/proto/prototool.yaml](../example/proto/prototool.yaml) for a full e
 
 ##### `prototool lint`
 
-Lint your Protobuf files. Lint rules can be set using the configuration file. See the configuration
-at [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available
-options.
+Lint rules can be set using the configuration file. See the configuration at
+[etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for all available
+options. There are three pre-configured groups of rules, the setting of which is integral to the
+`prototool lint`, `prototool create`, and `prototool format` commands:
+
+- `uber2`: This lint group follows the [V2 Uber Style Guide](../style/README.md), and makes some
+  modifications to more closely follow the Google Cloud APIs file structure, as well as adding even
+  more rules to enforce more consistent development patterns. This is the lint group we recommend
+  using.
+- `uber1`: This lint group follows the [V1 Uber Style Guide](../etc/style/uber1/uber1.proto). For
+  backwards compatibility reasons, this is the default lint group, however we recommend using the
+  `uber2` lint group.
+- `google`: This lint group follows the
+  [Google Style Guide](https://developers.google.com/protocol-buffers/docs/style). This is a small
+  group of rules meant to enforce basic naming. The style guide is copied to
+  [etc/style/google/google.proto](../etc/style/google/google.proto).
 
 There are three pre-configured groups of rules: `google`, `uber1`, and `uber2`.
 
@@ -226,9 +239,25 @@ Print the list of all files that will be used given the input `dirOrFile`. Usefu
 
 ##### `prototool break check`
 
-Check for breaking changes, either against a git branch or tag, or against a file with saved state,
-checking on a per-package basis. This command also understands the concept of beta vs. stable
-packages.
+Protobuf is a great way to represent your APIs and generate stubs in each language you develop
+with. As such, Protobuf APIs should be stable so as not to break consumers across repositories.
+Even in a monorepo context, making sure that your Protobuf APIs do not introduce breaking
+changes is important so that different deployed versions of your services do not have
+wire incompatibilities.
+
+Prototool exposes a breaking change detector through the `prototool break check` command. This will
+check your current Protobuf definitions against a past version of your Protobuf definitions to see
+if there are any source or wire incompatible changes. Some notes on this command:
+
+- The breaking change detection operates on a **per-package** basis, not per-file - definitions
+  can be moved between files within the same Protobuf package without being considered breaking.
+- The breaking change detector can either check against a given git branch or tag, or it can check
+  against a previous state saved with the `prototool break descriptor-set` command.
+- The breaking change detector understands the concept of **beta vs. stable packages**, discussed
+  in the [V2 Style Guide](../style/README.md#package-versioning). By default, the breaking change
+  detector will not check beta packages for breaking changes, and will not allow stable packages to
+  depend on beta packages, however both of these options are configurable in your `prototool.yaml`
+  file.
 
 *See [breaking.md](breaking.md) for full instructions.*
 
