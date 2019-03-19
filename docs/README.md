@@ -1,4 +1,4 @@
-# prototool [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
+# Prototool [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
 [Protobuf](https://developers.google.com/protocol-buffers) is one of the best interface description
 languages out there - it's widely adopted, and after over 15 years of use, it's practically
