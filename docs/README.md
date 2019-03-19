@@ -1,4 +1,6 @@
-# Prototool [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
+# Prototool
+
+[![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
 [Protobuf](https://developers.google.com/protocol-buffers) is one of the best interface description
 languages out there - it's widely adopted, and after over 15 years of use, it's practically
@@ -309,6 +311,9 @@ contribution to Prototool's functionality:
 
 [ci-img]: https://img.shields.io/travis/uber/prototool/dev.svg
 [ci]: https://travis-ci.org/uber/prototool/builds
+
+[cov-img]: https://codecov.io/gh/uber/prototool/branch/dev/graph/badge.svg
+[cov]: https://codecov.io/gh/uber/prototool/branch/dev
 
 [docker-img]: https://img.shields.io/docker/pulls/uber/prototool.svg
 [docker]: https://hub.docker.com/r/uber/prototool
