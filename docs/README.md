@@ -2,11 +2,10 @@
 
 [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
-**
-New: The v1.4.0 release contains many additions and improvements, including:
+**New: The v1.4.0 release contains many additions and improvements, including:**
 
-- A new [V2 Style Guide](../style) and matching lint group containing 39 new lint rules over our V1
-  Style Guide that helps with producing consistent, maintainable Protobuf definitions.
+**- A new [V2 Style Guide](../style) and matching lint group containing 39 new lint rules over our V1
+  Style Guide that helps with producing consistent, maintainable Protobuf definitions.**
 - A new [breaking change detector](breaking.md) that checks for breaking changes on a per-package
   basis, either against git branches or tags, or a file with your previously saved state.
 - A new [descriptor-set command](#prototool-descriptor-set) to produce `FileDescriptorSets` for
