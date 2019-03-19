@@ -110,6 +110,8 @@ lint:
   group: uber2
 ```
 
+*See [protoc.md](protoc.md) for how Prototool handles working with `protoc`.*
+
 The command `prototool config init` will generate a config file in the current directory with the
 currently recommended options set.
 
