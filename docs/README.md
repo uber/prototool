@@ -226,6 +226,10 @@ Print the list of all files that will be used given the input `dirOrFile`. Usefu
 
 ##### `prototool break check`
 
+Check for breaking changes, either against a git branch or tag, or against a file with saved state,
+checking on a per-package basis. This command also understands the concept of beta vs. stable
+packages.
+
 *See [breaking.md](breaking.md) for full instructions.*
 
 ##### `prototool grpc`
