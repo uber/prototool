@@ -1,4 +1,4 @@
-# prototool [![Mit License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker]
+# prototool [![Mit License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
 [Protobuf](https://developers.google.com/protocol-buffers) is one of the best interface description
 languages out there - it's widely adopted, and after over 15 years of use, it's practically
@@ -10,9 +10,8 @@ Prototool aims to solve this by making working with Protobuf much simpler.
 Prototool lets you:
 
 - Handle installation of `protoc` and the import of all of the Well-Known Types behind the scenes
-  in a platform-independent manner without any work on the part of the user.
-- Standardize building of your Protobuf files with a common [configuration](#configuration),
-  abstracting away all of the pain of protoc for you.
+  in a platform-independent manner.
+- Standardize building of your Protobuf files with a common [configuration](#configuration).
 - [Lint](#prototool-lint) your Protobuf files with common linting rules according to
   [Google' Style Guide](https://developers.google.com/protocol-buffers/docs/style),
   [Uber's V1 Style Guide](../etc/style/uber1/uber1.proto),
@@ -232,7 +231,7 @@ Print the list of all files that will be used given the input `dirOrFile`. Usefu
 
 ##### `prototool break check`
 
-TODO
+*See [breaking.md](breaking.md) for full instructions.*
 
 ##### `prototool grpc`
 
@@ -321,3 +320,9 @@ contribution to Prototool's functionality:
 
 [docker-img]: https://img.shields.io/docker/pulls/uber/prototool.svg
 [docker]: https://hub.docker.com/r/uber/prototool
+
+[homebrew-img]: https://img.shields.io/homebrew/v/prototool.svg
+[homebrew]: https://formulae.brew.sh/formula/prototool
+
+[aur-img]: https://img.shields.io/aur/version/prototool-git.svg
+[aur]: https://aur.archlinux.org/packages/prototool-git
