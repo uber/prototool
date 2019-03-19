@@ -314,7 +314,7 @@ For example, if your Protobuf definitions are in `path/to/proto`, the following 
 all message names.
 
 ```bash
-prototool descriptor-set path/to/proto/root --json | \
+prototool descriptor-set path/to/proto --json | \
   jq '.file[] | select(.messageType != null) | .messageType[] | .name' | \
   sort | uniq
 ```
