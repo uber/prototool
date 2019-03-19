@@ -10,19 +10,38 @@ Assuming the filename `example_create_file.proto`, the file will look like the f
 ```proto
 syntax = "proto3";
 
-package SOME.PKG;
+package some.pkg;
 
-option go_package = "PKGpb";
+option go_package = "pkgpb";
 option java_multiple_files = true;
 option java_outer_classname = "ExampleCreateFileProto";
-option java_package = "com.SOME.PKG.pb";
+option java_package = "com.some.pkg.pb";
 ```
 
-This matches what the linter expects. `SOME.PKG` will be computed as follows:
+If using the [uber2 lint group](lint.md), the file will look like the following:
 
-- If `--package` is specified, `SOME.PKG` will be the value passed to `--package`.
+```proto
+syntax = "proto3";
+
+package some.pkg.v1;
+
+option csharp_namespace = "Some.Pkg.V1"
+option go_package = "pkgv1";
+option java_multiple_files = true;
+option java_outer_classname = "ExampleCreateFileProto";
+option java_package = "com.some.pkg.v1";
+option objc_class_prefix = "SPX";
+option php_namespace = "Some\\Pkg\\V1";
+```
+
+This matches what the linter expects, and closely matches the
+[Google Cloud APIs File Structure](https://cloud.google.com/apis/design/file_structure).
+
+The package `some.pkg` will be computed as follows:
+
+- If `--package` is specified, `some.pkg` will be the value passed to `--package`.
 - Otherwise, if there is no `prototool.yaml` or `prototool.json` that would apply to the new file,
-  use `uber.prototool.generated`.
+  use `uber.prototool.generated`, or `uber.prototool.generated.v1` if using the `uber2` lint group.
 - Otherwise, if there is a `prototool.yaml` or `prototool.json` file, check if it has a `packages`
   setting under the `create` section (see
   [etc/config/example/prototool.yaml](../etc/config/example/prototool.yaml) for an example).
@@ -30,7 +49,7 @@ This matches what the linter expects. `SOME.PKG` will be computed as follows:
   `prototool.yaml` or `prototool.json` file will be used.
 - Otherwise, if there is no `packages` directive, just use the relative path from the directory
   with the `prototool.yaml` or `prototool.json` file. If the file is in the same directory as the
-  `prototool.yaml` file, use `uber.prototool.generated`.
+  `prototool.yaml` file, use `uber.prototool.generated` or `uber.prototool.generated.v1`.
 
 For example, assume you have the following file at `repo/prototool.yaml`:
 
