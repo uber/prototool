@@ -2,7 +2,7 @@
 
 [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
-## New: v1.4.0
+**New: v1.4.0**
 
 The v1.4.0 release contains many additions and improvements, including:
 
@@ -17,7 +17,7 @@ The v1.4.0 release contains many additions and improvements, including:
 - Granular control over the [protoc cache](protoc.md).
 - TLS and unix domain socket support for [grpc](grpc.md).
 
-*See [CHANGELOG.md](../CHANGELOG.md) for full details.*
+**See [CHANGELOG.md](../CHANGELOG.md) for full details.**
 
 [Protobuf](https://developers.google.com/protocol-buffers) is one of the best interface description
 languages out there - it's widely adopted, and after over 15 years of use, it's practically
