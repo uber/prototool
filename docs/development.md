@@ -26,4 +26,10 @@ Before submitting a PR, make sure to:
 The entire implementation is purposefully under the `internal` package to not expose any API for
 the time being.
 
-For maintainers: See [release.md](release.md) for the release process.
+## Maintainers
+
+See [release.md](release.md) for the release process.
+
+See https://github.com/uber/prototool/pull/417 for an example of how to update the default version
+of `protoc`. Note that `etc/config/example/prototool.yaml` is automatically updated once you
+update `DefaultProtocVersion` in `internal/vars/vars.go` and you run `make generate`.
