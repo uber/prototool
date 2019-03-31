@@ -24,12 +24,12 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_davecgh_go_spew",
         importpath = "github.com/davecgh/go-spew",
-        tag = "v1.1.1",
+        tag = "v1.1.0",
     )
     go_repository(
         name = "com_github_emicklei_proto",
         importpath = "github.com/emicklei/proto",
-        tag = "v1.6.9",
+        tag = "v1.6.10",
     )
     go_repository(
         name = "com_github_fullstorydev_grpcurl",
@@ -39,7 +39,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_gobuffalo_flect",
         importpath = "github.com/gobuffalo/flect",
-        tag = "v0.1.0",
+        tag = "v0.1.1",
     )
     go_repository(
         name = "com_github_gofrs_flock",
@@ -59,7 +59,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_golang_protobuf",
         importpath = "github.com/golang/protobuf",
-        tag = "v1.3.0",
+        tag = "v1.3.1",
     )
     go_repository(
         name = "com_github_inconshreveable_mousetrap",
@@ -133,13 +133,13 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_google_genproto",
-        commit = "11092d34479b",
+        commit = "c66870c02cf8",
         importpath = "google.golang.org/genproto",
     )
     go_repository(
         name = "org_golang_google_grpc",
         importpath = "google.golang.org/grpc",
-        tag = "v1.19.0",
+        tag = "v1.19.1",
     )
     go_repository(
         name = "org_golang_x_lint",
@@ -148,7 +148,7 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_x_net",
-        commit = "161cd47e91fd",
+        commit = "8a410e7b638d",
         importpath = "golang.org/x/net",
     )
     go_repository(

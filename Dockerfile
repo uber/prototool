@@ -1,9 +1,9 @@
-FROM golang:1.12.0-alpine3.9 as builder
+FROM golang:1.12.1-alpine3.9 as builder
 
 RUN apk add --update --no-cache build-base curl git upx && \
   rm -rf /var/cache/apk/*
 
-ENV GOLANG_PROTOBUF_VERSION=1.3.0 \
+ENV GOLANG_PROTOBUF_VERSION=1.3.1 \
   GOGO_PROTOBUF_VERSION=1.2.1
 RUN GO111MODULE=on go get \
   github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
@@ -14,7 +14,7 @@ RUN GO111MODULE=on go get \
   github.com/gogo/protobuf/protoc-gen-gogoslick@v${GOGO_PROTOBUF_VERSION} && \
   mv /go/bin/protoc-gen-go* /usr/local/bin/
 
-ENV GRPC_GATEWAY_VERSION=1.8.2
+ENV GRPC_GATEWAY_VERSION=1.8.5
 RUN curl -sSL \
   https://github.com/grpc-ecosystem/grpc-gateway/releases/download/v${GRPC_GATEWAY_VERSION}/protoc-gen-grpc-gateway-v${GRPC_GATEWAY_VERSION}-linux-x86_64 \
   -o /usr/local/bin/protoc-gen-grpc-gateway && \
@@ -24,13 +24,13 @@ RUN curl -sSL \
   chmod +x /usr/local/bin/protoc-gen-grpc-gateway && \
   chmod +x /usr/local/bin/protoc-gen-swagger
 
-ENV GRPC_WEB_VERSION=1.0.3
+ENV GRPC_WEB_VERSION=1.0.4
 RUN curl -sSL \
   https://github.com/grpc/grpc-web/releases/download/${GRPC_WEB_VERSION}/protoc-gen-grpc-web-${GRPC_WEB_VERSION}-linux-x86_64 \
   -o /usr/local/bin/protoc-gen-grpc-web && \
   chmod +x /usr/local/bin/protoc-gen-grpc-web
 
-ENV YARPC_VERSION=1.36.2
+ENV YARPC_VERSION=1.37.1
 RUN git clone --depth 1 -b v${YARPC_VERSION} https://github.com/yarpc/yarpc-go.git /go/src/go.uber.org/yarpc && \
     cd /go/src/go.uber.org/yarpc && \
     GO111MODULE=on go mod init && \
@@ -70,7 +70,7 @@ WORKDIR /work
 ENV \
   PROTOTOOL_PROTOC_BIN_PATH=/usr/bin/protoc \
   PROTOTOOL_PROTOC_WKT_PATH=/usr/include \
-  GRPC_VERSION=1.18.0 \
+  GRPC_VERSION=1.19.1 \
   PROTOBUF_VERSION=3.6.1 \
   ALPINE_GRPC_VERSION_SUFFIX=r0 \
   ALPINE_PROTOBUF_VERSION_SUFFIX=r1
@@ -83,8 +83,8 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/include
 
 ENV GOGO_PROTOBUF_VERSION=1.2.1 \
-  GOLANG_PROTOBUF_VERSION=1.3.0 \
-  GRPC_GATEWAY_VERSION=1.8.2 \
-  GRPC_WEB_VERSION=1.0.3 \
+  GOLANG_PROTOBUF_VERSION=1.3.1 \
+  GRPC_GATEWAY_VERSION=1.8.5 \
+  GRPC_WEB_VERSION=1.0.4 \
   TWIRP_VERSION=5.5.2 \
-  YARPC_VERSION=1.36.2
+  YARPC_VERSION=1.37.1

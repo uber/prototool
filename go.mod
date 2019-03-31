@@ -4,11 +4,11 @@ go 1.12
 
 require (
 	github.com/cpuguy83/go-md2man v1.0.10 // indirect
-	github.com/emicklei/proto v1.6.9
+	github.com/emicklei/proto v1.6.10
 	github.com/fullstorydev/grpcurl v1.2.1
-	github.com/gobuffalo/flect v0.1.0
+	github.com/gobuffalo/flect v0.1.1
 	github.com/gofrs/flock v0.7.1
-	github.com/golang/protobuf v1.3.0
+	github.com/golang/protobuf v1.3.1
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jhump/protoreflect v1.2.0
 	github.com/mitchellh/go-wordwrap v1.0.0
@@ -19,6 +19,6 @@ require (
 	go.uber.org/atomic v1.3.2 // indirect
 	go.uber.org/multierr v1.1.0
 	go.uber.org/zap v1.9.1
-	google.golang.org/grpc v1.19.0
+	google.golang.org/grpc v1.19.1
 	gopkg.in/yaml.v2 v2.2.2
 )
