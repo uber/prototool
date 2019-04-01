@@ -1,0 +1,6 @@
+lint:
+  group: uber2
+  rules:
+    add:
+      - ENUM_FIELDS_HAVE_COMMENTS
+      - MESSAGE_FIELDS_HAVE_COMMENTS
