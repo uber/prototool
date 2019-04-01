@@ -419,5 +419,5 @@ contribution to Prototool's functionality:
 [homebrew-img]: https://img.shields.io/homebrew/v/prototool.svg
 [homebrew]: https://formulae.brew.sh/formula/prototool
 
-[aur-img]: https://img.shields.io/aur/version/prototool-git.svg
-[aur]: https://aur.archlinux.org/packages/prototool-git
+[aur-img]: https://img.shields.io/aur/version/prototool-bin.svg
+[aur]: https://aur.archlinux.org/packages/prototool-bin

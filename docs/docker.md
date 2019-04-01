@@ -31,13 +31,13 @@ commonly-used, stable, maintained libraries.
 | --- | --- | --- |
 | prototool | (varies) | prototool |
 | [protoc] | 3.6.1 | protoc |
-| [grpc] | 1.18.0 | grpc_cpp_plugin<br>grpc_csharp_plugin<br>grpc_node_plugin<br>grpc_objective_c_plugin<br>grpc_php_plugin<br>grpc_python_plugin<br>grpc_ruby_plugin |
-| [golang/protobuf] | 1.3.0 | protoc-gen-go |
+| [grpc] | 1.19.1 | grpc_cpp_plugin<br>grpc_csharp_plugin<br>grpc_node_plugin<br>grpc_objective_c_plugin<br>grpc_php_plugin<br>grpc_python_plugin<br>grpc_ruby_plugin |
+| [golang/protobuf] | 1.3.1 | protoc-gen-go |
 | [gogo/protobuf] | 1.2.1 | protoc-gen-gofast<br>protoc-gen-gogo<br>protoc-gen-gogofast<br>protoc-gen-gogofaster<br>protoc-gen-gogoslick |
-| [grpc-gateway] | 1.8.2 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
-| [grpc-web] | 1.0.3 | protoc-gen-grpc-web |
+| [grpc-gateway] | 1.8.5 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
+| [grpc-web] | 1.0.4 | protoc-gen-grpc-web |
 | [twirp] | 5.5.2 | protoc-gen-twirp<br>protoc-gen-twirp_python |
-| [yarpc] | 1.36.2 | protoc-gen-yarpc-go |
+| [yarpc] | 1.37.1 | protoc-gen-yarpc-go |
 
 The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also installed.
 

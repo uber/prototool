@@ -19,7 +19,7 @@ export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
 export PATH := $(GOBIN):$(PATH)
 
-BAZEL_VERSION := 0.23.2
+BAZEL_VERSION := 0.24.0
 BAZEL := $(TMP_VERSIONS)/bazel/$(BAZEL_VERSION)
 ifeq ($(UNAME_OS),Darwin)
 BAZEL_OS := darwin
@@ -78,7 +78,7 @@ $(UPDATE_LICENSE):
 	@mkdir -p $(dir $(UPDATE_LICENSE))
 	@touch $(UPDATE_LICENSE)
 
-PROTOC_GEN_GO_VERSION := v1.3.0
+PROTOC_GEN_GO_VERSION := v1.3.1
 PROTOC_GEN_GO := $(TMP_VERSIONS)/protoc-gen-go/$(PROTOC_GEN_GO_VERSION)
 $(PROTOC_GEN_GO):
 	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
