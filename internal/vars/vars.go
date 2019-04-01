@@ -29,5 +29,5 @@ const (
 	// github.com/protocolbuffers/protobuf to use.
 	//
 	// See https://github.com/protocolbuffers/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.7.0"
+	DefaultProtocVersion = "3.7.1"
 )

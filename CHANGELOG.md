@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 - Add linters for enum field and message field comments. These linters are not
   part of any lint group but can be manually added in a configuration file.
+- Update the default version of `protoc` to `3.7.1`.
 
 
 ## [1.4.0] - 2019-03-19
