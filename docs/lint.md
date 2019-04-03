@@ -51,6 +51,27 @@ lint:
       - MESSAGE_NAMES_CAPITALIZED
 ```
 
+You can configure ignoring of lint rules on a per-file basis:
+
+```yaml
+lint:
+  ignores:
+    - id: MESSAGE_NAMES_CAMEL_CASE
+      files:
+        - foo.proto
+        - bar/baz.proto
+```
+
+To generate the a YAML configuration for currently-failing lint rules that can be copied into your
+configuration file, use `--generate-ignores`. This will lint your files, ignoring the existing
+setting for `lint.ignores`, and print a new value for it. Note that you should make sure not to
+touch other settings for `lint` in your configurartion file as this flag only generates the
+`lint.ignores` option.
+
+```
+prototool lint path/to/dir --generate-ignores
+```
+
 Linting also understands the concept of file headers, typically license headers. To specify a file
 header, add the following to your `prototool.yaml`:
 
