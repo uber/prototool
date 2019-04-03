@@ -751,7 +751,7 @@ message CommonFields {
 
 // Do not do this.
 message Vehicle {
-  CommonVehicleFields common_fields = 1;
+  CommonFields common_fields = 1;
   string vin = 2;
 }
 
