@@ -194,7 +194,7 @@ that `prototool config init --uncomment` generates.
 Compile your Protobuf files, but do not generate stubs. This has the effect of calling `protoc`
 with `-o /dev/null`.
 
-Pass the `--dry-fun` flag to see the `protoc` commands that Prototool runs behind the scenes.
+Pass the `--dry-run` flag to see the `protoc` commands that Prototool runs behind the scenes.
 
 ##### `prototool generate`
 
@@ -208,7 +208,7 @@ file instead of a set of files. Specifically, you can output a single JAR for th
 `protoc` `descriptor_set` plugin, optionally also calling `--include_imports` and/or
 `--include_source_info`.
 
-Pass the `--dry-fun` flag to see the `protoc` commands that Prototool runs behind the scenes.
+Pass the `--dry-run` flag to see the `protoc` commands that Prototool runs behind the scenes.
 
 See [example/proto/prototool.yaml](../example/proto/prototool.yaml) for a full example.
 
