@@ -193,7 +193,7 @@ service BamAPI {
 }
 
 service BanAPI {
-  rpc (GoodbyeRequest) returns (GoodbyeResponse) {
+  rpc SayGoodbye(SayGoodbyeRequest) returns (SayGoodbyeResponse) {
     option deprecated = true;
   }
 }
