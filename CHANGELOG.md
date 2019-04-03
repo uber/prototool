@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 - Add linters for enum field and message field comments. These linters are not
   part of any lint group but can be manually added in a configuration file.
+- Add `--generate-ignores` flag to the `lint` command to print out the value
+  for `lint.ignores` that will allow `lint` to pass. This is useful when
+  migrating to a set of lint rules, usually a lint group.
 - Update the default version of `protoc` to `3.7.1`.
 
 

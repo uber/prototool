@@ -2,9 +2,9 @@
 
 [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
-**New: v1.4.0**
+**New**
 
-The v1.4.0 release contains many additions and improvements, including:
+The v1.4.0 release contained many additions and improvements, including:
 
 - A new [V2 Style Guide](../style) and matching lint group containing 39 new lint rules over our V1
   Style Guide that helps with producing consistent, maintainable Protobuf definitions.
@@ -231,7 +231,8 @@ options. There are three pre-configured groups of rules, the setting of which is
   group of rules meant to enforce basic naming. The style guide is copied to
   [etc/style/google/google.proto](../etc/style/google/google.proto).
 
-There are three pre-configured groups of rules: `google`, `uber1`, and `uber2`.
+The flag `--generate-ignores` will help with migrating to a given lint group by generating
+the configuration to ignore existing lint failures on a per-file basis.
 
 *See [lint.md](lint.md) for full instructions.*
 

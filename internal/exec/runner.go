@@ -58,6 +58,7 @@ import (
 	"github.com/uber/prototool/internal/vars"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
+	"gopkg.in/yaml.v2"
 )
 
 var jsonpbMarshaler = &jsonpb.Marshaler{}
@@ -303,9 +304,9 @@ func (r *runner) doProtocCommands(compiler protoc.Compiler, meta *meta) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string) error {
-	if moreThanOneSet(listAllLinters, listLinters, listAllLintGroups, listLintGroup != "", diffLintGroups != "") {
-		return newExitErrorf(255, "can only set one of list-all-linters, list-linters, list-all-lint-groups, list-lint-group, diff-lint-groups")
+func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string, generateIgnores bool) error {
+	if moreThanOneSet(listAllLinters, listLinters, listAllLintGroups, listLintGroup != "", diffLintGroups != "", generateIgnores) {
+		return newExitErrorf(255, "can only set one of list-all-linters, list-linters, list-all-lint-groups, list-lint-group, diff-lint-groups, update-ignores")
 	}
 	if listAllLintGroups {
 		return r.listAllLintGroups()
@@ -330,12 +331,14 @@ func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, list
 	if _, err := r.compile(false, false, false, meta); err != nil {
 		return err
 	}
+	if generateIgnores {
+		return r.generateIgnores(meta)
+	}
 	return r.lint(meta)
 }
 
 func (r *runner) lint(meta *meta) error {
-	r.logger.Debug("calling LintRunner")
-	failures, err := r.newLintRunner().Run(meta.ProtoSet)
+	failures, err := r.newLintRunner().Run(meta.ProtoSet, false)
 	if err != nil {
 		return err
 	}
@@ -346,6 +349,65 @@ func (r *runner) lint(meta *meta) error {
 		return newExitErrorf(255, "")
 	}
 	return nil
+}
+
+func (r *runner) generateIgnores(meta *meta) error {
+	meta.ProtoSet.Config.Lint.IgnoreIDToFilePaths = make(map[string][]string)
+
+	failures, err := r.newLintRunner().Run(meta.ProtoSet, true)
+	if err != nil {
+		return err
+	}
+	if len(failures) == 0 {
+		return nil
+	}
+
+	idToFiles := make(map[string]map[string]struct{})
+	for _, failure := range failures {
+		if failure.LintID != "" && failure.Filename != "" {
+			rel, err := filepath.Rel(meta.ProtoSet.Config.DirPath, failure.Filename)
+			if err != nil {
+				return err
+			}
+			if _, ok := idToFiles[failure.LintID]; !ok {
+				idToFiles[failure.LintID] = make(map[string]struct{})
+			}
+			idToFiles[failure.LintID][rel] = struct{}{}
+		}
+	}
+
+	ids := make([]string, 0, len(idToFiles))
+	for id := range idToFiles {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+
+	externalConfig := &settings.ExternalConfig{}
+
+	for _, id := range ids {
+		filesMap := idToFiles[id]
+		files := make([]string, 0, len(filesMap))
+		for file := range filesMap {
+			files = append(files, file)
+		}
+		sort.Strings(files)
+		externalConfig.Lint.Ignores = append(
+			externalConfig.Lint.Ignores,
+			struct {
+				ID    string   `json:"id,omitempty" yaml:"id,omitempty"`
+				Files []string `json:"files,omitempty" yaml:"files,omitempty"`
+			}{
+				ID:    id,
+				Files: files,
+			},
+		)
+	}
+
+	data, err := yaml.Marshal(externalConfig)
+	if err != nil {
+		return err
+	}
+	return r.println(strings.TrimSpace(string(data)))
 }
 
 func (r *runner) listLinters(meta *meta) error {

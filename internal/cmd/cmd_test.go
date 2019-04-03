@@ -1554,6 +1554,85 @@ func TestInspectPackageImporters(t *testing.T) {
 	)
 }
 
+func TestGenerateIgnores(t *testing.T) {
+	t.Parallel()
+	assertExact(
+		t,
+		true,
+		0,
+		`lint:
+  ignores:
+  - id: COMMENTS_NO_C_STYLE
+    files:
+    - lots.proto
+  - id: ENUMS_NO_ALLOW_ALIAS
+    files:
+    - lots.proto
+  - id: ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+    files:
+    - lots.proto
+  - id: ENUM_FIELD_PREFIXES
+    files:
+    - lots.proto
+  - id: ENUM_NAMES_CAMEL_CASE
+    files:
+    - lots.proto
+  - id: ENUM_ZERO_VALUES_INVALID
+    files:
+    - lots.proto
+  - id: FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX
+    files:
+    - bar/dep.proto
+  - id: FILE_OPTIONS_REQUIRE_GO_PACKAGE
+    files:
+    - lots.proto
+  - id: FILE_OPTIONS_REQUIRE_JAVA_MULTIPLE_FILES
+    files:
+    - lots.proto
+  - id: FILE_OPTIONS_REQUIRE_JAVA_OUTER_CLASSNAME
+    files:
+    - lots.proto
+  - id: FILE_OPTIONS_REQUIRE_JAVA_PACKAGE
+    files:
+    - lots.proto
+  - id: MESSAGE_FIELD_NAMES_LOWER_SNAKE_CASE
+    files:
+    - lots.proto
+  - id: MESSAGE_NAMES_CAMEL_CASE
+    files:
+    - lots.proto
+  - id: MESSAGE_NAMES_CAPITALIZED
+    files:
+    - lots.proto
+  - id: PACKAGE_LOWER_SNAKE_CASE
+    files:
+    - lots.proto
+  - id: REQUEST_RESPONSE_TYPES_IN_SAME_FILE
+    files:
+    - lots.proto
+  - id: REQUEST_RESPONSE_TYPES_UNIQUE
+    files:
+    - lots.proto
+  - id: RPC_NAMES_CAPITALIZED
+    files:
+    - lots.proto
+  - id: SERVICE_NAMES_CAMEL_CASE
+    files:
+    - lots.proto
+  - id: SERVICE_NAMES_CAPITALIZED
+    files:
+    - lots.proto`,
+		"lint", "--generate-ignores", "testdata/lint/lots",
+	)
+	assertExact(
+		t,
+		true,
+		0,
+		``,
+		"lint", "--generate-ignores", "testdata/lint/version2",
+	)
+}
+
 func TestListLinters(t *testing.T) {
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters", "testdata/lint/base")
 	assertLinters(t, lint.Uber1Linters, "lint", "--list-linters", "testdata/lint/base")

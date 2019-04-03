@@ -40,12 +40,12 @@ func newRunner(options ...RunnerOption) *runner {
 	return runner
 }
 
-func (r *runner) Run(protoSet *file.ProtoSet) ([]*text.Failure, error) {
+func (r *runner) Run(protoSet *file.ProtoSet, absolutePaths bool) ([]*text.Failure, error) {
 	linters, err := GetLinters(protoSet.Config.Lint)
 	if err != nil {
 		return nil, err
 	}
-	dirPathToDescriptors, err := GetDirPathToDescriptors(protoSet)
+	dirPathToDescriptors, err := GetDirPathToDescriptors(protoSet, absolutePaths)
 	if err != nil {
 		return nil, err
 	}
