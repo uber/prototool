@@ -1004,7 +1004,7 @@ and there is no cost to having a message be unnested.
 
 Services should always be `PascalCase`. RPCs should always be `PascalCase.`
 
-Services should always be suffixed with `API`. For example, `TripAPI` or `UserAPI. This is for
+Services should always be suffixed with `API`. For example, `TripAPI` or `UserAPI`. This is for
 consistency.
 
 All services and RPCs require a comment that contains at least one complete sentence. See the
