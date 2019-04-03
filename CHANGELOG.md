@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+- No changes yet.
+
+
 ## [1.5.0] - 2019-04-03
 - Add linters for enum field and message field comments. These linters are not
   part of any lint group but can be manually added in a configuration file.
@@ -228,6 +232,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
+[Unreleased]: https://github.com/uber/prototool/compare/v1.5.0...HEAD
 [1.5.0]: https://github.com/uber/prototool/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/uber/prototool/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/uber/prototool/compare/v1.2.0...v1.3.0
