@@ -65,7 +65,7 @@ lint:
 To generate the a YAML configuration for currently-failing lint rules that can be copied into your
 configuration file, use `--generate-ignores`. This will lint your files, ignoring the existing
 setting for `lint.ignores`, and print a new value for it. Note that you should make sure not to
-touch other settings for `lint` in your configurartion file as this flag only generates the
+touch other settings for `lint` in your configuration file as this flag only generates the
 `lint.ignores` option.
 
 ```
