@@ -327,7 +327,7 @@ type ExternalConfig struct {
 	Break struct {
 		IncludeBeta   bool `json:"include_beta,omitempty" yaml:"include_beta,omitempty"`
 		AllowBetaDeps bool `json:"allow_beta_deps,omitempty" yaml:"allow_beta_deps,omitempty"`
-	}
+	} `json:"break,omitempty" yaml:"break,omitempty"`
 	Generate struct {
 		GoOptions struct {
 			ImportPath     string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`

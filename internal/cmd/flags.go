@@ -70,6 +70,7 @@ type flags struct {
 	tls               bool
 	tmp               bool
 	uncomment         bool
+	generateIgnores   bool
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -226,6 +227,10 @@ func (f *flags) bindStdin(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindUncomment(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.uncomment, "uncomment", false, "Uncomment the example config settings. Automatically sets --document.")
+}
+
+func (f *flags) bindGenerateIgnores(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.generateIgnores, "generate-ignores", false, "Generate a lint.ignores configuration to stdout that reflects current lint failures.\nThis can be copied to your configuration file.")
 }
 
 func (f *flags) bindTmp(flagSet *pflag.FlagSet) {

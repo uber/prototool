@@ -290,7 +290,7 @@ func init() {
 
 // Runner runs a lint job.
 type Runner interface {
-	Run(*file.ProtoSet) ([]*text.Failure, error)
+	Run(protoSet *file.ProtoSet, absolutePaths bool) ([]*text.Failure, error)
 }
 
 // RunnerOption is an option for a new Runner.
@@ -422,7 +422,9 @@ func GetLinters(config settings.LintConfig) ([]Linter, error) {
 
 // GetDirPathToDescriptors is a convenience function that gets the
 // descriptors for the given ProtoSet.
-func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*FileDescriptor, error) {
+//
+// Absolute paths are printed for failures if absolutePaths is true.
+func GetDirPathToDescriptors(protoSet *file.ProtoSet, absolutePaths bool) (map[string][]*FileDescriptor, error) {
 	dirPathToDescriptors := make(map[string][]*FileDescriptor, len(protoSet.DirPathToFiles))
 	for dirPath, protoFiles := range protoSet.DirPathToFiles {
 		// skip those files not under the directory
@@ -436,7 +438,11 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet) (map[string][]*FileDescrip
 				return nil, err
 			}
 			parser := proto.NewParser(file)
-			parser.Filename(protoFile.DisplayPath)
+			if absolutePaths {
+				parser.Filename(protoFile.Path)
+			} else {
+				parser.Filename(protoFile.DisplayPath)
+			}
 			descriptor, err := parser.Parse()
 			if err != nil {
 				_ = file.Close()
