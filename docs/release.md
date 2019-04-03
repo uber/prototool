@@ -45,8 +45,8 @@ This document outlines how to create a release of prototool.
     ```
 
 
-5.  Update the version number in internal/vars/vars.go and the Installation
-    section of the README.md and verify that it matches what is in the changelog.
+5.  Update the version number in internal/vars/vars.go and the docs/install.md
+    and verify that it matches what is in the changelog.
 
     ```diff
     -const Version = "1.21.0-dev"
@@ -56,7 +56,7 @@ This document outlines how to create a release of prototool.
 6.  Create a commit for the release.
 
     ```
-    git add internal/vars/vars.go README.md CHANGELOG.md
+    git add internal/vars/vars.go docs/install.md CHANGELOG.md
     git commit -m "Preparing release v$VERSION"
     ```
 

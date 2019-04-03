@@ -19,7 +19,7 @@ You can also install all of the assets on Linux or without Homebrew from GitHub 
 
 ```bash
 curl -sSL \
-  https://github.com/uber/prototool/releases/download/v1.4.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
+  https://github.com/uber/prototool/releases/download/v1.5.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
   tar -C /usr/local --strip-components 1 -xz
 ```
 
@@ -28,7 +28,7 @@ the `prototool` binary from GitHub Releases as well.
 
 ```bash
 curl -sSL \
-  https://github.com/uber/prototool/releases/download/v1.4.0/prototool-$(uname -s)-$(uname -m) \
+  https://github.com/uber/prototool/releases/download/v1.5.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
   chmod +x /usr/local/bin/prototool
 ```
@@ -85,7 +85,7 @@ export PATH := $(GOBIN):$(PATH)
 # This can be a branch, tag, or commit.
 # When changed, the given version of Prototool will be installed to
 # .tmp/$(uname -s)/(uname -m)/bin/prototool
-PROTOTOOL_VERSION := v1.4.0
+PROTOTOOL_VERSION := v1.5.0
 
 PROTOTOOL := $(TMP_VERSIONS)/prototool/$(PROTOTOOL_VERSION)
 $(PROTOTOOL):
