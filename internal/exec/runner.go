@@ -358,6 +358,9 @@ func (r *runner) generateIgnores(meta *meta) error {
 	if err != nil {
 		return err
 	}
+	if len(failures) == 0 {
+		return nil
+	}
 
 	idToFiles := make(map[string]map[string]struct{})
 	for _, failure := range failures {
