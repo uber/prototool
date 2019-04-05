@@ -25,6 +25,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -1445,6 +1446,21 @@ func TestGRPC(t *testing.T) {
 	)
 }
 
+func TestGRPCError(t *testing.T) {
+	t.Parallel()
+	assertGRPCExclamationError(t,
+		errors.New("test"),
+		1,
+		`{"status":{"code":2,"message":"test"}}
+		{"trailers":{"content-type":["application/grpc"]}}
+		rpc error: code = Unknown desc = test`,
+		"testdata/grpc/grpc.proto",
+		"grpc.ExcitedService/Exclamation",
+		`{"value":"hello"}`,
+		`--details`,
+	)
+}
+
 func TestVersion(t *testing.T) {
 	assertRegexp(t, false, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
 }
@@ -1814,7 +1830,11 @@ func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, inc
 }
 
 func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
-	excitedTestCase := startExcitedTestCase(t)
+	assertGRPCExclamationError(t, nil, expectedExitCode, expectedLinePrefixes, filePath, method, jsonData, extraFlags...)
+}
+
+func assertGRPCExclamationError(t *testing.T, exclamationError error, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
+	excitedTestCase := startExcitedTestCase(t, exclamationError)
 	defer excitedTestCase.Close()
 	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin", "--connect-timeout", "500ms"}, extraFlags...)...)
 }
@@ -1895,7 +1915,7 @@ func startTLSExcitedTestCase(t *testing.T, serverCert string, serverKey string) 
 	creds, err := credentials.NewServerTLSFromFile(serverCert, serverKey)
 	require.NoError(t, err)
 	grpcServer := grpc.NewServer(grpc.Creds(creds))
-	return startExcitedTestCaseWithServer(t, grpcServer)
+	return startExcitedTestCaseWithServer(t, nil, grpcServer)
 }
 
 func startmTLSExcitedTestCase(t *testing.T, serverCert string, serverKey string, clientCaCerts string) *excitedTestCase {
@@ -1918,17 +1938,17 @@ func startmTLSExcitedTestCase(t *testing.T, serverCert string, serverKey string,
 		ClientCAs:    certPool,
 	})
 	grpcServer := grpc.NewServer(grpc.Creds(creds))
-	return startExcitedTestCaseWithServer(t, grpcServer)
+	return startExcitedTestCaseWithServer(t, nil, grpcServer)
 }
 
-func startExcitedTestCase(t *testing.T) *excitedTestCase {
-	return startExcitedTestCaseWithServer(t, grpc.NewServer())
+func startExcitedTestCase(t *testing.T, exclamationError error) *excitedTestCase {
+	return startExcitedTestCaseWithServer(t, exclamationError, grpc.NewServer())
 }
 
-func startExcitedTestCaseWithServer(t *testing.T, grpcServer *grpc.Server) *excitedTestCase {
+func startExcitedTestCaseWithServer(t *testing.T, exclamationError error, grpcServer *grpc.Server) *excitedTestCase {
 	listener, err := getFreeListener()
 	require.NoError(t, err)
-	excitedServer := newExcitedServer()
+	excitedServer := newExcitedServer(exclamationError)
 	grpcpb.RegisterExcitedServiceServer(grpcServer, excitedServer)
 	go func() { _ = grpcServer.Serve(listener) }()
 	return &excitedTestCase{
@@ -1951,13 +1971,20 @@ func (c *excitedTestCase) Close() {
 	}
 }
 
-type excitedServer struct{}
+type excitedServer struct {
+	exclamationError error
+}
 
-func newExcitedServer() *excitedServer {
-	return &excitedServer{}
+func newExcitedServer(exclamationError error) *excitedServer {
+	return &excitedServer{
+		exclamationError: exclamationError,
+	}
 }
 
 func (s *excitedServer) Exclamation(ctx context.Context, request *grpcpb.ExclamationRequest) (*grpcpb.ExclamationResponse, error) {
+	if s.exclamationError != nil {
+		return nil, s.exclamationError
+	}
 	return &grpcpb.ExclamationResponse{
 		Value: request.Value + "!",
 	}, nil
