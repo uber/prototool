@@ -33,6 +33,8 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+	protoreflectdesc "github.com/jhump/protoreflect/desc"
+	"github.com/jhump/protoreflect/dynamic"
 	"github.com/uber/prototool/internal/desc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -72,7 +74,11 @@ func newHandler(options ...HandlerOption) *handler {
 }
 
 func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, address string, method string, inputReader io.Reader, outputWriter io.Writer) error {
-	descriptorSource, err := h.getDescriptorSourceForMethod(fileDescriptorSets, method)
+	descriptorSource, err := getDescriptorSourceForMethod(fileDescriptorSets, method)
+	if err != nil {
+		return err
+	}
+	anyResolver, err := getAnyResolver(fileDescriptorSets)
 	if err != nil {
 		return err
 	}
@@ -81,7 +87,7 @@ func (h *handler) Invoke(fileDescriptorSets []*descriptor.FileDescriptorSet, add
 		return err
 	}
 	defer func() { _ = clientConn.Close() }()
-	invocationEventHandler := newInvocationEventHandler(outputWriter, h.logger, h.details)
+	invocationEventHandler := newInvocationEventHandler(anyResolver, outputWriter, h.logger, h.details)
 	ctx, cancel := context.WithTimeout(context.Background(), h.callTimeout)
 	defer cancel()
 	if err := grpcurl.InvokeRPC(
@@ -157,7 +163,28 @@ func (h *handler) getDialOptions() []grpc.DialOption {
 	return dialOptions
 }
 
-func (h *handler) getDescriptorSourceForMethod(fileDescriptorSets []*descriptor.FileDescriptorSet, method string) (grpcurl.DescriptorSource, error) {
+func getAnyResolver(fileDescriptorSets []*descriptor.FileDescriptorSet) (jsonpb.AnyResolver, error) {
+	var fileDescriptors []*protoreflectdesc.FileDescriptor
+	for _, fileDescriptorSet := range fileDescriptorSets {
+		for _, fileDescriptorProto := range fileDescriptorSet.File {
+			iFileDescriptorSet, err := desc.SortFileDescriptorSet(fileDescriptorSet, fileDescriptorProto)
+			if err != nil {
+				return nil, err
+			}
+			fileDescriptor, err := protoreflectdesc.CreateFileDescriptorFromSet(iFileDescriptorSet)
+			if err != nil {
+				return nil, err
+			}
+			fileDescriptors = append(fileDescriptors, fileDescriptor)
+		}
+	}
+	return dynamic.AnyResolver(
+		dynamic.NewMessageFactoryWithDefaults(),
+		fileDescriptors...,
+	), nil
+}
+
+func getDescriptorSourceForMethod(fileDescriptorSets []*descriptor.FileDescriptorSet, method string) (grpcurl.DescriptorSource, error) {
 	servicePath, err := getServiceForMethod(method)
 	if err != nil {
 		return nil, err

@@ -46,7 +46,9 @@ import (
 	"github.com/uber/prototool/internal/settings"
 	"github.com/uber/prototool/internal/vars"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/status"
 )
 
 func TestCompile(t *testing.T) {
@@ -1444,16 +1446,27 @@ func TestGRPC(t *testing.T) {
 		ssClientCrt,
 		"--server-name", "client.local",
 	)
-}
 
-func TestGRPCError(t *testing.T) {
-	t.Parallel()
 	assertGRPCExclamationError(t,
 		errors.New("test"),
 		1,
 		`{"status":{"code":2,"message":"test"}}
 		{"trailers":{"content-type":["application/grpc"]}}
 		rpc error: code = Unknown desc = test`,
+		"testdata/grpc/grpc.proto",
+		"grpc.ExcitedService/Exclamation",
+		`{"value":"hello"}`,
+		`--details`,
+	)
+
+	st, err := status.New(codes.InvalidArgument, "test").WithDetails(&grpcpb.Foo{Bar: "baz"})
+	assert.NoError(t, err)
+	assertGRPCExclamationError(t,
+		status.ErrorProto(st.Proto()),
+		1,
+		`{"status":{"code":3,"message":"test","details":[{"@type":"type.googleapis.com/grpc.Foo","bar":"baz"}]}}
+		{"trailers":{"content-type":["application/grpc"]}}
+		rpc error: code = InvalidArgument desc = test`,
 		"testdata/grpc/grpc.proto",
 		"grpc.ExcitedService/Exclamation",
 		`{"value":"hello"}`,

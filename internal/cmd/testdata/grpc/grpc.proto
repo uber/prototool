@@ -7,6 +7,10 @@ option java_multiple_files = true;
 option java_outer_classname = "GrpcProto";
 option java_package = "com.grpc";
 
+message Foo {
+  string bar = 1;
+}
+
 message ExclamationRequest {
   string value = 1;
 }
