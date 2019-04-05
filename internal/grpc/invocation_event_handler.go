@@ -33,19 +33,21 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var jsonpbMarshaler = &jsonpb.Marshaler{}
-
 var _ grpcurl.InvocationEventHandler = &invocationEventHandler{}
 
 type invocationEventHandler struct {
-	output  io.Writer
-	logger  *zap.Logger
-	details bool
-	err     error
+	jsonpbMarshaler *jsonpb.Marshaler
+	output          io.Writer
+	logger          *zap.Logger
+	details         bool
+	err             error
 }
 
-func newInvocationEventHandler(output io.Writer, logger *zap.Logger, details bool) *invocationEventHandler {
+func newInvocationEventHandler(anyResolver jsonpb.AnyResolver, output io.Writer, logger *zap.Logger, details bool) *invocationEventHandler {
 	return &invocationEventHandler{
+		jsonpbMarshaler: &jsonpb.Marshaler{
+			AnyResolver: anyResolver,
+		},
 		output:  output,
 		logger:  logger,
 		details: details,
@@ -90,7 +92,7 @@ func (i *invocationEventHandler) printProtoMessage(input proto.Message, detailsK
 	if input == nil {
 		return
 	}
-	s, err := jsonpbMarshaler.MarshalToString(input)
+	s, err := i.jsonpbMarshaler.MarshalToString(input)
 	if err != nil {
 		i.logger.Error("marshal error", zap.Error(err))
 		return
