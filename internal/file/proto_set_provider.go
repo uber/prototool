@@ -235,7 +235,7 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 				}
 				numWalkedFiles++
 				if timedOut {
-					return fmt.Errorf("walking the diectory structure looking for proto files "+
+					return fmt.Errorf("walking the directory structure looking for proto files "+
 						"timed out after %v and having seen %d files, are you sure you are operating "+
 						"in the right context?", c.walkTimeout, numWalkedFiles)
 				}
