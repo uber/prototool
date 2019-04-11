@@ -51,6 +51,22 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func TestDownload(t *testing.T) {
+	tmpDir, err := ioutil.TempDir("", "")
+	require.NoError(t, err)
+	require.NotEmpty(t, tmpDir)
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
+	assertExact(t, false, 0, ``, "cache", "update", "--cache-path", tmpDir, "testdata/foo")
+	fileInfo, err := os.Stat(filepath.Join(tmpDir, "protobuf", "3.7.1"))
+	assert.NoError(t, err)
+	assert.True(t, fileInfo.IsDir())
+	fileInfo, err = os.Stat(filepath.Join(tmpDir, "protobuf", "3.7.1.lock"))
+	assert.NoError(t, err)
+	assert.False(t, fileInfo.IsDir())
+}
+
 func TestCompile(t *testing.T) {
 	t.Parallel()
 	assertDoCompileFiles(
@@ -128,7 +144,6 @@ func TestCompile(t *testing.T) {
 
 func TestInit(t *testing.T) {
 	t.Parallel()
-
 	tmpDir, err := ioutil.TempDir("", "")
 	require.NoError(t, err)
 	require.NotEmpty(t, tmpDir)
@@ -757,17 +772,11 @@ func TestLint(t *testing.T) {
 }
 
 func TestLintConfigDataOverride(t *testing.T) {
-	cwd, err := os.Getwd()
-	require.NoError(t, err)
-	require.NoError(t, os.Chdir("testdata/lint/gopackagelongform"))
-	defer func() {
-		require.NoError(t, os.Chdir(cwd))
-	}()
 	assertDoLintFile(
 		t,
 		false,
 		`5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
-		"gopackagelongform.proto",
+		"testdata/lint/gopackagelongform/gopackagelongform.proto",
 		"--config-data",
 		`{"lint":{"rules":{"remove":["FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX"]}}}`,
 	)
@@ -775,7 +784,7 @@ func TestLintConfigDataOverride(t *testing.T) {
 		t,
 		false,
 		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX`,
-		"gopackagelongform.proto",
+		"testdata/lint/gopackagelongform/gopackagelongform.proto",
 		"--config-data",
 		`{"lint":{"rules":{"remove":["FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM"]}}}`,
 	)
@@ -784,7 +793,7 @@ func TestLintConfigDataOverride(t *testing.T) {
 		false,
 		`5:1:FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX
 		5:1:FILE_OPTIONS_GO_PACKAGE_NOT_LONG_FORM`,
-		"gopackagelongform.proto",
+		"testdata/lint/gopackagelongform/gopackagelongform.proto",
 		"--config-data",
 		`{}`,
 	)
@@ -794,7 +803,7 @@ func TestLintConfigDataOverride(t *testing.T) {
 		1,
 		`json: unknown field "unknown_key"`,
 		"lint",
-		"gopackagelongform.proto",
+		"testdata/lint/gopackagelongform/gopackagelongform.proto",
 		"--config-data",
 		`{"unknown_key":"foo"}`,
 	)
@@ -1475,14 +1484,17 @@ func TestGRPC(t *testing.T) {
 }
 
 func TestVersion(t *testing.T) {
+	t.Parallel()
 	assertRegexp(t, false, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
 }
 
 func TestVersionJSON(t *testing.T) {
+	t.Parallel()
 	assertRegexp(t, false, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
 func TestDescriptorSet(t *testing.T) {
+	t.Parallel()
 	for _, includeSourceInfo := range []bool{false, true} {
 		assertDescriptorSet(
 			t,
@@ -1523,6 +1535,7 @@ func TestDescriptorSet(t *testing.T) {
 }
 
 func TestInspectPackages(t *testing.T) {
+	t.Parallel()
 	assertExact(
 		t,
 		true,
@@ -1535,6 +1548,7 @@ google.protobuf`,
 }
 
 func TestInspectPackageDeps(t *testing.T) {
+	t.Parallel()
 	assertExact(
 		t,
 		true,
@@ -1560,6 +1574,7 @@ google.protobuf`,
 }
 
 func TestInspectPackageImporters(t *testing.T) {
+	t.Parallel()
 	assertExact(
 		t,
 		true,
@@ -1663,6 +1678,7 @@ func TestGenerateIgnores(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
+	t.Parallel()
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters", "testdata/lint/base")
 	assertLinters(t, lint.Uber1Linters, "lint", "--list-linters", "testdata/lint/base")
 	assertLinters(t, lint.EmptyLinters, "lint", "--list-linters", "testdata/lint/empty")
@@ -1670,14 +1686,17 @@ func TestListLinters(t *testing.T) {
 }
 
 func TestListAllLinters(t *testing.T) {
+	t.Parallel()
 	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters", "testdata/lint/base")
 }
 
 func TestListAllLintGroups(t *testing.T) {
+	t.Parallel()
 	assertExact(t, true, 0, "empty\ngoogle\nuber1\nuber2", "lint", "--list-all-lint-groups")
 }
 
 func TestListLintGroup(t *testing.T) {
+	t.Parallel()
 	assertLinters(t, lint.EmptyLinters, "lint", "--list-lint-group", "empty", "testdata/lint/base")
 	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google", "testdata/lint/base")
 	assertLinters(t, lint.Uber1Linters, "lint", "--list-lint-group", "uber1", "testdata/lint/base")
@@ -1685,6 +1704,7 @@ func TestListLintGroup(t *testing.T) {
 }
 
 func TestDiffLintGroups(t *testing.T) {
+	t.Parallel()
 	assertExact(
 		t,
 		true,
@@ -1718,6 +1738,7 @@ func TestDiffLintGroups(t *testing.T) {
 }
 
 func TestGenerateDescriptorSetSameDirAsConfigFile(t *testing.T) {
+	t.Parallel()
 	// https://github.com/uber/prototool/issues/389
 	generatedFilePath := "testdata/generate/descriptorset/descriptorset.bin"
 	if _, err := os.Stat(generatedFilePath); err == nil {
