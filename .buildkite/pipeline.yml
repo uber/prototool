@@ -8,7 +8,7 @@ steps:
       queue: builders
   - wait
   - name: ':make:'
-    command: make
+    command: make all codecov
     plugins:
       - docker-compose#v3.0.2:
           run: buildkite

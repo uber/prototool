@@ -408,8 +408,8 @@ contribution to Prototool's functionality:
 [release-img]: https://img.shields.io/github/release/uber/prototool/all.svg
 [release]: https://github.com/uber/prototool/releases
 
-[ci-img]: https://img.shields.io/travis/uber/prototool/dev.svg
-[ci]: https://travis-ci.org/uber/prototool/builds
+[ci-img]: https://img.shields.io/buildkite/5faf32c23003786e641b9140ee98175b81c8bae973ae188415/dev.svg
+[ci]: https://buildkite.com/uberopensource/prototool
 
 [cov-img]: https://codecov.io/gh/uber/prototool/branch/dev/graph/badge.svg
 [cov]: https://codecov.io/gh/uber/prototool/branch/dev
