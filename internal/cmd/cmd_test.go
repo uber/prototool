@@ -59,10 +59,10 @@ func TestDownload(t *testing.T) {
 		_ = os.RemoveAll(tmpDir)
 	}()
 	assertExact(t, false, 0, ``, "cache", "update", "--cache-path", tmpDir, "testdata/foo")
-	fileInfo, err := os.Stat(filepath.Join(tmpDir, "protobuf", "3.7.1"))
+	fileInfo, err := os.Stat(filepath.Join(tmpDir, "protobuf", vars.DefaultProtocVersion))
 	assert.NoError(t, err)
 	assert.True(t, fileInfo.IsDir())
-	fileInfo, err = os.Stat(filepath.Join(tmpDir, "protobuf", "3.7.1.lock"))
+	fileInfo, err = os.Stat(filepath.Join(tmpDir, "protobuf", vars.DefaultProtocVersion+".lock"))
 	assert.NoError(t, err)
 	assert.False(t, fileInfo.IsDir())
 }
