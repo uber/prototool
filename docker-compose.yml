@@ -1,0 +1,22 @@
+version: '3.6'
+services:
+  buildkite:
+    build:
+      context: .
+      dockerfile: Dockerfile.buildkite
+      cache_from:
+        - golang:1.12.3-stretch
+    environment:
+      - CI
+      - CODECOV_TOKEN
+      - BUILDKITE
+      - BUILDKITE_AGENT_ACCESS_TOKEN
+      - BUILDKITE_BRANCH
+      - BUILDKITE_BUILD_ID
+      - BUILDKITE_BUILD_NUMBER
+      - BUILDKITE_BUILD_URL
+      - BUILDKITE_COMMIT
+      - BUILDKITE_JOB_ID
+      - BUILDKITE_PROJECT_SLUG
+      - BUILDKITE_PULL_REQUEST
+      - BUILDKITE_TAG

@@ -12,7 +12,7 @@ TMP_LIB := $(TMP)/lib
 TMP_VERSIONS := $(TMP)/versions
 
 DOCKER_IMAGE := uber/prototool:latest
-DOCKER_RELEASE_IMAGE := golang:1.12.1-stretch
+DOCKER_RELEASE_IMAGE := golang:1.12.3-stretch
 
 unexport GOPATH
 export GO111MODULE := on
@@ -97,6 +97,8 @@ $(CERTSTRAP):
 	@rm -rf $(dir $(CERTSTRAP))
 	@mkdir -p $(dir $(CERTSTRAP))
 	@touch $(CERTSTRAP)
+
+deps: $(BAZEL) $(GOLINT) $(ERRCHECK) $(STATICCHECK) $(UPDATE_LICENSE) $(CERTSTRAP)
 
 .DEFAULT_GOAL := all
 

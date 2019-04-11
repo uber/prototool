@@ -67,13 +67,7 @@ This document outlines how to create a release of prototool.
     git push origin master "v$VERSION"
     ```
 
-8.  Go to <https://travis-ci.org/uber/prototool/builds> and cancel the
-    build for `v$VERSION`.  If that Codecov build completes before the Codecov
-    build for master, the code coverage for master will not get updated because
-    only one branch gets updated per commit; this was verified with Codecov
-    support. This will get tested by the build for master anyways.
-
-9.  Build the release artifacts. This will put files in the release package
+8.  Build the release artifacts. This will put files in the release package
     that will be uploaded in the next step.
 
     ```
@@ -81,19 +75,19 @@ This document outlines how to create a release of prototool.
     ls release
     ```
 
-10. Go to <https://github.com/uber/prototool/tags> and edit the release notes
+9. Go to <https://github.com/uber/prototool/tags> and edit the release notes
     of the new tag.  Copy the changelog entries for this release in the
     release notes and set the name of the release to the version number
     (`v$VERSION`). Upload the release artifacts from the release directory.
 
-11. Switch back to development.
+10. Switch back to development.
 
     ```
     git checkout $BRANCH
     git merge master
     ```
 
-12. Add a placeholder for the next version to CHANGELOG.md and a new link at
+11. Add a placeholder for the next version to CHANGELOG.md and a new link at
     the bottom.
 
     ```diff
@@ -108,7 +102,7 @@ This document outlines how to create a release of prototool.
      [1.21.0]: https://github.com/uber/prototool/compare/v1.20.1...v1.21.0
     ```
 
-13. Update the version number in internal/vars/vars.go to a new minor version
+12. Update the version number in internal/vars/vars.go to a new minor version
     suffixed with `"-dev"`.
 
     ```diff
@@ -116,7 +110,7 @@ This document outlines how to create a release of prototool.
     +const Version = "1.22.0-dev"
     ```
 
-14. Commit and push your changes.
+13. Commit and push your changes.
 
     ```
     git add CHANGELOG.md internal/vars/vars.go
@@ -124,7 +118,7 @@ This document outlines how to create a release of prototool.
     git push origin $BRANCH
     ```
 
-15. Update the Homebrew formula using `brew bump-formula-pr`. This will create
+14. Update the Homebrew formula using `brew bump-formula-pr`. This will create
     a fork of github.com/Homebrew/homebrew-core and create a PR with the
     updated formula for Prototool.
 
