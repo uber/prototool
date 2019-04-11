@@ -1,7 +1,7 @@
 steps:
   - name: ':docker: :package:'
     plugins:
-      - docker-compose#3.0.2:
+      - docker-compose#v3.0.2:
           build: buildkite
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
     agents:
@@ -10,7 +10,7 @@ steps:
   - name: ':make:'
     command: make
     plugins:
-      - docker-compose#3.0.2:
+      - docker-compose#v3.0.2:
           run: buildkite
     agents:
       queue: workers
