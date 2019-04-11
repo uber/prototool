@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  buildkite:
+    build:
+      context: .
+      dockerfile: Dockerfile.buildkite
+      cache_from:
+        - golang:1.12.3-stretch
