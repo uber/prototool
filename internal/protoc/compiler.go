@@ -52,9 +52,10 @@ var (
 	// backup that does not require this to be at the beginning of the line
 	fullPluginFailedRegexp = regexp.MustCompile("(.*)--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 
-	extraImportRegexp     = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
-	recursiveImportRegexp = regexp.MustCompile("^(.*): File recursively imports itself: (.*)$")
-	fileNotFoundRegexp    = regexp.MustCompile("^(.*): File not found.$")
+	extraImportRegexp           = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
+	recursiveImportRegexp       = regexp.MustCompile("^(.*): File recursively imports itself: (.*)$")
+	directoryDoesNotExistRegexp = regexp.MustCompile("^(.*): warning: directory does not exist.$")
+	fileNotFoundRegexp          = regexp.MustCompile("^(.*): File not found.$")
 	// protoc outputs both this line and fileNotFound, so we end up ignoring this one
 	// TODO figure out what the error is for errors in the import
 	importNotFoundRegexp              = regexp.MustCompile("^(.*): Import (.*) was not found or had errors.$")
@@ -658,6 +659,11 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 			return &text.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
 				Message:  fmt.Sprintf(`File recursively imports itself %s.`, matches[2]),
+			}
+		}
+		if matches := directoryDoesNotExistRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
+			return &text.Failure{
+				Message: fmt.Sprintf(`Directory "%s" does not exist.`, matches[1]),
 			}
 		}
 		if matches := fileNotFoundRegexp.FindStringSubmatch(protocLine); len(matches) > 1 {
