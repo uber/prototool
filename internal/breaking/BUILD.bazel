@@ -42,6 +42,7 @@ go_library(
 go_test(
     name = "go_default_test",
     srcs = ["breaking_test.go"],
+    data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
         "//internal/extract:go_default_library",

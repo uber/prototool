@@ -44,7 +44,7 @@ EOF
 
 go mod tidy -v
 bazel run //:gazelle
-rm internal/cmd/testdata/grpc/BUILD.bazel
+rm -f internal/cmd/testdata/grpc/BUILD.bazel
 
 go mod tidy -v
 bazel run //:gazelle -- update-repos -from_file=go.mod

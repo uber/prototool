@@ -12,11 +12,11 @@ go_library(
     deps = [
         "//internal/desc:go_default_library",
         "@com_github_fullstorydev_grpcurl//:go_default_library",
-        "@com_github_golang_protobuf//jsonpb:go_default_library_gen",
+        "@com_github_golang_protobuf//jsonpb:go_default_library",
         "@com_github_golang_protobuf//proto:go_default_library",
+        "@com_github_golang_protobuf//protoc-gen-go/descriptor:go_default_library",
         "@com_github_jhump_protoreflect//desc:go_default_library",
         "@com_github_jhump_protoreflect//dynamic:go_default_library",
-        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
         "@org_golang_google_grpc//:go_default_library",
         "@org_golang_google_grpc//credentials:go_default_library",
         "@org_golang_google_grpc//keepalive:go_default_library",

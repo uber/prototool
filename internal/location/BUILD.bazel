@@ -12,7 +12,7 @@ go_library(
     ],
     importpath = "github.com/uber/prototool/internal/location",
     visibility = ["//:__subpackages__"],
-    deps = ["@io_bazel_rules_go//proto/wkt:descriptor_go_proto"],
+    deps = ["@com_github_golang_protobuf//protoc-gen-go/descriptor:go_default_library"],
 )
 
 go_test(
@@ -25,7 +25,7 @@ go_test(
     ],
     embed = [":go_default_library"],
     deps = [
+        "@com_github_golang_protobuf//protoc-gen-go/descriptor:go_default_library",
         "@com_github_stretchr_testify//assert:go_default_library",
-        "@io_bazel_rules_go//proto/wkt:descriptor_go_proto",
     ],
 )
