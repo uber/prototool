@@ -20,6 +20,7 @@ go_test(
         "file_test.go",
         "proto_set_provider_test.go",
     ],
+    data = glob(["testdata/**"]),
     embed = [":go_default_library"],
     deps = [
         "//internal/settings:go_default_library",
