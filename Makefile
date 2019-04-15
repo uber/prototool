@@ -148,7 +148,8 @@ internalgen: install
 
 .PHONY: bazelgen
 bazelgen: $(BAZEL)
-	bash etc/bin/bazelgen.sh
+	bazel run //:gazelle
+	bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=bazel/deps.bzl%prototool_deps
 
 .PHONY: grpcgen
 grpcgen: $(CERTSTRAP)
