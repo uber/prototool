@@ -102,7 +102,7 @@ deps: $(BAZEL) $(GOLINT) $(ERRCHECK) $(STATICCHECK) $(UPDATE_LICENSE) $(CERTSTRA
 .DEFAULT_GOAL := all
 
 .PHONY: all
-all: lint cover bazelbuild
+all: lint cover bazeltest bazelbuild
 
 .PHONY: install
 install:
@@ -128,7 +128,7 @@ golden: install
 example: install
 	go install github.com/golang/protobuf/protoc-gen-go
 	@mkdir -p $(TMP_ETC)
-	rm -rf example/gen
+	find example/gen -name '*.pb.go' | xargs rm -f
 	prototool all --fix example/proto/uber
 	go build ./example/gen/go/uber/foo/v1
 	go build ./example/gen/go/uber/bar/v1
@@ -139,9 +139,9 @@ example: install
 .PHONY: internalgen
 internalgen: install
 	go install github.com/golang/protobuf/protoc-gen-go
-	rm -rf internal/cmd/testdata/grpc/gen
+	find internal/cmd/testdata/grpc/gen -name '*.pb.go' | xargs rm -f
 	prototool generate internal/cmd/testdata/grpc
-	rm -rf internal/reflect/gen
+	find internal/reflect/gen -name '*.pb.go' | xargs rm -f
 	prototool all --fix internal/reflect/proto
 	rm -f etc/config/example/prototool.yaml
 	prototool config init etc/config/example --uncomment
@@ -218,9 +218,13 @@ cover:
 codecov:
 	bash <(curl -s https://codecov.io/bash) -c -f $(TMP_ETC)/coverage.txt
 
+.PHONY: bazeltest
+bazeltest: $(BAZEL)
+	bazel test //...
+
 .PHONY: bazelbuild
 bazelbuild: $(BAZEL)
-	bazel build //...:all
+	bazel build //...
 
 .PHONY: releasegen
 releasegen: all
@@ -234,23 +238,9 @@ releasegen: all
 brewgen:
 	sh etc/bin/brewgen.sh
 
-.PHONY: releaseinstall
-releaseinstall: releasegen releaseclean
-	tar -C /usr/local --strip-components 1 -xzf release/prototool-$(UNAME_OS)-$(UNAME_ARCH).tar.gz
-
-.PHONY: releaseclean
-releaseclean:
-	rm -f /usr/local/bin/prototool
-	rm -f /usr/local/etc/bash_completion.d/prototool
-	rm -f /usr/local/etc/zsh_completion.d/prototool
-	rm -f /usr/local/share/man/man1/prototool*
-
 .PHONY: clean
 clean:
 	git clean -xdf
-
-.PHONY: cleanall
-cleanall: clean releaseclean
 
 .PHONY: dockerbuild
 dockerbuild:
