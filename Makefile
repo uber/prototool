@@ -2,8 +2,6 @@ SHELL := /bin/bash -o pipefail
 UNAME_OS := $(shell uname -s)
 UNAME_ARCH := $(shell uname -m)
 
-GOLANG_EXCLUDES := \/example\/ \/gen\/grpcpb \/gen\/uber\/proto\/reflect\/ \/internal\/cmd\/gen-prototool
-
 TMP_BASE := .tmp
 TMP := $(TMP_BASE)/$(UNAME_OS)/$(UNAME_ARCH)
 TMP_BIN = $(TMP)/bin
@@ -111,8 +109,8 @@ install:
 	go install ./cmd/prototool
 
 .PHONY: license
-license: __eval_srcs $(UPDATE_LICENSE)
-	update-license $(SRCS)
+license: $(UPDATE_LICENSE)
+	update-license $(shell find . -name '*.go')
 
 .PHONY: golden
 golden: install
@@ -157,8 +155,8 @@ grpcgen: $(CERTSTRAP)
 	bash etc/bin/grpcgen.sh
 
 .PHONY: generate
-generate: __eval_srcs license golden example internalgen bazelgen
-	gofmt -s -w $(SRCS)
+generate: golden example internalgen bazelgen license
+	gofmt -s -w $(shell find . -name '*.go')
 	go mod tidy -v
 
 .PHONY: checknodiffgenerated
@@ -173,28 +171,26 @@ checknodiffgenerated:
 	@[ ! -s "$(CHECKNODIFFGENERATED_DIFF)" ] || (echo "make generate produced a diff, make sure to check these in:" | cat - $(CHECKNODIFFGENERATED_DIFF) && false)
 
 .PHONY: golint
-golint: __eval_pkgs $(GOLINT)
+golint: $(GOLINT)
 	golint -set_exit_status ./...
 
 .PHONY: vet
-vet: __eval_pkgs
+vet:
 	go vet ./...
 
 .PHONY:
-errcheck: __eval_pkgs $(ERRCHECK)
+errcheck: $(ERRCHECK)
 	errcheck ./...
 
 
 .PHONY: staticcheck
-staticcheck: __eval_pkgs $(STATICCHECK)
+staticcheck: $(STATICCHECK)
 	staticcheck ./...
 
 .PHONY: checklicense
-checklicense: __eval_srcs $(UPDATE_LICENSE)
-	@echo update-license --dry $(SRCS)
-	@if [ -n "$$(update-license --dry $(SRCS))" ]; then \
-		echo "These files need to have their license updated by running make license:"; \
-		update-license --dry $(SRCS); \
+checklicense: $(UPDATE_LICENSE)
+	@if [ -n "$$(update-license --dry $(shell find . -name '*.go'))" ]; then \
+		echo "Run make license."; \
 		exit 1; \
 	fi
 
@@ -202,11 +198,11 @@ checklicense: __eval_srcs $(UPDATE_LICENSE)
 lint: checknodiffgenerated golint vet errcheck staticcheck checklicense
 
 .PHONY: test
-test: __eval_pkgs
+test:
 	go test -race ./...
 
 .PHONY: cover
-cover: __eval_pkgs
+cover:
 	@mkdir -p $(TMP_ETC)
 	@rm -f $(TMP_ETC)/coverage.txt $(TMP_ETC)/coverage.html
 	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=./... ./...
@@ -269,11 +265,3 @@ dockershell: dockerbuild
 
 .PHONY: dockerall
 dockerall: dockerbuild dockertest
-
-.PHONY: __eval_srcs
-__eval_srcs:
-	$(eval SRCS := $(shell find . -name '*.go' | grep -v $(patsubst %,-e %,$(GOLANG_EXCLUDES))))
-
-.PHONY: __eval_pkgs
-__eval_pkgs:
-	$(eval PKGS := $(shell go list ./... | grep -v $(patsubst %,-e %,$(GOLANG_EXCLUDES))))
