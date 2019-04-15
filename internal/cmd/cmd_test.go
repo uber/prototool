@@ -1678,7 +1678,6 @@ func TestGenerateIgnores(t *testing.T) {
 }
 
 func TestListLinters(t *testing.T) {
-	t.Parallel()
 	assertLinters(t, lint.DefaultLinters, "lint", "--list-linters", "testdata/lint/base")
 	assertLinters(t, lint.Uber1Linters, "lint", "--list-linters", "testdata/lint/base")
 	assertLinters(t, lint.EmptyLinters, "lint", "--list-linters", "testdata/lint/empty")
@@ -1686,17 +1685,14 @@ func TestListLinters(t *testing.T) {
 }
 
 func TestListAllLinters(t *testing.T) {
-	t.Parallel()
 	assertLinters(t, lint.AllLinters, "lint", "--list-all-linters", "testdata/lint/base")
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	t.Parallel()
 	assertExact(t, true, 0, "empty\ngoogle\nuber1\nuber2", "lint", "--list-all-lint-groups")
 }
 
 func TestListLintGroup(t *testing.T) {
-	t.Parallel()
 	assertLinters(t, lint.EmptyLinters, "lint", "--list-lint-group", "empty", "testdata/lint/base")
 	assertLinters(t, lint.GoogleLinters, "lint", "--list-lint-group", "google", "testdata/lint/base")
 	assertLinters(t, lint.Uber1Linters, "lint", "--list-lint-group", "uber1", "testdata/lint/base")
@@ -1704,7 +1700,6 @@ func TestListLintGroup(t *testing.T) {
 }
 
 func TestDiffLintGroups(t *testing.T) {
-	t.Parallel()
 	assertExact(
 		t,
 		true,

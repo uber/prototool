@@ -1,4 +1,4 @@
-FROM golang:1.12.3-alpine3.9 as builder
+FROM golang:1.12.4-alpine3.9 as builder
 
 RUN apk add --update --no-cache build-base curl git upx && \
   rm -rf /var/cache/apk/*

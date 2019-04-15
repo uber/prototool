@@ -155,7 +155,9 @@ func TestNewDownloaderProtocValidation(t *testing.T) {
 			require.NoError(t, err)
 
 			// Clean up all the created test directories.
-			defer os.RemoveAll(tmpRoot)
+			defer func() {
+				_ = os.RemoveAll(tmpRoot)
+			}()
 
 			if tt.createBinPath {
 				tt.binPath, err = ioutil.TempDir(tmpRoot, tt.binPath)

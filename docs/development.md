@@ -26,6 +26,12 @@ Before submitting a PR, make sure to:
 The entire implementation is purposefully under the `internal` package to not expose any API for
 the time being.
 
+To use the locally-installed tools on your command line:
+
+```
+. $(make env)
+```
+
 ## Maintainers
 
 See [release.md](release.md) for the release process.
