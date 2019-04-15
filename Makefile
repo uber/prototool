@@ -174,20 +174,20 @@ checknodiffgenerated:
 
 .PHONY: golint
 golint: __eval_pkgs $(GOLINT)
-	golint -set_exit_status $(PKGS)
+	golint -set_exit_status ./...
 
 .PHONY: vet
 vet: __eval_pkgs
-	go vet $(PKGS)
+	go vet ./...
 
 .PHONY:
 errcheck: __eval_pkgs $(ERRCHECK)
-	errcheck $(PKGS)
+	errcheck ./...
 
 
 .PHONY: staticcheck
 staticcheck: __eval_pkgs $(STATICCHECK)
-	staticcheck $(PKGS)
+	staticcheck ./...
 
 .PHONY: checklicense
 checklicense: __eval_srcs $(UPDATE_LICENSE)
@@ -203,13 +203,13 @@ lint: checknodiffgenerated golint vet errcheck staticcheck checklicense
 
 .PHONY: test
 test: __eval_pkgs
-	go test -race $(PKGS)
+	go test -race ./...
 
 .PHONY: cover
 cover: __eval_pkgs
 	@mkdir -p $(TMP_ETC)
 	@rm -f $(TMP_ETC)/coverage.txt $(TMP_ETC)/coverage.html
-	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=$(shell echo $(PKGS) | tr ' ' ',') $(PKGS)
+	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=./... ./...
 	@go tool cover -html=$(TMP_ETC)/coverage.txt -o $(TMP_ETC)/coverage.html
 	@echo
 	@go tool cover -func=$(TMP_ETC)/coverage.txt | grep total
