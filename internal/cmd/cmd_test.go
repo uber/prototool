@@ -52,17 +52,11 @@ import (
 )
 
 func TestDownload(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "")
-	require.NoError(t, err)
-	require.NotEmpty(t, tmpDir)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
-	assertExact(t, false, 0, ``, "cache", "update", "--cache-path", tmpDir, "testdata/foo")
-	fileInfo, err := os.Stat(filepath.Join(tmpDir, "protobuf", vars.DefaultProtocVersion))
+	assertExact(t, true, false, 0, ``, "cache", "update", "testdata/foo")
+	fileInfo, err := os.Stat(filepath.Join("testcache", "protobuf", vars.DefaultProtocVersion))
 	assert.NoError(t, err)
 	assert.True(t, fileInfo.IsDir())
-	fileInfo, err = os.Stat(filepath.Join(tmpDir, "protobuf", vars.DefaultProtocVersion+".lock"))
+	fileInfo, err = os.Stat(filepath.Join("testcache", "protobuf", vars.DefaultProtocVersion+".lock"))
 	assert.NoError(t, err)
 	assert.False(t, fileInfo.IsDir())
 }
@@ -151,8 +145,8 @@ func TestInit(t *testing.T) {
 		_ = os.RemoveAll(tmpDir)
 	}()
 
-	assertDo(t, false, 0, "", "config", "init", tmpDir)
-	assertDo(t, false, 1, fmt.Sprintf("%s already exists", filepath.Join(tmpDir, settings.DefaultConfigFilename)), "config", "init", tmpDir)
+	assertDo(t, false, false, 0, "", "config", "init", tmpDir)
+	assertDo(t, false, false, 1, fmt.Sprintf("%s already exists", filepath.Join(tmpDir, settings.DefaultConfigFilename)), "config", "init", tmpDir)
 }
 
 func TestLint(t *testing.T) {
@@ -169,24 +163,24 @@ func TestLint(t *testing.T) {
 		"",
 		"testdata/lint/version2",
 	)
-	assertDoLintFile(
-		t,
-		true,
-		"",
-		"../../etc/style/google",
-	)
-	assertDoLintFile(
-		t,
-		true,
-		"",
-		"../../etc/style/uber1",
-	)
-	assertDoLintFile(
-		t,
-		true,
-		"",
-		"../../style",
-	)
+	//assertDoLintFile(
+	//t,
+	//true,
+	//"",
+	//"../../etc/style/google",
+	//)
+	//assertDoLintFile(
+	//t,
+	//true,
+	//"",
+	//"../../etc/style/uber1",
+	//)
+	//assertDoLintFile(
+	//t,
+	//true,
+	//"",
+	//"../../style",
+	//)
 	assertDoLintFile(
 		t,
 		false,
@@ -799,6 +793,7 @@ func TestLintConfigDataOverride(t *testing.T) {
 	)
 	assertExact(
 		t,
+		true,
 		true,
 		1,
 		`json: unknown field "unknown_key"`,
@@ -1485,12 +1480,12 @@ func TestGRPC(t *testing.T) {
 
 func TestVersion(t *testing.T) {
 	t.Parallel()
-	assertRegexp(t, false, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
+	assertRegexp(t, false, false, 0, fmt.Sprintf("Version:.*%s\nDefault protoc version:.*%s\n", vars.Version, vars.DefaultProtocVersion), "version")
 }
 
 func TestVersionJSON(t *testing.T) {
 	t.Parallel()
-	assertRegexp(t, false, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
+	assertRegexp(t, false, false, 0, fmt.Sprintf(`(?s){.*"version":.*"%s",.*"default_protoc_version":.*"%s".*}`, vars.Version, vars.DefaultProtocVersion), "version", "--json")
 }
 
 func TestDescriptorSet(t *testing.T) {
@@ -1539,6 +1534,7 @@ func TestInspectPackages(t *testing.T) {
 	assertExact(
 		t,
 		true,
+		true,
 		0,
 		`bar
 foo
@@ -1552,6 +1548,7 @@ func TestInspectPackageDeps(t *testing.T) {
 	assertExact(
 		t,
 		true,
+		true,
 		0,
 		`bar
 google.protobuf`,
@@ -1560,12 +1557,14 @@ google.protobuf`,
 	assertExact(
 		t,
 		true,
+		true,
 		0,
 		``,
 		"x", "inspect", "package-deps", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
+		true,
 		true,
 		0,
 		``,
@@ -1578,6 +1577,7 @@ func TestInspectPackageImporters(t *testing.T) {
 	assertExact(
 		t,
 		true,
+		true,
 		0,
 		``,
 		"x", "inspect", "package-importers", "testdata/foo", "--name", "foo",
@@ -1585,12 +1585,14 @@ func TestInspectPackageImporters(t *testing.T) {
 	assertExact(
 		t,
 		true,
+		true,
 		0,
 		`foo`,
 		"x", "inspect", "package-importers", "testdata/foo", "--name", "bar",
 	)
 	assertExact(
 		t,
+		true,
 		true,
 		0,
 		`foo`,
@@ -1602,6 +1604,7 @@ func TestGenerateIgnores(t *testing.T) {
 	t.Parallel()
 	assertExact(
 		t,
+		true,
 		true,
 		0,
 		`lint:
@@ -1671,6 +1674,7 @@ func TestGenerateIgnores(t *testing.T) {
 	assertExact(
 		t,
 		true,
+		true,
 		0,
 		``,
 		"lint", "--generate-ignores", "testdata/lint/version2",
@@ -1689,7 +1693,7 @@ func TestListAllLinters(t *testing.T) {
 }
 
 func TestListAllLintGroups(t *testing.T) {
-	assertExact(t, true, 0, "empty\ngoogle\nuber1\nuber2", "lint", "--list-all-lint-groups")
+	assertExact(t, true, true, 0, "empty\ngoogle\nuber1\nuber2", "lint", "--list-all-lint-groups")
 }
 
 func TestListLintGroup(t *testing.T) {
@@ -1702,6 +1706,7 @@ func TestListLintGroup(t *testing.T) {
 func TestDiffLintGroups(t *testing.T) {
 	assertExact(
 		t,
+		true,
 		true,
 		0,
 		`> COMMENTS_NO_C_STYLE
@@ -1739,7 +1744,7 @@ func TestGenerateDescriptorSetSameDirAsConfigFile(t *testing.T) {
 	if _, err := os.Stat(generatedFilePath); err == nil {
 		assert.NoError(t, os.Remove(generatedFilePath))
 	}
-	_, exitCode := testDo(t, false, "generate", filepath.Dir(generatedFilePath))
+	_, exitCode := testDo(t, true, false, "generate", filepath.Dir(generatedFilePath))
 	assert.Equal(t, 0, exitCode)
 	_, err := os.Stat(generatedFilePath)
 	assert.NoError(t, err)
@@ -1751,12 +1756,12 @@ func assertLinters(t *testing.T, linters []lint.Linter, args ...string) {
 		linterIDs = append(linterIDs, linter.ID())
 	}
 	sort.Strings(linterIDs)
-	assertDo(t, true, 0, strings.Join(linterIDs, "\n"), args...)
+	assertDo(t, true, true, 0, strings.Join(linterIDs, "\n"), args...)
 }
 
 func assertLinterIDs(t *testing.T, linterIDs []string, args ...string) {
 	sort.Strings(linterIDs)
-	assertDo(t, true, 0, strings.Join(linterIDs, "\n"), args...)
+	assertDo(t, true, true, 0, strings.Join(linterIDs, "\n"), args...)
 }
 
 func assertDoCompileFiles(t *testing.T, expectSuccess bool, asJSON bool, expectedLinePrefixes string, filePaths ...string) {
@@ -1769,7 +1774,7 @@ func assertDoCompileFiles(t *testing.T, expectSuccess bool, asJSON bool, expecte
 	if asJSON {
 		cmd = append(cmd, "--json")
 	}
-	assertDo(t, true, expectedExitCode, strings.Join(lines, "\n"), append(cmd, filePaths...)...)
+	assertDo(t, true, true, expectedExitCode, strings.Join(lines, "\n"), append(cmd, filePaths...)...)
 }
 
 func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath string, pkgOverride string, expectedFileData string) {
@@ -1781,7 +1786,7 @@ func assertDoCreateFile(t *testing.T, expectSuccess bool, remove bool, filePath 
 	if pkgOverride != "" {
 		args = append(args, "--package", pkgOverride)
 	}
-	_, exitCode := testDo(t, false, args...)
+	_, exitCode := testDo(t, false, false, args...)
 	if expectSuccess {
 		assert.Equal(t, 0, exitCode)
 		fileData, err := ioutil.ReadFile(filePath)
@@ -1801,7 +1806,7 @@ func assertDoLintFile(t *testing.T, expectSuccess bool, expectedLinePrefixesWith
 	if !expectSuccess {
 		expectedExitCode = 255
 	}
-	assertDo(t, true, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint", filePath}, args...)...)
+	assertDo(t, true, true, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint", filePath}, args...)...)
 }
 
 func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes string, filePaths ...string) {
@@ -1810,7 +1815,7 @@ func assertDoLintFiles(t *testing.T, expectSuccess bool, expectedLinePrefixes st
 	if !expectSuccess {
 		expectedExitCode = 255
 	}
-	assertDo(t, true, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint"}, filePaths...)...)
+	assertDo(t, true, true, expectedExitCode, strings.Join(lines, "\n"), append([]string{"lint"}, filePaths...)...)
 }
 
 func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath string) {
@@ -1819,7 +1824,7 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 		args = append(args, "--fix")
 	}
 	args = append(args, filePath)
-	output, exitCode := testDo(t, true, args...)
+	output, exitCode := testDo(t, true, true, args...)
 	expectedExitCode := 0
 	if !expectSuccess {
 		expectedExitCode = 255
@@ -1831,7 +1836,7 @@ func assertGoldenFormat(t *testing.T, expectSuccess bool, fix bool, filePath str
 }
 
 func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, includeImports bool, includeSourceInfo bool, expectedNames ...string) {
-	args := []string{"descriptor-set"}
+	args := []string{"descriptor-set", "--cache-path", "testcache"}
 	if includeImports {
 		args = append(args, "--include-imports")
 	}
@@ -1848,7 +1853,7 @@ func assertDescriptorSet(t *testing.T, expectSuccess bool, dirOrFile string, inc
 	assert.Equal(t, expectedExitCode, exitCode)
 
 	fileDescriptorSet := &descriptor.FileDescriptorSet{}
-	assert.NoError(t, proto.Unmarshal(buffer.Bytes(), fileDescriptorSet))
+	assert.NoError(t, proto.Unmarshal(buffer.Bytes(), fileDescriptorSet), buffer.String())
 	names := make([]string, 0, len(fileDescriptorSet.File))
 	for _, fileDescriptorProto := range fileDescriptorSet.File {
 		names = append(names, fileDescriptorProto.GetName())
@@ -1865,7 +1870,7 @@ func assertGRPC(t *testing.T, expectedExitCode int, expectedLinePrefixes string,
 func assertGRPCExclamationError(t *testing.T, exclamationError error, expectedExitCode int, expectedLinePrefixes string, filePath string, method string, jsonData string, extraFlags ...string) {
 	excitedTestCase := startExcitedTestCase(t, exclamationError)
 	defer excitedTestCase.Close()
-	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin", "--connect-timeout", "500ms"}, extraFlags...)...)
+	assertDoStdin(t, strings.NewReader(jsonData), true, true, expectedExitCode, expectedLinePrefixes, append([]string{"grpc", filePath, "--address", excitedTestCase.Address(), "--method", method, "--stdin", "--connect-timeout", "500ms"}, extraFlags...)...)
 }
 
 // GRPC Server TLS assert
@@ -1889,37 +1894,37 @@ func assertGRPCmTLS(t *testing.T, expectedExitCode int, expectedLinePrefixes str
 	if clientCert != "" {
 		args = append(args, "--cert", clientCert, "--key", clientKey)
 	}
-	assertDoStdin(t, strings.NewReader(jsonData), true, expectedExitCode, expectedLinePrefixes, append(args, extraFlags...)...)
+	assertDoStdin(t, strings.NewReader(jsonData), true, true, expectedExitCode, expectedLinePrefixes, append(args, extraFlags...)...)
 }
 
-func assertRegexp(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedRegexp string, args ...string) {
-	stdout, exitCode := testDo(t, extraErrorFormat, args...)
+func assertRegexp(t *testing.T, withCachePath bool, extraErrorFormat bool, expectedExitCode int, expectedRegexp string, args ...string) {
+	stdout, exitCode := testDo(t, withCachePath, extraErrorFormat, args...)
 	assert.Equal(t, expectedExitCode, exitCode)
 	matched, err := regexp.MatchString(expectedRegexp, stdout)
 	assert.NoError(t, err)
 	assert.True(t, matched, "Expected regex %s but got %s", expectedRegexp, stdout)
 }
 
-func assertExact(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedStdout string, args ...string) {
-	stdout, exitCode := testDo(t, extraErrorFormat, args...)
+func assertExact(t *testing.T, withCachePath bool, extraErrorFormat bool, expectedExitCode int, expectedStdout string, args ...string) {
+	stdout, exitCode := testDo(t, withCachePath, extraErrorFormat, args...)
 	assert.Equal(t, expectedExitCode, exitCode)
 	assert.Equal(t, expectedStdout, stdout)
 }
 
-func assertDoStdin(t *testing.T, stdin io.Reader, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
-	assertDoInternal(t, stdin, extraErrorFormat, expectedExitCode, expectedLinePrefixes, args...)
+func assertDoStdin(t *testing.T, stdin io.Reader, withCachePath bool, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
+	assertDoInternal(t, stdin, withCachePath, extraErrorFormat, expectedExitCode, expectedLinePrefixes, args...)
 }
 
-func assertDo(t *testing.T, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
-	assertDoInternal(t, nil, extraErrorFormat, expectedExitCode, expectedLinePrefixes, args...)
+func assertDo(t *testing.T, withCachePath bool, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
+	assertDoInternal(t, nil, withCachePath, extraErrorFormat, expectedExitCode, expectedLinePrefixes, args...)
 }
 
-func testDoStdin(t *testing.T, stdin io.Reader, extraErrorFormat bool, args ...string) (string, int) {
-	return testDoInternal(stdin, extraErrorFormat, args...)
+func testDoStdin(t *testing.T, stdin io.Reader, withCachePath bool, extraErrorFormat bool, args ...string) (string, int) {
+	return testDoInternal(stdin, withCachePath, extraErrorFormat, args...)
 }
 
-func testDo(t *testing.T, extraErrorFormat bool, args ...string) (string, int) {
-	return testDoInternal(nil, extraErrorFormat, args...)
+func testDo(t *testing.T, withCachePath bool, extraErrorFormat bool, args ...string) (string, int) {
+	return testDoInternal(nil, withCachePath, extraErrorFormat, args...)
 }
 
 func getCleanLines(output string) []string {
@@ -2061,8 +2066,8 @@ func (s *excitedServer) ExclamationBidiStream(streamServer grpcpb.ExcitedService
 
 // do not use these in tests
 
-func assertDoInternal(t *testing.T, stdin io.Reader, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
-	stdout, exitCode := testDoStdin(t, stdin, extraErrorFormat, args...)
+func assertDoInternal(t *testing.T, stdin io.Reader, withCachePath bool, extraErrorFormat bool, expectedExitCode int, expectedLinePrefixes string, args ...string) {
+	stdout, exitCode := testDoStdin(t, stdin, withCachePath, extraErrorFormat, args...)
 	outputSplit := getCleanLines(stdout)
 	assert.Equal(t, expectedExitCode, exitCode, strings.Join(outputSplit, "\n"))
 	expectedLinePrefixesSplit := getCleanLines(expectedLinePrefixes)
@@ -2072,12 +2077,19 @@ func assertDoInternal(t *testing.T, stdin io.Reader, extraErrorFormat bool, expe
 	}
 }
 
-func testDoInternal(stdin io.Reader, extraErrorFormat bool, args ...string) (string, int) {
+func testDoInternal(stdin io.Reader, withCachePath bool, extraErrorFormat bool, args ...string) (string, int) {
 	if stdin == nil {
 		stdin = os.Stdin
 	}
+	if withCachePath {
+		args = append(
+			args,
+			"--cache-path", "testcache",
+		)
+	}
 	if extraErrorFormat {
-		args = append(args,
+		args = append(
+			args,
 			"--error-format", "filename:line:column:id:message",
 		)
 	}

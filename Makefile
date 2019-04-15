@@ -109,8 +109,8 @@ install:
 	go install ./cmd/prototool
 
 .PHONY: license
-license: $(UPDATE_LICENSE)
-	update-license $(shell find . -name '*.go')
+license: __eval_srcs $(UPDATE_LICENSE)
+	update-license $(SRCS)
 
 .PHONY: golden
 golden: install
@@ -155,8 +155,8 @@ grpcgen: $(CERTSTRAP)
 	bash etc/bin/grpcgen.sh
 
 .PHONY: generate
-generate: golden example internalgen bazelgen license
-	gofmt -s -w $(shell find . -name '*.go')
+generate: __eval_srcs golden example internalgen bazelgen license
+	gofmt -s -w $(SRCS)
 	go mod tidy -v
 
 .PHONY: checknodiffgenerated
@@ -188,8 +188,8 @@ staticcheck: $(STATICCHECK)
 	staticcheck ./...
 
 .PHONY: checklicense
-checklicense: $(UPDATE_LICENSE)
-	@if [ -n "$$(update-license --dry $(shell find . -name '*.go'))" ]; then \
+checklicense: __eval_srcs $(UPDATE_LICENSE)
+	@if [ -n "$$(update-license --dry $(SRCS))" ]; then \
 		echo "Run make license."; \
 		exit 1; \
 	fi
@@ -265,3 +265,7 @@ dockershell: dockerbuild
 
 .PHONY: dockerall
 dockerall: dockerbuild dockertest
+
+.PHONY: __eval_srcs
+__eval_srcs:
+	$(eval SRCS := $(shell find . -not -path 'bazel-*' -not -path '.tmp*' -name '*.go'))
