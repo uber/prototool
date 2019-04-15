@@ -221,15 +221,20 @@ func (r *runner) Files(args []string) error {
 	if err != nil {
 		return err
 	}
+	var allFiles []string
 	for dirPath, files := range meta.ProtoSet.DirPathToFiles {
 		// skip those files not under the directory
 		if !strings.HasPrefix(dirPath, meta.ProtoSet.DirPath) {
 			continue
 		}
 		for _, file := range files {
-			if err := r.println(file.DisplayPath); err != nil {
-				return err
-			}
+			allFiles = append(allFiles, file.DisplayPath)
+		}
+	}
+	sort.Strings(allFiles)
+	for _, file := range allFiles {
+		if err := r.println(file); err != nil {
+			return err
 		}
 	}
 	return nil

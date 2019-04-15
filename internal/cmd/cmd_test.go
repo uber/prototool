@@ -1737,6 +1737,11 @@ func TestDiffLintGroups(t *testing.T) {
 	)
 }
 
+func TestFiles(t *testing.T) {
+	assertExact(t, false, false, 0, `testdata/foo/bar/dep.proto
+testdata/foo/success.proto`, "files", "testdata/foo")
+}
+
 func TestGenerateDescriptorSetSameDirAsConfigFile(t *testing.T) {
 	t.Parallel()
 	// https://github.com/uber/prototool/issues/389
