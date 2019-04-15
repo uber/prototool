@@ -23,6 +23,7 @@ package testing
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	"github.com/golang/protobuf/jsonpb"
@@ -52,6 +53,7 @@ func GetFileDescriptorSets(workDirPath string, dirPath string) (protoc.FileDescr
 	}
 	compileResult, err := protoc.NewCompiler(
 		protoc.CompilerWithFileDescriptorSet(),
+		protoc.CompilerWithCachePath(filepath.Join(workDirPath, "testcache")),
 	).Compile(protoSet)
 	if err != nil {
 		return nil, err

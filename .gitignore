@@ -25,6 +25,10 @@
 /internal/cmd/testdata/create/version2four/baz.proto
 /internal/cmd/testdata/create/version2five/baz.proto
 /internal/cmd/testdata/generate/descriptorset/descriptorset.bin
+/internal/cmd/testcache
+/internal/extract/testcache
+/internal/breaking/testcache
+/internal/reflect/testcache
 /main
 /prototool.iml
 /release

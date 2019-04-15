@@ -2,8 +2,6 @@ SHELL := /bin/bash -o pipefail
 UNAME_OS := $(shell uname -s)
 UNAME_ARCH := $(shell uname -m)
 
-GOLANG_EXCLUDES := \/example\/ \/gen\/grpcpb \/gen\/uber\/proto\/reflect\/ \/internal\/cmd\/gen-prototool
-
 TMP_BASE := .tmp
 TMP := $(TMP_BASE)/$(UNAME_OS)/$(UNAME_ARCH)
 TMP_BIN = $(TMP)/bin
@@ -12,14 +10,24 @@ TMP_LIB := $(TMP)/lib
 TMP_VERSIONS := $(TMP)/versions
 
 DOCKER_IMAGE := uber/prototool:latest
-DOCKER_RELEASE_IMAGE := golang:1.12.3-stretch
+DOCKER_RELEASE_IMAGE := golang:1.12.4-stretch
 
 unexport GOPATH
 export GO111MODULE := on
 export GOBIN := $(abspath $(TMP_BIN))
 export PATH := $(GOBIN):$(PATH)
 
-BAZEL_VERSION := 0.24.0
+.PHONY: env
+env:
+	@mkdir -p $(TMP)
+	@rm -f $(TMP)/env
+	@echo 'unset GOPATH' >> $(TMP)/env
+	@echo 'export GO111MODULE=on' >> $(TMP)/env
+	@echo 'export GOBIN="$(GOBIN)"' >> $(TMP)/env
+	@echo 'export PATH="$(GOBIN):$${PATH}"' >> $(TMP)/env
+	@echo $(TMP)/env
+
+BAZEL_VERSION := 0.24.1
 BAZEL := $(TMP_VERSIONS)/bazel/$(BAZEL_VERSION)
 ifeq ($(UNAME_OS),Darwin)
 BAZEL_OS := darwin
@@ -78,16 +86,6 @@ $(UPDATE_LICENSE):
 	@mkdir -p $(dir $(UPDATE_LICENSE))
 	@touch $(UPDATE_LICENSE)
 
-PROTOC_GEN_GO_VERSION := v1.3.1
-PROTOC_GEN_GO := $(TMP_VERSIONS)/protoc-gen-go/$(PROTOC_GEN_GO_VERSION)
-$(PROTOC_GEN_GO):
-	$(eval PROTOC_GEN_GO_TMP := $(shell mktemp -d))
-	cd $(PROTOC_GEN_GO_TMP); go get github.com/golang/protobuf/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
-	@rm -rf $(PROTOC_GEN_GO_TMP)
-	@rm -rf $(dir $(PROTOC_GEN_GO))
-	@mkdir -p $(dir $(PROTOC_GEN_GO))
-	@touch $(PROTOC_GEN_GO)
-
 CERTSTRAP_VERSION := v1.1.1
 CERTSTRAP := $(TMP_VERSIONS)/certstrap/$(CERTSTRAP_VERSION)
 $(CERTSTRAP):
@@ -98,6 +96,7 @@ $(CERTSTRAP):
 	@mkdir -p $(dir $(CERTSTRAP))
 	@touch $(CERTSTRAP)
 
+.PHONY: deps
 deps: $(BAZEL) $(GOLINT) $(ERRCHECK) $(STATICCHECK) $(UPDATE_LICENSE) $(CERTSTRAP)
 
 .DEFAULT_GOAL := all
@@ -115,27 +114,19 @@ license: __eval_srcs $(UPDATE_LICENSE)
 
 .PHONY: golden
 golden: install
-	for file in $(shell find internal/cmd/testdata/format -name '*.proto.golden'); do \
+	for file in $(shell find internal/cmd/testdata/format internal/cmd/testdata/format-fix internal/cmd/testdata/format-fix-v2 -name '*.proto.golden'); do \
 		rm -f $${file}; \
 	done
 	for file in $(shell find internal/cmd/testdata/format -name '*.proto'); do \
 		prototool format $${file} > $${file}.golden || true; \
 	done
-	for file in $(shell find internal/cmd/testdata/format-fix -name '*.proto.golden'); do \
-		rm -f $${file}; \
-	done
-	for file in $(shell find internal/cmd/testdata/format-fix -name '*.proto'); do \
-		prototool format --fix $${file} > $${file}.golden || true; \
-	done
-	for file in $(shell find internal/cmd/testdata/format-fix-v2 -name '*.proto.golden'); do \
-		rm -f $${file}; \
-	done
-	for file in $(shell find internal/cmd/testdata/format-fix-v2 -name '*.proto'); do \
+	for file in $(shell find internal/cmd/testdata/format-fix internal/cmd/testdata/format-fix-v2 -name '*.proto'); do \
 		prototool format --fix $${file} > $${file}.golden || true; \
 	done
 
 .PHONY: example
-example: install $(PROTOC_GEN_GO)
+example: install
+	go install github.com/golang/protobuf/protoc-gen-go
 	@mkdir -p $(TMP_ETC)
 	rm -rf example/gen
 	prototool all --fix example/proto/uber
@@ -146,7 +137,8 @@ example: install $(PROTOC_GEN_GO)
 	prototool lint etc/style/uber1
 
 .PHONY: internalgen
-internalgen: install $(PROTOC_GEN_GO)
+internalgen: install
+	go install github.com/golang/protobuf/protoc-gen-go
 	rm -rf internal/cmd/testdata/grpc/gen
 	prototool generate internal/cmd/testdata/grpc
 	rm -rf internal/reflect/gen
@@ -156,14 +148,15 @@ internalgen: install $(PROTOC_GEN_GO)
 
 .PHONY: bazelgen
 bazelgen: $(BAZEL)
-	bash etc/bin/bazelgen.sh
+	bazel run //:gazelle
+	bazel run //:gazelle -- update-repos -from_file=go.mod -to_macro=bazel/deps.bzl%prototool_deps
 
 .PHONY: grpcgen
 grpcgen: $(CERTSTRAP)
 	bash etc/bin/grpcgen.sh
 
 .PHONY: generate
-generate: __eval_srcs license golden example internalgen bazelgen
+generate: __eval_srcs golden example internalgen bazelgen license
 	gofmt -s -w $(SRCS)
 	go mod tidy -v
 
@@ -179,44 +172,41 @@ checknodiffgenerated:
 	@[ ! -s "$(CHECKNODIFFGENERATED_DIFF)" ] || (echo "make generate produced a diff, make sure to check these in:" | cat - $(CHECKNODIFFGENERATED_DIFF) && false)
 
 .PHONY: golint
-golint: __eval_srcs $(GOLINT)
-	for file in $(SRCS); do \
-		golint $${file}; \
-		if [ -n "$$(golint $${file})" ]; then \
-			exit 1; \
-		fi; \
-	done
+golint: $(GOLINT)
+	golint -set_exit_status ./...
+
+.PHONY: vet
+vet:
+	go vet ./...
 
 .PHONY:
-errcheck: __eval_pkgs $(ERRCHECK)
-	errcheck -ignoretests $(PKGS)
+errcheck: $(ERRCHECK)
+	errcheck ./...
 
 
 .PHONY: staticcheck
-staticcheck: __eval_pkgs $(STATICCHECK)
-	staticcheck --tests=false $(PKGS)
+staticcheck: $(STATICCHECK)
+	staticcheck ./...
 
 .PHONY: checklicense
 checklicense: __eval_srcs $(UPDATE_LICENSE)
-	@echo update-license --dry $(SRCS)
 	@if [ -n "$$(update-license --dry $(SRCS))" ]; then \
-		echo "These files need to have their license updated by running make license:"; \
-		update-license --dry $(SRCS); \
+		echo "Run make license."; \
 		exit 1; \
 	fi
 
 .PHONY: lint
-lint: checknodiffgenerated golint errcheck staticcheck checklicense
+lint: checknodiffgenerated golint vet errcheck staticcheck checklicense
 
 .PHONY: test
-test: __eval_pkgs
-	go test -race $(PKGS)
+test:
+	go test -race ./...
 
 .PHONY: cover
-cover: __eval_pkgs
+cover:
 	@mkdir -p $(TMP_ETC)
 	@rm -f $(TMP_ETC)/coverage.txt $(TMP_ETC)/coverage.html
-	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=$(shell echo $(PKGS) | tr ' ' ',') $(PKGS)
+	go test -race -coverprofile=$(TMP_ETC)/coverage.txt -coverpkg=./... ./...
 	@go tool cover -html=$(TMP_ETC)/coverage.txt -o $(TMP_ETC)/coverage.html
 	@echo
 	@go tool cover -func=$(TMP_ETC)/coverage.txt | grep total
@@ -279,8 +269,4 @@ dockerall: dockerbuild dockertest
 
 .PHONY: __eval_srcs
 __eval_srcs:
-	$(eval SRCS := $(shell find . -name '*.go' | grep -v $(patsubst %,-e %,$(GOLANG_EXCLUDES))))
-
-.PHONY: __eval_pkgs
-__eval_pkgs:
-	$(eval PKGS := $(shell go list ./... | grep -v $(patsubst %,-e %,$(GOLANG_EXCLUDES))))
+	$(eval SRCS := $(shell find . -not -path 'bazel-*' -not -path '.tmp*' -name '*.go'))
