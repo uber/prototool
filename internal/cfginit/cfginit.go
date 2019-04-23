@@ -74,7 +74,7 @@ protoc:
     {{.V}}  name: uber
 
 # Lint directives.
-{{.V}}lint:
+lint:
   # The lint group to use.
   # Available groups: "uber1", "uber2", "google", "empty".
   # The default group is the "uber1" lint group for backwards compatibility reasons,
