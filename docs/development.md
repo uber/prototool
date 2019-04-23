@@ -41,3 +41,5 @@ of `protoc`. Note that `etc/config/example/prototool.yaml` is automatically upda
 update `DefaultProtocVersion` in `internal/vars/vars.go` and you run `make generate`.
 
 See https://github.com/uber/prototool/pull/418 for an example of updating versions of dependencies.
+
+See https://github.com/uber/prototool/pull/437 for an example of updating versions for Docker.

@@ -36,8 +36,8 @@ commonly-used, stable, maintained libraries.
 | [gogo/protobuf] | 1.2.1 | protoc-gen-gofast<br>protoc-gen-gogo<br>protoc-gen-gogofast<br>protoc-gen-gogofaster<br>protoc-gen-gogoslick |
 | [grpc-gateway] | 1.8.5 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
 | [grpc-web] | 1.0.4 | protoc-gen-grpc-web |
-| [twirp] | 5.5.2 | protoc-gen-twirp<br>protoc-gen-twirp_python |
-| [yarpc] | 1.37.1 | protoc-gen-yarpc-go |
+| [twirp] | 5.7.0 | protoc-gen-twirp<br>protoc-gen-twirp_python |
+| [yarpc] | 1.37.2 | protoc-gen-yarpc-go |
 
 The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also installed.
 
@@ -58,6 +58,8 @@ To update the Docker image, edit the [Dockerfile](../Dockerfile).
 Note that for version changes, the versions are copied in four places: once for each layer in the
 Dockerfile (sharing these is harder than you think), once in [etc/docker/testing/bin/test.sh](../etc/docker/testing/bin/test.sh),
 and once in this documentation.
+
+See https://github.com/uber/prototool/pull/437 for an example of updating versions.
 
 Updates of `protobuf` and `grpc` must match the current versions for `alpine:edge` for now. See [here](https://pkgs.alpinelinux.org/packages?name=protobuf&branch=edge&repo=main&arch=x86_64) and [here](https://pkgs.alpinelinux.org/packages?name=grpc&branch=edge&repo=testing&arch=x86_64) for the current versions.
 
