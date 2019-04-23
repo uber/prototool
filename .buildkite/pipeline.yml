@@ -39,7 +39,7 @@ steps:
     command: bash etc/docker/testing/bin/test.sh
     plugins:
       - docker-compose#v3.0.2:
-          run: buildkite
+          run: app
           volumes:
             - "./:/work"
     agents:
