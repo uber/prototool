@@ -34,12 +34,4 @@ To use the locally-installed tools on your command line:
 
 ## Maintainers
 
-See [release.md](release.md) for the release process.
-
-See https://github.com/uber/prototool/pull/417 for an example of how to update the default version
-of `protoc`. Note that `etc/config/example/prototool.yaml` is automatically updated once you
-update `DefaultProtocVersion` in `internal/vars/vars.go` and you run `make generate`.
-
-See https://github.com/uber/prototool/pull/418 for an example of updating versions of dependencies.
-
-See https://github.com/uber/prototool/pull/437 for an example of updating versions for Docker.
+See [maintenance.md](maintenance.md) for maintenance-related tasks.

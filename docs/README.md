@@ -383,6 +383,8 @@ not have any breaking changes on a given major version, with some exceptions:
 
 See [development.md](development.md) for concerns related to Prototool development.
 
+See [maintenance.md](maintenance.md) for maintenance-related tasks.
+
 ## FAQ
 
 See [faq.md](faq.md) for answers to frequently asked questions.

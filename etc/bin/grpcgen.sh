@@ -1,5 +1,9 @@
 #!/bin/bash
 
+####################################################################################
+##### ** THIS SCRIPT SHOULD ONLY BE CALLED BY THE CORRESPONDING MAKE TARGET ** #####
+####################################################################################
+
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${0}")/../.." && pwd)"
@@ -10,7 +14,7 @@ cd "${DIR}"
 check_which() {
   if ! command -v "${1}" >/dev/null 2>/dev/null; then
     echo "${1} is not installed" >&2
-    exit1
+    exit 1
   fi
 }
 

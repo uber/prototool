@@ -3,10 +3,9 @@
 [Back to README.md](README.md)
 
 We provide a Docker image with `prototool`, `protoc`, and common Protobuf plugins pre-installed.
-Most plugins are compressed with [UPX](https://github.com/upx/upx). As of this writing, the resulting
-image is around 79MB. This provides a consistent environment to generate your Protobuf stubs.
-
-This is in early development.
+Most plugins are compressed with [UPX](https://github.com/upx/upx). As of this writing, the
+resulting image is around 58MB. This provides a consistent environment to generate your Protobuf
+stubs.
 
 ## Docker Hub
 
@@ -14,7 +13,8 @@ This image is hosted at [hub.docker.com/r/uber/prototool](https://hub.docker.com
 
 ## Usage
 
-Bind your input directory as a volume to `/work`, and call your command, for example `prototool generate`:
+Bind your input directory as a volume to `/work`, and call your command, for example
+`prototool generate`:
 
 ```
 docker run -v "$(pwd):/work" uber/prototool:latest prototool generate
@@ -24,8 +24,11 @@ You can build on top of this image as well if you have custom requirements.
 
 ## Included
 
-The following libraries are included. This is not meant to be exhaustive - these represent our view of the most
-commonly-used, stable, maintained libraries.
+The following libraries are included. This is not meant to be exhaustive - these represent our view
+of the most commonly-used, stable, maintained libraries. If you think another library should be
+included, propose it in a GitHub issue and we will evaluate it, however in general we do not want
+to add additional plugins - our recommendation is to instead build your own image based on
+`uber/prototool` that adds plugins you require.
 
 | Name | Version | Binaries |
 | --- | --- | --- |
@@ -39,29 +42,19 @@ commonly-used, stable, maintained libraries.
 | [twirp] | 5.7.0 | protoc-gen-twirp<br>protoc-gen-twirp_python |
 | [yarpc] | 1.37.2 | protoc-gen-yarpc-go |
 
-The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also installed.
-
-If you think another library should be included, propose it in a GitHub issue and we will evaluate it.
+The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also
+installed.
 
 ## Versioning
 
-Images are pushed for every commit to the dev branch as the tags `uber/prototool:dev, uber:prototool:latest`, and
-every minor release starting with `v1.4.0` will have a tag e.g. `uber/prototool:1.4.0`. Note that as opposed
-to the rest of Prototool, there is no breaking change guarantee between minor releases - we do not account
-for breaking changes in libraries we provide within this image, and will update them regularly on `dev`.
-We recommend pinning to one of the minor release Docker image tags once they are available.
+Images are pushed for every commit to the dev branch as the tags `uber/prototool:dev`,
+`uber:prototool:latest`, and every minor release starting with `v1.4.0` has a tag e.g.
+`uber/prototool:1.4.0`. Note that as opposed to the rest of Prototool, there is no breaking change
+guarantee between minor releases - we do not account for breaking changes in libraries we provide
+within this image, and will update them regularly on `dev`. We recommend pinning to one of the
+minor release Docker image tags.
 
 ## Development
-
-To update the Docker image, edit the [Dockerfile](../Dockerfile).
-
-Note that for version changes, the versions are copied in four places: once for each layer in the
-Dockerfile (sharing these is harder than you think), once in [etc/docker/testing/bin/test.sh](../etc/docker/testing/bin/test.sh),
-and once in this documentation.
-
-See https://github.com/uber/prototool/pull/437 for an example of updating versions.
-
-Updates of `protobuf` and `grpc` must match the current versions for `alpine:edge` for now. See [here](https://pkgs.alpinelinux.org/packages?name=protobuf&branch=edge&repo=main&arch=x86_64) and [here](https://pkgs.alpinelinux.org/packages?name=grpc&branch=edge&repo=testing&arch=x86_64) for the current versions.
 
 Local development commands:
 
@@ -75,6 +68,10 @@ make dockerall
 ```
 
 The test files are in [etc/docker/testing](../etc/docker/testing).
+
+## Maintenance
+
+See [maintenance.md](maintenance.md) for maintenance-related information.
 
 [protoc]: https://github.com/protocolbuffers/protobuf
 [grpc]: https://github.com/grpc/grpc
