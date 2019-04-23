@@ -36,8 +36,8 @@ commonly-used, stable, maintained libraries.
 | [gogo/protobuf] | 1.2.1 | protoc-gen-gofast<br>protoc-gen-gogo<br>protoc-gen-gogofast<br>protoc-gen-gogofaster<br>protoc-gen-gogoslick |
 | [grpc-gateway] | 1.8.5 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
 | [grpc-web] | 1.0.4 | protoc-gen-grpc-web |
-| [twirp] | 5.5.2 | protoc-gen-twirp<br>protoc-gen-twirp_python |
-| [yarpc] | 1.37.1 | protoc-gen-yarpc-go |
+| [twirp] | 5.7.0 | protoc-gen-twirp<br>protoc-gen-twirp_python |
+| [yarpc] | 1.37.2 | protoc-gen-yarpc-go |
 
 The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also installed.
 

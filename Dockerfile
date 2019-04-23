@@ -30,18 +30,22 @@ RUN curl -sSL \
   -o /usr/local/bin/protoc-gen-grpc-web && \
   chmod +x /usr/local/bin/protoc-gen-grpc-web
 
-ENV YARPC_VERSION=1.37.1
+ENV YARPC_VERSION=1.37.2
 RUN git clone --depth 1 -b v${YARPC_VERSION} https://github.com/yarpc/yarpc-go.git /go/src/go.uber.org/yarpc && \
     cd /go/src/go.uber.org/yarpc && \
     GO111MODULE=on go mod init && \
     GO111MODULE=on go install ./encoding/protobuf/protoc-gen-yarpc-go && \
     mv /go/bin/protoc-gen-yarpc-go /usr/local/bin/
 
-ENV TWIRP_VERSION=5.5.2
-RUN git clone --depth 1 -b v${TWIRP_VERSION} https://github.com/twitchtv/twirp.git /go/src/github.com/twitchtv/twirp && \
-  cd /go/src/github.com/twitchtv/twirp && \
-  go install ./protoc-gen-twirp ./protoc-gen-twirp_python && \
-  mv /go/bin/protoc-gen-twirp* /usr/local/bin/
+ENV TWIRP_VERSION=5.7.0
+RUN curl -sSL \
+  https://github.com/twitchtv/twirp/releases/download/v${TWIRP_VERSION}/protoc-gen-twirp-Linux-x86_64 \
+  -o /usr/local/bin/protoc-gen-twirp && \
+  curl -sSL \
+  https://github.com/twitchtv/twirp/releases/download/v${TWIRP_VERSION}/protoc-gen-twirp_python-Linux-x86_64 \
+  -o /usr/local/bin/protoc-gen-twirp_python && \
+  chmod +x /usr/local/bin/protoc-gen-twirp && \
+  chmod +x /usr/local/bin/protoc-gen-twirp_python
 
 ENV PROTOBUF_VERSION=3.6.1
 RUN mkdir -p /tmp/protoc && \
@@ -86,5 +90,5 @@ ENV GOGO_PROTOBUF_VERSION=1.2.1 \
   GOLANG_PROTOBUF_VERSION=1.3.1 \
   GRPC_GATEWAY_VERSION=1.8.5 \
   GRPC_WEB_VERSION=1.0.4 \
-  TWIRP_VERSION=5.5.2 \
-  YARPC_VERSION=1.37.1
+  TWIRP_VERSION=5.7.0 \
+  YARPC_VERSION=1.37.2
