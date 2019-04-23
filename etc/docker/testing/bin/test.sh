@@ -27,11 +27,14 @@ check_command_output() {
 }
 
 check_command_output_file() {
-  tmp_file="$(mktemp)"
-  trap 'rm -rf "${tmp_file}"' EXIT
+  tmp_file1="$(mktemp)"
+  tmp_file2="$(mktemp)"
+  trap 'rm -rf "${tmp_file1}"' EXIT
+  trap 'rm -rf "${tmp_file2}"' EXIT
   echo "Checking that '${*:2}' results in the contents of '${1}'"
-  "${@:2}" > "${tmp_file}"
-  if ! diff "${1}" "${tmp_file}"; then
+  cat "${1}" | sort > "${tmp_file1}"
+  "${@:2}" | sort > "${tmp_file2}"
+  if ! diff "${tmp_file1}" "${tmp_file2}"; then
     echo "Diff detected" >&2
     exit 1
   fi

@@ -28,8 +28,15 @@ steps:
           run: buildkite
     agents:
       queue: workers
-  - name: 'make bazeltest bazelbuild'
-    command: make bazeltest bazelbuild
+  - name: 'make bazeltest'
+    command: make bazeltest
+    plugins:
+      - docker-compose#v3.0.2:
+          run: buildkite
+    agents:
+      queue: workers
+  - name: 'make bazelbuild'
+    command: make bazelbuild
     plugins:
       - docker-compose#v3.0.2:
           run: buildkite
