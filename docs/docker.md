@@ -59,6 +59,8 @@ Note that for version changes, the versions are copied in four places: once for 
 Dockerfile (sharing these is harder than you think), once in [etc/docker/testing/bin/test.sh](../etc/docker/testing/bin/test.sh),
 and once in this documentation.
 
+See https://github.com/uber/prototool/pull/437 for an example of updating versions.
+
 Updates of `protobuf` and `grpc` must match the current versions for `alpine:edge` for now. See [here](https://pkgs.alpinelinux.org/packages?name=protobuf&branch=edge&repo=main&arch=x86_64) and [here](https://pkgs.alpinelinux.org/packages?name=grpc&branch=edge&repo=testing&arch=x86_64) for the current versions.
 
 Local development commands:
