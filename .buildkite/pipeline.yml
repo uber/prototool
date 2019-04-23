@@ -7,8 +7,22 @@ steps:
     agents:
       queue: builders
   - wait
-  - name: ':make:'
-    command: make all codecov
+  - name: 'make lint codecov'
+    command: make lint codecov
+    plugins:
+      - docker-compose#v3.0.2:
+          run: buildkite
+    agents:
+      queue: workers
+  - name: 'make bazeltest bazelbuild'
+    command: make bazeltest bazelbuild
+    plugins:
+      - docker-compose#v3.0.2:
+          run: buildkite
+    agents:
+      queue: workers
+  - name: 'make dockerall'
+    command: make dockerall
     plugins:
       - docker-compose#v3.0.2:
           run: buildkite

@@ -215,7 +215,7 @@ cover:
 	@echo open $(TMP_ETC)/coverage.html
 
 .PHONY: codecov
-codecov:
+codecov: cover
 	bash <(curl -s https://codecov.io/bash) -c -f $(TMP_ETC)/coverage.txt
 
 .PHONY: bazeltest
