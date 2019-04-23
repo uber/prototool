@@ -1,8 +1,7 @@
 FROM golang:1.12.4-stretch
 
-ENV GO111MODULE=on
-ENV GOPATH=
-
+ENV GO111MODULE=on \
+  GOPATH=
 RUN apt-get update -yq && \
   apt-get install -yq build-essential unzip && \
   rm -rf /var/lib/apt/lists/*

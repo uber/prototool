@@ -20,3 +20,9 @@ services:
       - BUILDKITE_PROJECT_SLUG
       - BUILDKITE_PULL_REQUEST
       - BUILDKITE_TAG
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from:
+        - golang:1.12.4-alpine3.9

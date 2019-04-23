@@ -1,16 +1,53 @@
 steps:
-  - name: ':docker: :package:'
+  - name: ':docker: :package: buildkite'
     plugins:
       - docker-compose#v3.0.2:
           build: buildkite
           image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
     agents:
       queue: builders
+  - name: ':docker: :package: app'
+    plugins:
+      - docker-compose#v3.0.2:
+          build: app
+          image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
+    agents:
+      queue: builders
   - wait
-  - name: ':make:'
-    command: make all codecov
+  - name: 'make lint'
+    command: make lint
     plugins:
       - docker-compose#v3.0.2:
           run: buildkite
+    agents:
+      queue: workers
+  - name: 'make codecov'
+    command: make codecov
+    plugins:
+      - docker-compose#v3.0.2:
+          run: buildkite
+    agents:
+      queue: workers
+  - name: 'make bazeltest'
+    command: make bazeltest
+    plugins:
+      - docker-compose#v3.0.2:
+          run: buildkite
+    agents:
+      queue: workers
+  - name: 'make bazelbuild'
+    command: make bazelbuild
+    plugins:
+      - docker-compose#v3.0.2:
+          run: buildkite
+    agents:
+      queue: workers
+  - name: 'docker test'
+    command: bash etc/docker/testing/bin/test.sh
+    plugins:
+      - docker-compose#v3.0.2:
+          run: app
+          volumes:
+            - "./:/work"
     agents:
       queue: workers
