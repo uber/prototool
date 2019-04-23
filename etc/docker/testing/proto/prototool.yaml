@@ -59,6 +59,9 @@ generate:
     - name: gogoslick
       type: gogo
       output: ../gen/gogoslick
+    - name: govalidators
+      path: protoc-gen-govalidators
+      output: ../gen/govalidators
     - name: grpc-gateway
       type: go
       output: ../gen/grpc-gateway

@@ -8,10 +8,12 @@ require (
 	github.com/fullstorydev/grpcurl v1.2.1
 	github.com/gobuffalo/flect v0.1.1
 	github.com/gofrs/flock v0.7.1
+	github.com/gogo/protobuf v1.2.1 // indirect
 	github.com/golang/protobuf v1.3.1
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jhump/protoreflect v1.2.0
 	github.com/mitchellh/go-wordwrap v1.0.0
+	github.com/mwitkow/go-proto-validators v0.0.0-20190212092829-1f388280e944 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3

@@ -11,7 +11,8 @@ RUN GO111MODULE=on go get \
   github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
-  github.com/gogo/protobuf/protoc-gen-gogoslick@v${GOGO_PROTOBUF_VERSION} && \
+  github.com/gogo/protobuf/protoc-gen-gogoslick@v${GOGO_PROTOBUF_VERSION} \
+  github.com/mwitkow/go-proto-validators/protoc-gen-govalidators && \
   mv /go/bin/protoc-gen-go* /usr/local/bin/
 
 ENV GRPC_GATEWAY_VERSION=1.8.5

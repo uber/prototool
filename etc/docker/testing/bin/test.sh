@@ -80,6 +80,7 @@ check_which /usr/local/bin/protoc-gen-gogo
 check_which /usr/local/bin/protoc-gen-gogofast
 check_which /usr/local/bin/protoc-gen-gogofaster
 check_which /usr/local/bin/protoc-gen-gogoslick
+check_which /usr/local/bin/protoc-gen-govalidators
 check_which /usr/local/bin/protoc-gen-grpc-gateway
 check_which /usr/local/bin/protoc-gen-grpc-web
 check_which /usr/local/bin/protoc-gen-swagger
