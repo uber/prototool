@@ -155,6 +155,14 @@ bazelgen: $(BAZEL)
 grpcgen: $(CERTSTRAP)
 	bash etc/bin/grpcgen.sh
 
+.PHONY: updatedeps
+updatedeps:
+	rm -f go.mod go.sum
+	go mod init
+	go get -u ./...
+	$(MAKE) generate
+	$(MAKE)
+
 .PHONY: generate
 generate: __eval_srcs golden example internalgen bazelgen license
 	gofmt -s -w $(SRCS)

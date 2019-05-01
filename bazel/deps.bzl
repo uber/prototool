@@ -46,8 +46,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_gobuffalo_flect",
         importpath = "github.com/gobuffalo/flect",
-        sum = "h1:GTZJjJufv9FxgRs1+0Soo3wj+Md3kTUmTER/YE4uINA=",
-        version = "v0.1.1",
+        sum = "h1:3GQ53z7E3o00C/yy7Ko8VXqQXoJGLkrTQCLTF1EjoXU=",
+        version = "v0.1.3",
     )
     go_repository(
         name = "com_github_gofrs_flock",
@@ -166,20 +166,20 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_google_grpc",
         importpath = "google.golang.org/grpc",
-        sum = "h1:TrBcJ1yqAl1G++wO39nD/qtgpsW9/1+QGrluyMGEYgM=",
-        version = "v1.19.1",
+        sum = "h1:Hz2g2wirWK7H0qIIhGIqRGTuMwTE8HEKFnDZZ7lm9NU=",
+        version = "v1.20.1",
     )
     go_repository(
         name = "org_golang_x_lint",
         importpath = "golang.org/x/lint",
-        sum = "h1:x/bBzNauLQAlE3fLku/xy92Y8QwKX5HZymrMz2IiKFc=",
-        version = "v0.0.0-20181026193005-c67002cb31c3",
+        sum = "h1:XQyxROzUlZH+WIQwySDgnISgOivlhjIEwaQaJEJrrN0=",
+        version = "v0.0.0-20190313153728-d0100b6bd8b3",
     )
     go_repository(
         name = "org_golang_x_net",
         importpath = "golang.org/x/net",
-        sum = "h1:g9qWBGx4puODJTMVyoPrpoxPFgVGd+z1DZwjfRu4d0I=",
-        version = "v0.0.0-20180826012351-8a410e7b638d",
+        sum = "h1:oWX7TPOiFAMXLq8o0ikBYfCJVlRHBcsciT5bXOrH628=",
+        version = "v0.0.0-20190311183353-d8887717615a",
     )
     go_repository(
         name = "org_golang_x_oauth2",
@@ -196,8 +196,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_x_sys",
         importpath = "golang.org/x/sys",
-        sum = "h1:Ve1ORMCxvRmSXBwJK+t3Oy+V2vRW2OetUQBq4rJIkZE=",
-        version = "v0.0.0-20180830151530-49385e6e1522",
+        sum = "h1:1BGLXjeY4akVXGgbC9HugT3Jv3hCI0z56oJR5vAMgBU=",
+        version = "v0.0.0-20190215142949-d0b11bdaac8a",
     )
     go_repository(
         name = "org_golang_x_text",
@@ -208,8 +208,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_x_tools",
         importpath = "golang.org/x/tools",
-        sum = "h1:qMK98NmNCRVDIYFycQ5yVRkvgDUFfdP8Ip4KqmDEB7g=",
-        version = "v0.0.0-20190114222345-bf090417da8b",
+        sum = "h1:/e+gpKk9r3dJobndpTytxS2gOy6m5uvpg+ISQoEcusQ=",
+        version = "v0.0.0-20190311212946-11955173bddd",
     )
     go_repository(
         name = "org_uber_go_atomic",
@@ -226,6 +226,12 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_uber_go_zap",
         importpath = "go.uber.org/zap",
-        sum = "h1:XCJQEf3W6eZaVwhRBof6ImoYGJSITeKWsyeh3HFu/5o=",
-        version = "v1.9.1",
+        sum = "h1:ORx85nbTijNz8ljznvCMR1ZBIPKFn3jQrag10X2AsuM=",
+        version = "v1.10.0",
+    )
+    go_repository(
+        name = "org_golang_x_crypto",
+        importpath = "golang.org/x/crypto",
+        sum = "h1:VklqNMn3ovrHsnt90PveolxSbWFaJdECFbxSq0Mqo2M=",
+        version = "v0.0.0-20190308221718-c2843e01d9a2",
     )

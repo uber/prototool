@@ -26,7 +26,18 @@ See https://github.com/uber/prototool/pull/417 for an example.
 
 ## Updating dependencies
 
-See https://github.com/uber/prototool/pull/418 for an example of updating versions of dependencies.
+There are some issues running `go get -u ./...` multiple times with Golang Modules as of writing
+this documentation, so be careful when updating dependencies. Right now, the easiest way to make
+sure dependencies are up to date is to run the corresponding Makefile target.
+
+```
+make updatedeps
+```
+
+This will do a complete update of the `go.mod`, `go.sum`, and `bazel/deps.bzl` files. This should
+be revisited in the future, however.
+
+See https://github.com/uber/prototool/pull/443 for an example.
 
 ## Updating Docker image dependencies
 
