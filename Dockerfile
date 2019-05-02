@@ -30,7 +30,7 @@ RUN curl -sSL \
   -o /usr/local/bin/protoc-gen-grpc-web && \
   chmod +x /usr/local/bin/protoc-gen-grpc-web
 
-ENV YARPC_VERSION=1.37.2
+ENV YARPC_VERSION=1.37.3
 RUN git clone --depth 1 -b v${YARPC_VERSION} https://github.com/yarpc/yarpc-go.git /go/src/go.uber.org/yarpc && \
     cd /go/src/go.uber.org/yarpc && \
     GO111MODULE=on go mod init && \
@@ -91,4 +91,4 @@ ENV GOGO_PROTOBUF_VERSION=1.2.1 \
   GRPC_GATEWAY_VERSION=1.8.5 \
   GRPC_WEB_VERSION=1.0.4 \
   TWIRP_VERSION=5.7.0 \
-  YARPC_VERSION=1.37.2
+  YARPC_VERSION=1.37.3
