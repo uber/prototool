@@ -40,7 +40,7 @@ to add additional plugins - our recommendation is to instead build your own imag
 | [grpc-gateway] | 1.8.5 | protoc-gen-grpc-gateway<br>protoc-gen-swagger |
 | [grpc-web] | 1.0.4 | protoc-gen-grpc-web |
 | [twirp] | 5.7.0 | protoc-gen-twirp<br>protoc-gen-twirp_python |
-| [yarpc] | 1.37.2 | protoc-gen-yarpc-go |
+| [yarpc] | 1.37.3 | protoc-gen-yarpc-go |
 
 The Well-Known Types are copied to `/usr/include`. The packages `bash`, `curl`, and `git` are also
 installed.
