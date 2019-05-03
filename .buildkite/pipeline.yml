@@ -42,6 +42,13 @@ steps:
           run: buildkite
     agents:
       queue: workers
+  - name: 'make fossa'
+    command: make fossa
+    plugins:
+      - docker-compose#v3.0.2:
+          run: buildkite
+    agents:
+      queue: workers
   - name: 'docker test'
     command: bash etc/docker/testing/bin/test.sh
     plugins:

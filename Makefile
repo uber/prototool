@@ -265,6 +265,11 @@ dockershell: dockerbuild
 .PHONY: dockerall
 dockerall: dockerbuild dockertest
 
+.PHONY: fossa
+fossa:
+	curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash -s -- -b "$(GOBIN)"
+	fossa
+
 .PHONY: __eval_srcs
 __eval_srcs:
 	$(eval SRCS := $(shell find . -not -path 'bazel-*' -not -path '.tmp*' -name '*.go'))

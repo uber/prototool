@@ -20,6 +20,7 @@ services:
       - BUILDKITE_PROJECT_SLUG
       - BUILDKITE_PULL_REQUEST
       - BUILDKITE_TAG
+      - FOSSA_API_KEY
   app:
     build:
       context: .
