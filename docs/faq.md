@@ -29,7 +29,14 @@ directory, you should clean it up on your own, we don't want to effectively call
 
 *Question:* Help! Prototool is failing when I use it within a Docker image based on Alpine Linux!
 
-*Answer:* `apk add libc6-compat`
+*Answer:* https://github.com/sgerrand/alpine-pkg-glibc
+
+```
+apk --no-cache add ca-certificates wget
+wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
+wget https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.29-r0/glibc-2.29-r0.apk
+apk add glibc-2.29-r0.apk
+```
 
 `protoc` is not statically compiled, and adding this package fixes the problem.
 
