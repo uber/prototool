@@ -1,0 +1,23 @@
+version: 2
+cli:
+  server: https://app.fossa.com
+  fetcher: custom
+  project: https://github.com/uber/prototool
+analyze:
+  modules:
+    - name: github.com/uber/prototool/cmd/prototool
+      type: go
+      target: github.com/uber/prototool/cmd/prototool
+      path: cmd/prototool
+    - name: github.com/uber/prototool/internal/cmd/gen-prototool-bash-completion
+      type: go
+      target: github.com/uber/prototool/internal/cmd/gen-prototool-bash-completion
+      path: internal/cmd/gen-prototool-bash-completion
+    - name: github.com/uber/prototool/internal/cmd/gen-prototool-manpages
+      type: go
+      target: github.com/uber/prototool/internal/cmd/gen-prototool-manpages
+      path: internal/cmd/gen-prototool-manpages
+    - name: github.com/uber/prototool/internal/cmd/gen-prototool-zsh-completion
+      type: go
+      target: github.com/uber/prototool/internal/cmd/gen-prototool-zsh-completion
+      path: internal/cmd/gen-prototool-zsh-completion
