@@ -51,3 +51,10 @@ steps:
             - "./:/work"
     agents:
       queue: workers
+    # Wait until all the previous tests have completed
+    - wait
+    # Run FOSSA to scan for OSS license compliance
+  - name: ':fossa-oss-scan:'
+    commands:
+      - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
+      - "fossa"
