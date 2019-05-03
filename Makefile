@@ -8,6 +8,7 @@ TMP_BIN = $(TMP)/bin
 TMP_ETC := $(TMP)/etc
 TMP_LIB := $(TMP)/lib
 TMP_VERSIONS := $(TMP)/versions
+TMP_FOSSA_GOPATH := $(TMP)/fossa/go
 
 DOCKER_IMAGE := uber/prototool:latest
 DOCKER_RELEASE_IMAGE := golang:1.12.4-stretch
@@ -267,8 +268,9 @@ dockerall: dockerbuild dockertest
 
 .PHONY: fossa
 fossa:
-	curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash -s -- -b "$(GOBIN)"
-	fossa
+	@mkdir -p $(TMP_FOSSA_GOPATH)
+	GOPATH=$(abspath $(TMP_FOSSA_GOPATH)) curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash -s -- -b "$(GOBIN)"
+	GOPATH=$(abspath $(TMP_FOSSA_GOPATH)) fossa
 
 .PHONY: __eval_srcs
 __eval_srcs:
