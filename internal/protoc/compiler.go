@@ -119,9 +119,11 @@ func (c *compiler) Compile(protoSet *file.ProtoSet) (*CompileResult, error) {
 	var errs []error
 	var lock sync.Mutex
 	var wg sync.WaitGroup
+	semaphoreC := make(chan struct{}, runtime.NumCPU())
 	for _, cmdMeta := range cmdMetas {
 		cmdMeta := cmdMeta
 		wg.Add(1)
+		semaphoreC <- struct{}{}
 		go func() {
 			defer wg.Done()
 			iFailures, iErr := c.runCmdMeta(cmdMeta)
@@ -131,6 +133,7 @@ func (c *compiler) Compile(protoSet *file.ProtoSet) (*CompileResult, error) {
 				errs = append(errs, iErr)
 			}
 			lock.Unlock()
+			<-semaphoreC
 		}()
 	}
 	wg.Wait()
