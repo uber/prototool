@@ -81,14 +81,14 @@ func TestCompile(t *testing.T) {
 		t,
 		false,
 		false,
-		`testdata/compile/extra_import/extra_import.proto:1:1:Import "dep.proto" was not used.`,
+		`testdata/compile/extra_import/extra_import.proto:6:1:Import "dep.proto" was not used.`,
 		"testdata/compile/extra_import/extra_import.proto",
 	)
 	assertDoCompileFiles(
 		t,
 		false,
 		false,
-		`testdata/compile/json/json_camel_case_conflict.proto:1:1:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
+		`testdata/compile/json/json_camel_case_conflict.proto:7:9:The JSON camel-case name of field "helloworld" conflicts with field "helloWorld". This is not allowed in proto3.`,
 		"testdata/compile/json/json_camel_case_conflict.proto",
 	)
 	assertDoCompileFiles(
@@ -110,7 +110,8 @@ func TestCompile(t *testing.T) {
 		t,
 		false,
 		false,
-		`testdata/compile/recursive/one.proto:1:1:File recursively imports itself one.proto -> two.proto -> one.proto.`,
+		`testdata/compile/recursive/one.proto:5:1:File recursively imports itself one.proto -> two.proto -> one.proto.
+		testdata/compile/recursive/one.proto:5:1:Import "two.proto" was not found or had errors.`,
 		"testdata/compile/recursive/one.proto",
 	)
 	assertDoCompileFiles(
