@@ -52,14 +52,20 @@ var (
 	// backup that does not require this to be at the beginning of the line
 	fullPluginFailedRegexp = regexp.MustCompile("(.*)--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 
-	extraImportRegexp           = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
+	// protoc started printing line and column information in 3.8.0
+	extraImport380Regexp = regexp.MustCompile(`^(.*):(\d+):(\d+): warning: Import (.*) but not used.$`)
+	extraImportRegexp    = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
+	// protoc started printing line and column information in 3.8.0
+	recursiveImport380Regexp    = regexp.MustCompile(`^(.*):(\d+):(\d+): File recursively imports itself: (.*)$`)
 	recursiveImportRegexp       = regexp.MustCompile("^(.*): File recursively imports itself: (.*)$")
 	directoryDoesNotExistRegexp = regexp.MustCompile("^(.*): warning: directory does not exist.$")
 	fileNotFoundRegexp          = regexp.MustCompile("^(.*): File not found.$")
 	// protoc outputs both this line and fileNotFound, so we end up ignoring this one
 	// TODO figure out what the error is for errors in the import
-	importNotFoundRegexp              = regexp.MustCompile("^(.*): Import (.*) was not found or had errors.$")
-	noSyntaxSpecifiedRegexp           = regexp.MustCompile(`No syntax specified for the proto file: (.*)\. Please use`)
+	importNotFoundRegexp    = regexp.MustCompile("^(.*): Import (.*) was not found or had errors.$")
+	noSyntaxSpecifiedRegexp = regexp.MustCompile(`No syntax specified for the proto file: (.*)\. Please use`)
+	// protoc started printing line and column information in 3.8.0
+	jsonCamelCase380Regexp            = regexp.MustCompile(`^(.*):(\d+):(\d+): (The JSON camel-case name of field.*)$`)
 	jsonCamelCaseRegexp               = regexp.MustCompile("^(.*): (The JSON camel-case name of field.*)$")
 	isNotDefinedRegexp                = regexp.MustCompile("^(.*): (.*) is not defined.$")
 	seemsToBeDefinedRegexp            = regexp.MustCompile(`^(.*): (".*" seems to be defined in ".*", which is not imported by ".*". To use it here, please add the necessary import.)$`)
@@ -649,6 +655,25 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 				Message:  `No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.`,
 			}
 		}
+		if matches := extraImport380Regexp.FindStringSubmatch(protocLine); len(matches) > 4 {
+			if cmdMeta.protoSet.Config.Compile.AllowUnusedImports {
+				return nil
+			}
+			line, err := strconv.Atoi(matches[2])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			column, err := strconv.Atoi(matches[3])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			return &text.Failure{
+				Filename: bestFilePath(cmdMeta, matches[1]),
+				Line:     line,
+				Column:   column,
+				Message:  fmt.Sprintf(`Import "%s" was not used.`, matches[4]),
+			}
+		}
 		if matches := extraImportRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			if cmdMeta.protoSet.Config.Compile.AllowUnusedImports {
 				return nil
@@ -656,6 +681,22 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 			return &text.Failure{
 				Filename: bestFilePath(cmdMeta, matches[1]),
 				Message:  fmt.Sprintf(`Import "%s" was not used.`, matches[2]),
+			}
+		}
+		if matches := recursiveImport380Regexp.FindStringSubmatch(protocLine); len(matches) > 4 {
+			line, err := strconv.Atoi(matches[2])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			column, err := strconv.Atoi(matches[3])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			return &text.Failure{
+				Filename: bestFilePath(cmdMeta, matches[1]),
+				Line:     line,
+				Column:   column,
+				Message:  fmt.Sprintf(`File recursively imports itself %s.`, matches[4]),
 			}
 		}
 		if matches := recursiveImportRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
@@ -686,6 +727,22 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 			// handled by fileNotFoundRegexp
 			// see comments at top
 			return nil
+		}
+		if matches := jsonCamelCase380Regexp.FindStringSubmatch(protocLine); len(matches) > 4 {
+			line, err := strconv.Atoi(matches[2])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			column, err := strconv.Atoi(matches[3])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			return &text.Failure{
+				Filename: bestFilePath(cmdMeta, matches[1]),
+				Line:     line,
+				Column:   column,
+				Message:  matches[4],
+			}
 		}
 		if matches := jsonCamelCaseRegexp.FindStringSubmatch(protocLine); len(matches) > 2 {
 			return &text.Failure{
