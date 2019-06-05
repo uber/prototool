@@ -103,38 +103,45 @@ func (v *firstPassVisitor) Do() []*text.Failure {
 		}
 		if v.fix == FixV2 {
 			v.goPackageOption.Constant = proto.Literal{
-				Source:   protostrs.GoPackageV2(v.Package.Name),
-				IsString: true,
+				Source:    protostrs.GoPackageV2(v.Package.Name),
+				IsString:  true,
+				QuoteRune: '"',
 			}
 		} else {
 			v.goPackageOption.Constant = proto.Literal{
-				Source:   protostrs.GoPackage(v.Package.Name),
-				IsString: true,
+				Source:    protostrs.GoPackage(v.Package.Name),
+				IsString:  true,
+				QuoteRune: '"',
 			}
 		}
 		v.javaMultipleFilesOption.Constant = proto.Literal{
 			Source: "true",
 		}
 		v.javaOuterClassnameOption.Constant = proto.Literal{
-			Source:   protostrs.JavaOuterClassname(v.filename),
-			IsString: true,
+			Source:    protostrs.JavaOuterClassname(v.filename),
+			IsString:  true,
+			QuoteRune: '"',
 		}
 		v.javaPackageOption.Constant = proto.Literal{
-			Source:   protostrs.JavaPackagePrefixOverride(v.Package.Name, v.javaPackagePrefix),
-			IsString: true,
+			Source:    protostrs.JavaPackagePrefixOverride(v.Package.Name, v.javaPackagePrefix),
+			IsString:  true,
+			QuoteRune: '"',
 		}
 		if v.fix == FixV2 {
 			v.csharpNamespaceOption.Constant = proto.Literal{
-				Source:   protostrs.CSharpNamespace(v.Package.Name),
-				IsString: true,
+				Source:    protostrs.CSharpNamespace(v.Package.Name),
+				IsString:  true,
+				QuoteRune: '"',
 			}
 			v.objcClassPrefixOption.Constant = proto.Literal{
-				Source:   protostrs.OBJCClassPrefix(v.Package.Name),
-				IsString: true,
+				Source:    protostrs.OBJCClassPrefix(v.Package.Name),
+				IsString:  true,
+				QuoteRune: '"',
 			}
 			v.phpNamespaceOption.Constant = proto.Literal{
-				Source:   protostrs.PHPNamespace(v.Package.Name),
-				IsString: true,
+				Source:    protostrs.PHPNamespace(v.Package.Name),
+				IsString:  true,
+				QuoteRune: '"',
 			}
 		}
 		v.Options = append(
