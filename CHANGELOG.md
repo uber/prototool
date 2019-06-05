@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- No changes yet.
+- Update the default `protoc` version to `3.8.0`.
+- Parse updated `protoc` output for `3.8.0`.
+- Fix issue where there were an unbounded number of `protoc` calls were
+  being executed.
 
 
 ## [1.7.0] - 2019-05-02
