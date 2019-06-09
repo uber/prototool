@@ -76,6 +76,8 @@ Package sub-names should only include characters in the range `[a-z0-9]`, i.e al
 and with only letter and digit characters. If names get too long or have underscores, the
 generated stubs in certain languages are less than idiomatic.
 
+[Usually](https://cloud.google.com/apis/design/file_structure#proto_options) "the package name should start with the company name".
+
 As illustrative examples, the following are not acceptable package names.
 
 ```proto
