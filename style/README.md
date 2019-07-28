@@ -911,7 +911,7 @@ message VehicleState {
   // The map is from key type to value type.
   map<string, Order> order_id_to_order = 4;
   // Timestamps are the exception, see below.
-  google.protobuf.Timestmp time = 5;
+  google.protobuf.Timestamp time = 5;
 }
 ```
 
