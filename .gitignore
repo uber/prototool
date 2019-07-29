@@ -1,6 +1,7 @@
 /.glide
 /.idea
 /.tmp
+/.vscode
 /bazel-*
 /brew
 /etc/docker/testing/gen
