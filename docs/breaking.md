@@ -103,7 +103,7 @@ This is in effect an alias for `prototool descriptor-set --include-imports -o FI
 To check your current definitions against a previous state:
 
 ```bash
-prototool break check path/to/proto --descriptor-set break_descriptor_set.bin
+prototool break check path/to/proto --descriptor-set-path break_descriptor_set.bin
 ```
 
 What this does behind the scenes:
