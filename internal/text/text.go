@@ -236,49 +236,43 @@ func NewFailuref(position scanner.Position, lintID string, format string, args .
 
 // SortFailures sorts the Failures, by filename, line, column, id, message.
 func SortFailures(failures []*Failure) {
-	sort.Stable(sortFailures(failures))
-}
-
-type sortFailures []*Failure
-
-func (f sortFailures) Len() int          { return len(f) }
-func (f sortFailures) Swap(i int, j int) { f[i], f[j] = f[j], f[i] }
-func (f sortFailures) Less(i int, j int) bool {
-	if f[i] == nil && f[j] == nil {
+	sort.SliceStable(failures, func(i, j int) bool {
+		if failures[i] == nil && failures[j] == nil {
+			return false
+		}
+		if failures[i] == nil && failures[j] != nil {
+			return true
+		}
+		if failures[i] != nil && failures[j] == nil {
+			return false
+		}
+		if failures[i].Filename < failures[j].Filename {
+			return true
+		}
+		if failures[i].Filename > failures[j].Filename {
+			return false
+		}
+		if failures[i].Line < failures[j].Line {
+			return true
+		}
+		if failures[i].Line > failures[j].Line {
+			return false
+		}
+		if failures[i].Column < failures[j].Column {
+			return true
+		}
+		if failures[i].Column > failures[j].Column {
+			return false
+		}
+		if failures[i].LintID < failures[j].LintID {
+			return true
+		}
+		if failures[i].LintID > failures[j].LintID {
+			return false
+		}
+		if failures[i].Message < failures[j].Message {
+			return true
+		}
 		return false
-	}
-	if f[i] == nil && f[j] != nil {
-		return true
-	}
-	if f[i] != nil && f[j] == nil {
-		return false
-	}
-	if f[i].Filename < f[j].Filename {
-		return true
-	}
-	if f[i].Filename > f[j].Filename {
-		return false
-	}
-	if f[i].Line < f[j].Line {
-		return true
-	}
-	if f[i].Line > f[j].Line {
-		return false
-	}
-	if f[i].Column < f[j].Column {
-		return true
-	}
-	if f[i].Column > f[j].Column {
-		return false
-	}
-	if f[i].LintID < f[j].LintID {
-		return true
-	}
-	if f[i].LintID > f[j].LintID {
-		return false
-	}
-	if f[i].Message < f[j].Message {
-		return true
-	}
-	return false
+	})
 }
