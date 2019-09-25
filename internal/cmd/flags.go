@@ -49,6 +49,7 @@ type flags struct {
 	insecure          bool
 	includeImports    bool
 	includeSourceInfo bool
+	namespaceOutput   bool
 	json              bool
 	keepaliveTime     string
 	key               string
@@ -155,6 +156,10 @@ func (f *flags) bindIncludeImports(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindIncludeSourceInfo(flagSet *pflag.FlagSet) {
 	flagSet.BoolVar(&f.includeSourceInfo, "include-source-info", false, "Do not strip SourceCodeInfo from the FileDescriptorProto. This results in vastly larger descriptors that include information about the original location of each decl in the source file as well as surrounding comments.")
+}
+
+func (f *flags) bindNamespaceOutput(flagSet *pflag.FlagSet) {
+	flagSet.BoolVar(&f.namespaceOutput, "namespace-output", false, "Create directory for output namespaced for the proto. Useful for generators like protoc-gen-doc that overwrite with the same filename.")
 }
 
 func (f *flags) bindJSON(flagSet *pflag.FlagSet) {

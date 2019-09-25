@@ -275,6 +275,10 @@ type GenPlugin struct {
 	// Add the --include_source_info flags to protoc.
 	// Only valid if Name is descriptor_set.
 	IncludeSourceInfo bool
+	// If set to true, creates a namespaced directory for the output.
+	// Some plugins like protoc-gen-doc overwrite on subsequent proto files.
+	// See: https://github.com/uber/prototool/issues/484
+	NamespaceOutput bool
 }
 
 // OutputPath is an output path.
@@ -342,6 +346,7 @@ type ExternalConfig struct {
 			FileSuffix        string `json:"file_suffix,omitempty" yaml:"file_suffix,omitempty"`
 			IncludeImports    bool   `json:"include_imports,omitempty" yaml:"include_imports,omitempty"`
 			IncludeSourceInfo bool   `json:"include_source_info,omitempty" yaml:"include_source_info,omitempty"`
+			NamespaceOutput   bool   `json:"namespace_output,omitempty" yaml:"namespace_output,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"generate,omitempty" yaml:"generate,omitempty"`
 }

@@ -478,6 +478,13 @@ func getPluginFlagSet(protoSet *file.ProtoSet, dirPath string, genPlugin setting
 		return nil, err
 	}
 	outputPath := genPlugin.OutputPath.AbsPath
+	if genPlugin.NamespaceOutput {
+		ns := strings.Replace(dirPath, protoSet.DirPath, "", 1)
+		outputPath = outputPath + ns
+		if err := os.MkdirAll(outputPath, 0744); err != nil {
+			return nil, err
+		}
+	}
 	if genPlugin.FileSuffix != "" {
 		relOutputFilePath, err := getRelOutputFilePath(protoSet, dirPath, genPlugin.FileSuffix)
 		if err != nil {

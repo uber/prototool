@@ -244,6 +244,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindErrorFormat(flagSet)
 			flags.bindIncludeImports(flagSet)
 			flags.bindIncludeSourceInfo(flagSet)
+			flags.bindNamespaceOutput(flagSet)
 			flags.bindJSON(flagSet)
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)

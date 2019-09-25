@@ -264,6 +264,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			FileSuffix:        plugin.FileSuffix,
 			IncludeImports:    plugin.IncludeImports,
 			IncludeSourceInfo: plugin.IncludeSourceInfo,
+			NamespaceOutput:   plugin.NamespaceOutput,
 			OutputPath: OutputPath{
 				RelPath: relPath,
 				AbsPath: absPath,
