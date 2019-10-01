@@ -109,8 +109,8 @@ ENV \
   PROTOTOOL_PROTOC_BIN_PATH=/usr/bin/protoc \
   PROTOTOOL_PROTOC_WKT_PATH=/usr/include \
   GRPC_VERSION=1.21.3 \
-  PROTOBUF_VERSION=3.8.0 \
-  ALPINE_GRPC_VERSION_SUFFIX=r0 \
+  PROTOBUF_VERSION=3.9.2 \
+  ALPINE_GRPC_VERSION_SUFFIX=r1 \
   ALPINE_PROTOBUF_VERSION_SUFFIX=r0
 
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories && \
