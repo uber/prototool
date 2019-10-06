@@ -487,7 +487,11 @@ func getPluginFlagSet(protoSet *file.ProtoSet, dirPath string, genPlugin setting
 	}
 	flagSet := []string{fmt.Sprintf("--%s_out=%s", genPlugin.Name, outputPath)}
 	if len(protoFlags) > 0 {
-		flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, outputPath)}
+		if genPlugin.UntiedFlags {
+			flagSet = append(flagSet, fmt.Sprintf("--%s_opt=%s", genPlugin.Name, protoFlags))
+		} else {
+			flagSet = []string{fmt.Sprintf("--%s_out=%s:%s", genPlugin.Name, protoFlags, outputPath)}
+		}
 	}
 	genPluginPath, err := genPlugin.GetPath()
 	if err != nil {
