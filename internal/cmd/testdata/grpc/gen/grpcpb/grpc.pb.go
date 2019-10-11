@@ -28,6 +28,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -334,6 +336,23 @@ type ExcitedServiceServer interface {
 	ExclamationServerStream(*ExclamationRequest, ExcitedService_ExclamationServerStreamServer) error
 	// ExclamationBidiStream adds an exclamation to the each request value.
 	ExclamationBidiStream(ExcitedService_ExclamationBidiStreamServer) error
+}
+
+// UnimplementedExcitedServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedExcitedServiceServer struct {
+}
+
+func (*UnimplementedExcitedServiceServer) Exclamation(ctx context.Context, req *ExclamationRequest) (*ExclamationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Exclamation not implemented")
+}
+func (*UnimplementedExcitedServiceServer) ExclamationClientStream(srv ExcitedService_ExclamationClientStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method ExclamationClientStream not implemented")
+}
+func (*UnimplementedExcitedServiceServer) ExclamationServerStream(req *ExclamationRequest, srv ExcitedService_ExclamationServerStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method ExclamationServerStream not implemented")
+}
+func (*UnimplementedExcitedServiceServer) ExclamationBidiStream(srv ExcitedService_ExclamationBidiStreamServer) error {
+	return status.Errorf(codes.Unimplemented, "method ExclamationBidiStream not implemented")
 }
 
 func RegisterExcitedServiceServer(s *grpc.Server, srv ExcitedServiceServer) {

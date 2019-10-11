@@ -23,6 +23,7 @@ package grpc
 import (
 	"encoding/json"
 	"io"
+	"reflect"
 
 	"github.com/fullstorydev/grpcurl"
 	"github.com/golang/protobuf/jsonpb"
@@ -89,7 +90,8 @@ func (i *invocationEventHandler) Err() error {
 }
 
 func (i *invocationEventHandler) printProtoMessage(input proto.Message, detailsKey string) {
-	if input == nil {
+	// Check for nil interface as well as non-nil interface whose underlying value is a nil value
+	if input == nil || reflect.ValueOf(input).IsNil() {
 		return
 	}
 	s, err := i.jsonpbMarshaler.MarshalToString(input)
