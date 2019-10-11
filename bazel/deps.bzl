@@ -40,8 +40,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_fullstorydev_grpcurl",
         importpath = "github.com/fullstorydev/grpcurl",
-        sum = "h1:XwiEVudma689HpecmJX6sTmOQCd1G5Cyqyj+zSqdk30=",
-        version = "v1.3.0",
+        sum = "h1:cJKWsBYMocdxXQvgbnhtLG810SL5MhKT4K7BagxRih8=",
+        version = "v1.3.2",
     )
     go_repository(
         name = "com_github_gobuffalo_flect",
@@ -82,8 +82,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_jhump_protoreflect",
         importpath = "github.com/jhump/protoreflect",
-        sum = "h1:tgahjuElRiJthp9JfaMUFxabBVIytT/lnMSadY5kMjM=",
-        version = "v1.4.1",
+        sum = "h1:NgpVT+dX71c8hZnxHof2M7QDK7QtohIJ7DYycjnkyfc=",
+        version = "v1.5.0",
     )
     go_repository(
         name = "com_github_mitchellh_go_wordwrap",
