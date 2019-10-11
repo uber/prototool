@@ -96,6 +96,7 @@ func (i *invocationEventHandler) printProtoMessage(input proto.Message, detailsK
 	}
 	s, err := i.jsonpbMarshaler.MarshalToString(input)
 	if err != nil {
+		i.logger.Error("marshal error", zap.Error(err))
 		return
 	}
 	i.println(i.marshalSanitize(s, detailsKey))
