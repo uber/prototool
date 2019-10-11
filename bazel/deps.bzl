@@ -106,7 +106,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_russross_blackfriday",
         importpath = "github.com/russross/blackfriday",
-        sum = "h1:cBXrhZNUf9C+La9/YpS+UHpUT8YD6Td9ZMSU9APFcsk=",
+        sum = "h1:HyvC0ARfnZBqnXwABFeSZHpKvJHJJfPz81GNueLj0oo=",
         version = "v1.5.2",
     )
     go_repository(
