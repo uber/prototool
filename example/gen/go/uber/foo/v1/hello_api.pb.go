@@ -28,6 +28,8 @@ import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -252,6 +254,17 @@ type HelloAPIServer interface {
 	Foo(context.Context, *FooRequest) (*FooResponse, error)
 	// Bar does a bar.
 	Bar(context.Context, *BarRequest) (*BarResponse, error)
+}
+
+// UnimplementedHelloAPIServer can be embedded to have forward compatible implementations.
+type UnimplementedHelloAPIServer struct {
+}
+
+func (*UnimplementedHelloAPIServer) Foo(ctx context.Context, req *FooRequest) (*FooResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Foo not implemented")
+}
+func (*UnimplementedHelloAPIServer) Bar(ctx context.Context, req *BarRequest) (*BarResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Bar not implemented")
 }
 
 func RegisterHelloAPIServer(s *grpc.Server, srv HelloAPIServer) {

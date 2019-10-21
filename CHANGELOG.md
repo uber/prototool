@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - No changes yet.
 
 
+## [1.9.0] - 2019-10-12
+- Updated dependencies for Go 1.13
+
+
 ## [1.8.0] - 2019-06-10
 - Update the default `protoc` version to `3.8.0`.
 - Parse updated `protoc` output for `3.8.0`.
@@ -248,7 +252,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/uber/prototool/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/uber/prototool/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/uber/prototool/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/uber/prototool/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/uber/prototool/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/uber/prototool/compare/v1.5.0...v1.6.0
