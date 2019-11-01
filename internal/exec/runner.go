@@ -70,15 +70,16 @@ type runner struct {
 	input       io.Reader
 	output      io.Writer
 
-	logger        *zap.Logger
-	develMode     bool
-	cachePath     string
-	configData    string
-	protocBinPath string
-	protocWKTPath string
-	protocURL     string
-	errorFormat   string
-	json          bool
+	logger         *zap.Logger
+	develMode      bool
+	cachePath      string
+	configData     string
+	configFilePath string
+	protocBinPath  string
+	protocWKTPath  string
+	protocURL      string
+	errorFormat    string
+	json           bool
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -97,6 +98,12 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 		protoSetProviderOptions = append(
 			protoSetProviderOptions,
 			file.ProtoSetProviderWithConfigData(runner.configData),
+		)
+	}
+	if runner.configFilePath != "" {
+		protoSetProviderOptions = append(
+			protoSetProviderOptions,
+			file.ProtoSetProviderWithConfigFilePath(runner.configFilePath),
 		)
 	}
 	if runner.develMode {

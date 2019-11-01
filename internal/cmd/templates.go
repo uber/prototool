@@ -303,6 +303,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindConfigFilePath(flagSet)
 		},
 	}
 
@@ -592,6 +593,12 @@ func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writ
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithConfigData(flags.configData),
+		)
+	}
+	if flags.configFilePath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithConfigFilePath(flags.configFilePath),
 		)
 	}
 	if flags.json {

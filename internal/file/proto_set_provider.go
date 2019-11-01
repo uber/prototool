@@ -36,6 +36,7 @@ type protoSetProvider struct {
 	logger         *zap.Logger
 	develMode      bool
 	configData     string
+	configFilePath string
 	walkTimeout    time.Duration
 	configProvider settings.ConfigProvider
 }
@@ -93,10 +94,17 @@ func (c *protoSetProvider) getMultipleForDir(workDirPath string, dirPath string)
 	// Set the configuration directory to the current working directory.
 	configDirPath := workDirPath
 	if c.configData == "" {
-		configFilePath, err := c.configProvider.GetFilePathForDir(absDirPath)
+		var configFilePath string
+
+		if c.configFilePath == "" {
+			configFilePath, err = c.configProvider.GetFilePathForDir(absDirPath)
+		} else {
+			configFilePath, err = AbsClean(c.configFilePath)
+		}
 		if err != nil {
 			return nil, err
 		}
+
 		// we need everything for generation, not just the files in the given directory
 		// so we go back to the config file if it is shallower
 		// display path will be unaffected as this is based on workDirPath
@@ -141,7 +149,12 @@ func (c *protoSetProvider) getBaseProtoSets(absWorkDirPath string, dirPathToProt
 		var err error
 		// we only want one ProtoSet if we have set configData
 		// since we are overriding all configuration files
-		if c.configData == "" {
+		if c.configFilePath != "" {
+			configFilePath, err = AbsClean(c.configFilePath)
+			if err != nil {
+				return nil, err
+			}
+		} else if c.configData == "" {
 			configFilePath, err = c.configProvider.GetFilePathForDir(dirPath)
 			if err != nil {
 				return nil, err

@@ -117,6 +117,14 @@ func ProtoSetProviderWithConfigData(configData string) ProtoSetProviderOption {
 	}
 }
 
+// ProtoSetProviderWithConfigFilePath returns a ProtoSetProviderOption that uses the given configuration
+// file instead of searching for other configuration files.
+func ProtoSetProviderWithConfigFilePath(configFilePath string) ProtoSetProviderOption {
+	return func(protoSetProvider *protoSetProvider) {
+		protoSetProvider.configFilePath = configFilePath
+	}
+}
+
 // ProtoSetProviderWithWalkTimeout returns a ProtoSetProviderOption will timeout after walking
 // a directory structure when searching for Protobuf files after the given amount of time.
 //

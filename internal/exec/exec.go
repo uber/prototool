@@ -98,6 +98,13 @@ func RunnerWithConfigData(configData string) RunnerOption {
 	}
 }
 
+// RunnerWithConfigFilePath returns a RunnerOption that uses the given config file path.
+func RunnerWithConfigFilePath(configFilePath string) RunnerOption {
+	return func(runner *runner) {
+		runner.configFilePath = configFilePath
+	}
+}
+
 // RunnerWithJSON returns a RunnerOption that will print failures as JSON.
 func RunnerWithJSON() RunnerOption {
 	return func(runner *runner) {
