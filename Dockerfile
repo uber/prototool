@@ -4,15 +4,17 @@ RUN apk add --update --no-cache build-base curl git upx && \
   rm -rf /var/cache/apk/*
 
 ENV GOLANG_PROTOBUF_VERSION=1.3.1 \
-  GOGO_PROTOBUF_VERSION=1.2.1
+  GOGO_PROTOBUF_VERSION=1.2.1 \
+  MYPY_PROTOBUF_VERSION=master
 RUN GO111MODULE=on go get \
   github.com/golang/protobuf/protoc-gen-go@v${GOLANG_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gofast@v${GOGO_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gogo@v${GOGO_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gogofast@v${GOGO_PROTOBUF_VERSION} \
   github.com/gogo/protobuf/protoc-gen-gogofaster@v${GOGO_PROTOBUF_VERSION} \
-  github.com/gogo/protobuf/protoc-gen-gogoslick@v${GOGO_PROTOBUF_VERSION} && \
-  mv /go/bin/protoc-gen-go* /usr/local/bin/
+  github.com/gogo/protobuf/protoc-gen-gogoslick@v${GOGO_PROTOBUF_VERSION} \
+  github.com/dropbox/mypy-protobuf/go/src/protoc-gen-mypy@${MYPY_PROTOBUF_VERSION} && \
+  mv /go/bin/protoc-gen-go* /go/bin/protoc-gen-mypy /usr/local/bin/
 
 ENV GRPC_GATEWAY_VERSION=1.8.5
 RUN curl -sSL \
