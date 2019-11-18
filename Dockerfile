@@ -74,13 +74,12 @@ WORKDIR /work
 ENV \
   PROTOTOOL_PROTOC_BIN_PATH=/usr/bin/protoc \
   PROTOTOOL_PROTOC_WKT_PATH=/usr/include \
-  GRPC_VERSION=1.21.3 \
-  PROTOBUF_VERSION=3.8.0 \
+  GRPC_VERSION=1.25.0 \
+  PROTOBUF_VERSION=3.10.1 \
   ALPINE_GRPC_VERSION_SUFFIX=r0 \
   ALPINE_PROTOBUF_VERSION_SUFFIX=r0
 
-RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories && \
-  apk add --update --no-cache bash curl git grpc=${GRPC_VERSION}-${ALPINE_GRPC_VERSION_SUFFIX} protobuf=${PROTOBUF_VERSION}-${ALPINE_PROTOBUF_VERSION_SUFFIX} && \
+RUN apk add --update --no-cache bash curl git grpc=${GRPC_VERSION}-${ALPINE_GRPC_VERSION_SUFFIX} protobuf=${PROTOBUF_VERSION}-${ALPINE_PROTOBUF_VERSION_SUFFIX} && \
   rm -rf /var/cache/apk/*
 
 COPY --from=builder /usr/local/bin /usr/local/bin
