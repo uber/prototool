@@ -54,6 +54,7 @@ RUN mkdir -p /tmp/protoc && \
   -o /tmp/protoc/protoc.zip && \
   cd /tmp/protoc && \
   unzip protoc.zip && \
+  chmod -R o+r /tmp/protoc/include && \
   mv /tmp/protoc/include /usr/local/include
 
 RUN mkdir -p /tmp/prototool
