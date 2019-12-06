@@ -2,9 +2,7 @@
 
 [![MIT License][mit-img]][mit] [![GitHub Release][release-img]][release] [![Build Status][ci-img]][ci] [![Coverage Status][cov-img]][cov] [![Docker Image][docker-img]][docker] [![Homebrew Package][homebrew-img]][homebrew] [![AUR Package][aur-img]][aur]
 
-**Update**
-
-We recommend checking out [Buf](https://github.com/bufbuild/buf), which is under active development.  There are a ton of docs for getting started, including for [migration from Prototool](https://buf.build/docs/migration-prototool).
+**Update:  We recommend checking out [Buf](https://github.com/bufbuild/buf), which is under active development.  There are a ton of docs for getting started, including for [migration from Prototool](https://buf.build/docs/migration-prototool).**
 
 
 [Protobuf](https://developers.google.com/protocol-buffers) is one of the best interface description
