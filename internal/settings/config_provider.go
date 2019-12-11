@@ -28,6 +28,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -204,6 +205,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 	}
 	includePaths := make([]string, 0, len(e.Protoc.Includes))
 	for _, includePath := range strs.SortUniq(e.Protoc.Includes) {
+		includePath = processEnvVariables(includePath, os.Getenv)
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -214,6 +216,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 	for _, ignore := range e.Lint.Ignores {
 		id := strings.ToUpper(ignore.ID)
 		for _, protoFilePath := range ignore.Files {
+			protoFilePath = processEnvVariables(protoFilePath, os.Getenv)
 			if !filepath.IsAbs(protoFilePath) {
 				protoFilePath = filepath.Join(dirPath, protoFilePath)
 			}
@@ -299,10 +302,11 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		}
 		var fileHeaderContent string
 		if e.Lint.FileHeader.Path != "" {
-			if filepath.IsAbs(e.Lint.FileHeader.Path) {
-				return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeader.Path)
+			fileHeaderPath := processEnvVariables(e.Lint.FileHeader.Path, os.Getenv)
+			if filepath.IsAbs(fileHeaderPath) {
+				return Config{}, fmt.Errorf("path for file header must be relative: %s", fileHeaderPath)
 			}
-			fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeader.Path))
+			fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, fileHeaderPath))
 			if err != nil {
 				return Config{}, err
 			}
@@ -350,7 +354,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
-			FileHeader:          fileHeader,
+			FileHeader:          processEnvVariables(fileHeader, os.Getenv),
 			JavaPackagePrefix:   e.Lint.JavaPackagePrefix,
 			AllowSuppression:    e.Lint.AllowSuppression,
 		},
@@ -360,7 +364,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
-				ImportPath:     e.Generate.GoOptions.ImportPath,
+				ImportPath:     processEnvVariables(e.Generate.GoOptions.ImportPath, os.Getenv),
 				ExtraModifiers: e.Generate.GoOptions.ExtraModifiers,
 			},
 			Plugins: genPlugins,
@@ -431,6 +435,32 @@ func jsonUnmarshalStrict(data []byte, v interface{}) error {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(v)
+}
+
+var envVariableRegexp = regexp.MustCompile(`\$+\{[^}]+\}`)
+
+// processEnvVariables detects variables by pattern `${NAME}` and replace them
+// on the value from the global environment.
+// To skip of the replacement can be used escape format like `$${NAME}` and
+// the value will be replaced on `${NAME}`
+func processEnvVariables(str string, mapper func(string) string) string {
+	return envVariableRegexp.ReplaceAllStringFunc(str, func(s string) string {
+		if strings.HasPrefix(s, "${") {
+			return mapper(s[2 : len(s)-1])
+		}
+		varIndex := 0
+		for i := 0; i < len(s); i++ {
+			if s[i] != '$' {
+				break
+			}
+			varIndex++
+		}
+		if varIndex%2 == 0 {
+			// Encode double $$ as single $
+			return s[varIndex/2:]
+		}
+		return s[:varIndex/2] + mapper(s[varIndex+1:len(s)-1])
+	})
 }
 
 func getFileHeaderLines(content string) []string {
