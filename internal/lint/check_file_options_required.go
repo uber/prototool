@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,6 +67,12 @@ var fileOptionsRequirePHPNamespaceLinter = NewLinter(
 	"FILE_OPTIONS_REQUIRE_PHP_NAMESPACE",
 	`Verifies that the file option "php_namespace" is set.`,
 	newCheckFileOptionsRequire("php_namespace"),
+)
+
+var fileOptionsRequireRubyPackageLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_RUBY_PACKAGE",
+	`Verifies that the file option "ruby_package" is set.`,
+	newCheckFileOptionsRequire("ruby_package"),
 )
 
 func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*FileDescriptor) error {
