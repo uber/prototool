@@ -68,7 +68,7 @@ RUN cd /tmp/prototool && \
 RUN upx --lzma /usr/local/bin/*
 
 FROM swift:5.1 AS swift-builder
-ENV SWIFT_PROTO_VERSION=1.7.0
+ENV SWIFT_PROTO_VERSION=1.8.0
 RUN set -ex; \
   mkdir -p /tmp/swift-proto; \
   git clone -c advice.detachedHead=false --depth 1 -b ${SWIFT_PROTO_VERSION} \
