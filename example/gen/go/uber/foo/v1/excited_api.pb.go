@@ -127,7 +127,9 @@ func init() {
 	proto.RegisterType((*ExclamationResponse)(nil), "uber.foo.v1.ExclamationResponse")
 }
 
-func init() { proto.RegisterFile("uber/foo/v1/excited_api.proto", fileDescriptor_af997259370c9c75) }
+func init() {
+	proto.RegisterFile("uber/foo/v1/excited_api.proto", fileDescriptor_af997259370c9c75)
+}
 
 var fileDescriptor_af997259370c9c75 = []byte{
 	// 262 bytes of a gzipped FileDescriptorProto
@@ -152,11 +154,11 @@ var fileDescriptor_af997259370c9c75 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // ExcitedAPIClient is the client API for ExcitedAPI service.
 //
@@ -174,10 +176,10 @@ type ExcitedAPIClient interface {
 }
 
 type excitedAPIClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewExcitedAPIClient(cc *grpc.ClientConn) ExcitedAPIClient {
+func NewExcitedAPIClient(cc grpc.ClientConnInterface) ExcitedAPIClient {
 	return &excitedAPIClient{cc}
 }
 

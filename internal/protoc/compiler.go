@@ -52,6 +52,7 @@ var (
 	// backup that does not require this to be at the beginning of the line
 	fullPluginFailedRegexp = regexp.MustCompile("(.*)--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 
+	extraImport3110Regexp = regexp.MustCompile(`^(.*):(\d+):(\d+): warning: Import (.*) is unused.$`)
 	// protoc started printing line and column information in 3.8.0
 	extraImport380Regexp = regexp.MustCompile(`^(.*):(\d+):(\d+): warning: Import (.*) but not used.$`)
 	extraImportRegexp    = regexp.MustCompile("^(.*): warning: Import (.*) but not used.$")
@@ -655,6 +656,27 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 				Message:  `No syntax specified. Please use 'syntax = "proto2";' or 'syntax = "proto3";' to specify a syntax version.`,
 			}
 		}
+		// Check for protoc 3.11.0 extra import wording
+		if matches := extraImport3110Regexp.FindStringSubmatch(protocLine); len(matches) > 4 {
+			if cmdMeta.protoSet.Config.Compile.AllowUnusedImports {
+				return nil
+			}
+			line, err := strconv.Atoi(matches[2])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			column, err := strconv.Atoi(matches[3])
+			if err != nil {
+				return c.handleUninterpretedProtocLine(protocLine)
+			}
+			return &text.Failure{
+				Filename: bestFilePath(cmdMeta, matches[1]),
+				Line:     line,
+				Column:   column,
+				Message:  fmt.Sprintf(`Import "%s" was not used.`, matches[4]),
+			}
+		}
+		// Check for protoc 3.8.0 extra import wording
 		if matches := extraImport380Regexp.FindStringSubmatch(protocLine); len(matches) > 4 {
 			if cmdMeta.protoSet.Config.Compile.AllowUnusedImports {
 				return nil
@@ -784,6 +806,7 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 		// I would prefer to error so that we signal that we don't know what the line is
 		// but if this becomes problematic with some plugin in the future, we should
 		// return nil, nil here
+
 		return c.handleUninterpretedProtocLine(protocLine)
 	}
 	line, err := strconv.Atoi(split[1])

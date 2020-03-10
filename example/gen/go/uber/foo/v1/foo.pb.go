@@ -527,7 +527,9 @@ func init() {
 	proto.RegisterType((*Bazz)(nil), "uber.foo.v1.Bazz")
 }
 
-func init() { proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_e4cff45982d67b5e) }
+func init() {
+	proto.RegisterFile("uber/foo/v1/foo.proto", fileDescriptor_e4cff45982d67b5e)
+}
 
 var fileDescriptor_e4cff45982d67b5e = []byte{
 	// 630 bytes of a gzipped FileDescriptorProto

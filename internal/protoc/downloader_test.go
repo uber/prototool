@@ -249,6 +249,7 @@ func TestNewDownloaderProtocURL(t *testing.T) {
 					},
 				},
 			)
+			require.NoError(t, err)
 
 			url, err := dl.getProtocURL(tt.goos, tt.goarch)
 			if tt.expectError {
