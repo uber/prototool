@@ -52,6 +52,7 @@ var (
 	// backup that does not require this to be at the beginning of the line
 	fullPluginFailedRegexp = regexp.MustCompile("(.*)--.*_out: protoc-gen-(.*): Plugin failed with status code (.*).$")
 
+	// protoc changed the wording for unused imports in 3.11.0
 	extraImport3110Regexp = regexp.MustCompile(`^(.*):(\d+):(\d+): warning: Import (.*) is unused.$`)
 	// protoc started printing line and column information in 3.8.0
 	extraImport380Regexp = regexp.MustCompile(`^(.*):(\d+):(\d+): warning: Import (.*) but not used.$`)
