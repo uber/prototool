@@ -21,12 +21,12 @@ for more details.
 - Otherwise, if on Linux, `$HOME/.cache/prototool` will be used, or on Darwin,
   `$HOME/Library/Caches/prototool` will be used.
 
-By default, `protoc` version `3.8.0` is downloaded, however this is configurable in your
+By default, `protoc` version `3.11.0` is downloaded, however this is configurable in your
 `prototool.yaml` file.
 
 ```yaml
 protoc:
-  version: 3.8.0
+  version: 3.11.0
 ```
 
 Downloads are safe to run concurrently across processes, for example if using from Bazel, as
