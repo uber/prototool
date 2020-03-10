@@ -69,37 +69,16 @@ RUN upx --lzma /usr/local/bin/*
 
 FROM swift:5.1 AS swift-builder
 ENV SWIFT_PROTO_VERSION=1.8.0
-RUN set -ex; \
-  mkdir -p /tmp/swift-proto; \
-  git clone -c advice.detachedHead=false --depth 1 -b ${SWIFT_PROTO_VERSION} \
-    https://github.com/apple/swift-protobuf.git /tmp/swift-proto; \
-  cd /tmp/swift-proto; \
-  swift build -c release; \
-  mv .build/release/protoc-gen-swift /usr/local/bin/protoc-gen-swift
-
-FROM scratch AS swift-dist
-# This list of files is generated using `ldd /usr/local/bin/protoc-gen-swift`
-# Static linking is not yet supported by swiftc https://bugs.swift.org/browse/SR-648
-COPY --from=swift-builder /usr/local/bin/protoc-gen-swift /usr/local/bin/protoc-gen-swift
-COPY --from=swift-builder /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
-COPY --from=swift-builder /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.so.2
-COPY --from=swift-builder /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/libgcc_s.so.1
-COPY --from=swift-builder /lib/x86_64-linux-gnu/libm.so.6 /lib/x86_64-linux-gnu/libm.so.6
-COPY --from=swift-builder /lib/x86_64-linux-gnu/libpthread.so.0 /lib/x86_64-linux-gnu/libpthread.so.0
-COPY --from=swift-builder /lib/x86_64-linux-gnu/librt.so.1 /lib/x86_64-linux-gnu/librt.so.1
-COPY --from=swift-builder /lib/x86_64-linux-gnu/libutil.so.1 /lib/x86_64-linux-gnu/libutil.so.1
-COPY --from=swift-builder /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
-COPY --from=swift-builder /usr/lib/swift/linux/libBlocksRuntime.so /usr/lib/swift/linux/libBlocksRuntime.so
-COPY --from=swift-builder /usr/lib/swift/linux/libdispatch.so /usr/lib/swift/linux/libdispatch.so
-COPY --from=swift-builder /usr/lib/swift/linux/libFoundation.so /usr/lib/swift/linux/libFoundation.so
-COPY --from=swift-builder /usr/lib/swift/linux/libicudataswift.so.61 /usr/lib/swift/linux/libicudataswift.so.61
-COPY --from=swift-builder /usr/lib/swift/linux/libicui18nswift.so.61 /usr/lib/swift/linux/libicui18nswift.so.61
-COPY --from=swift-builder /usr/lib/swift/linux/libicuucswift.so.61 /usr/lib/swift/linux/libicuucswift.so.61
-COPY --from=swift-builder /usr/lib/swift/linux/libswiftCore.so /usr/lib/swift/linux/libswiftCore.so
-COPY --from=swift-builder /usr/lib/swift/linux/libswiftDispatch.so /usr/lib/swift/linux/libswiftDispatch.so
-COPY --from=swift-builder /usr/lib/swift/linux/libswiftGlibc.so /usr/lib/swift/linux/libswiftGlibc.so
-COPY --from=swift-builder /usr/lib/x86_64-linux-gnu/libatomic.so.1 /usr/lib/x86_64-linux-gnu/libatomic.so.1
-COPY --from=swift-builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+WORKDIR /swift-proto
+RUN git clone -c advice.detachedHead=false --depth 1 -b ${SWIFT_PROTO_VERSION} https://github.com/apple/swift-protobuf.git .
+RUN swift build --static-swift-stdlib --configuration release
+# Copy release binary to distribution folder
+WORKDIR /dist
+RUN install -TD /swift-proto/.build/release/protoc-gen-swift ./usr/local/bin/protoc-gen-swift
+# Find all dependencies and copy them to distribution
+RUN ldd /dist/usr/local/bin/protoc-gen-swift | awk '{ print $3 }' | sort | uniq | xargs -I {} install -TD {} .{}
+# Explicitely copy dynamic linker since it is filtered out by awk
+RUN install -TD /lib64/ld-linux-x86-64.so.2 ./lib64/ld-linux-x86-64.so.2
 
 FROM alpine:latest
 
@@ -119,7 +98,7 @@ RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/reposit
 
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /usr/local/include /usr/include
-COPY --from=swift-dist / /
+COPY --from=swift-builder /dist /
 
 ENV GOGO_PROTOBUF_VERSION=1.2.1 \
   GOLANG_PROTOBUF_VERSION=1.3.1 \
