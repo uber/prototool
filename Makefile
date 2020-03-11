@@ -260,11 +260,11 @@ dockerbuild:
 
 .PHONY: dockertest
 dockertest:
-	docker run -v $(CURDIR):/work $(DOCKER_IMAGE) bash etc/docker/testing/bin/test.sh
+	docker run --rm -v $(CURDIR):/work $(DOCKER_IMAGE) bash etc/docker/testing/bin/test.sh
 
 .PHONY: dockershell
 dockershell: dockerbuild
-	docker run -it -v $(CURDIR):/work $(DOCKER_IMAGE) bash
+	docker run --rm -it -v $(CURDIR):/work $(DOCKER_IMAGE) bash
 
 .PHONY: dockerall
 dockerall: dockerbuild dockertest
