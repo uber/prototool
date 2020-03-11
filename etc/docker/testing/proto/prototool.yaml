@@ -75,3 +75,5 @@ generate:
     - name: yarpc-go
       type: gogo
       output: ../gen/yarpc-go
+    - name: swift
+      output: ../gen/swift
