@@ -79,6 +79,7 @@ var (
 		fileOptionsRequireJavaPackageLinter,
 		fileOptionsRequireOBJCClassPrefixLinter,
 		fileOptionsRequirePHPNamespaceLinter,
+		fileOptionsRequireRubyPackageLinter,
 		fileOptionsUnsetJavaMultipleFilesLinter,
 		fileOptionsUnsetJavaOuterClassnameLinter,
 		gogoNotImportedLinter,
