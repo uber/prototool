@@ -17,7 +17,7 @@ prototool cache update
 # Cache to a specific directory path/to/cache
 prototool cache update --cache-path path/to/cache
 # Cache using custom configuration data instead of finding a prototool.yaml file using the file discovery mechanism
-prototool cache update --config-data '{"protoc":{"version":"3.8.0"}}'
+prototool cache update --config-data '{"protoc":{"version":"3.11.0"}}'
 ```
 
 There is also a command `prototool cache delete` which will delete all cached assets of

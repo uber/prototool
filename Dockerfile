@@ -67,7 +67,7 @@ RUN cd /tmp/prototool && \
 
 RUN upx --lzma /usr/local/bin/*
 
-FROM alpine:edge
+FROM alpine:latest
 
 WORKDIR /work
 
