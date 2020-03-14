@@ -9,6 +9,7 @@ option java_outer_classname = "HelloApiProto";
 option java_package = "com.foo.v1";
 option objc_class_prefix = "FXX";
 option php_namespace = "Foo\\V1";
+option ruby_package = "Foo::V1";
 
 import "google/api/api.proto";
 

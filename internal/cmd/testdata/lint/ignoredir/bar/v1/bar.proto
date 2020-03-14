@@ -9,6 +9,7 @@ option java_outer_classname = "BarProto";
 option java_package = "com.bar.v1";
 option objc_class_prefix = "BXX";
 option php_namespace = "Bar\\V1";
+option ruby_package = "Bar::V1";
 
 message Bar {
   float one = 1;
