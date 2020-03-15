@@ -29,12 +29,11 @@ load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies")
 
 gazelle_dependencies()
 
-
 git_repository(
     name = "com_google_protobuf",
-    commit = "09745575a923640154bcf307fba8aedff47f240a",
+    commit = "d0bfd5221182da1a7cc280f3337b5e41a89539cf",
     remote = "https://github.com/protocolbuffers/protobuf",
-    shallow_since = "1558721209 -0700",
+    shallow_since = "1581711200 -0800"
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -45,4 +44,7 @@ load("//bazel:deps.bzl", "prototool_deps")
 
 prototool_deps()
 
+load("//bazel:deps.bzl", "prototool_deps")
 
+# gazelle:repository_macro bazel/deps.bzl%prototool_deps
+prototool_deps()
