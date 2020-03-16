@@ -232,7 +232,7 @@ codecov: cover
 
 .PHONY: bazeltest
 bazeltest: $(BAZEL)
-	bazel test GODEBUG=tls13=0 //...
+	bazel test //...
 
 .PHONY: bazelbuild
 bazelbuild: $(BAZEL)
