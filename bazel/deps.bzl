@@ -160,14 +160,14 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_google_genproto",
         importpath = "google.golang.org/genproto",
-        sum = "h1:QmnwU8dKvY8c/vZikd2jhBNwrrGS5qeyK/2Aeeh9Grk=",
-        version = "v0.0.0-20200306153348-d950eab6f860",
+        sum = "h1:IXPzGf8J51hBQirC+OIHbIlTuVYOMarft+Wvi+qDzmg=",
+        version = "v0.0.0-20200311144346-b662892dd51b",
     )
     go_repository(
         name = "org_golang_google_grpc",
         importpath = "google.golang.org/grpc",
-        sum = "h1:zvIju4sqAGvwKspUQOhwnpcqSbzi7/H6QomNNjTL4sk=",
-        version = "v1.27.1",
+        sum = "h1:bO/TA4OxCOummhSf10siHuG7vJOiwh7SpRpFZDkOgl4=",
+        version = "v1.28.0",
     )
     go_repository(
         name = "org_golang_x_lint",
@@ -208,8 +208,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_x_tools",
         importpath = "golang.org/x/tools",
-        sum = "h1:9Di9iYgOt9ThCipBxChBVhgNipDoE5mxO84rQV7D0FE=",
-        version = "v0.0.0-20200308013534-11ec41452d41",
+        sum = "h1:CuaXjesf8HXc9cSxHpEzHyFF+1FCOpgdxhQ/5vRcYZw=",
+        version = "v0.0.0-20200311222014-c807066ff753",
     )
     go_repository(
         name = "org_uber_go_atomic",
@@ -418,8 +418,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_envoyproxy_go_control_plane",
         importpath = "github.com/envoyproxy/go-control-plane",
-        sum = "h1:4cmBvAEBNJaGARUEs3/suWRyfyBfhf7I60WBZq+bv2w=",
-        version = "v0.9.1-0.20191026205805-5f8ba28d4473",
+        sum = "h1:rEvIZUSZ3fx39WIi3JkQqQBitGwpELBIYWeBVh6wn+E=",
+        version = "v0.9.4",
     )
     go_repository(
         name = "com_github_envoyproxy_protoc_gen_validate",
@@ -708,4 +708,10 @@ def prototool_deps(**kwargs):
         importpath = "go.uber.org/tools",
         sum = "h1:0mgffUl7nfd+FpvXMVz4IDEaUSmT1ysygQC7qYo7sG4=",
         version = "v0.0.0-20190618225709-2cfd321de3ee",
+    )
+    go_repository(
+        name = "com_github_cncf_udpa_go",
+        importpath = "github.com/cncf/udpa/go",
+        sum = "h1:WBZRG4aNOuI15bLRrCgN8fCq8E5Xuty6jGbmSNEvSsU=",
+        version = "v0.0.0-20191209042840-269d4d468f6f",
     )
