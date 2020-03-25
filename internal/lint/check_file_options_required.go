@@ -69,6 +69,12 @@ var fileOptionsRequirePHPNamespaceLinter = NewLinter(
 	newCheckFileOptionsRequire("php_namespace"),
 )
 
+var fileOptionsRequireRubyPackageLinter = NewLinter(
+	"FILE_OPTIONS_REQUIRE_RUBY_PACKAGE",
+	`Verifies that the file option "ruby_package" is set.`,
+	newCheckFileOptionsRequire("ruby_package"),
+)
+
 func newCheckFileOptionsRequire(fileOption string) func(func(*text.Failure), string, []*FileDescriptor) error {
 	return func(add func(*text.Failure), dirPath string, descriptors []*FileDescriptor) error {
 		return runVisitor(&fileOptionsRequireVisitor{
