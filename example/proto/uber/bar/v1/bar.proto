@@ -29,7 +29,6 @@ option java_outer_classname = "BarProto";
 option java_package = "com.uber.bar.v1";
 option objc_class_prefix = "UBX";
 option php_namespace = "Uber\\Bar\\V1";
-option ruby_package = "Uber::Bar::V1";
 
 // Hello is a hello.
 message Hello {
