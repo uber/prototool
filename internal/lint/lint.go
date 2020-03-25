@@ -228,7 +228,6 @@ var (
 		fileOptionsRequireJavaPackageLinter,
 		fileOptionsRequireOBJCClassPrefixLinter,
 		fileOptionsRequirePHPNamespaceLinter,
-		fileOptionsRequireRubyPackageLinter,
 		importsNotPublicLinter,
 		importsNotWeakLinter,
 		messagesHaveSentenceCommentsExceptRequestResponseTypesLinter,
