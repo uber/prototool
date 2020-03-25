@@ -9,4 +9,3 @@ option java_outer_classname = "FileNameInvalidProto";
 option java_package = "com.foo.v1";
 option objc_class_prefix = "FXX";
 option php_namespace = "Foo\\V1";
-option ruby_package = "Foo::V1";
