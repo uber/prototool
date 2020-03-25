@@ -226,9 +226,9 @@ The following is an example of this in practice.
     │   │       └── ccap.proto // package uber.finance.ccap.v1
     │   └── payment
     │       ├── v1
-    │       │   └── payment.proto // package uber.payment.v1
+    │       │   └── payment.proto // package uber.finance.payment.v1
     │       └── v1beta1
-    │           └── payment.proto // package uber.payment.v1beta1
+    │           └── payment.proto // package uber.finance.payment.v1beta1
     └── trip
         ├── v1
         │   ├── trip_api.proto // package uber.trip.v1
