@@ -287,7 +287,6 @@ option java_outer_classname = "TripProto";
 option java_package = "com.uber.trip.v1";
 option objc_class_prefix = "UTX";
 option php_namespace = "Uber\\Trip\\V1";
-option ruby_package = "Uber::Trip::V1";
 
 import "uber/user/v1/user.proto";
 import "google/protobuf/timestamp.proto";
@@ -328,7 +327,6 @@ option java_outer_classname = "TripApiProto";
 option java_package = "com.uber.trip.v1";
 option objc_class_prefix = "UTX";
 option php_namespace = "Uber\\Trip\\V1";
-option ruby_package = "Uber::Trip::V1";
 
 import "uber/trip/v1/trip.proto";
 import "google/protobuf/timestamp.proto";
@@ -419,8 +417,6 @@ option java_package = "com.uber.trip.v1";
 option objc_class_prefix = "UTX";
 // The php_namespace is the same as the csharp_namespace, with "\\" substituted for ".".
 option php_namespace = "Uber\\Trip\\V1";
-// The ruby_package is the same as the csharp_namespace, with "::" substituted for ".".
-option ruby_package = "Uber::Trip::V1";
 ```
 
 While it is unlikely that a given organization will use all of these file options for their
