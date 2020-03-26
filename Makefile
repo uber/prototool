@@ -115,7 +115,6 @@ install:
 .PHONy: bins
 bins:
 	go build ./cmd/prototool
-	cp ./prototool ../proto-sandbox/
 
 .PHONY: license
 license: __eval_srcs $(UPDATE_LICENSE)
