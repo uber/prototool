@@ -93,17 +93,12 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	}
 	protoSetProviderOptions := []file.ProtoSetProviderOption{
 		file.ProtoSetProviderWithLogger(runner.logger),
+		file.ProtoSetProviderWithWalkTimeout(runner.walkTimeout),
 	}
 	if runner.configData != "" {
 		protoSetProviderOptions = append(
 			protoSetProviderOptions,
 			file.ProtoSetProviderWithConfigData(runner.configData),
-		)
-	}
-	if runner.walkTimeout != 0 {
-		protoSetProviderOptions = append(
-			protoSetProviderOptions,
-			file.ProtoSetProviderWithWalkTimeout(runner.walkTimeout),
 		)
 	}
 	if runner.develMode {
