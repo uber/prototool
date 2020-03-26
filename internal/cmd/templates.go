@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 
 	wordwrap "github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
@@ -472,7 +473,7 @@ $ prototool grpc example \
 		Short: "Lint proto files and compile with protoc to check for failures.",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup, flags.diffLintGroups, flags.generateIgnores)
+			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup, flags.diffLintGroups, flags.generateIgnores, flags.walkTimeout)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
@@ -488,6 +489,7 @@ $ prototool grpc example \
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
 			flags.bindGenerateIgnores(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -632,6 +634,16 @@ func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writ
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithProtocURL(flags.protocURL),
+		)
+	}
+	if flags.walkTimeout != "" {
+		parsedWalkTimeout, err := time.ParseDuration(flags.walkTimeout)
+		if err != nil {
+			return nil, err
+		}
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithWalkTimeout(parsedWalkTimeout),
 		)
 	}
 	if develMode {

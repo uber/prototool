@@ -79,6 +79,7 @@ type runner struct {
 	protocURL     string
 	errorFormat   string
 	json          bool
+	walkTimeout   time.Duration
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -97,6 +98,12 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 		protoSetProviderOptions = append(
 			protoSetProviderOptions,
 			file.ProtoSetProviderWithConfigData(runner.configData),
+		)
+	}
+	if runner.walkTimeout != 0 {
+		protoSetProviderOptions = append(
+			protoSetProviderOptions,
+			file.ProtoSetProviderWithWalkTimeout(runner.walkTimeout),
 		)
 	}
 	if runner.develMode {
@@ -309,7 +316,7 @@ func (r *runner) doProtocCommands(compiler protoc.Compiler, meta *meta) error {
 	return nil
 }
 
-func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string, generateIgnores bool) error {
+func (r *runner) Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string, generateIgnores bool, walkTimeout string) error {
 	if moreThanOneSet(listAllLinters, listLinters, listAllLintGroups, listLintGroup != "", diffLintGroups != "", generateIgnores) {
 		return newExitErrorf(255, "can only set one of list-all-linters, list-linters, list-all-lint-groups, list-lint-group, diff-lint-groups, update-ignores")
 	}

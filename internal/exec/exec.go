@@ -25,6 +25,7 @@ package exec
 
 import (
 	"io"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -53,7 +54,7 @@ type Runner interface {
 	Files(args []string) error
 	Compile(args []string, dryRun bool) error
 	Gen(args []string, dryRun bool) error
-	Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string, generateIgnores bool) error
+	Lint(args []string, listAllLinters bool, listLinters bool, listAllLintGroups bool, listLintGroup string, diffLintGroups string, generateIgnores bool, walkTimeout string) error
 	Format(args []string, overwrite, diffMode, lintMode, fix bool) error
 	All(args []string, disableFormat, disableLint, fix bool) error
 	GRPC(args, headers []string, address, method, data, callTimeout, connectTimeout, keepaliveTime string, stdin bool, details bool, tls bool, insecure bool, cacert string, cert string, key string, serverName string) error
@@ -131,6 +132,13 @@ func RunnerWithProtocWKTPath(protocWKTPath string) RunnerOption {
 func RunnerWithProtocURL(protocURL string) RunnerOption {
 	return func(runner *runner) {
 		runner.protocURL = protocURL
+	}
+}
+
+// RunnerWithWalkTimeout returns a RunnerOption that sets a given walk timeout
+func RunnerWithWalkTimeout(walkTimeout time.Duration) RunnerOption {
+	return func(runner *runner) {
+		runner.walkTimeout = walkTimeout
 	}
 }
 
