@@ -42,8 +42,7 @@ type protoSetProvider struct {
 
 func newProtoSetProvider(options ...ProtoSetProviderOption) *protoSetProvider {
 	protoSetProvider := &protoSetProvider{
-		logger:      zap.NewNop(),
-		walkTimeout: DefaultWalkTimeout,
+		logger: zap.NewNop(),
 	}
 	for _, option := range options {
 		option(protoSetProvider)
