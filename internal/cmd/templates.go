@@ -56,6 +56,7 @@ var (
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -76,6 +77,7 @@ var (
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -95,6 +97,7 @@ var (
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
 			flags.bindOutputPathBreakDescriptorSet(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -158,6 +161,7 @@ Artifacts are downloaded to the following directories based on flags and environ
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -251,6 +255,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindProtocWKTPath(flagSet)
 			flags.bindOutputPath(flagSet)
 			flags.bindTmp(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -263,6 +268,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindConfigData(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -285,6 +291,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -304,6 +311,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -473,7 +481,7 @@ $ prototool grpc example \
 		Short: "Lint proto files and compile with protoc to check for failures.",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
-			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup, flags.diffLintGroups, flags.generateIgnores, flags.walkTimeout)
+			return runner.Lint(args, flags.listAllLinters, flags.listLinters, flags.listAllLintGroups, flags.listLintGroup, flags.diffLintGroups, flags.generateIgnores)
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
