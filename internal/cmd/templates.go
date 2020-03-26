@@ -125,6 +125,7 @@ Artifacts are downloaded to the following directories based on flags and environ
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -406,6 +407,7 @@ $ prototool grpc example \
 			flags.bindCert(flagSet)
 			flags.bindKey(flagSet)
 			flags.bindServerName(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -423,6 +425,7 @@ $ prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -441,6 +444,7 @@ $ prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -459,6 +463,7 @@ $ prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
