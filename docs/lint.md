@@ -148,25 +148,25 @@ Following is a list of all lint rules provided by Prototool as well as what lint
 
 | Rule | Description | Lint Group |
 | --- | --- | --- |
-| COMMENTS_NO_C_STYLE | Verifies that there are no /* C-style */ comments. | uber1, uber2|
+| COMMENTS_NO_C_STYLE | Verifies that there are no `/* C-style */` comments. | uber1, uber2|
 | COMMENTS_NO_INLINE | Verifies that there are no inline comments. | uber2 |
-| ENUM_FIELD_NAMES_UPPER_SNAKE_CASE | Verifies that all enum field names are UPPER_SNAKE_CASE. | google, uber1, uber2 |
-| ENUM_FIELD_NAMES_UPPERCASE | Verifies that all enum field names are UPPERCASE. | none |
-| ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE | Verifies that all enum fields are prefixed with ENUM_NAME_. | uber2 |
-| ENUM_FIELD_PREFIXES | Verifies that all enum fields are prefixed with [NESTED_MESSAGE_NAME_]ENUM_NAME_. | uber1 |
-| ENUM_FIELDS_HAVE_COMMENTS | Verifies that all enum fields have a comment of the form "// FIELD_NAME ...". | none |
+| ENUM_FIELD_NAMES_UPPER_SNAKE_CASE | Verifies that all enum field names are `UPPER_SNAKE_CASE`. | google, uber1, uber2 |
+| ENUM_FIELD_NAMES_UPPERCASE | Verifies that all enum field names are `UPPERCASE`. | none |
+| ENUM_FIELD_PREFIXES_EXCEPT_MESSAGE | Verifies that all enum fields are prefixed with `ENUM_NAME_`. | uber2 |
+| ENUM_FIELD_PREFIXES | Verifies that all enum fields are prefixed with `[NESTED_MESSAGE_NAME_]ENUM_NAME_`. | uber1 |
+| ENUM_FIELDS_HAVE_COMMENTS | Verifies that all enum fields have a comment of the form `// FIELD_NAME ...`. | none |
 | ENUM_FIELDS_HAVE_SENTENCE_COMMENTS | Verifies that all enum fields have a comment that contains at least one complete sentence. | none |
 | ENUM_NAMES_CAMEL_CASE | Verifies that all enum names are CamelCase. | google, uber1, uber2 |
 | ENUM_NAMES_CAPITALIZED | Verifies that all enum names are Capitalized. | google, uber1, uber2 |
-| ENUM_ZERO_VALUES_INVALID_EXCEPT_MESSAGE | Verifies that all enum zero value names are ENUM_NAME_INVALID. | uber2 |
-| ENUM_ZERO_VALUES_INVALID | Verifies that all enum zero value names are [NESTED_MESSAGE_NAME_]ENUM_NAME_INVALID. | uber1 |
+| ENUM_ZERO_VALUES_INVALID_EXCEPT_MESSAGE | Verifies that all enum zero value names are `ENUM_NAME_INVALID`. | uber2 |
+| ENUM_ZERO_VALUES_INVALID | Verifies that all enum zero value names are `[NESTED_MESSAGE_NAME_]ENUM_NAME_INVALID`. | uber1 |
 | ENUMS_HAVE_COMMENTS | Verifies that all enums have a comment of the form `// EnumName ...`. | none |
 | ENUMS_HAVE_SENTENCE_COMMENTS | Verifies that all enums have a comment that contains at least one complete sentence. | uber2 |
-| ENUMS_NO_ALLOW_ALIAS | Verifies that no enums use the option "allow_alias". | uber1, uber2 |
+| ENUMS_NO_ALLOW_ALIAS | Verifies that no enums use the option `allow_alias`. | uber1, uber2 |
 | FIELDS_NOT_RESERVED | Verifies that no message or enum has a reserved field. | uber2 |
 | FILE_HEADER | Verifies that the file header matches the expected file header if the file_header option is set in the configuration file. | google, uber1, uber2 |
-| FILE_NAMES_LOWER_SNAKE_CASE | Verifies that the file name is lower_snake_case.proto. | uber2 |
-| FILE_OPTIONS_EQUAL_CSHARP_NAMESPACE_CAPITALIZED | Verifies that the file option "csharp_namespace" is the capitalized version of the package. | uber2 |
+| FILE_NAMES_LOWER_SNAKE_CASE | Verifies that the file name is `lower_snake_case.proto`. | uber2 |
+| FILE_OPTIONS_EQUAL_CSHARP_NAMESPACE_CAPITALIZED | Verifies that the file option `csharp_namespace` is the capitalized version of the package. | uber2 |
 | FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX | Verifies that the file option `go_package` is equal to `$(basename PACKAGE)pb`. | uber1 |
 | FILE_OPTIONS_EQUAL_GO_PACKAGE_V2_SUFFIX | Verifies that the file option `go_package` is equal to the last two values of the package separated by "."s, or just the package name if there are no "."s. | uber2 |
 | FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE | Verifies that the file option `java_multiple_files` is equal to true. | uber1, uber2 |
@@ -210,7 +210,8 @@ MESSAGE_NAMES_CAMEL_CASE | Verifies that all non-extended message names are Came
 MESSAGE_NAMES_CAPITALIZED | Verifies that all non-extended message names are Capitalized. | google, uber1, uber2 |
 MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment of the form `// MessageName ...`. | none |
 MESSAGES_HAVE_COMMENTS | Verifies that all non-extended messages have a comment of the form `// MessageName ...`. | none |
-MESSAGES_HAVE_SENTENCE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence. | uber2 |
+MESSAGES_HAVE_SENTENCE_COMMENTS
+_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence. | uber2 |
 MESSAGES_NOT_EMPTY_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all messages except for request and response types are not empty. | none |
 NAMES_NO_COMMON | Verifies that no type name contains the word `common` because `common` has no semantic meaning, consider using a name that reflects the type instead. | uber2 |
 NAMES_NO_DATA | Verifies that no type name contains the word `data` because `data` is a decorator and all types on Protobuf are data.  Consider merging this information into a higher-level type, or if you must have such a type, Use `info` instead. | uber2 |
