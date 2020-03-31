@@ -42,8 +42,7 @@ type protoSetProvider struct {
 
 func newProtoSetProvider(options ...ProtoSetProviderOption) *protoSetProvider {
 	protoSetProvider := &protoSetProvider{
-		logger:      zap.NewNop(),
-		walkTimeout: DefaultWalkTimeout,
+		logger: zap.NewNop(),
 	}
 	for _, option := range options {
 		option(protoSetProvider)
@@ -225,6 +224,9 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 			return nil, err
 		}
 	}
+
+	c.logger.Debug("walking the directory structure", zap.Duration("walkTimeout", c.walkTimeout))
+
 	walkErrC := make(chan error)
 	go func() {
 		walkErrC <- filepath.Walk(

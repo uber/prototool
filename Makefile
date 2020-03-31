@@ -112,6 +112,10 @@ all: lint cover bazeltest bazelbuild
 install:
 	go install ./cmd/prototool
 
+.PHONy: bins
+bins:
+	go build ./cmd/prototool
+
 .PHONY: license
 license: __eval_srcs $(UPDATE_LICENSE)
 	update-license $(SRCS)

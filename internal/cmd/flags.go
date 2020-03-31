@@ -71,6 +71,7 @@ type flags struct {
 	tmp               bool
 	uncomment         bool
 	generateIgnores   bool
+	walkTimeout       string
 }
 
 func (f *flags) bindAddress(flagSet *pflag.FlagSet) {
@@ -259,4 +260,8 @@ func (f *flags) bindKey(flagSet *pflag.FlagSet) {
 
 func (f *flags) bindServerName(flagSet *pflag.FlagSet) {
 	flagSet.StringVar(&f.serverName, "server-name", "", "Override expected server \"Common Name\" when validating TLS certificate. Should usually be set if using a HTTP proxy or an IP for the --address. If set, --tls is required.")
+}
+
+func (f *flags) bindWalkTimeout(flagSet *pflag.FlagSet) {
+	flagSet.StringVar(&f.walkTimeout, "walk-timeout", "3s", "The maximum time to allow for walking the directory structure looking for proto files.")
 }
