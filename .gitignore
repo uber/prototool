@@ -2,6 +2,7 @@
 /.idea
 /.tmp
 /.vscode
+/prototool
 /bazel-*
 /brew
 /etc/docker/testing/gen

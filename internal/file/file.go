@@ -29,9 +29,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// DefaultWalkTimeout is the default walk timeout.
-const DefaultWalkTimeout time.Duration = 3 * time.Second
-
 var rootDirPath = filepath.Dir(string(filepath.Separator))
 
 // ProtoSet represents a set of .proto files and an associated config.
