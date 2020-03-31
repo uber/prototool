@@ -170,7 +170,7 @@ Following is a list of all lint rules provided by Prototool as well as what lint
 | FILE_OPTIONS_EQUAL_GO_PACKAGE_PB_SUFFIX | Verifies that the file option `go_package` is equal to `$(basename PACKAGE)pb`. | uber1 |
 | FILE_OPTIONS_EQUAL_GO_PACKAGE_V2_SUFFIX | Verifies that the file option `go_package` is equal to the last two values of the package separated by "."s, or just the package name if there are no "."s. | uber2 |
 | FILE_OPTIONS_EQUAL_JAVA_MULTIPLE_FILES_TRUE | Verifies that the file option `java_multiple_files` is equal to true. | uber1, uber2 |
-FILE_OPTIONS_EQUAL_JAVA_OUTER_CLASSNAME_PROTO_SUFFIX | Verifies that the file option `java_outer_classname` is equal to `$(upperCamelCase $(basename FILE))Proto.` | uber1, uber2 |
+FILE_OPTIONS_EQUAL_JAVA<br>_OUTER_CLASSNAME_PROTO_SUFFIX | Verifies that the file option `java_outer_classname` is equal to `$(upperCamelCase $(basename FILE))Proto.` | uber1, uber2 |
 FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX | Verifies that the file option `java_package` is equal to `com.PACKAGE`. | uber1 |
 FILE_OPTIONS_EQUAL_JAVA_PACKAGE_PREFIX | Verifies that the file option `java_package` is equal to `PREFIX.PACKAGE`, with `PREFIX` defaulting to `com` and configurable in your configuration file. | uber2 |
 FILE_OPTIONS_EQUAL_OBJC_CLASS_PREFIX_ABBR | Verifies that the file option `objc_class_prefix` is the abbreviated version of the package. | uber2 |
@@ -211,7 +211,7 @@ MESSAGE_NAMES_CAPITALIZED | Verifies that all non-extended message names are Cap
 MESSAGES_HAVE_COMMENTS_EXCEPT<br>_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment of the form `// MessageName ...`. | none |
 MESSAGES_HAVE_COMMENTS | Verifies that all non-extended messages have a comment of the form `// MessageName ...`. | none |
 MESSAGES_HAVE_SENTENCE_COMMENTS<br>_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence. | uber2 |
-MESSAGES_NOT_EMPTY_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all messages except for request and response types are not empty. | none |
+MESSAGES_NOT_EMPTY<br>_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all messages except for request and response types are not empty. | none |
 NAMES_NO_COMMON | Verifies that no type name contains the word `common` because `common` has no semantic meaning, consider using a name that reflects the type instead. | uber2 |
 NAMES_NO_DATA | Verifies that no type name contains the word `data` because `data` is a decorator and all types on Protobuf are data.  Consider merging this information into a higher-level type, or if you must have such a type, Use `info` instead. | uber2 |
 NAMES_NO_UUID | Verifies that no type name contains the word `uuid` because UUIDs in Protobuf are named ID instead of UUID. | uber2 |
