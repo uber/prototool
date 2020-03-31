@@ -208,10 +208,9 @@ MESSAGE_FIELDS_NOT_FLOATS | Verifies that all message fields are not floats. | n
 MESSAGE_FIELDS_TIME | Verifies that all non-map fields that contain `time` in their name are of type `google.protobuf.Timestamp`. | none |
 MESSAGE_NAMES_CAMEL_CASE | Verifies that all non-extended message names are CamelCase. | google, uber1, uber2 |
 MESSAGE_NAMES_CAPITALIZED | Verifies that all non-extended message names are Capitalized. | google, uber1, uber2 |
-MESSAGES_HAVE_COMMENTS_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment of the form `// MessageName ...`. | none |
+MESSAGES_HAVE_COMMENTS_EXCEPT<br>_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment of the form `// MessageName ...`. | none |
 MESSAGES_HAVE_COMMENTS | Verifies that all non-extended messages have a comment of the form `// MessageName ...`. | none |
-MESSAGES_HAVE_SENTENCE_COMMENTS
-_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence. | uber2 |
+MESSAGES_HAVE_SENTENCE_COMMENTS<br>_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all non-extended messages except for request and response types have a comment that contains at least one complete sentence. | uber2 |
 MESSAGES_NOT_EMPTY_EXCEPT_REQUEST_RESPONSE_TYPES | Verifies that all messages except for request and response types are not empty. | none |
 NAMES_NO_COMMON | Verifies that no type name contains the word `common` because `common` has no semantic meaning, consider using a name that reflects the type instead. | uber2 |
 NAMES_NO_DATA | Verifies that no type name contains the word `data` because `data` is a decorator and all types on Protobuf are data.  Consider merging this information into a higher-level type, or if you must have such a type, Use `info` instead. | uber2 |
