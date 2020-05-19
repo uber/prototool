@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,6 @@ import (
 	"github.com/uber/prototool/internal/settings"
 	"go.uber.org/zap"
 )
-
-// DefaultWalkTimeout is the default walk timeout.
-const DefaultWalkTimeout time.Duration = 3 * time.Second
 
 var rootDirPath = filepath.Dir(string(filepath.Separator))
 

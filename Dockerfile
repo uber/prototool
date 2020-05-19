@@ -1,4 +1,4 @@
-FROM golang:1.12.4-alpine3.9 as builder
+FROM golang:1.14-alpine3.11 as builder
 
 RUN apk add --update --no-cache build-base curl git upx && \
   rm -rf /var/cache/apk/*
@@ -67,17 +67,17 @@ RUN cd /tmp/prototool && \
 
 RUN upx --lzma /usr/local/bin/*
 
-FROM alpine:edge
+FROM alpine:latest
 
 WORKDIR /work
 
 ENV \
   PROTOTOOL_PROTOC_BIN_PATH=/usr/bin/protoc \
   PROTOTOOL_PROTOC_WKT_PATH=/usr/include \
-  GRPC_VERSION=1.21.3 \
-  PROTOBUF_VERSION=3.8.0 \
-  ALPINE_GRPC_VERSION_SUFFIX=r0 \
-  ALPINE_PROTOBUF_VERSION_SUFFIX=r0
+  GRPC_VERSION=1.25.0 \
+  PROTOBUF_VERSION=3.11.2 \
+  ALPINE_GRPC_VERSION_SUFFIX=r1 \
+  ALPINE_PROTOBUF_VERSION_SUFFIX=r1
 
 RUN echo 'http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories && \
   apk add --update --no-cache bash curl git grpc=${GRPC_VERSION}-${ALPINE_GRPC_VERSION_SUFFIX} protobuf=${PROTOBUF_VERSION}-${ALPINE_PROTOBUF_VERSION_SUFFIX} && \

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -185,6 +185,78 @@ func TestNewDownloaderProtocValidation(t *testing.T) {
 				assert.EqualError(t, err, tt.err.Error())
 			} else {
 				assert.Nil(t, err)
+			}
+		})
+	}
+}
+
+func TestNewDownloaderProtocURL(t *testing.T) {
+	tests := []struct {
+		desc            string
+		expectedURL     string
+		expectError     bool
+		goarch          string
+		goos            string
+		protobufVersion string
+	}{
+		{
+			protobufVersion: "3.10.0",
+			goos:            "linux",
+			goarch:          "amd64",
+			expectedURL:     "https://github.com/protocolbuffers/protobuf/releases/download/v3.10.0/protoc-3.10.0-linux-x86_64.zip",
+			desc:            "linux amd64 official version",
+		},
+		{
+			protobufVersion: "3.10.0-rc-1",
+			goos:            "linux",
+			goarch:          "amd64",
+			expectedURL:     "https://github.com/protocolbuffers/protobuf/releases/download/v3.10.0-rc1/protoc-3.10.0-rc-1-linux-x86_64.zip",
+			desc:            "linux amd64 release candidate",
+		},
+		{
+			protobufVersion: "3.10.0",
+			goos:            "darwin",
+			goarch:          "amd64",
+			expectedURL:     "https://github.com/protocolbuffers/protobuf/releases/download/v3.10.0/protoc-3.10.0-osx-x86_64.zip",
+			desc:            "darwin amd64 official version",
+		},
+		{
+			protobufVersion: "3.10.0-rc-1",
+			goos:            "darwin",
+			goarch:          "amd64",
+			expectedURL:     "https://github.com/protocolbuffers/protobuf/releases/download/v3.10.0-rc1/protoc-3.10.0-rc-1-osx-x86_64.zip",
+			desc:            "darwin amd64 release candidate",
+		},
+		{
+			goos:        "foo",
+			goarch:      "amd64",
+			expectError: true,
+			desc:        "invalid goos",
+		},
+		{
+			goos:        "linux",
+			goarch:      "foo",
+			expectError: true,
+			desc:        "invalid goarch",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.desc, func(t *testing.T) {
+			dl, err := newDownloader(
+				settings.Config{
+					Compile: settings.CompileConfig{
+						ProtobufVersion: tt.protobufVersion,
+					},
+				},
+			)
+			require.NoError(t, err)
+
+			url, err := dl.getProtocURL(tt.goos, tt.goarch)
+			if tt.expectError {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, url, tt.expectedURL)
 			}
 		})
 	}

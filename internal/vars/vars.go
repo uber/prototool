@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,11 @@ package vars
 
 const (
 	// Version is the current version.
-	Version = "1.9.0"
+	Version = "1.10.0-dev"
 
 	// DefaultProtocVersion is the default version of protoc from
 	// github.com/protocolbuffers/protobuf to use.
 	//
 	// See https://github.com/protocolbuffers/protobuf/releases for the latest release.
-	DefaultProtocVersion = "3.8.0"
+	DefaultProtocVersion = "3.11.0"
 )

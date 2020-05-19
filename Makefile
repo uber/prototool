@@ -31,7 +31,7 @@ env:
 	@echo 'export PATH="$(GOBIN):$${PATH}"' >> $(TMP)/env
 	@echo $(TMP)/env
 
-BAZEL_VERSION := 0.24.1
+BAZEL_VERSION := 1.2.0
 BAZEL := $(TMP_VERSIONS)/bazel/$(BAZEL_VERSION)
 ifeq ($(UNAME_OS),Darwin)
 BAZEL_OS := darwin
@@ -111,6 +111,10 @@ all: lint cover bazeltest bazelbuild
 .PHONY: install
 install:
 	go install ./cmd/prototool
+
+.PHONy: bins
+bins:
+	go build ./cmd/prototool
 
 .PHONY: license
 license: __eval_srcs $(UPDATE_LICENSE)

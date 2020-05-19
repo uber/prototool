@@ -104,7 +104,7 @@ package uber.finance.ccap.v1;
 Package sub-names cannot be any of the following.
 
 - `internal` - This is effectively a reserved keyword in Golang and results in the generated
-  package not being accessible outside of it's context.
+  package not being accessible outside of its context.
 - `public` - This is a reserved keyword in many languages.
 - `private` - This is a reserved keyword in many languages.
 - `protected` - This is a reserved keyword in many languages.
@@ -226,9 +226,9 @@ The following is an example of this in practice.
     │   │       └── ccap.proto // package uber.finance.ccap.v1
     │   └── payment
     │       ├── v1
-    │       │   └── payment.proto // package uber.payment.v1
+    │       │   └── payment.proto // package uber.finance.payment.v1
     │       └── v1beta1
-    │           └── payment.proto // package uber.payment.v1beta1
+    │           └── payment.proto // package uber.finance.payment.v1beta1
     └── trip
         ├── v1
         │   ├── trip_api.proto // package uber.trip.v1
@@ -256,7 +256,7 @@ All files should be ordered in the following manner.
 Protobuf definitions should go into one of two types of files: **Service files** or
 **Supporting files**.
 
-A service file contains exactly one service, and it's corresponding request and response messages.
+A service file contains exactly one service, and its corresponding request and response messages.
 This file is named after the service, substituting `PascalCase` for `lower_snake_case`. The service
 should be the first element in the file, with requests and responses sorted to match the order
 of the declared service methods.
@@ -1011,7 +1011,7 @@ All services and RPCs require a comment that contains at least one complete sent
 [Documentation](#documentation) section for more details.
 
 Please read the above [File Structure](#file-structure) section carefully. Each service should
-be in it's own file named after the service. For example, `TripAPI` should be in a file named
+be in its own file named after the service. For example, `TripAPI` should be in a file named
 `trip_api.proto`.
 
 Every RPC request and response should be unique to the RPC, and named after the RPC. As per the

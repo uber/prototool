@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ package exec
 
 import (
 	"io"
+	"time"
 
 	"go.uber.org/zap"
 )
@@ -131,6 +132,13 @@ func RunnerWithProtocWKTPath(protocWKTPath string) RunnerOption {
 func RunnerWithProtocURL(protocURL string) RunnerOption {
 	return func(runner *runner) {
 		runner.protocURL = protocURL
+	}
+}
+
+// RunnerWithWalkTimeout returns a RunnerOption that sets a given walk timeout
+func RunnerWithWalkTimeout(walkTimeout time.Duration) RunnerOption {
+	return func(runner *runner) {
+		runner.walkTimeout = walkTimeout
 	}
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -79,6 +79,7 @@ type runner struct {
 	protocURL     string
 	errorFormat   string
 	json          bool
+	walkTimeout   time.Duration
 }
 
 func newRunner(workDirPath string, input io.Reader, output io.Writer, options ...RunnerOption) *runner {
@@ -92,6 +93,7 @@ func newRunner(workDirPath string, input io.Reader, output io.Writer, options ..
 	}
 	protoSetProviderOptions := []file.ProtoSetProviderOption{
 		file.ProtoSetProviderWithLogger(runner.logger),
+		file.ProtoSetProviderWithWalkTimeout(runner.walkTimeout),
 	}
 	if runner.configData != "" {
 		protoSetProviderOptions = append(

@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"sync"
@@ -310,9 +311,14 @@ func (d *downloader) getProtocURL(goos string, goarch string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	// Protoc download URLs for release candidates don't use the hyphen in the version part of the URL
+	re := regexp.MustCompile(`(rc)-(\d+$)`)
+	version := re.ReplaceAllString(d.config.Compile.ProtobufVersion, "$1$2")
+
 	return fmt.Sprintf(
 		"https://github.com/protocolbuffers/protobuf/releases/download/v%s/protoc-%s-%s-%s.zip",
-		d.config.Compile.ProtobufVersion,
+		version,
 		d.config.Compile.ProtobufVersion,
 		protocS,
 		unameM,

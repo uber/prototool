@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
+// Copyright (c) 2020 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"time"
 
 	wordwrap "github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
@@ -55,6 +56,7 @@ var (
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -75,6 +77,7 @@ var (
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -94,6 +97,7 @@ var (
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
 			flags.bindOutputPathBreakDescriptorSet(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -121,6 +125,7 @@ Artifacts are downloaded to the following directories based on flags and environ
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindCachePath(flagSet)
 			flags.bindConfigData(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -157,6 +162,7 @@ Artifacts are downloaded to the following directories based on flags and environ
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -250,6 +256,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindProtocWKTPath(flagSet)
 			flags.bindOutputPath(flagSet)
 			flags.bindTmp(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -262,6 +269,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		},
 		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
 			flags.bindConfigData(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -284,6 +292,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -303,6 +312,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -397,6 +407,7 @@ $ prototool grpc example \
 			flags.bindCert(flagSet)
 			flags.bindKey(flagSet)
 			flags.bindServerName(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -414,6 +425,7 @@ $ prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -432,6 +444,7 @@ $ prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -450,6 +463,7 @@ $ prototool grpc example \
 			flags.bindProtocURL(flagSet)
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -488,6 +502,7 @@ $ prototool grpc example \
 			flags.bindProtocBinPath(flagSet)
 			flags.bindProtocWKTPath(flagSet)
 			flags.bindGenerateIgnores(flagSet)
+			flags.bindWalkTimeout(flagSet)
 		},
 	}
 
@@ -632,6 +647,16 @@ func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writ
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithProtocURL(flags.protocURL),
+		)
+	}
+	if flags.walkTimeout != "" {
+		parsedWalkTimeout, err := time.ParseDuration(flags.walkTimeout)
+		if err != nil {
+			return nil, err
+		}
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithWalkTimeout(parsedWalkTimeout),
 		)
 	}
 	if develMode {
