@@ -4,8 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [1.10.0] - 2020-05-19
+## [Unreleased]
 - No changes yet.
+
+
+## [1.10.0] - 2020-05-19
+- Document all lint rules and their group memberships (#548)
+- Add walk-timeout command line flag (#545)
+- Fix directory structure example in Style Guide (#543)
+- Add linter for ruby_package file option
+- Update Prototool deps
+- Update Prototool to go 1.14 and protoc 3.11.0
+- Use a more stable build of Alpine as a base image
+- Fix minor typos in style guide (#535)
+- Added a regex check for a release candidate syntax in the protobuf version.  If it exists, remove the hyphen for the version portion of the URL (#515)
 
 
 ## [1.9.0] - 2019-10-12
@@ -252,6 +264,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
+[Unreleased]: https://github.com/uber/prototool/compare/v1.10.0...HEAD
 [1.10.0]: https://github.com/uber/prototool/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/uber/prototool/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/uber/prototool/compare/v1.7.0...v1.8.0
