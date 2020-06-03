@@ -1,5 +1,8 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
+load("//:def.bzl", "prototool")
 
 # gazelle:prefix github.com/uber/prototool
 # gazelle:proto disable_global
 gazelle(name = "gazelle")
+
+prototool(name = "prototool")

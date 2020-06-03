@@ -8,7 +8,7 @@ def _prototool_impl(ctx):
     commands.append("cd \"$BUILD_WORKING_DIRECTORY\"")
 
     # Invoke prototool with the user arguments.
-    abs_prototool_path = paths.join("\"$BUILD_WORKSPACE_DIRECTORY\"", ctx.executable._prototool_executable.path)
+    abs_prototool_path = paths.join("\"$BUILD_WORKSPACE_DIRECTORY\"", ctx.executable._prototool.path)
     commands.append("{0} $@".format(abs_prototool_path))
 
     ctx.actions.run_shell(
@@ -18,7 +18,7 @@ def _prototool_impl(ctx):
             output = ctx.outputs.executable.path,
         ),
         arguments = ["$@"],
-        tools = [ctx.executable._prototool_executable],
+        tools = [ctx.executable._prototool],
     )
 
     return DefaultInfo(executable = ctx.outputs.executable)
@@ -27,7 +27,7 @@ prototool = rule(
     implementation = _prototool_impl,
     executable = True,
     attrs = {
-        "_prototool_executable": attr.label(
+        "_prototool": attr.label(
             cfg = "host",
             default = Label("//cmd/prototool"),
             executable = True,
