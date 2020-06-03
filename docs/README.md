@@ -58,6 +58,7 @@ Protobuf file, or under a second for a larger number (500+) of Protobuf files.
     * [prototool descriptor-set](#prototool-descriptor-set)
     * [prototool grpc](#prototool-grpc)
   * [Tips and Tricks](#tips-and-tricks)
+  * [Bazel Integration](#bazel-integration)
   * [Vim Integration](#vim-integration)
   * [Stability](#stability)
   * [Development](#development)
@@ -337,6 +338,46 @@ should follow some basic rules:
 - Have all Protobuf files in the same directory use the same `package`.
 - Do not use long-form `go_package` values, ie use `foopb`, not `github.com/bar/baz/foo;foopb`.
   This helps `prototool generate` do the best job.
+
+## Bazel Integration
+
+Prototool can also be invoked via Bazel. 
+
+##### Setup
+In your `WORKSAPCE`:
+
+```python
+PROTOTOOL_VERSION = "<desired version from github.com/uber/prototool/releases>"
+
+http_archive(
+    name = "com_uber_prototool",
+    strip_prefix = "prototool-" + PROTOTOOL_VERSION,
+    url = "https://github.com/uber/prototool/archive/v" + PROTOTOOL_VERSION + ".tar.gz",
+)
+
+load("@com_uber_prototool//bazel:deps.bzl", "prototool_deps")
+
+prototool_deps()
+```
+
+In your `BUILD.bazel`:
+
+```python
+load("@com_uber_prototool//:def.bzl", "prototool")
+
+prototool(name = "prototool")
+```
+
+##### Usage
+
+Prototool can now be invoked similar to the CLI tool. Note that you must pass arguments preceding "--".
+
+```bash
+> bazel run //:prototool -- version
+> bazel run //:prototool -- lint protobuf/grpc/health/v1/health.proto
+> bazel run //:prototool -- format protobuf/grpc/health/v1/health.proto
+> bazel run //:prototool -- break check --git-branch master protobuf
+```
 
 ## Vim Integration
 
