@@ -57,17 +57,17 @@ check_dir_not_exists() {
   fi
 }
 
-check_env GOGO_PROTOBUF_VERSION 1.2.1
-check_env GOLANG_PROTOBUF_VERSION 1.3.1
-check_env GRPC_VERSION 1.25.0
-check_env GRPC_GATEWAY_VERSION 1.8.5
-check_env GRPC_WEB_VERSION 1.0.4
-check_env PROTOBUF_VERSION 3.11.2
-check_env TWIRP_VERSION 5.7.0
-check_env YARPC_VERSION 1.37.3
+check_env GOGO_PROTOBUF_VERSION 1.3.1
+check_env GOLANG_PROTOBUF_VERSION 1.4.2
+check_env GRPC_VERSION 1.28.1
+check_env GRPC_GATEWAY_VERSION 1.14.6
+check_env GRPC_WEB_VERSION 1.1.0
+check_env PROTOBUF_VERSION 3.12.2
+check_env TWIRP_VERSION 5.11.0
+check_env YARPC_VERSION 1.46.0
 check_env PROTOTOOL_PROTOC_BIN_PATH /usr/bin/protoc
 check_env PROTOTOOL_PROTOC_WKT_PATH /usr/include
-check_command_output "libprotoc 3.11.2" protoc --version
+check_command_output "libprotoc 3.12.2" protoc --version
 check_command_output_file etc/wkt.txt find /usr/include -type f
 check_which /usr/bin/protoc
 check_which /usr/bin/grpc_cpp_plugin
