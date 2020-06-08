@@ -4,11 +4,11 @@ go 1.14
 
 require (
 	github.com/emicklei/proto v1.9.0
-	github.com/fullstorydev/grpcurl v1.4.0
+	github.com/fullstorydev/grpcurl v1.6.0
 	github.com/gobuffalo/flect v0.2.1
 	github.com/gofrs/flock v0.7.1
-	github.com/golang/protobuf v1.3.4
-	github.com/jhump/protoreflect v1.6.0
+	github.com/golang/protobuf v1.3.5
+	github.com/jhump/protoreflect v1.6.1
 	github.com/mitchellh/go-wordwrap v1.0.0
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
@@ -19,8 +19,7 @@ require (
 	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
 	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
 	golang.org/x/text v0.3.2 // indirect
-	golang.org/x/tools v0.0.0-20200311222014-c807066ff753 // indirect
 	google.golang.org/genproto v0.0.0-20200311144346-b662892dd51b // indirect
-	google.golang.org/grpc v1.28.0
+	google.golang.org/grpc v1.29.0
 	gopkg.in/yaml.v2 v2.2.8
 )
