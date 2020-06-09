@@ -4,8 +4,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "co_honnef_go_tools",
         importpath = "honnef.co/go/tools",
-        sum = "h1:3JgtbtFHMiCmsznwGVTUWbgGov+pVqnlf1dEJTNAXeM=",
-        version = "v0.0.1-2019.2.3",
+        sum = "h1:sXmLre5bzIR6ypkjXCDI3jHPssRhc8KD/Ome589sc3U=",
+        version = "v0.0.1-2020.1.3",
     )
     go_repository(
         name = "com_github_burntsushi_toml",
@@ -40,8 +40,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_fullstorydev_grpcurl",
         importpath = "github.com/fullstorydev/grpcurl",
-        sum = "h1:rKQyAaegPtCj4mpItnCHd+PIEHspIZl14VWhHYIHhls=",
-        version = "v1.4.0",
+        sum = "h1:p8BB6VZF8O7w6MxGr3KJ9E6EVKaswCevSALK6FBtMzA=",
+        version = "v1.6.0",
     )
     go_repository(
         name = "com_github_gobuffalo_flect",
@@ -70,8 +70,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_golang_protobuf",
         importpath = "github.com/golang/protobuf",
-        sum = "h1:87PNWwrRvUSnqS4dlcBU/ftvOIBep4sYuBLlh6rX2wk=",
-        version = "v1.3.4",
+        sum = "h1:F768QJ1E9tib+q5Sc8MkdJi1RxLTbRcTf8LJV56aRls=",
+        version = "v1.3.5",
     )
     go_repository(
         name = "com_github_inconshreveable_mousetrap",
@@ -82,8 +82,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_jhump_protoreflect",
         importpath = "github.com/jhump/protoreflect",
-        sum = "h1:h5jfMVslIg6l29nsMs0D8Wj17RDVdNYti0vDN/PZZoE=",
-        version = "v1.6.0",
+        sum = "h1:4/2yi5LyDPP7nN+Hiird1SAJ6YoxUm13/oxHGRnbPd8=",
+        version = "v1.6.1",
     )
     go_repository(
         name = "com_github_mitchellh_go_wordwrap",
@@ -166,8 +166,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_google_grpc",
         importpath = "google.golang.org/grpc",
-        sum = "h1:bO/TA4OxCOummhSf10siHuG7vJOiwh7SpRpFZDkOgl4=",
-        version = "v1.28.0",
+        sum = "h1:2pJjwYOdkZ9HlN4sWRYBg9ttH5bCOlsueaM+b/oYjwo=",
+        version = "v1.29.0",
     )
     go_repository(
         name = "org_golang_x_lint",
@@ -208,8 +208,8 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_x_tools",
         importpath = "golang.org/x/tools",
-        sum = "h1:CuaXjesf8HXc9cSxHpEzHyFF+1FCOpgdxhQ/5vRcYZw=",
-        version = "v0.0.0-20200311222014-c807066ff753",
+        sum = "h1:zSzQJAznWxAh9fZxiPy2FZo+ZZEYoYFYYDYdOrU7AaM=",
+        version = "v0.0.0-20200426102838-f3a5411a4c3b",
     )
     go_repository(
         name = "org_uber_go_atomic",
@@ -714,4 +714,22 @@ def prototool_deps(**kwargs):
         importpath = "github.com/cncf/udpa/go",
         sum = "h1:WBZRG4aNOuI15bLRrCgN8fCq8E5Xuty6jGbmSNEvSsU=",
         version = "v0.0.0-20191209042840-269d4d468f6f",
+    )
+    go_repository(
+        name = "com_github_gordonklaus_ineffassign",
+        importpath = "github.com/gordonklaus/ineffassign",
+        sum = "h1:vc7Dmrk4JwS0ZPS6WZvWlwDflgDTA26jItmbSj83nug=",
+        version = "v0.0.0-20200309095847-7953dde2c7bf",
+    )
+    go_repository(
+        name = "com_github_nishanths_predeclared",
+        importpath = "github.com/nishanths/predeclared",
+        sum = "h1:0NtlnvxTh8fQsQm55+bkvrqgn0zcv+M4TF8otNCuYl4=",
+        version = "v0.0.0-20190419143655-18a43bb90ffc",
+    )
+    go_repository(
+        name = "com_github_yuin_goldmark",
+        importpath = "github.com/yuin/goldmark",
+        sum = "h1:nqDD4MMMQA0lmWq03Z2/myGPYLQoXtmi0rGVs95ntbo=",
+        version = "v1.1.27",
     )
