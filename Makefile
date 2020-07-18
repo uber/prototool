@@ -112,7 +112,7 @@ all: lint cover bazeltest bazelbuild
 install:
 	go install ./cmd/prototool
 
-.PHONy: bins
+.PHONY: bins
 bins:
 	go build ./cmd/prototool
 
