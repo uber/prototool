@@ -188,3 +188,11 @@ generate:
       file_suffix: bin
       include_imports: true
       include_source_info: true
+      
+      #generates swift pb files
+    - name: swift
+      output: ../../.gen/proto/swift
+      
+      #generates swift grpc files
+    - name: swiftgrpc
+      output: ../../.gen/proto/swift
