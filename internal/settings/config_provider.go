@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Uber Technologies, Inc.
+// Copyright (c) 2021 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,10 @@ func (c *configProvider) GetForData(dirPath string, externalConfigData string) (
 	dirPath = filepath.Clean(dirPath)
 	var externalConfig ExternalConfig
 	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
-		return Config{}, err
+		c.logger.Debug("config data is not in proper JSON format", zap.String("dirPath", dirPath))
+		if err = yaml.UnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
+			return Config{}, err
+		}
 	}
 	return externalConfigToConfig(c.develMode, externalConfig, dirPath)
 }
@@ -104,7 +107,10 @@ func (c *configProvider) GetExcludePrefixesForData(dirPath string, externalConfi
 	dirPath = filepath.Clean(dirPath)
 	var externalConfig ExternalConfig
 	if err := jsonUnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
-		return nil, err
+		c.logger.Debug("config data is not in proper JSON format", zap.String("dirPath", dirPath))
+		if err = yaml.UnmarshalStrict([]byte(externalConfigData), &externalConfig); err != nil {
+			return nil, err
+		}
 	}
 	return getExcludePrefixes(externalConfig.Excludes, dirPath)
 }
