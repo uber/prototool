@@ -7,7 +7,7 @@ go_library(
         "foo.pb.go",
         "hello_api.pb.go",
     ],
-    importpath = "github.com/uber/prototool/example/gen/go/uber/foo/v1",
+    importpath = "github.com/dapperlabs/prototool/example/gen/go/uber/foo/v1",
     visibility = ["//visibility:public"],
     deps = [
         "//example/gen/go/uber/bar/v1:go_default_library",

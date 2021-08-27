@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "go_default_library",
     srcs = ["text.go"],
-    importpath = "github.com/uber/prototool/internal/text",
+    importpath = "github.com/dapperlabs/prototool/internal/text",
     visibility = ["//:__subpackages__"],
 )
 

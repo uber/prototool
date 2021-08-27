@@ -30,7 +30,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/uber/prototool/internal/strs"
+	"github.com/dapperlabs/prototool/internal/strs"
 )
 
 // CSharpNamespace returns the value for the file option "csharp_namespace"

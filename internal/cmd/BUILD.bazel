@@ -7,7 +7,7 @@ go_library(
         "flags.go",
         "templates.go",
     ],
-    importpath = "github.com/uber/prototool/internal/cmd",
+    importpath = "github.com/dapperlabs/prototool/internal/cmd",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/exec:go_default_library",

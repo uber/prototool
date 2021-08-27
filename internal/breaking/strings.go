@@ -23,7 +23,7 @@ package breaking
 import (
 	"fmt"
 
-	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
+	reflectv1 "github.com/dapperlabs/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 )
 
 var (

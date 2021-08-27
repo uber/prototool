@@ -28,7 +28,7 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	duration "github.com/golang/protobuf/ptypes/duration"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
-	v1 "github.com/uber/prototool/example/gen/go/uber/bar/v1"
+	v1 "github.com/dapperlabs/prototool/example/gen/go/uber/bar/v1"
 	math "math"
 )
 

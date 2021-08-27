@@ -24,8 +24,8 @@ import (
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/protostrs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/protostrs"
+	"github.com/dapperlabs/prototool/internal/text"
 )
 
 var packageMajorBetaVersionedLinter = NewLinter(

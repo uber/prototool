@@ -3,6 +3,6 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = ["wkt.go"],
-    importpath = "github.com/uber/prototool/internal/wkt",
+    importpath = "github.com/dapperlabs/prototool/internal/wkt",
     visibility = ["//:__subpackages__"],
 )

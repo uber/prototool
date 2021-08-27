@@ -3,6 +3,6 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = ["cfginit.go"],
-    importpath = "github.com/uber/prototool/internal/cfginit",
+    importpath = "github.com/dapperlabs/prototool/internal/cfginit",
     visibility = ["//:__subpackages__"],
 )

@@ -27,8 +27,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
-	"github.com/uber/prototool/internal/strs"
+	reflectv1 "github.com/dapperlabs/prototool/internal/reflect/gen/uber/proto/reflect/v1"
+	"github.com/dapperlabs/prototool/internal/strs"
 )
 
 // NewPackageSet returns a new valid PackageSet for the given

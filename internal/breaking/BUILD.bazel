@@ -27,7 +27,7 @@ go_library(
         "runner.go",
         "strings.go",
     ],
-    importpath = "github.com/uber/prototool/internal/breaking",
+    importpath = "github.com/dapperlabs/prototool/internal/breaking",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/extract:go_default_library",

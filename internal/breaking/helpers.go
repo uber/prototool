@@ -23,8 +23,8 @@ package breaking
 import (
 	"fmt"
 
-	"github.com/uber/prototool/internal/extract"
-	"github.com/uber/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/extract"
+	"github.com/dapperlabs/prototool/internal/text"
 )
 
 func forEachPackagePair(

@@ -6,7 +6,7 @@ go_library(
         "create.go",
         "handler.go",
     ],
-    importpath = "github.com/uber/prototool/internal/create",
+    importpath = "github.com/dapperlabs/prototool/internal/create",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/protostrs:go_default_library",

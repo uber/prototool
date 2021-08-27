@@ -10,7 +10,7 @@ TMP_LIB := $(TMP)/lib
 TMP_VERSIONS := $(TMP)/versions
 TMP_FOSSA_GOPATH := $(TMP)/fossa/go
 
-DOCKER_IMAGE := uber/prototool:latest
+DOCKER_IMAGE := dapperlabs/prototool:latest
 DOCKER_RELEASE_IMAGE := golang:1.12.4-stretch
 
 unexport GOPATH
@@ -166,7 +166,7 @@ grpcgen: $(CERTSTRAP)
 .PHONY: updatedeps
 updatedeps:
 	rm -f go.mod go.sum
-	go mod init github.com/uber/prototool
+	go mod init github.com/dapperlabs/prototool
 	go get -u ./...
 	$(MAKE) generate
 	$(MAKE)

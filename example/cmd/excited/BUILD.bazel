@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "go_default_library",
     srcs = ["main.go"],
-    importpath = "github.com/uber/prototool/example/cmd/excited",
+    importpath = "github.com/dapperlabs/prototool/example/cmd/excited",
     visibility = ["//visibility:private"],
     deps = [
         "//example/gen/go/uber/foo/v1:go_default_library",

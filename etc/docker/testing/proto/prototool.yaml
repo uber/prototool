@@ -2,7 +2,7 @@ lint:
   group: uber2
 generate:
   go_options:
-    import_path: github.com/uber/prototool/etc/docker/testing/proto
+    import_path: github.com/dapperlabs/prototool/etc/docker/testing/proto
   plugins:
     - name: cpp
       output: ../gen/cpp

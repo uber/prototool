@@ -25,8 +25,8 @@ import (
 	"strings"
 	"text/scanner"
 
-	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/strs"
+	"github.com/dapperlabs/prototool/internal/text"
 )
 
 var fileNamesLowerSnakeCaseLinter = NewLinter(

@@ -9,7 +9,7 @@ go_library(
         "main_visitor.go",
         "transformer.go",
     ],
-    importpath = "github.com/uber/prototool/internal/format",
+    importpath = "github.com/dapperlabs/prototool/internal/format",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/buf:go_default_library",
