@@ -40,8 +40,8 @@ This document outlines how to create a release of prototool.
     ```
 
     ```diff
-    -[Unreleased]: https://github.com/uber/prototool/compare/v1.20.1...HEAD
-    +[1.21.0]: https://github.com/uber/prototool/compare/v1.20.1...v1.21.0
+    -[Unreleased]: https://github.com/dapperlabs/prototool/compare/v1.20.1...HEAD
+    +[1.21.0]: https://github.com/dapperlabs/prototool/compare/v1.20.1...v1.21.0
     ```
 
 
@@ -75,7 +75,7 @@ This document outlines how to create a release of prototool.
     ls release
     ```
 
-9. Go to <https://github.com/uber/prototool/tags> and edit the release notes
+9. Go to <https://github.com/dapperlabs/prototool/tags> and edit the release notes
     of the new tag.  Copy the changelog entries for this release in the
     release notes and set the name of the release to the version number
     (`v$VERSION`). Upload the release artifacts from the release directory.
@@ -98,8 +98,8 @@ This document outlines how to create a release of prototool.
     ```
 
     ```diff
-    +[Unreleased]: https://github.com/uber/prototool/compare/v1.21.0...HEAD
-     [1.21.0]: https://github.com/uber/prototool/compare/v1.20.1...v1.21.0
+    +[Unreleased]: https://github.com/dapperlabs/prototool/compare/v1.21.0...HEAD
+     [1.21.0]: https://github.com/dapperlabs/prototool/compare/v1.20.1...v1.21.0
     ```
 
 12. Update the version number in internal/vars/vars.go to a new minor version
@@ -123,5 +123,5 @@ This document outlines how to create a release of prototool.
     updated formula for Prototool.
 
     ```
-    brew bump-formula-pr --url=https://github.com/uber/prototool/archive/v$VERSION.tar.gz prototool
+    brew bump-formula-pr --url=https://github.com/dapperlabs/prototool/archive/v$VERSION.tar.gz prototool
     ```

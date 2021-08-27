@@ -29,9 +29,9 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/stretchr/testify/require"
-	"github.com/uber/prototool/internal/file"
-	"github.com/uber/prototool/internal/protoc"
-	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
+	"github.com/dapperlabs/prototool/internal/file"
+	"github.com/dapperlabs/prototool/internal/protoc"
+	reflectv1 "github.com/dapperlabs/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 	"go.uber.org/multierr"
 )
 

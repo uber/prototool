@@ -38,9 +38,9 @@ import (
 	"time"
 
 	"github.com/gofrs/flock"
-	"github.com/uber/prototool/internal/file"
-	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/vars"
+	"github.com/dapperlabs/prototool/internal/file"
+	"github.com/dapperlabs/prototool/internal/settings"
+	"github.com/dapperlabs/prototool/internal/vars"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 )
@@ -443,7 +443,7 @@ func getUnameSUnameMPaths(goos string, goarch string) (string, string, error) {
 	}
 	var unameM string
 	switch goarch {
-	case "amd64":
+	case "amd64", "arm64":
 		unameM = "x86_64"
 	default:
 		return "", "", fmt.Errorf("unsupported value for runtime.GOARCH: %v", goarch)

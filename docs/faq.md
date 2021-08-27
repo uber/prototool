@@ -52,7 +52,7 @@ provide the ability to use the "built-in" output directives
 
 If you want to have a consistent build environment for external plugins, we recommend creating a
 Docker image. We provide a basic Docker image at
-[hub.docker.com/r/uber/prototool](https://hub.docker.com/r/uber/prototool), defined in the
+[hub.docker.com/r/dapperlabs/prototool](https://hub.docker.com/r/dapperlabs/prototool), defined in the
 [Dockerfile](../Dockerfile) within this repository.
 
 *See [docker.md](docker.md) for more details.*

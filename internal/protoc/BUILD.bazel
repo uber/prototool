@@ -7,7 +7,7 @@ go_library(
         "downloader.go",
         "protoc.go",
     ],
-    importpath = "github.com/uber/prototool/internal/protoc",
+    importpath = "github.com/dapperlabs/prototool/internal/protoc",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/file:go_default_library",

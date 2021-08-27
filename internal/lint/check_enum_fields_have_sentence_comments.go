@@ -22,7 +22,7 @@ package lint
 
 import (
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/text"
 )
 
 var enumFieldsHaveSentenceCommentsLinter = NewLinter(

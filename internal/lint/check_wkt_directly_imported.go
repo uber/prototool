@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
-	"github.com/uber/prototool/internal/wkt"
+	"github.com/dapperlabs/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/wkt"
 )
 
 // TODO: This will not detect things like "timestamp.proto" or "protobuf/timestamp.proto"

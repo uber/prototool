@@ -38,10 +38,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
-	"github.com/uber/prototool/internal/file"
-	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/text"
-	"github.com/uber/prototool/internal/wkt"
+	"github.com/dapperlabs/prototool/internal/file"
+	"github.com/dapperlabs/prototool/internal/settings"
+	"github.com/dapperlabs/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/wkt"
 	"go.uber.org/zap"
 )
 
@@ -281,7 +281,7 @@ func (c *compiler) runCmdMeta(cmdMeta *cmdMeta) ([]*text.Failure, error) {
 	// protoc exited with 0 status. This is because there are outputs
 	// from protoc that we consider errors that protoc considers warnings,
 	// and plugins in general do not produce output unless there is an error.
-	// See https://github.com/uber/prototool/issues/128 for a full discussion.
+	// See https://github.com/dapperlabs/prototool/issues/128 for a full discussion.
 	failures := c.parseProtocOutput(cmdMeta, output)
 	// We had a run error but for whatever reason did not get any parsed
 	// output lines, we still want to fail in this case
@@ -510,7 +510,7 @@ func getRelOutputFilePath(protoSet *file.ProtoSet, dirPath string, fileSuffix st
 	if err != nil {
 		// if we cannot find the relative path, we have a real problem
 		// this should never happen, but could in a bad case with links
-		return "", fmt.Errorf("could not find relative path for %q to %q, this is a system error, please file a bug at github.com/uber/prototool/issues/new: %v", dirPath, protoSet.Config.DirPath, err)
+		return "", fmt.Errorf("could not find relative path for %q to %q, this is a system error, please file a bug at github.com/dapperlabs/prototool/issues/new: %v", dirPath, protoSet.Config.DirPath, err)
 	}
 	base := filepath.Base(relPath)
 	if relPath == "" || relPath == "." {
@@ -808,7 +808,7 @@ func (c *compiler) parseProtocLine(cmdMeta *cmdMeta, protocLine string) *text.Fa
 
 func (c *compiler) handleUninterpretedProtocLine(protocLine string) *text.Failure {
 	c.logger.Warn("protoc returned a line we do not understand, please file this as an issue "+
-		"at https://github.com/uber/prototool/issues/new", zap.String("protocLine", protocLine))
+		"at https://github.com/dapperlabs/prototool/issues/new", zap.String("protocLine", protocLine))
 	return &text.Failure{
 		Message: protocLine,
 	}

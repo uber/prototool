@@ -41,10 +41,10 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/uber/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
-	"github.com/uber/prototool/internal/lint"
-	"github.com/uber/prototool/internal/settings"
-	"github.com/uber/prototool/internal/vars"
+	"github.com/dapperlabs/prototool/internal/cmd/testdata/grpc/gen/grpcpb"
+	"github.com/dapperlabs/prototool/internal/lint"
+	"github.com/dapperlabs/prototool/internal/settings"
+	"github.com/dapperlabs/prototool/internal/vars"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -1745,7 +1745,7 @@ testdata/foo/success.proto`, "files", "testdata/foo")
 
 func TestGenerateDescriptorSetSameDirAsConfigFile(t *testing.T) {
 	t.Parallel()
-	// https://github.com/uber/prototool/issues/389
+	// https://github.com/dapperlabs/prototool/issues/389
 	generatedFilePath := "testdata/generate/descriptorset/descriptorset.bin"
 	if _, err := os.Stat(generatedFilePath); err == nil {
 		assert.NoError(t, os.Remove(generatedFilePath))

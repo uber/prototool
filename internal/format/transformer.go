@@ -26,7 +26,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/text"
 	"go.uber.org/zap"
 )
 

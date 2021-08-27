@@ -26,7 +26,7 @@ import (
 	"log"
 	"net"
 
-	foov1 "github.com/uber/prototool/example/gen/go/uber/foo/v1"
+	foov1 "github.com/dapperlabs/prototool/example/gen/go/uber/foo/v1"
 	"google.golang.org/grpc"
 )
 

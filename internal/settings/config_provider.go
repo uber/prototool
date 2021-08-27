@@ -31,7 +31,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/uber/prototool/internal/strs"
+	"github.com/dapperlabs/prototool/internal/strs"
 	"go.uber.org/zap"
 	yaml "gopkg.in/yaml.v2"
 )

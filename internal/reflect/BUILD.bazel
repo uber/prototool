@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "go_default_library",
     srcs = ["reflect.go"],
-    importpath = "github.com/uber/prototool/internal/reflect",
+    importpath = "github.com/dapperlabs/prototool/internal/reflect",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/reflect/gen/uber/proto/reflect/v1:go_default_library",

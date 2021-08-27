@@ -61,7 +61,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   use a `FileDescriptorSet` instead of a shallow clone by generating a
   file with `break descriptor-set` and then passing the path to this file
   to `break check` with the `--descriptor-set-path` flag.
-- A Docker image is now provided on Docker Hub as [uber/prototool](https://hub.docker.com/r/uber/prototool)
+- A Docker image is now provided on Docker Hub as [dapperlabs/prototool](https://hub.docker.com/r/dapperlabs/prototool)
   which provides an environment with commonly-used plugins.
 - Switch to Golang Modules for dependency management.
 - Add Bazel build files and `bazel/deps.bzl` to allow Prototool to be easily
@@ -142,7 +142,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Delete the ability to explicitly specify multiple files, and have the effect
   of one file being specified be the same as the former `--dir-mode`. See
-  [#16](https://github.com/uber/prototool/issues/16) for more details.
+  [#16](https://github.com/dapperlabs/prototool/issues/16) for more details.
 - Delete `protoc_include_wkt` setting. This is always set to true.
 - Delete `no_default_excludes` setting. This is always set to true.
 - Delete `gen.go_options.no_default_modifiers` setting.
@@ -248,21 +248,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release.
 
-[1.9.0]: https://github.com/uber/prototool/compare/v1.8.0...v1.9.0
-[1.8.0]: https://github.com/uber/prototool/compare/v1.7.0...v1.8.0
-[1.7.0]: https://github.com/uber/prototool/compare/v1.6.0...v1.7.0
-[1.6.0]: https://github.com/uber/prototool/compare/v1.5.0...v1.6.0
-[1.5.0]: https://github.com/uber/prototool/compare/v1.4.0...v1.5.0
-[1.4.0]: https://github.com/uber/prototool/compare/v1.3.0...v1.4.0
-[1.3.0]: https://github.com/uber/prototool/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/uber/prototool/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/uber/prototool/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/uber/prototool/compare/v1.0.0-rc1...v1.0.0
-[1.0.0-rc1]: https://github.com/uber/prototool/compare/v0.7.1...v1.0.0-rc1
-[0.7.1]: https://github.com/uber/prototool/compare/v0.7.0...v0.7.1
-[0.7.0]: https://github.com/uber/prototool/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/uber/prototool/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/uber/prototool/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/uber/prototool/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/uber/prototool/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/uber/prototool/compare/v0.1.0...v0.2.0
+[1.9.0]: https://github.com/dapperlabs/prototool/compare/v1.8.0...v1.9.0
+[1.8.0]: https://github.com/dapperlabs/prototool/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/dapperlabs/prototool/compare/v1.6.0...v1.7.0
+[1.6.0]: https://github.com/dapperlabs/prototool/compare/v1.5.0...v1.6.0
+[1.5.0]: https://github.com/dapperlabs/prototool/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/dapperlabs/prototool/compare/v1.3.0...v1.4.0
+[1.3.0]: https://github.com/dapperlabs/prototool/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/dapperlabs/prototool/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/dapperlabs/prototool/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/dapperlabs/prototool/compare/v1.0.0-rc1...v1.0.0
+[1.0.0-rc1]: https://github.com/dapperlabs/prototool/compare/v0.7.1...v1.0.0-rc1
+[0.7.1]: https://github.com/dapperlabs/prototool/compare/v0.7.0...v0.7.1
+[0.7.0]: https://github.com/dapperlabs/prototool/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/dapperlabs/prototool/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/dapperlabs/prototool/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/dapperlabs/prototool/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/dapperlabs/prototool/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/dapperlabs/prototool/compare/v0.1.0...v0.2.0

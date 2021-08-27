@@ -13,7 +13,7 @@ git_repository(
     commit = "63ddd72aa315d020456f1a96bc6fcca9405810cb",
 )
 
-load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_toolchains")
+load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_toolchain3s")
 go_rules_dependencies()
 go_register_toolchains()
 

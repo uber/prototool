@@ -19,7 +19,7 @@ replace `Plug` with `Vundle` below.
 
 ```vim
 Plug 'w0rp/ale'
-Plug 'uber/prototool', { 'rtp':'vim/prototool' }
+Plug 'dapperlabs/prototool', { 'rtp':'vim/prototool' }
 let g:ale_linters = {
 \   'go': ['golint'],
 \   'proto': ['prototool-lint'],
@@ -39,11 +39,11 @@ A longer explanation:
 " Note that Plug downloads from dev by default. There may be minor changes
 " to the Vim integration on dev between releases, but this won't be common.
 " To make sure you are on the same branch as your Prototool install, set
-" the branch field in the options for uber/prototool per the vim-plug
+" the branch field in the options for dapperlabs/prototool per the vim-plug
 " documentation. Vundle does not allow setting branches, so on Vundle,
 " go into plug directory and checkout the branch of the release you are on.
 Plug 'w0rp/ale'
-Plug 'uber/prototool', { 'rtp':'vim/prototool' }
+Plug 'dapperlabs/prototool', { 'rtp':'vim/prototool' }
 
 " We recommend setting just this for Golang, as well as the necessary set for proto.
 " Note the 'prototool' linter is still available, but deprecated in favor of individual linters.

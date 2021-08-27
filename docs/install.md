@@ -19,7 +19,7 @@ You can also install all of the assets on Linux or without Homebrew from GitHub 
 
 ```bash
 curl -sSL \
-  https://github.com/uber/prototool/releases/download/v1.8.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
+  https://github.com/dapperlabs/prototool/releases/download/v1.8.0/prototool-$(uname -s)-$(uname -m).tar.gz | \
   tar -C /usr/local --strip-components 1 -xz
 ```
 
@@ -28,7 +28,7 @@ the `prototool` binary from GitHub Releases as well.
 
 ```bash
 curl -sSL \
-  https://github.com/uber/prototool/releases/download/v1.8.0/prototool-$(uname -s)-$(uname -m) \
+  https://github.com/dapperlabs/prototool/releases/download/v1.8.0/prototool-$(uname -s)-$(uname -m) \
   -o /usr/local/bin/prototool && \
   chmod +x /usr/local/bin/prototool
 ```
@@ -39,13 +39,13 @@ You can also install the `prototool` binary using `go get` if using Go 1.11+ wit
 You can specify a branch such as `dev`, or a specific commit.
 
 ```bash
-GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+GO111MODULE=on go get github.com/dapperlabs/prototool/cmd/prototool@dev
 ```
 
 To install to a specific location, use the `GOBIN` environment variable.
 
 ```bash
-GO111MODULE=on GOBIN=/path/to/bin go get github.com/uber/prototool/cmd/prototool@dev
+GO111MODULE=on GOBIN=/path/to/bin go get github.com/dapperlabs/prototool/cmd/prototool@dev
 ```
 
 If using Go 1.12+, you can install without affecting any `go.mod` file by using a temporary
@@ -60,7 +60,7 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "${TMP}"' EXIT
 cd "${TMP}"
 
-GO111MODULE=on GOBIN=/path/to/bin go get github.com/uber/prototool/cmd/prototool@dev
+GO111MODULE=on GOBIN=/path/to/bin go get github.com/dapperlabs/prototool/cmd/prototool@dev
 ```
 
 The below is a `Makefile` snippet that would accomplish installing Prototool for use with any
@@ -90,7 +90,7 @@ PROTOTOOL_VERSION := v1.8.0
 PROTOTOOL := $(TMP_VERSIONS)/prototool/$(PROTOTOOL_VERSION)
 $(PROTOTOOL):
 	$(eval PROTOTOOL_TMP := $(shell mktemp -d))
-	cd $(PROTOTOOL_TMP); go get github.com/uber/prototool/cmd/prototool@$(PROTOTOOL_VERSION)
+	cd $(PROTOTOOL_TMP); go get github.com/dapperlabs/prototool/cmd/prototool@$(PROTOTOOL_VERSION)
 	@rm -rf $(PROTOTOOL_TMP)
 	@rm -rf $(dir $(PROTOTOOL))
 	@mkdir -p $(dir $(PROTOTOOL))

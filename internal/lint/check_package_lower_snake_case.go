@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/uber/prototool/internal/strs"
-	"github.com/uber/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/strs"
+	"github.com/dapperlabs/prototool/internal/text"
 )
 
 var packageLowerSnakeCaseLinter = NewLinter(

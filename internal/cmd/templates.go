@@ -29,7 +29,7 @@ import (
 	wordwrap "github.com/mitchellh/go-wordwrap"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"github.com/uber/prototool/internal/exec"
+	"github.com/dapperlabs/prototool/internal/exec"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

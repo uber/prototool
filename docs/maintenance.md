@@ -22,7 +22,7 @@ The following files need to be updated:
 Once these files are updated, run `make generate`. Do not manually update
 `etc/config/example/prototool.yaml` as this will be automatically updated with `make generate`.
 
-See https://github.com/uber/prototool/pull/417 for an example.
+See https://github.com/dapperlabs/prototool/pull/417 for an example.
 
 ## Updating dependencies
 
@@ -37,7 +37,7 @@ make updatedeps
 This will do a complete update of the `go.mod`, `go.sum`, and `bazel/deps.bzl` files. This should
 be revisited in the future, however.
 
-See https://github.com/uber/prototool/pull/443 for an example.
+See https://github.com/dapperlabs/prototool/pull/443 for an example.
 
 ## Updating Docker image dependencies
 
@@ -53,4 +53,4 @@ Updates of `protobuf` and `grpc` must match the current versions for `alpine:edg
 [here](https://pkgs.alpinelinux.org/packages?name=grpc&branch=edge&repo=testing&arch=x86_64) for
 the current versions.
 
-See https://github.com/uber/prototool/pull/437 for an example.
+See https://github.com/dapperlabs/prototool/pull/437 for an example.

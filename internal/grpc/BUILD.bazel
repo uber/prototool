@@ -7,7 +7,7 @@ go_library(
         "handler.go",
         "invocation_event_handler.go",
     ],
-    importpath = "github.com/uber/prototool/internal/grpc",
+    importpath = "github.com/dapperlabs/prototool/internal/grpc",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/desc:go_default_library",

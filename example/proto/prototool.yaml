@@ -10,7 +10,7 @@ lint:
     path: ../../LICENSE
 generate:
   go_options:
-    import_path: github.com/uber/prototool/example/proto
+    import_path: github.com/dapperlabs/prototool/example/proto
   plugins:
     - name: go
       type: go

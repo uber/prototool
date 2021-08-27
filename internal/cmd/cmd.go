@@ -37,7 +37,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
-	"github.com/uber/prototool/internal/exec"
+	"github.com/dapperlabs/prototool/internal/exec"
 )
 
 // when generating man pages, the current date is used

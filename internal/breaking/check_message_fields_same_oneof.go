@@ -21,8 +21,8 @@
 package breaking
 
 import (
-	"github.com/uber/prototool/internal/extract"
-	"github.com/uber/prototool/internal/text"
+	"github.com/dapperlabs/prototool/internal/extract"
+	"github.com/dapperlabs/prototool/internal/text"
 )
 
 func checkMessageFieldsSameOneof(addFailure func(*text.Failure), from *extract.PackageSet, to *extract.PackageSet) error {

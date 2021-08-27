@@ -35,7 +35,7 @@ import (
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	protoreflectdesc "github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/dynamic"
-	"github.com/uber/prototool/internal/desc"
+	"github.com/dapperlabs/prototool/internal/desc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"

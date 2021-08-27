@@ -24,8 +24,8 @@ package extract
 import (
 	"fmt"
 
-	"github.com/uber/prototool/internal/protostrs"
-	reflectv1 "github.com/uber/prototool/internal/reflect/gen/uber/proto/reflect/v1"
+	"github.com/dapperlabs/prototool/internal/protostrs"
+	reflectv1 "github.com/dapperlabs/prototool/internal/reflect/gen/uber/proto/reflect/v1"
 )
 
 // PackageSet is the Golang wrapper for the Protobuf PackageSet object.
