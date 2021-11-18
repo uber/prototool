@@ -1,0 +1,17 @@
+project_name: prototool
+
+builds:
+- main: ./cmd/prototool
+  id: "prototool"
+  binary: prototool
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch: [amd64]
+
+dockers:
+  - id: "prototool"
+    dockerfile: Dockerfile
+    image_templates:
+    - "gcr.io/hnlq715/prototool:latest"
