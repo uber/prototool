@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"unicode"
 
@@ -473,17 +474,44 @@ func GetDirPathToDescriptors(protoSet *file.ProtoSet, absolutePaths bool) (map[s
 // CheckMultiple is a convenience function that checks multiple linters and multiple descriptors.
 func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
 	var allFailures []*text.Failure
+
 	for dirPath, descriptors := range dirPathToDescriptors {
+		nolints, err := nolintLinter.Check(dirPath, descriptors)
+		if err != nil {
+			return nil, err
+		}
+		var allNolintsMap = make(map[int]struct{})
+		for _, v := range nolints {
+			allNolintsMap[v.Line] = struct{}{}
+		}
 		for _, linter := range linters {
 			failures, err := checkOne(linter, dirPath, descriptors, ignoreIDToFilePaths)
 			if err != nil {
 				return nil, err
 			}
-			allFailures = append(allFailures, failures...)
+			for _, v := range failures {
+				if _, ok := allNolintsMap[v.Line]; ok {
+					continue
+				}
+				allFailures = append(allFailures, failures...)
+			}
 		}
 	}
 	text.SortFailures(allFailures)
 	return allFailures, nil
+}
+
+func filterNolintFailures(failures []*text.Failure, nolints map[string]struct{}) []*text.Failure {
+	filtered := make([]*text.Failure, 0, len(failures))
+	for _, v := range failures {
+		if _, ok := nolints[v.Filename+strconv.Itoa(v.Line)]; ok {
+			continue
+		}
+
+		filtered = append(filtered, v)
+	}
+
+	return filtered
 }
 
 func checkOne(linter Linter, dirPath string, descriptors []*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
