@@ -25,7 +25,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"unicode"
 
@@ -499,19 +498,6 @@ func CheckMultiple(linters []Linter, dirPathToDescriptors map[string][]*FileDesc
 	}
 	text.SortFailures(allFailures)
 	return allFailures, nil
-}
-
-func filterNolintFailures(failures []*text.Failure, nolints map[string]struct{}) []*text.Failure {
-	filtered := make([]*text.Failure, 0, len(failures))
-	for _, v := range failures {
-		if _, ok := nolints[v.Filename+strconv.Itoa(v.Line)]; ok {
-			continue
-		}
-
-		filtered = append(filtered, v)
-	}
-
-	return filtered
 }
 
 func checkOne(linter Linter, dirPath string, descriptors []*FileDescriptor, ignoreIDToFilePaths map[string][]string) ([]*text.Failure, error) {
