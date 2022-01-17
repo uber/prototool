@@ -143,6 +143,8 @@ func (v *mainVisitor) VisitNormalField(element *proto.NormalField) {
 	}
 	if element.Repeated {
 		prefix = "repeated "
+	} else if element.Optional {
+		prefix = "optional "
 	}
 	v.PField(prefix, element.Type, element.Field)
 }
