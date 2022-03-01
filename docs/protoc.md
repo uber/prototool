@@ -43,7 +43,7 @@ this can be done in one of three ways.
   commands. The Well-Known Type path should be the directory that includes the `google/protobuf`
   directory containing the Well-Known Types.
 - By setting the `PROTOTOOL_PROTOC_BIN_PATH` and `PROTOTOOL_PROTOC_WKT_PATH` environment variables,
-  as we do in the [provided Docker image](docker.md). These variables are analagous to the
+  as we do in the [provided Docker image](docker.md). These variables are analogous to the
   `--protoc-bin-path` and `--protoc-wkt-path` flags, however the flags take precedence.
 
 If any of these options are set, the `protoc.version` option in the `prototool.yaml` file is

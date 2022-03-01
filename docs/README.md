@@ -273,7 +273,7 @@ if there are any source or wire incompatible changes. Some notes on this command
 Produce a serialized `FileDescriptorSet` for all Protobuf definitions. By default, the serialized
 `FileDescriptorSet` is printed to stdout. There are a few options:
 
-- `--include-imports, --include-source-info` are analagous to `protoc`'s `--include_imports,
+- `--include-imports, --include-source-info` are analogous to `protoc`'s `--include_imports,
   --include_source_info` flags.
 - `--json` outputs the FileDescriptorSet as JSON instead of binary.
 - `-o` writes the `FileDescriptorSet` to the given output file path.
