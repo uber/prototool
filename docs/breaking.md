@@ -89,7 +89,7 @@ definitions.
 ### Saved State
 
 If not using git, or you would prefer not to rely on git state to compare your Protobuf definitions
-for breaking changes, you can instead save state to a file and use that for comparsion.
+for breaking changes, you can instead save state to a file and use that for comparison.
 
 To save your current state:
 
@@ -120,7 +120,7 @@ understands the concept of beta vs. stable packages.
 
 If a package's last component is `vMAJORbetaBETA`, where `MAJOR` and `BETA`
 are both greater than 0, `prototool break check` will understand that this package is a
-beta package, otherwise the package is understood as a stable pacakge.
+beta package, otherwise the package is understood as a stable package.
 
 The following are examples of beta packages.
 

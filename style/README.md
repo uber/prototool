@@ -1153,7 +1153,7 @@ capitalization.
 - `common` - Common has no semantic meaning. See the above discussions on not having common
   messages. Use a name that reflects the actual meaning of what you are representing instead.
 - `data` - The name "data" is a superfluous decorator. All Protobuf types are data. Use of
-  "data" also causes singular vs plural issues during iteration, as the singluar of "data" is
+  "data" also causes singular vs plural issues during iteration, as the singular of "data" is
   "datum". If you must have a type that needs such a decorator, use "info" instead.
 - `uuid` - We use "id" instead of "uuid" for purposes of consistency. An ID is meant to be
   a UUID unless otherwise specified.
